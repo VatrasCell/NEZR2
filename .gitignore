@@ -2,3 +2,4 @@ exportExcel/*
 exportSQL/*
 bin/**
 .settings/*
+/bin/
