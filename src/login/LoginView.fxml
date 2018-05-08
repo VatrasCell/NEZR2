@@ -6,10 +6,9 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.layout.AnchorPane?>
 
-
 <BorderPane id="sc_login" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="login.LoginController">
    <center>
-      <GridPane BorderPane.alignment="CENTER">
+      <GridPane maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="160.0" prefWidth="600.0" BorderPane.alignment="TOP_CENTER">
         <columnConstraints>
           <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
           <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
@@ -41,22 +40,22 @@
                   <Insets left="15.0" />
                </GridPane.margin>
             </Label>
-            <PasswordField id="password" GridPane.columnIndex="1" GridPane.rowIndex="1">
+            <TextField id="username" fx:id="username" GridPane.columnIndex="1">
+               <GridPane.margin>
+                  <Insets right="15.0" />
+               </GridPane.margin>
+            </TextField>
+            <PasswordField id="password" fx:id="password" GridPane.columnIndex="1" GridPane.rowIndex="1">
                <GridPane.margin>
                   <Insets right="15.0" />
                </GridPane.margin>
             </PasswordField>
-            <TextField id="username" GridPane.columnIndex="1">
+            <TextField id="ip" fx:id="ip" GridPane.columnIndex="1" GridPane.rowIndex="2">
                <GridPane.margin>
                   <Insets right="15.0" />
                </GridPane.margin>
             </TextField>
-            <TextField id="ip" GridPane.columnIndex="1" GridPane.rowIndex="2">
-               <GridPane.margin>
-                  <Insets right="15.0" />
-               </GridPane.margin>
-            </TextField>
-            <TextField id="port" GridPane.columnIndex="1" GridPane.rowIndex="3">
+            <TextField id="port" fx:id="port" GridPane.columnIndex="1" GridPane.rowIndex="3">
                <GridPane.margin>
                   <Insets right="15.0" />
                </GridPane.margin>
@@ -72,7 +71,7 @@
       </Label>
    </top>
    <bottom>
-      <HBox prefHeight="100.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+      <HBox prefHeight="38.0" prefWidth="600.0" BorderPane.alignment="CENTER">
          <children>
             <Button id="btn_exit" fx:id="btn_exit" mnemonicParsing="false" onAction="#exit" text="Abbruch">
                <HBox.margin>

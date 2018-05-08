@@ -5,7 +5,6 @@ import java.io.IOException;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.stage.Stage;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 
 
@@ -13,12 +12,11 @@ public class Main extends Application {
 	@Override
 	public void start(Stage primaryStage) throws IOException {
 		primaryStage.setTitle("NEZR FX");
-		Parent root = FXMLLoader.load(getClass().getResource("../login/LoginView.fxml"));
 		
-		Scene scene = new Scene(root);
+		ScreenController.setRootScene(primaryStage);
+		ScreenController.addScreen("login", new Scene(FXMLLoader.load(getClass().getResource("../login/LoginView.fxml"))));
 		
-		primaryStage.setScene(scene);
-		primaryStage.show();
+		ScreenController.activate("login");
 	}
 	
 	public static void main(String[] args) {

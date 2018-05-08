@@ -24,8 +24,8 @@ import javax.swing.DefaultListModel;
 
 import org.h2.tools.RunScript;
 
-import export.ExcelCell;
-import fragebogen.*;
+// import export.ExcelCell;
+// import fragebogen.*;
 
 /**
  * @author Alle
@@ -34,165 +34,27 @@ import fragebogen.*;
  *          Klasse fuer alle Datenbankzugriffe.
  */
 public class Datenbank {
+	
 	private static Connection myCon = null; // Verbindung zur DB
 	private static Statement mySQL = null; // Zum Statement erstellen
 	private static PreparedStatement psSql = null; // Zum PreparedStatement
 													// erstellen
 	private static ResultSet myRS = null; // Ergebnisse der Abfrage
 
-	private static String db = "nezr_v5"; // Datenbankname
-	private static String url = ""; // URL der Datenbank useSSL=false
-	private static String user = ""; // Login-ID
-	private static String pwd = ""; // Passwort
+	protected static String db = "nezr_v5"; // Datenbankname
+	protected static String url = ""; // URL der Datenbank useSSL=false
+	protected static String user = ""; // Login-ID
+	protected static String pwd = ""; // Passwort
 
 	private static int fehler = 0;
 	private static int idstandort = 0;
-
-	/**
-	 * Testet, ob ein Verbinfung zum Datenbankserver möglich ist.
-	 * 
-	 * @param user
-	 *            String: Username
-	 * @param pwd
-	 *            String: Passwort
-	 * @param ip
-	 *            String: IP des Servers
-	 * @param port
-	 *            int: Port
-	 * @return boolean
-	 * @author Alle
-	 */
-	public static boolean testDB(String user, String pwd, String ip, int port, boolean doSync) {
-		boolean loginMySQL = false;
-		boolean loginh2 = false;
-		System.out.println(doSync);
-		//TODO: Sync
-		doSync = false;
-		
-		boolean doH2 = false;
-
-		File f = new File("./h2/bin/data/nezr_v5.mv.db");
-		if (f.exists() && !f.isDirectory()) {
-			doH2 = true;
-		}
-		do {
-			if (doH2) {
-				System.out.println("loginH2");
-				loginh2 = loginH2(user, pwd);
-				if (loginh2) {
-					if(!doSync) {
-						break;
-					}
-					if (loginMySQL) {
-						break;
-					} else {
-						doH2 = false;
-						continue;
-					}
-				} else {
-					if (loginMySQL) {
-						break;
-					} else {
-						doH2 = false;
-						continue;
-					}
-				}
-			} else {
-				System.out.println("loginMySQL");
-				loginMySQL = loginMySQL(user, pwd, ip, port);
-				if (loginMySQL) {
-					if(!doSync) {
-						break;
-					}
-					if (loginh2) {
-						break;
-					} else {
-						doH2 = true;
-						continue;
-					}
-				} else {
-					break;
-				}
-			}
-		} while (true);
-
-		Datenbank.user = user;
-		Datenbank.pwd = pwd;
-		System.out.println(loginMySQL + " " + loginh2);
-		if (loginh2) {
-			Datenbank.url = "jdbc:h2:./h2/bin/data/" + Datenbank.db + ";MODE=MySQL";
-		} else if (loginMySQL) {
-			Datenbank.url = "jdbc:mysql://" + ip + ":" + port + "/" + Datenbank.db + "?useSSL=false";
-		}
-		
-		if(loginh2 && loginMySQL) {
-			syncDatabases("H2");
-		}
-
-		return (loginMySQL || loginh2);
-	}
-	
-	public static boolean syncDatabases(String goal) {
-		System.out.println("do sync...");
-		if(goal.equals("H2")) {
-			try {
-				exp_cmd(2, "mysql");
-			} catch (IOException e1) {
-				e1.printStackTrace();
-			}
-			try {
-				myCon = DriverManager.getConnection(url, user, pwd);			
-				RunScript.execute(myCon, new FileReader(".\\exportSQL\\mysql.sql"));
-				
-				return true;
-			} catch (SQLException | FileNotFoundException e) {
-				e.printStackTrace();
-			}						
-		}
-		return false;
-	}
-
-	private static boolean loginH2(String user, String pwd) {
-		Connection connection;
-		try {
-			connection = DriverManager.getConnection("jdbc:h2:./h2/bin/data/" + Datenbank.db + ";MODE=MySQL", user,
-					pwd);
-			
-			/*Statement statement = connection.createStatement();
-			ResultSet resultSet = statement.executeQuery("use nezr_v5");
-			
-			statement = connection.createStatement();
-			resultSet = statement.executeQuery("show tables");
-			while(resultSet.next()) {
-				System.out.println(resultSet.getString(0));
-			}*/
-			connection.close();
-			return true;
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-	}
-
-	private static boolean loginMySQL(String user, String pwd, String ip, int port) {
-		Connection connection;
-		try {
-			connection = DriverManager
-					.getConnection("jdbc:mysql://" + ip + ":" + port + "/" + Datenbank.db + "?useSSL=false", user, pwd);
-			connection.close();
-			return true;
-		} catch (SQLException e) {
-			e.printStackTrace();
-			return false;
-		}
-	}
 
 	/**
 	 * Gibt den aktivierten Fragebogen zurück.
 	 * 
 	 * @return FragebogenDialog
 	 * @author Eric
-	 */
+	 *//*
 	public static FragebogenDialog getActivFragebogen() {
 		FragebogenDialog fragebogen;
 		try {
@@ -222,7 +84,7 @@ public class Datenbank {
 		return null;
 	}
 
-	/**
+	*//**
 	 * Prüft, ob eine Frage doppelt vor kommt und gibt dem Duplikat einen
 	 * Suffix.
 	 * 
@@ -230,7 +92,7 @@ public class Datenbank {
 	 *            String: die Frage
 	 * @return String: die Frage ggf. mit Suffix
 	 * @author Eric
-	 */
+	 *//*
 	public static String duplicateFrage(String frage) {
 		try {
 			myCon = DriverManager.getConnection(url, user, pwd);
@@ -299,7 +161,7 @@ public class Datenbank {
 		}
 	}
 
-	/**
+	*//**
 	 * Speichert eine neue Freie Frage. Gibt bei Erfolg TRUE zurück.
 	 * 
 	 * @param selectedFB
@@ -308,7 +170,7 @@ public class Datenbank {
 	 *            FrageErstellen
 	 * @return boolean
 	 * @author Anne
-	 */
+	 *//*
 	public static boolean saveFreieFrage(FragebogenDialog selectedFB, FrageErstellen frage) {
 
 		try {
@@ -460,7 +322,7 @@ public class Datenbank {
 		return false;
 	}
 
-	/**
+	*//**
 	 * Speichert eine neue Bewertungsfrage. Gibt bei Erfolg TRUE zurück.
 	 * 
 	 * @param selectedFB
@@ -473,7 +335,7 @@ public class Datenbank {
 	 *            String
 	 * @return boolean
 	 * @author Anne
-	 */
+	 *//*
 	public static boolean saveBewertungsfrage(FragebogenDialog selectedFB, FrageErstellen frage) {
 
 		try {
@@ -650,7 +512,7 @@ public class Datenbank {
 		return false;
 	}
 
-	/**
+	*//**
 	 * Speichert eine neue Multipe Choice Frage. Gibt bei Erfolg TRUE zurück.
 	 * 
 	 * @param neueFrageMc
@@ -661,7 +523,7 @@ public class Datenbank {
 	 *            Object
 	 * @return boolean
 	 * @author Eric
-	 */
+	 *//*
 	public static boolean saveMC(FragebogenDialog selectedFB, FrageErstellen frage, Vector<Integer> antIds) {
 
 		try {
@@ -854,7 +716,7 @@ public class Datenbank {
 		return false;
 	}
 
-	/**
+	*//**
 	 * Erstellt String mit den angegebenen Flags.
 	 * 
 	 * @param pflichtfrage
@@ -877,7 +739,7 @@ public class Datenbank {
 	 *            String: ist es eine Bewertungsfrage?
 	 * @return String flag
 	 * @author Florian
-	 */
+	 *//*
 	public static String getMoeglicheFlags(boolean pflichtfrage, boolean liste, boolean multipleChoice,
 			boolean textarea, boolean ja_nein, boolean isZahl, boolean isX, String zahlArt, int anzahlZeichen,
 			String art) {
@@ -923,7 +785,7 @@ public class Datenbank {
 		return flag;
 	}
 
-	/**
+	*//**
 	 * Gibt die flags fuer das "reagiert auf" zurueck.
 	 * 
 	 * @param fb
@@ -936,7 +798,7 @@ public class Datenbank {
 	 *            String
 	 * @return String flag
 	 * @author Florian
-	 */
+	 *//*
 	public static String getFlags(FragebogenDialog fb, int index, int positionVec, String frageart) {
 		Vector<FrageErstellen> fragen = getFragen(fb);
 		String flag = "";
@@ -961,12 +823,12 @@ public class Datenbank {
 
 	}
 
-	/**
+	*//**
 	 * Erzeugt aus dem Vector FrageErstellen eine DefaultListModel der Fragen.
 	 * 
 	 * @return DefaultListModel String
 	 * @author Anne und Florian
-	 */
+	 *//*
 	public static DefaultListModel<String> getFragen_react(FragebogenDialog fb, FrageErstellen fr) {
 		Vector<FrageErstellen> fragen = getFragen(fb);
 		DefaultListModel<String> listFragen = new DefaultListModel<>();
@@ -982,12 +844,12 @@ public class Datenbank {
 		return listFragen;
 	}
 
-	/**
+	*//**
 	 * Erzeugt aus dem Vector FrageErstellen eine DefaultListModel der Fragen.
 	 * 
 	 * @return DefaultListModel String
 	 * @author Anne und Florian
-	 */
+	 *//*
 	public static DefaultListModel<String> getFragen_react(FragebogenDialog fb) {
 		Vector<FrageErstellen> fragen = getFragen(fb);
 		DefaultListModel<String> listFragen = new DefaultListModel<>();
@@ -1001,7 +863,7 @@ public class Datenbank {
 		return listFragen;
 	}
 
-	/**
+	*//**
 	 * Erzeugt ein DefaultListModel String aus den Antworten der Frage mit dem
 	 * Index.
 	 * 
@@ -1009,7 +871,7 @@ public class Datenbank {
 	 *            int
 	 * @return DefaultListModel String
 	 * @author Anne und Florian
-	 */
+	 *//*
 	public static DefaultListModel<String> getAntworten_react(FragebogenDialog fb, int index) {
 		Vector<FrageErstellen> fragen = getFragen(fb);
 		DefaultListModel<String> listAntworten = new DefaultListModel<>();
@@ -1028,14 +890,14 @@ public class Datenbank {
 		return listAntworten;
 	}
 
-	/**
+	*//**
 	 * Gibt alle Ueberschriften des gegebenen Fragebogen zurueck.
 	 * 
 	 * @param fb
 	 *            FrageobgenDialog: der Fragebogen
 	 * @return Vector FrageErstellen
 	 * @author Eric
-	 */
+	 *//*
 	public static Vector<FrageErstellen> getUeberschriften(FragebogenDialog fb) {
 		Vector<FrageErstellen> ueberschriften = new Vector<FrageErstellen>();
 		try {
@@ -1066,13 +928,13 @@ public class Datenbank {
 		return ueberschriften;
 	}
 
-	/**
+	*//**
 	 * Erstellt einen Vector aus allen Fragen, welche im ausgewählten Fragebogen
 	 * sind.
 	 * 
 	 * @return Vector FrageErstellen
 	 * @author Julian und Eric
-	 */
+	 *//*
 	public static Vector<FrageErstellen> getFragen(FragebogenDialog fb) {
 		try {
 			System.out.println("FragebogenID: " + fb.getFragebogenId());
@@ -1152,9 +1014,9 @@ public class Datenbank {
 				String frage = unslashUnicode(myRS.getString("FrageFF"));
 				alleFragen.addElement(frage);
 				if ((ffFragen.isEmpty() || !ffFragen.get(ffFragen.size() - 1).getFrage().equals(
-						frage))/*
+						frage))
 								 * && !myRS.getString("Antwort").equals("#####")
-								 */) {
+								 ) {
 					FrageErstellen fragenObj = new FrageErstellen();
 					fragenObj.setFrage(frage);
 					fragenObj.setFrageID(myRS.getInt("idFreieFragen"));
@@ -1242,13 +1104,13 @@ public class Datenbank {
 		}
 	}
 
-	/**
+	*//**
 	 * Speichert alle durch den Benutzer gegebenen Antworten in die Datenbank.
 	 * 
 	 * @param fragen
 	 *            Vector Vector FrageErstellen: alle Fragen des Fragebogens
 	 * @author Julian und Eric
-	 */
+	 *//*
 	public static void saveUmfrage(Vector<Vector<FrageErstellen>> fragen) {
 		try {
 			myCon = DriverManager.getConnection(url, user, pwd);
@@ -1324,7 +1186,7 @@ public class Datenbank {
 		Main.resetFragebogen();
 	}
 
-	/**
+	*//**
 	 * Gibt die ID der Antwort zurück. Ist die Antwort noch nicht vorhanden,
 	 * wird sie zuerst in der Datenbank gespeichert.
 	 * 
@@ -1332,7 +1194,7 @@ public class Datenbank {
 	 *            String
 	 * @return int
 	 * @author Eric
-	 */
+	 *//*
 	public static int getAntwortID(String antwort) {
 		int id = -1;
 		try {
@@ -1381,12 +1243,12 @@ public class Datenbank {
 		return id;
 	}
 
-	/**
+	*//**
 	 * Gibt die Anzahl an gespeicherten Befragungen zurück.
 	 * 
 	 * @return int
 	 * @author Eric
-	 */
+	 *//*
 	public static int getAnzahlBefragung() {
 		int re = -1;
 		try {
@@ -1404,43 +1266,14 @@ public class Datenbank {
 		return re;
 	}
 
-	/**
-	 * Gibt alle Standorte zurueck
-	 * 
-	 * @return Vector String aller Standorte
-	 * @author Florian und Elias
-	 */
-	public static Vector<String> getStandort() {
-
-		try {
-			myCon = DriverManager.getConnection(url, user, pwd);
-			mySQL = myCon.createStatement();
-			String statement = "SELECT * FROM ort";
-			myRS = mySQL.executeQuery(statement);
-			Vector<String> ort = new Vector<String>();
-			while (myRS.next()) {
-				ort.add(myRS.getString("Ort"));
-			}
-			mySQL = null;
-			myRS = null;
-			myCon.close();
-			return ort;
-		} catch (SQLException e) {
-			e.printStackTrace();
-			ErrorLog.fehlerBerichtB("ERROR",
-					Datenbank.class + ": " + Thread.currentThread().getStackTrace()[1].getLineNumber(), e.getMessage());
-		}
-		return null;
-	}
-
-	/**
+	*//**
 	 * Gibt alle Frageboegen eines Standortes zurueck
 	 * 
 	 * @param standort
 	 *            String: der Standort
 	 * @return Vector FragebogenDialog aller Frageboegen des Standortes
 	 * @author Eric
-	 */
+	 *//*
 	public static Vector<FragebogenDialog> getFragebogen(String standort) {
 		try {
 			myCon = DriverManager.getConnection(url, user, pwd);
@@ -1485,14 +1318,14 @@ public class Datenbank {
 		return null;
 	}
 
-	/**
+	*//**
 	 * Gibt die Fragebogen ID des gegebenen Fragebogens zurueck
 	 * 
 	 * @param selectedFB
 	 *            FragebogenDialog: der Fragebogen
 	 * @return idFragebogen int
 	 * @author Anne und Florian
-	 */
+	 *//*
 	public static int getFragebogenId(FragebogenDialog selectedFB) {
 		int idFB = -1;
 		try {
@@ -1519,7 +1352,7 @@ public class Datenbank {
 		return idFB;
 	}
 
-	/**
+	*//**
 	 * Fuegt einen neuen Fragebogen in die Datenbank ein. Gibt bei Erfolg TRUE
 	 * zurueck.
 	 * 
@@ -1527,7 +1360,7 @@ public class Datenbank {
 	 *            String: Name des Fragebogens
 	 * @return boolean
 	 * @author Anne
-	 */
+	 *//*
 	public static boolean setFragebogen(String fbName) {
 		try {
 			myCon = DriverManager.getConnection(url, user, pwd);
@@ -1557,7 +1390,7 @@ public class Datenbank {
 		return false;
 	}
 
-	/**
+	*//**
 	 * Setzt den gegebenen Fragebogen auf aktiv und deaktiviert alle anderen
 	 * Frageboegen. Gibt bei Erfolg TRUE zurueck.
 	 * 
@@ -1565,7 +1398,7 @@ public class Datenbank {
 	 *            FragebogenDialog: der Fragebogen
 	 * @return boolean
 	 * @author Anne
-	 */
+	 *//*
 	public static boolean updateFragebogen(FragebogenDialog fb) {
 		try {
 			myCon = DriverManager.getConnection(url, user, pwd);
@@ -1590,14 +1423,14 @@ public class Datenbank {
 		return false;
 	}
 
-	/**
+	*//**
 	 * Deaktiviert den gegebenen Fragebogen. Gibt bei Erfolg TRUE zurueck.
 	 * 
 	 * @param fb
 	 *            FragebogenDialog: der Fragebogen
 	 * @return boolean
 	 * @author Eric
-	 */
+	 *//*
 	public static boolean disableFragebogen(FragebogenDialog fb) {
 		try {
 			// anneSuperNeu
@@ -1618,7 +1451,7 @@ public class Datenbank {
 		return false;
 	}
 
-	/**
+	*//**
 	 * Prueft, ob ein Fragebogen "fehlerfrei" fuer die Befragung ist. Gibt bei
 	 * Erfolg TRUE zurueck.
 	 * 
@@ -1626,7 +1459,7 @@ public class Datenbank {
 	 *            FragebogenDialog: der Fragebogen
 	 * @return boolean
 	 * @author Eric
-	 */
+	 *//*
 	public static boolean isFbValid(FragebogenDialog fb) {
 		try {
 			Vector<FrageErstellen> fragen = getFragen(fb);
@@ -1650,14 +1483,14 @@ public class Datenbank {
 		}
 	}
 
-	/**
+	*//**
 	 * Kopiert den gegebenen Fragebogen. Gibt bei Erfolg TRUE zurueck.
 	 * 
 	 * @param fb
 	 *            FragebogenDialog: der Fragebogen
 	 * @return boolean
 	 * @author Eric
-	 */
+	 *//*
 	public static boolean copyFragebogen(FragebogenDialog fb) {
 		int oldID = fb.getFragebogenId();
 		int newID = -1;
@@ -1810,7 +1643,7 @@ public class Datenbank {
 						}
 					}
 
-					/*
+					
 					 * Pattern MY_PATTERN = Pattern.compile("MC[0-9]+A[0-9]+");
 					 * Matcher mges = MY_PATTERN.matcher(data.get(2));
 					 * 
@@ -1839,7 +1672,7 @@ public class Datenbank {
 					 * oldMcId - Integer.parseInt(data.get(0)); String flag2 =
 					 * "FF" + (newFragenID + diff) + m2.group(0); flags =
 					 * flags.replace(mgesFF.group(0), flag2); } }
-					 */
+					 
 
 					mySQL = null;
 					mySQL = myCon.createStatement();
@@ -1992,14 +1825,14 @@ public class Datenbank {
 		return false;
 	}
 
-	/**
+	*//**
 	 * Updated die Flags, beim Löschen einer Antwort, auf die reagiert wird.
 	 * Gibt bei Erfolg TRUE zurueck.
 	 * 
 	 * @param frage
 	 *            FrageErstellen: die Frage
 	 * @return boolean
-	 */
+	 *//*
 	// anneSehrNeu
 	public static boolean updateFlags(FrageErstellen frage) {
 		String statement;
@@ -2129,14 +1962,14 @@ public class Datenbank {
 		return false;
 	}
 
-	/**
+	*//**
 	 * Benennt den gegebenen Fragebogen um. Gibt bei Erfolg TRUE zurueck.
 	 * 
 	 * @param fb
 	 *            FragebogenDialog: der Fragebogen
 	 * @return boolean
 	 * @author Eric
-	 */
+	 *//*
 	public static boolean renameFragebogen(FragebogenDialog fb) {
 		try {
 			myCon = DriverManager.getConnection(url, user, pwd);
@@ -2157,14 +1990,14 @@ public class Datenbank {
 		return false;
 	}
 
-	/**
+	*//**
 	 * Loescht den gegebenen Fragebogen. Gibt bei Erfolg TRUE zurueck.
 	 * 
 	 * @param fb
 	 *            FragebogenDialog: der Fragebogen
 	 * @return boolean
 	 * @author Anne
-	 */
+	 *//*
 	public static boolean deleteFragebogen(FragebogenDialog fb) {
 		Vector<Integer> idsmc = new Vector<Integer>(); // IDs der MC Fragen
 		Vector<Integer> idsff = new Vector<Integer>(); // IDs der Freien Fragen
@@ -2321,14 +2154,14 @@ public class Datenbank {
 		return false;
 	}
 
-	/**
+	*//**
 	 * Setzt den gegebenen Fragebogen auf final. Gibt bei Erfolg TRUE zurueck.
 	 * 
 	 * @param fb
 	 *            FragebogenDialog: der Fragebogen
 	 * @return boolean
 	 * @author Eric
-	 */
+	 *//*
 	public static boolean setFinal(FragebogenDialog fb) {
 		try {
 			// anneSuperNeu
@@ -2347,7 +2180,7 @@ public class Datenbank {
 		return false;
 	}
 
-	/**
+	*//**
 	 * Setzt den gegebenen Fragebogen auf nicht final. Gibt bei Erfolg TRUE
 	 * zurueck.
 	 * 
@@ -2355,7 +2188,7 @@ public class Datenbank {
 	 *            FragebogenDialog
 	 * @return boolean
 	 * @author Eric
-	 */
+	 *//*
 	public static boolean setUnFinal(FragebogenDialog fb) {
 		try {
 			// anneSuperNeu
@@ -2376,7 +2209,7 @@ public class Datenbank {
 		return false;
 	}
 
-	/**
+	*//**
 	 * Prueft, ob der gegebenen Fragebogen final ist. Gibt bei Erfolg TRUE
 	 * zurueck.
 	 * 
@@ -2384,7 +2217,7 @@ public class Datenbank {
 	 *            FragebogenDialog: der Fragebogen
 	 * @return boolean
 	 * @author Eric
-	 */
+	 *//*
 	public static boolean isFinal(FragebogenDialog fb) {
 		try {
 			// anneSuperNeu
@@ -2413,7 +2246,7 @@ public class Datenbank {
 		return false;
 	}
 
-	/**
+	*//**
 	 * Befuellt die Frage mit den fehlenden Parametern.
 	 * 
 	 * @param frage
@@ -2421,7 +2254,7 @@ public class Datenbank {
 	 * @return FrageErstellen
 	 * @author Eric
 	 * 
-	 */
+	 *//*
 	public static FrageErstellen getSelectedFrage(FrageErstellen frage, FragebogenDialog fb) {
 		FrageErstellen selectedFrage = new FrageErstellen();
 		try {
@@ -2467,7 +2300,7 @@ public class Datenbank {
 				}
 			}
 
-			/*
+			
 			 * if(myRS.next()) { String flags = myRS.getString("flags");
 			 * if(flags.contains("B")) {
 			 * selectedFrage.setArt("Bewertungsfrage"); } else {
@@ -2497,7 +2330,7 @@ public class Datenbank {
 			 * selectedFrage.setPosition(myRS.getInt("position"));
 			 * selectedFrage.setFrageID(myRS.getInt("id"));
 			 * selectedFrage.setFlags(myRS.getString("flags")); } }
-			 */
+			 
 			mySQL = null;
 			myRS = null;
 			myCon.close();
@@ -2512,13 +2345,13 @@ public class Datenbank {
 		return null;
 	}
 
-	/**
+	*//**
 	 * Loescht die gegebene Frage. Gibt bei Erfolg TRUE zurueck.
 	 * 
 	 * @param frage
 	 *            FrageErstellen: die Frage
 	 * @return boolean
-	 */
+	 *//*
 	// anneSehrNeu
 	public static boolean deleteFrage(FrageErstellen frage) {
 		Vector<Integer> antmcnr = new Vector<Integer>(); // IDs der Antworten
@@ -2750,7 +2583,7 @@ public class Datenbank {
 		return false;
 	}
 
-	/**
+	*//**
 	 * Loescht die gegebene Antwort. Gibt bei Erfolg TRUE zurueck.
 	 * 
 	 * @param antids
@@ -2758,7 +2591,7 @@ public class Datenbank {
 	 * @param frage
 	 *            FrageErstellen: die zugehörige Frage
 	 * @return boolean
-	 */
+	 *//*
 	// anneSehrNeu
 	public static boolean deleteAntworten(Vector<Integer> antids, FrageErstellen frage) {
 		String statement;
@@ -2776,13 +2609,13 @@ public class Datenbank {
 
 			mySQL = myCon.createStatement();
 			statement = "DELETE FROM Antworten WHERE AntwortNr NOT IN (SELECT AntwortNr FROM MC_has_a)";
-			/*
+			
 			 * + " AND NOT(antwort='ja') AND NOT(antwort='nein') " +
 			 * "AND NOT(antwort='#####') AND NOT(antwort='0') AND NOT(antwort='1') AND NOT(antwort='2') AND NOT(antwort='3') AND NOT(antwort='4') "
 			 * +
 			 * "AND NOT(antwort='5') AND NOT(antwort='6') AND NOT(antwort='7') AND NOT(antwort='8') AND NOT(antwort='9') AND NOT(antwort='10')"
 			 * ;
-			 */
+			 
 			mySQL.execute(statement);
 			mySQL = null;
 
@@ -2796,11 +2629,11 @@ public class Datenbank {
 		return false;
 	}
 
-	/**
+	*//**
 	 * Gibt alle Kategorien zurueck.
 	 * 
 	 * @return Vector String aller Kategorien
-	 */
+	 *//*
 	public static Vector<String> getKategorie() {
 		try {
 			myCon = DriverManager.getConnection(url, user, pwd);
@@ -2824,14 +2657,14 @@ public class Datenbank {
 		return null;
 	}
 
-	/**
+	*//**
 	 * Fuegt eine neue Kategorie der Datenbank hinzu. Gibt bei Erfolg TRUE
 	 * zurueck.
 	 * 
 	 * @param kat
 	 *            String: die Kategorie
 	 * @return boolean
-	 */
+	 *//*
 	public static boolean setKategorie(String kat) {
 		try {
 			myCon = DriverManager.getConnection(url, user, pwd);
@@ -2860,13 +2693,13 @@ public class Datenbank {
 		return false;
 	}
 
-	/**
+	*//**
 	 * Gibt alle Antworten einer Frage zurueck.
 	 * 
 	 * @param frage
 	 *            FrageErstellen: die Frage
 	 * @return Vector String aller Antworten
-	 */
+	 *//*
 	public static Vector<String> getAntworten(FrageErstellen frage) {
 		try {
 			myCon = DriverManager.getConnection(url, user, pwd);
@@ -2903,7 +2736,7 @@ public class Datenbank {
 		return null;
 	}
 
-	/**
+	*//**
 	 * Prueft, ob eine Frage Pflichtfrage ist. Gibt bei Erfolg TRUE zurueck.
 	 * 
 	 * @param fb
@@ -2913,7 +2746,7 @@ public class Datenbank {
 	 * @param id
 	 *            int: ID der Frage
 	 * @return boolean
-	 */
+	 *//*
 	public static boolean isPflichtfrage(FragebogenDialog fb, String art, int id) {
 		if (art.equals("FF")) {
 			try {
@@ -2967,7 +2800,7 @@ public class Datenbank {
 		}
 	}
 
-	/**
+	*//**
 	 * Updatet die Flags. Gibt bei Erfolg TRUE zurueck.
 	 * 
 	 * @param fb
@@ -2977,7 +2810,7 @@ public class Datenbank {
 	 * @param id
 	 *            int: ID der Frage
 	 * @return boolean
-	 */
+	 *//*
 	public static boolean updateFlags(FragebogenDialog fb, String art, int id) {
 		if (art.equals("FF")) {
 			try {
@@ -3046,13 +2879,13 @@ public class Datenbank {
 
 	// Maximum an möglicher Position im Fragebogen herausfinden; für den Spinner
 	// beim Fragen Erstellen/bearbeiten
-	/**
+	*//**
 	 * Gibt das Maximum an moeglicher Position im Fragebogen zurueck.
 	 * 
 	 * @param fb
 	 *            FragebogenDialog: der Fragebogen
 	 * @return int
-	 */
+	 *//*
 	public static int getCountPosition(FragebogenDialog fb) {
 		int positionCount = 0;
 		int maxPosMc = 0;
@@ -3094,13 +2927,13 @@ public class Datenbank {
 		return positionCount;
 	}
 
-	/**
+	*//**
 	 * ka
 	 * 
 	 * @param date
 	 * @param typ
 	 * @return
-	 */
+	 *//*
 	private static String date_de_sql(String date, String typ) {
 		// type ist die zu konfiguerierende masse (sql oder de)
 		String ret;
@@ -3121,7 +2954,7 @@ public class Datenbank {
 		return ret;
 	}
 
-	/**
+	*//**
 	 * ka
 	 * 
 	 * @param art
@@ -3129,7 +2962,7 @@ public class Datenbank {
 	 * @return
 	 * @throws IOException
 	 */
-	public static String exp_cmd(int art, String name) throws IOException {
+	protected static String exp_cmd(int art, String name) throws IOException {
 		String ret = "false";
 
 		try {
@@ -3163,8 +2996,8 @@ public class Datenbank {
 			ret = "true";
 		} catch (Exception e) {
 			e.printStackTrace();
-			ErrorLog.fehlerBerichtB("ERROR",
-					Datenbank.class + ": " + Thread.currentThread().getStackTrace()[1].getLineNumber(), e.getMessage());
+			//ErrorLog.fehlerBerichtB("ERROR",
+			//		Datenbank.class + ": " + Thread.currentThread().getStackTrace()[1].getLineNumber(), e.getMessage());
 		}
 		return ret;
 	}
@@ -3173,7 +3006,7 @@ public class Datenbank {
 	 * ka
 	 * 
 	 * @return
-	 */
+	 *//*
 	public static Vector<String> exp_formular_namen() {
 
 		Vector<String> ret = new Vector<String>();
@@ -3199,14 +3032,14 @@ public class Datenbank {
 		return ret;
 	}
 
-	/**
+	*//**
 	 * ka
 	 * 
 	 * @param art
 	 * @param name
 	 * @return
-	 */
-	/*public static String exp_sql(int art, String name) {
+	 *//*
+	public static String exp_sql(int art, String name) {
 		String ret = "false";
 
 		try {
@@ -3243,11 +3076,11 @@ public class Datenbank {
 					Datenbank.class + ": " + Thread.currentThread().getStackTrace()[1].getLineNumber(), e.getMessage());
 		}
 		return ret;
-	}*/
+	}
 
-	/*----------------------------------------------------------------------------------------*/
+	----------------------------------------------------------------------------------------
 
-	/**
+	*//**
 	 * Erstellt einen Vector aus Excel Zellen anhand des FrageErstellen
 	 * Objektes.
 	 * 
@@ -3258,7 +3091,7 @@ public class Datenbank {
 	 * @param bis
 	 *            Srring: Datum
 	 * @return Vector
-	 */
+	 *//*
 	public static Vector<ExcelCell> getAntwortenPosition(FrageErstellen frage, String von, String bis) {
 		Vector<ExcelCell> re = new Vector<ExcelCell>();
 		if (((frage.getArt().equals("MC")) && (frage.getFlags().indexOf("B") >= 0))
@@ -3320,7 +3153,7 @@ public class Datenbank {
 		return re;
 	}
 
-	/**
+	*//**
 	 * Erstellt einen Vector aus Excel Zellen anhand des FrageErstellen Objektes
 	 * und der Antwort.
 	 * 
@@ -3333,7 +3166,7 @@ public class Datenbank {
 	 * @param bis
 	 *            Srring: Datum
 	 * @return Vector
-	 */
+	 *//*
 	public static Vector<ExcelCell> getAntwortenPosition(FrageErstellen frage, String antwort, String von, String bis) {
 		Vector<ExcelCell> re = new Vector<ExcelCell>();
 		try {
@@ -3371,13 +3204,13 @@ public class Datenbank {
 		return re;
 	}
 
-	/**
+	*//**
 	 * Wandelt Umlaute in einem String zu Unicode um.
 	 * 
 	 * @param unSlashed
 	 *            String: mit Umlauten
 	 * @return String mit Unicode
-	 */
+	 *//*
 	public static String slashUnicode(String unSlashed) {
 		if (unSlashed.indexOf("Ä") >= 0) {
 			unSlashed = unSlashed.replaceAll("Ä", "\\\\\\u00c4");
@@ -3404,13 +3237,13 @@ public class Datenbank {
 
 	}
 
-	/**
+	*//**
 	 * Wandelt Unicode Zeichen in einem String zu Umlauten um.
 	 * 
 	 * @param slashed
 	 *            String: mit Unicode
 	 * @return String mit Umlauten
-	 */
+	 *//*
 	public static String unslashUnicode(String slashed) {
 
 		ArrayList<String> pieces = new ArrayList<String>();
@@ -3444,5 +3277,5 @@ public class Datenbank {
 		slashed = temp + slashed;
 
 		return slashed;
-	}
+	}*/
 }

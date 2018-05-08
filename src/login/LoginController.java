@@ -1,9 +1,15 @@
 package login;
 
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
+
+import java.io.IOException;
+
+import application.ScreenController;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.control.PasswordField;
 
 public class LoginController {
@@ -27,10 +33,16 @@ public class LoginController {
 	private Button btn_exit;
 	
 	@FXML
-	private void login(ActionEvent event) {
+	private void login(ActionEvent event) throws IOException {
 		System.out.println("doLogin");
 		if(!username.getText().equals("") && !password.getText().equals("")) {
-			
+			if(LoginService.testDB(username.getText(), password.getText(), ip.getText(), Integer.parseInt(port.getText()), false)) {
+				System.out.println("logged in");
+				ScreenController.addScreen("location", new Scene(FXMLLoader.load(getClass().getResource("../location/LocationView.fxml"))));
+				ScreenController.activate("location");
+			} else {
+				System.out.println("login wrong values");
+			}
 		}
 	}
 	
