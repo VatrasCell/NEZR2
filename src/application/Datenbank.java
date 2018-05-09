@@ -3210,7 +3210,7 @@ public class Datenbank {
 	 * @param unSlashed
 	 *            String: mit Umlauten
 	 * @return String mit Unicode
-	 *//*
+	 */
 	public static String slashUnicode(String unSlashed) {
 		if (unSlashed.indexOf("Ä") >= 0) {
 			unSlashed = unSlashed.replaceAll("Ä", "\\\\\\u00c4");
@@ -3237,13 +3237,13 @@ public class Datenbank {
 
 	}
 
-	*//**
+	/**
 	 * Wandelt Unicode Zeichen in einem String zu Umlauten um.
 	 * 
 	 * @param slashed
 	 *            String: mit Unicode
 	 * @return String mit Umlauten
-	 *//*
+	 */
 	public static String unslashUnicode(String slashed) {
 
 		ArrayList<String> pieces = new ArrayList<String>();
@@ -3277,5 +3277,5 @@ public class Datenbank {
 		slashed = temp + slashed;
 
 		return slashed;
-	}*/
+	}
 }

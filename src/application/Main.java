@@ -13,10 +13,14 @@ public class Main extends Application {
 	public void start(Stage primaryStage) throws IOException {
 		primaryStage.setTitle("NEZR FX");
 		
+		primaryStage.setFullScreen(false);
+		
 		ScreenController.setRootScene(primaryStage);
 		ScreenController.addScreen("login", new Scene(FXMLLoader.load(getClass().getResource("../login/LoginView.fxml"))));
 		
 		ScreenController.activate("login");
+		
+		System.out.println(primaryStage.getWidth() + " " + primaryStage.getHeight());
 	}
 	
 	public static void main(String[] args) {
