@@ -16,8 +16,8 @@ public class Main extends Application {
 		primaryStage.setFullScreen(false);
 		
 		ScreenController.setRootScene(primaryStage);
-		ScreenController.addScreen("login", new Scene(FXMLLoader.load(getClass().getResource("../login/LoginView.fxml"))));
 		
+		ScreenController.addScreen("login", new Scene(FXMLLoader.load(getClass().getResource("../login/LoginView.fxml"))));
 		ScreenController.activate("login");
 		
 		System.out.println(primaryStage.getWidth() + " " + primaryStage.getHeight());

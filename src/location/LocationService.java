@@ -25,7 +25,7 @@ public class LocationService extends Datenbank {
 			ResultSet myRS = mySQL.executeQuery(statement);
 			Vector<String> ort = new Vector<String>();
 			while (myRS.next()) {
-				ort.add(myRS.getString("Ort"));
+				ort.add(unslashUnicode(myRS.getString("Ort")));
 			}
 			mySQL = null;
 			myRS = null;

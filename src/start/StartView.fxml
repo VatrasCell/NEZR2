@@ -1,8 +1,58 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.text.*?>
+<?import javafx.scene.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
 <?import javafx.scene.layout.BorderPane?>
 
-<BorderPane xmlns:fx="http://javafx.com/fxml/1">
-	<!-- TODO Add Nodes -->
-</BorderPane>
-
+<GridPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="start.StartController">
+  <columnConstraints>
+    <ColumnConstraints hgrow="SOMETIMES" maxWidth="141.0" minWidth="10.0" prefWidth="105.0" />
+      <ColumnConstraints hgrow="SOMETIMES" maxWidth="459.0" minWidth="10.0" prefWidth="391.0" />
+    <ColumnConstraints hgrow="SOMETIMES" maxWidth="242.0" minWidth="10.0" prefWidth="104.0" />
+  </columnConstraints>
+  <rowConstraints>
+    <RowConstraints maxHeight="223.0" minHeight="10.0" prefHeight="192.0" vgrow="SOMETIMES" />
+    <RowConstraints maxHeight="139.0" minHeight="10.0" prefHeight="64.0" vgrow="SOMETIMES" />
+      <RowConstraints maxHeight="135.0" minHeight="10.0" prefHeight="68.0" vgrow="SOMETIMES" />
+    <RowConstraints maxHeight="135.0" minHeight="10.0" prefHeight="131.0" vgrow="SOMETIMES" />
+  </rowConstraints>
+   <children>
+      <FlowPane nodeOrientation="RIGHT_TO_LEFT" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="2">
+         <children>
+            <ImageView fx:id="imageView" fitHeight="190.0" fitWidth="106.0" pickOnBounds="true" preserveRatio="true" smooth="false">
+               <image>
+                  <Image url="@../test/img/logo_default.png" />
+               </image>
+               <FlowPane.margin>
+                  <Insets />
+               </FlowPane.margin>
+            </ImageView>
+         </children>
+         <GridPane.margin>
+            <Insets right="15.0" top="15.0" />
+         </GridPane.margin>
+      </FlowPane>
+      <Label text="Startseite" textAlignment="CENTER" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.valignment="TOP">
+         <GridPane.margin>
+            <Insets top="15.0" />
+         </GridPane.margin>
+      </Label>
+      <Button mnemonicParsing="false" text="Admin" GridPane.halignment="LEFT" GridPane.valignment="TOP">
+         <GridPane.margin>
+            <Insets left="15.0" top="15.0" />
+         </GridPane.margin>
+      </Button>
+      <Label fx:id="lbl_fragebogen" text="Fragebogen XXX" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="2" GridPane.valignment="CENTER" />
+      <Label fx:id="lbl_warning" text="Label" textAlignment="CENTER" textFill="#c90000" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="CENTER">
+         <font>
+            <Font name="System Bold" size="12.0" />
+         </font>
+      </Label>
+      <Button mnemonicParsing="false" onAction="#next" text="Start" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="3" GridPane.valignment="TOP" />
+   </children>
+</GridPane>

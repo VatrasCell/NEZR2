@@ -55,9 +55,9 @@
 	-fx-font-size: 14.0px;
 	-fx-disabled-opacity: 0.6;
 	/*default colors */
-	-swatch-grey: rgb(200.0, 200.0, 200.0);
-	-swatch-dark-grey: rgb(150.0, 150.0, 150.0);
-	-swatch-light-grey: rgb(230.0, 230.0, 230.0);
+	-swatch-grey: rgb(200, 200, 200);
+	-swatch-dark-grey: white;
+	-swatch-light-grey: white;
 	-swatch-toolbar: rgb(245.0, 245.0, 245.0);
 	-swatch-toolbar-selected: rgb(215.0, 215.0, 215.0);
 	/* 
