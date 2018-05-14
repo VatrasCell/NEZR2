@@ -18,7 +18,6 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.ProgressBar;
-import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
@@ -176,10 +175,13 @@ public class StartController {
 					
 					HBox hBox = new HBox();
 					Label lblEins = new Label("sehr\nschlecht");
+					lblEins.setId("lblEins");
 					hBox.getChildren().add(lblEins);
 					Label lblZehn = new Label("sehr gut");
+					lblZehn.setId("lblZehn");
 					hBox.getChildren().add(lblZehn);
 					Label lblNull = new Label("keine\nAussage");
+					lblNull.setId("lblNull");
 					hBox.getChildren().add(lblNull);
 					
 					//TODO: add spacing
@@ -213,15 +215,16 @@ public class StartController {
 					int index = frage.indexOf(" ", 15);
 					char[] string = frage.toCharArray();
 					string[index] = '\n';
-					frageAnzeige = frage.replaceAll("\n", "<br/>");
-					frageAnzeige = frageAnzeige + add;
+					//frageAnzeige = frage.replaceAll("\n", "<br/>");
+					frageAnzeige = frage + add;
 					
 				} else {
 					frageAnzeige = frage + add;
 				}
 				
 				Label lblFrage = new Label(frageAnzeige);
-				
+				System.out.println("frageObj.get(y).frageid = " + frageObj.get(y).getFrageID());
+				lblFrage.setId("lblFrage_" + frageObj.get(y).getFrageID());
 				Pattern MY_PATTERN = Pattern.compile("MC[0-9]+A[0-9]+");
 				Matcher mges = MY_PATTERN.matcher(frageObj.get(y).getFlags());
 				if (mges.find()) {
@@ -229,7 +232,7 @@ public class StartController {
 				}
 				
 				// allePanel.get(z).add(lblFrage, "align center, span, wrap");
-				// frageObj.get(y).setFrageLabel(lblFrage);
+				frageObj.get(y).setScene(allePanel.get(z));
 				vBox.getChildren().add(lblFrage);
 				
 				
@@ -242,7 +245,7 @@ public class StartController {
 						//allePanel.get(z).add(textArea, "span, center");
 						Vector<TextArea> textAreas = new Vector<TextArea>();
 						textAreas.add(textArea);
-						//frageObj.get(y).setAntwortenTEXT(textAreas);
+						frageObj.get(y).setAntwortenTEXT(textAreas);
 						vBox.getChildren().add(textArea);
 					} else {
 						if(frageObj.get(y).getFlags().indexOf("LIST") >= 0) {
@@ -263,7 +266,7 @@ public class StartController {
 							//allePanel.get(z).add(textField, "wrap, span, center");
 							Vector<TextField> textFields = new Vector<TextField>();
 							textFields.add(textField);
-							//frageObj.get(y).setAntwortenFF(textFields);
+							frageObj.get(y).setAntwortenFF(textFields);
 							vBox.getChildren().add(textField);
 						}
 					}
@@ -286,7 +289,7 @@ public class StartController {
 						
 						antwortenLIST.add(liste);
 						vBox.getChildren().add(liste);
-						//frageObj.get(y).setAntwortenLIST(antwortenLIST);
+						frageObj.get(y).setAntwortenLIST(antwortenLIST);
 						continue;
 					}
 					
@@ -363,7 +366,7 @@ public class StartController {
 						}
 						
 						if(frageObj.get(y).getFlags().indexOf("B") >= 0) {
-							/*
+							/*TODO
 							if(!frageObj.get(y).getFrageLabel().isVisible()) {
 								lblNull.setVisible(false);
 								lblEins.setVisible(false);
@@ -412,10 +415,10 @@ public class StartController {
 						}*/	
 					}
 					vBox.getChildren().add(hBox);
-					// frageObj.get(y).setAntwortenMC(checkboxs);
+					frageObj.get(y).setAntwortenMC(checkboxs);
 					
 				} else{
-					//Error nachricht, wenn das obere nicht zutrift
+					//Error Nachricht, wenn das obere nicht zutrifft
 					//ErrorLog.fehlerBerichtB("ERROR",getClass() + ": " + Thread.currentThread().getStackTrace()[1].getLineNumber(), "Befragung konnte nicht erstellt/ angezeigt werden!");
 				}	
 				
@@ -423,7 +426,7 @@ public class StartController {
 			fragenJePanel.addElement(frageObj);
 			
 		}	
-		/*
+		
 		for(int y = 0; y < fragen.size(); y++) {
 			
 			Pattern MY_PATTERN = Pattern.compile("MC[0-9]+A[0-9]+");
@@ -472,7 +475,7 @@ public class StartController {
 				}
 			}
 		}
-		*/
+		
 		
 		for(int i = 0; i < allePanel.size(); ++i) {
 			ScreenController.addScreen("survey_" + i, allePanel.get(i));
@@ -484,6 +487,27 @@ public class StartController {
 			// ErrorLog.fehlerBerichtB("ERROR",getClass() + ": " + Thread.currentThread().getStackTrace()[1].getLineNumber(), e.getMessage());
 			e.printStackTrace();
 		}
+	}
+	
+	/**
+	 * Gibt die Position des "FrageErstellen" Objektes in dem Vector "fragen" 
+	 * zurück welche die entsprechende Fragen- ID und Fragenart hat. F�r die Vorschau!
+	 * <p>
+	 * @param x int: Fragen- ID
+	 * @param s String: Fragenart
+	 * @param fragen Vector FrageErstellen: alle Fragen
+	 * @return Postition im Vector "fragen" als int.
+	 */
+	private int getY(int x, String s, Vector<Frage> fragen) {
+		// TODO 
+		
+		for(int i = 0; i < fragen.size(); i++) {
+			System.out.println(fragen.get(i).getFrageID()+ " == " + x + " && " + fragen.get(i).getArt() + " == " + s);
+			if(x == fragen.get(i).getFrageID() && s.equals(fragen.get(i).getArt())) {
+				return i;
+			}
+		}
+		return -1;
 	}
 	
 	@FXML

@@ -3,8 +3,12 @@ package model;
 import java.util.Comparator;
 import java.util.Vector;
 
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+
+import javafx.scene.Scene;
 import javafx.scene.control.CheckBox;
-import javafx.scene.control.ScrollPane;
+import javafx.scene.control.ListView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 
@@ -19,10 +23,11 @@ public class Frage implements Comparable<Frage>, Comparator<Frage> {
 	private String ueberschrift = "";
 	private Vector<String> antwort_moeglichkeit = new Vector<String>();
 	private Vector<String> antwort = new Vector<String>();
-	// private JLabel frageLabel;
+	// private Label frageLabel;
+	private Scene scene;
 	private Vector<CheckBox> antwortenMC = new Vector<>();
 	private Vector<TextField> antwortenFF = new Vector<>();
-	private Vector<ScrollPane> antwortenLIST = new Vector<>();
+	private Vector<ListView<String>> antwortenLIST = new Vector<>();
 	private Vector<TextArea> antwortenTEXT = new Vector<>();
 	private Frage target;
 	private int fragebogenID;
@@ -177,13 +182,13 @@ public class Frage implements Comparable<Frage>, Comparator<Frage> {
 	/**
 	 * @return the antwortenLIST
 	 */
-	public Vector<ScrollPane> getAntwortenLIST() {
+	public Vector<ListView<String>> getAntwortenLIST() {
 		return antwortenLIST;
 	}
 	/**
 	 * @param antwortenLIST the antwortenLIST to set
 	 */
-	public void setAntwortenLIST(Vector<ScrollPane> antwortenLIST) {
+	public void setAntwortenLIST(Vector<ListView<String>> antwortenLIST) {
 		this.antwortenLIST = antwortenLIST;
 	}
 	/**
@@ -222,7 +227,18 @@ public class Frage implements Comparable<Frage>, Comparator<Frage> {
 	public void setFragebogenID(int fragebogenID) {
 		this.fragebogenID = fragebogenID;
 	}
-	
+	/**
+	 * @return the scene
+	 */
+	public Scene getScene() {
+		return scene;
+	}
+	/**
+	 * @param scene the scene to set
+	 */
+	public void setScene(Scene scene) {
+		this.scene = scene;
+	}
 	@Override
 	public int compareTo(Frage o) {
 
@@ -247,6 +263,172 @@ public class Frage implements Comparable<Frage>, Comparator<Frage> {
 	public String toString() {
 		return "Frage [frage=" + frage + ", art=" + art + ", kategorie=" + kategorie + ", flags=" + flags
 				+ ", Position=" + Position + ", ueberschrift=" + ueberschrift + ", antwort_moeglichkeit="
-				+ antwort_moeglichkeit + ", target=" + target + "]";
-	}		
+				+ antwort_moeglichkeit + "]";
+	}	
+	
+	/**
+	 * Setzt dynamisch ChangeListener
+	 * @param index int: Position im Vector
+	 * @param s String: Fragenart
+	 */
+	public void setListener(int index, String s) {
+		if(s == "MC") {
+			CheckBox checkbox = target.antwortenMC.get(index);
+			checkbox.selectedProperty().addListener(new ChangeListener<Boolean>() {
+		        public void changed(ObservableValue<? extends Boolean> ov,
+		                Boolean old_val, Boolean new_val) {
+		        	if(checkbox.isSelected()) {
+						scene.lookup("#lblFrage_" + getFrageID()).setVisible(true);
+						
+						for(int i = 0; i < antwortenFF.size(); i++) {
+							antwortenFF.get(i).setVisible(true);
+						}
+						for(int i = 0; i < antwortenMC.size(); i++) {
+							antwortenMC.get(i).setVisible(true);
+						}
+						for(int i = 0; i < antwortenLIST.size(); i++) {
+							antwortenLIST.get(i).setVisible(true);
+						}
+						if(getFlags().indexOf("B") >= 0) {
+							scene.lookup("#lblNull").setVisible(true);
+							scene.lookup("#lblEins").setVisible(true);
+							scene.lookup("#lblZehn").setVisible(true);
+						}
+					} else {
+						scene.lookup("#lblFrage_" + getFrageID()).setVisible(false);
+						
+						for(int i = 0; i < antwortenFF.size(); i++) {
+							antwortenFF.get(i).setVisible(false);
+						}
+						for(int i = 0; i < antwortenMC.size(); i++) {
+							antwortenMC.get(i).setVisible(false);
+						}
+						for(int i = 0; i < antwortenLIST.size(); i++) {
+							antwortenLIST.get(i).setVisible(false);
+						}
+						if(getFlags().indexOf("B") >= 0) {
+							scene.lookup("#lblNull").setVisible(false);
+							scene.lookup("#lblEins").setVisible(false);
+							scene.lookup("#lblZehn").setVisible(false);
+						}
+					}
+		            }
+		        });
+		} else if (s == "FF") {
+			/*
+			TextField textField = target.antwortenFF.get(index);
+			textField.getDocument().addDocumentListener(new DocumentListener() {
+				
+				@Override
+				public void removeUpdate(DocumentEvent e) {
+					go();
+				}
+				
+				@Override
+				public void insertUpdate(DocumentEvent e) {
+					go();
+				}
+				
+				@Override
+				public void changedUpdate(DocumentEvent e) {
+					go();
+				}
+				
+				private void go() {
+					if(textField.getText().equals("")) {
+						frageLabel.setVisible(true);
+						
+						for(int i = 0; i < antwortenFF.size(); i++) {
+							antwortenFF.get(i).setVisible(true);
+						}
+						for(int i = 0; i < antwortenMC.size(); i++) {
+							antwortenMC.get(i).setVisible(true);
+						}
+						for(int i = 0; i < antwortenLIST.size(); i++) {
+							antwortenLIST.get(i).setVisible(true);
+						}
+					} else {
+						frageLabel.setVisible(false);
+						
+						for(int i = 0; i < antwortenFF.size(); i++) {
+							antwortenFF.get(i).setVisible(false);
+						}
+						for(int i = 0; i < antwortenMC.size(); i++) {
+							antwortenMC.get(i).setVisible(false);
+						}
+						for(int i = 0; i < antwortenLIST.size(); i++) {
+							antwortenLIST.get(i).setVisible(false);
+						}
+					}
+				}
+			});
+		} else if (s.indexOf("INT") >= 0) {
+			TextField textField = antwortenFF.get(0);
+			textField.getDocument().addDocumentListener(new Numberlistener()  {
+				
+				@Override
+				public void removeUpdate(DocumentEvent e) {
+					go();
+				}
+				
+				@Override
+				public void insertUpdate(DocumentEvent e) {
+					go();
+				}
+				
+				@Override
+				public void changedUpdate(DocumentEvent e) {
+					go();
+				}
+				
+				private void go() {
+					if(textField.getText().equals("")) {
+						Main.setEverythingIsAwesome(true);
+					} else {
+						int i = Integer.parseInt(s.substring(5));
+						String op = s.substring(3, 5);
+						System.out.println(op);
+						switch(op) {
+						case "==":
+							try {
+								Integer.parseInt(textField.getText());
+								if(textField.getText().length() == i) {
+									Main.setEverythingIsAwesome(true);
+								} else {
+									Main.setEverythingIsAwesome(false);
+								}
+							} catch (NumberFormatException e) {
+								Main.setEverythingIsAwesome(false);
+							}
+							break;
+						case "<=":
+							try {
+								Integer.parseInt(textField.getText());
+								if(textField.getText().length() <= i) {
+									Main.setEverythingIsAwesome(true);
+								} else {
+									Main.setEverythingIsAwesome(false);
+								}
+							} catch (NumberFormatException e) {
+								Main.setEverythingIsAwesome(false);
+							}
+							break;
+						case ">=":
+							try {
+								Integer.parseInt(textField.getText());
+								if(textField.getText().length() >= i) {
+									Main.setEverythingIsAwesome(true);
+								} else {
+									Main.setEverythingIsAwesome(false);
+								}
+							} catch (NumberFormatException e) {
+								Main.setEverythingIsAwesome(false);
+							}
+							break;
+						}	
+					}
+				}
+			});*/
+		}
+	}	
 }
