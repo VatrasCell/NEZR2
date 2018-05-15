@@ -9,4 +9,5 @@ public class GlobalVars {
 	public static Fragebogen activFragebogen = null;
 	public static int page = 0;
 	public static int countPanel;
+	public static boolean everythingIsAwesome = true;
 }

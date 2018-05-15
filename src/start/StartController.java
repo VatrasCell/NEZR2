@@ -18,8 +18,10 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.ProgressBar;
+import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.control.ToggleGroup;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
@@ -193,6 +195,7 @@ public class StartController {
 				
 				//Fuegt eine Frage ein
 				Vector<CheckBox> checkBoxen = new Vector<>();
+				ToggleGroup group = new ToggleGroup();
 				boolean isMC = false;
 				String frage = frageObj.get(y).getFrage();
 				Pattern MY_PATTERNs = Pattern.compile("#\\[[0-9]+\\]");
@@ -284,7 +287,7 @@ public class StartController {
 						MY_PATTERN = Pattern.compile("MC[0-9]+A[0-9]+");
 						mges = MY_PATTERN.matcher(frageObj.get(y).getFlags());
 						if (mges.find()) {
-							//scrollPane.setVisible(false);
+							liste.setVisible(false);
 						}
 						
 						antwortenLIST.add(liste);
@@ -333,7 +336,6 @@ public class StartController {
 						if (mges.find()) {
 							chckbxSda.setVisible(false);
 						}
-						
 						checkBoxen.add(chckbxSda);
 						if(!isMC) {
 							chckbxSda.selectedProperty().addListener(new ChangeListener<Boolean>() {

@@ -3,6 +3,7 @@ package model;
 import java.util.Comparator;
 import java.util.Vector;
 
+import application.GlobalVars;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 
@@ -315,8 +316,37 @@ public class Frage implements Comparable<Frage>, Comparator<Frage> {
 		            }
 		        });
 		} else if (s == "FF") {
-			/*
+			
 			TextField textField = target.antwortenFF.get(index);
+			textField.textProperty().addListener((observable, oldValue, newValue) -> {
+			    System.out.println("textfield changed from " + oldValue + " to " + newValue);
+			    if(textField.getText().equals("")) {
+			    	scene.lookup("#lblFrage_" + getFrageID()).setVisible(true);
+					
+					for(int i = 0; i < antwortenFF.size(); i++) {
+						antwortenFF.get(i).setVisible(true);
+					}
+					for(int i = 0; i < antwortenMC.size(); i++) {
+						antwortenMC.get(i).setVisible(true);
+					}
+					for(int i = 0; i < antwortenLIST.size(); i++) {
+						antwortenLIST.get(i).setVisible(true);
+					}
+				} else {
+					scene.lookup("#lblFrage_" + getFrageID()).setVisible(false);
+					
+					for(int i = 0; i < antwortenFF.size(); i++) {
+						antwortenFF.get(i).setVisible(false);
+					}
+					for(int i = 0; i < antwortenMC.size(); i++) {
+						antwortenMC.get(i).setVisible(false);
+					}
+					for(int i = 0; i < antwortenLIST.size(); i++) {
+						antwortenLIST.get(i).setVisible(false);
+					}
+				}
+			});
+			/*
 			textField.getDocument().addDocumentListener(new DocumentListener() {
 				
 				@Override
@@ -362,8 +392,58 @@ public class Frage implements Comparable<Frage>, Comparator<Frage> {
 					}
 				}
 			});
+			*/
 		} else if (s.indexOf("INT") >= 0) {
 			TextField textField = antwortenFF.get(0);
+			textField.textProperty().addListener((observable, oldValue, newValue) -> {
+			    System.out.println("textfield changed from " + oldValue + " to " + newValue);
+			    if(textField.getText().equals("")) {
+					GlobalVars.everythingIsAwesome = true;
+				} else {
+					int i = Integer.parseInt(s.substring(5));
+					String op = s.substring(3, 5);
+					System.out.println(op);
+					switch(op) {
+					case "==":
+						try {
+							Integer.parseInt(textField.getText());
+							if(textField.getText().length() == i) {
+								GlobalVars.everythingIsAwesome = true;
+							} else {
+								GlobalVars.everythingIsAwesome = false;
+							}
+						} catch (NumberFormatException e) {
+							GlobalVars.everythingIsAwesome = false;
+						}
+						break;
+					case "<=":
+						try {
+							Integer.parseInt(textField.getText());
+							if(textField.getText().length() <= i) {
+								GlobalVars.everythingIsAwesome = true;
+							} else {
+								GlobalVars.everythingIsAwesome = false;
+							}
+						} catch (NumberFormatException e) {
+							GlobalVars.everythingIsAwesome = false;
+						}
+						break;
+					case ">=":
+						try {
+							Integer.parseInt(textField.getText());
+							if(textField.getText().length() >= i) {
+								GlobalVars.everythingIsAwesome = true;
+							} else {
+								GlobalVars.everythingIsAwesome = false;
+							}
+						} catch (NumberFormatException e) {
+							GlobalVars.everythingIsAwesome = false;
+						}
+						break;
+					}	
+				}
+			});
+			/*
 			textField.getDocument().addDocumentListener(new Numberlistener()  {
 				
 				@Override
