@@ -11,16 +11,19 @@ import javafx.scene.Scene;
 public class Main extends Application {
 	@Override
 	public void start(Stage primaryStage) throws IOException {
-		primaryStage.setTitle("NEZR FX");
-		
+		if(GlobalVars.DEVMODE) {
+			primaryStage.setTitle("NEZR FX DEVMODE");
+		} else {
+			primaryStage.setTitle("NEZR FX");
+		}
 		primaryStage.setFullScreen(false);
 		
 		ScreenController.setRootScene(primaryStage);
 		
 		ScreenController.addScreen("login", new Scene(FXMLLoader.load(getClass().getResource("../login/LoginView.fxml"))));
-		ScreenController.activate("login");
-		
-		System.out.println(primaryStage.getWidth() + " " + primaryStage.getHeight());
+		if(!GlobalVars.DEVMODE) {
+			ScreenController.activate("login");
+		}
 	}
 	
 	public static void main(String[] args) {

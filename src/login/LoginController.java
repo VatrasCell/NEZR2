@@ -6,6 +6,7 @@ import javafx.scene.control.TextField;
 
 import java.io.IOException;
 
+import application.GlobalVars;
 import application.ScreenController;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -31,6 +32,17 @@ public class LoginController {
 	
 	@FXML
 	private Button btn_exit;
+	
+	@FXML
+	private void initialize() throws IOException {
+		if(GlobalVars.DEVMODE) {
+			username.setText("root");
+			password.setText("1234");
+			ip.setText("1234");
+			port.setText("1234");
+			login(new ActionEvent());
+		}
+	}
 	
 	@FXML
 	private void login(ActionEvent event) throws IOException {

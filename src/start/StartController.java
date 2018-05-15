@@ -13,15 +13,14 @@ import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.ProgressBar;
-import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
-import javafx.scene.control.ToggleGroup;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
@@ -176,6 +175,7 @@ public class StartController {
 				if(!isBHeader && frageObj.get(y).getFlags().indexOf("B") >= 0) {
 					
 					HBox hBox = new HBox();
+					//hBox.setAlignment(Pos.CENTER);
 					Label lblEins = new Label("sehr\nschlecht");
 					lblEins.setId("lblEins");
 					hBox.getChildren().add(lblEins);
@@ -195,7 +195,6 @@ public class StartController {
 				
 				//Fuegt eine Frage ein
 				Vector<CheckBox> checkBoxen = new Vector<>();
-				ToggleGroup group = new ToggleGroup();
 				boolean isMC = false;
 				String frage = frageObj.get(y).getFrage();
 				Pattern MY_PATTERNs = Pattern.compile("#\\[[0-9]+\\]");
@@ -307,6 +306,7 @@ public class StartController {
 					anzahlZeile.addElement(intAntworten);
 					
 					HBox hBox = new HBox();
+					hBox.setAlignment(Pos.CENTER);
 					//Uebe die schleife aus, wenn count kleiner ist als die groesse der antwortmoeglichkeiten
 					Vector<CheckBox> checkboxs = new Vector<>();
 					for(int count3 = 0; count3 < frageObj.get(y).getAntwort_moeglichkeit().size(); count3++){
@@ -341,7 +341,13 @@ public class StartController {
 							chckbxSda.selectedProperty().addListener(new ChangeListener<Boolean>() {
 						        public void changed(ObservableValue<? extends Boolean> ov,
 						                Boolean old_val, Boolean new_val) {
-						                    System.out.println("!isMC" + ov + " - " + old_val + " - " + new_val);
+						                    //System.out.println("!isMC" + ov + " - " + old_val + " - " + new_val);
+						                    if(new_val) {
+												for(int i = 0; i < checkBoxen.size(); i++) {
+													if(!checkBoxen.get(i).getText().equals(chckbxSda.getText()))
+														checkBoxen.get(i).setSelected(false);
+										        }
+						                    }
 						            }
 						        });
 							/*
@@ -362,7 +368,7 @@ public class StartController {
 							chckbxSda.selectedProperty().addListener(new ChangeListener<Boolean>() {
 						        public void changed(ObservableValue<? extends Boolean> ov,
 						                Boolean old_val, Boolean new_val) {
-						                    System.out.println(ov + " - " + old_val + " - " + new_val);
+						                    //System.out.println(ov + " - " + old_val + " - " + new_val);
 						            }
 						        });
 						}
