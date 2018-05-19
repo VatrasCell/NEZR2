@@ -225,7 +225,7 @@ public class StartController {
 				}
 				
 				Label lblFrage = new Label(frageAnzeige);
-				System.out.println("frageObj.get(y).frageid = " + frageObj.get(y).getFrageID());
+				// System.out.println("frageObj.get(y).frageid = " + frageObj.get(y).getFrageID());
 				lblFrage.setId("lblFrage_" + frageObj.get(y).getFrageID());
 				Pattern MY_PATTERN = Pattern.compile("MC[0-9]+A[0-9]+");
 				Matcher mges = MY_PATTERN.matcher(frageObj.get(y).getFlags());
@@ -235,6 +235,7 @@ public class StartController {
 				
 				// allePanel.get(z).add(lblFrage, "align center, span, wrap");
 				frageObj.get(y).setScene(allePanel.get(z));
+				frageObj.get(y).setFrageLabel(lblFrage);
 				vBox.getChildren().add(lblFrage);
 				
 				
@@ -489,6 +490,7 @@ public class StartController {
 			ScreenController.addScreen("survey_" + i, allePanel.get(i));
 		}
 		
+		GlobalVars.fragenJePanel = fragenJePanel;
 		GlobalVars.countPanel = countPanel;
 		
 		} catch (Exception e) {
@@ -510,7 +512,7 @@ public class StartController {
 		// TODO 
 		
 		for(int i = 0; i < fragen.size(); i++) {
-			System.out.println(fragen.get(i).getFrageID()+ " == " + x + " && " + fragen.get(i).getArt() + " == " + s);
+			// System.out.println(fragen.get(i).getFrageID()+ " == " + x + " && " + fragen.get(i).getArt() + " == " + s);
 			if(x == fragen.get(i).getFrageID() && s.equals(fragen.get(i).getArt())) {
 				return i;
 			}
@@ -523,6 +525,6 @@ public class StartController {
 		Vector<Frage> fragen = SurveyService.getFragen(GlobalVars.activFragebogen);
 		makeFragebogen(fragen);
 		ScreenController.activate("survey_0");
-		fragen.forEach((Frage frage) -> System.out.println(frage));
+		// fragen.forEach((Frage frage) -> System.out.println(frage));
 	}
 }

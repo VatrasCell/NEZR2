@@ -46,21 +46,21 @@ public class LoginController {
 	
 	@FXML
 	private void login(ActionEvent event) throws IOException {
-		System.out.println("doLogin");
+		//System.out.println("doLogin");
 		if(!username.getText().equals("") && !password.getText().equals("")) {
 			if(LoginService.testDB(username.getText(), password.getText(), ip.getText(), Integer.parseInt(port.getText()), false)) {
-				System.out.println("logged in");
+				//System.out.println("logged in");
 				ScreenController.addScreen("location", new Scene(FXMLLoader.load(getClass().getResource("../location/LocationView.fxml"))));
 				ScreenController.activate("location");
 			} else {
-				System.out.println("login wrong values");
+				//System.out.println("login wrong values");
 			}
 		}
 	}
 	
 	@FXML
 	private void exit(ActionEvent event) {
-		System.out.println("exit");
+		//System.out.println("exit");
 		System.exit(0);
 	}
 }

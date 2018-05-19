@@ -9,6 +9,7 @@ import javafx.beans.value.ObservableValue;
 
 import javafx.scene.Scene;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
@@ -24,7 +25,7 @@ public class Frage implements Comparable<Frage>, Comparator<Frage> {
 	private String ueberschrift = "";
 	private Vector<String> antwort_moeglichkeit = new Vector<String>();
 	private Vector<String> antwort = new Vector<String>();
-	// private Label frageLabel;
+	private Label frageLabel;
 	private Scene scene;
 	private Vector<CheckBox> antwortenMC = new Vector<>();
 	private Vector<TextField> antwortenFF = new Vector<>();
@@ -240,6 +241,18 @@ public class Frage implements Comparable<Frage>, Comparator<Frage> {
 	public void setScene(Scene scene) {
 		this.scene = scene;
 	}
+	/**
+	 * @return the frageLabel
+	 */
+	public Label getFrageLabel() {
+		return frageLabel;
+	}
+	/**
+	 * @param frageLabel the frageLabel to set
+	 */
+	public void setFrageLabel(Label frageLabel) {
+		this.frageLabel = frageLabel;
+	}
 	@Override
 	public int compareTo(Frage o) {
 
@@ -319,7 +332,7 @@ public class Frage implements Comparable<Frage>, Comparator<Frage> {
 			
 			TextField textField = target.antwortenFF.get(index);
 			textField.textProperty().addListener((observable, oldValue, newValue) -> {
-			    System.out.println("textfield changed from " + oldValue + " to " + newValue);
+			    // System.out.println("textfield changed from " + oldValue + " to " + newValue);
 			    if(textField.getText().equals("")) {
 			    	scene.lookup("#lblFrage_" + getFrageID()).setVisible(true);
 					
@@ -333,6 +346,7 @@ public class Frage implements Comparable<Frage>, Comparator<Frage> {
 						antwortenLIST.get(i).setVisible(true);
 					}
 				} else {
+					// System.out.println(getFrageID() + " " + target.getFrageID());
 					scene.lookup("#lblFrage_" + getFrageID()).setVisible(false);
 					
 					for(int i = 0; i < antwortenFF.size(); i++) {

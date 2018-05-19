@@ -1,18 +1,33 @@
 package survey;
 
+import java.util.Vector;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import application.Datenbank;
 import application.GlobalVars;
 import application.ScreenController;
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.ListView;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
+import model.Frage;
 
 public class SurveyController {
 	
 	@FXML
 	private void next() {
-		if(GlobalVars.page < GlobalVars.countPanel - 1) {
-			GlobalVars.page++;
-			ScreenController.activate("survey_" + GlobalVars.page);
+		if(check()) {
+			if(GlobalVars.page < GlobalVars.countPanel - 1) {
+				GlobalVars.page++;
+				ScreenController.activate("survey_" + GlobalVars.page);
+			} else {
+				System.out.println("do Save");
+			}
 		} else {
-			System.out.println("do Save");
+			System.out.println("everythingIsNOTAwesome");
 		}
 	}
 	
@@ -23,6 +38,236 @@ public class SurveyController {
 			ScreenController.activate("survey_" + GlobalVars.page);
 		} else {
 			System.out.println("still page 1");
+		}
+	}
+	
+	private boolean check() {
+		GlobalVars.everythingIsAwesome = true;
+		for(Frage frage : GlobalVars.fragenJePanel.get(GlobalVars.page)) {
+            if(!checkInt(frage) || !checkPflichtfrage(frage)) {
+            	GlobalVars.everythingIsAwesome = false;
+            	break;
+            }
+		}
+		
+		
+		if(GlobalVars.everythingIsAwesome) {
+			for(Frage frage : GlobalVars.fragenJePanel.get(GlobalVars.page)) {
+				if(frage.getArt() == "MC") {
+					if(frage.getFlags().indexOf("LIST") >= 0) {
+						Vector<String> antwort = new Vector<String>();
+						for(ListView<String> listView : frage.getAntwortenLIST()) {
+							if(listView.isVisible()) {
+								for(String value : listView.getSelectionModel().getSelectedItems()) {
+									antwort.addElement(value);
+								}
+							}
+						}
+						frage.setAntwort(antwort);
+					} else {
+						Vector<String> antwort = new Vector<String>();
+						for(CheckBox checkbox : frage.getAntwortenMC()) {
+							if(checkbox.isSelected() && checkbox.isVisible()) {
+								antwort.addElement(checkbox.getText());
+							}
+						}
+						frage.setAntwort(antwort);
+					}
+				} else {
+					if(frage.getFlags().indexOf("TEXT") >= 0) {
+						Vector<String> antwort = new Vector<String>();
+						for(TextArea textArea : frage.getAntwortenTEXT()) {
+							if(!textArea.getText().equals("") && textArea.isVisible()) {
+								String string = textArea.getText();
+								antwort.addElement(Datenbank.slashUnicode(string));
+							}
+						}
+						frage.setAntwort(antwort);
+					} else {
+						Vector<String> antwort = new Vector<String>();
+						for(TextField textField : frage.getAntwortenFF()) {
+							if(!textField.getText().equals("") && textField.isVisible()) {
+								String string = textField.getText();
+								antwort.addElement(Datenbank.slashUnicode(string));
+							}
+						}
+						frage.setAntwort(antwort);
+					}
+				}
+			}
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	/**
+	 * Prueft, ob die gegebene Frage dem flag INT genuegt.
+	 * @param frage FrageErstellen: die Frage
+	 * @return boolean
+	 */
+	/**
+	 * @param frage
+	 * @return
+	 */
+	/**
+	 * @param frage
+	 * @return
+	 */
+	private boolean checkInt(Frage frage) {
+		Pattern MY_PATTERNint = Pattern.compile("INT[<>=]=[0-9]+");
+		Matcher mint = MY_PATTERNint.matcher(frage.getFlags());
+		if (mint.find()) {
+			String s = mint.group(0);
+			int i = Integer.parseInt(s.substring(5));
+			String op = s.substring(3, 5);
+			
+			TextField textField = frage.getAntwortenFF().get(0);
+			if(textField.getText().equals("")) {
+				return true;
+			} else {
+				switch(op) {
+				case "==":
+					try {
+						Integer.parseInt(frage.getAntwortenFF().get(0).getText());
+						if(textField.getText().length() == i) {
+							return true;
+						} else {
+//							BalloonTip fehler = new BalloonTip(textField, "die Zahl ist nicht gleich " + i + " Zeichen lang");
+//							fehler.getStyle();
+//							fehler.setCloseButton(null);
+//							TimingUtils.showTimedBalloon(fehler, 2000);
+//							fehler.setVisible(true);
+							return false;
+						}
+					} catch (NumberFormatException eeee) {
+//						BalloonTip fehler = new BalloonTip(textField, "keine g\u00fcltige Zahl");
+//						fehler.setCloseButton(null);
+//						TimingUtils.showTimedBalloon(fehler, 2000);
+//						fehler.setVisible(true);
+						return false;
+					}
+				case "<=":
+					try {
+						Integer.parseInt(frage.getAntwortenFF().get(0).getText());
+						if(textField.getText().length() <= i) {
+							return true;
+						} else {
+//							BalloonTip fehler = new BalloonTip(textField, "die Zahl ist nicht kleiner oder gleich " + i + " Zeichen lang");
+//							fehler.setCloseButton(null);
+//							TimingUtils.showTimedBalloon(fehler, 2000);
+//							fehler.setVisible(true);
+							return false;
+						}
+					} catch (NumberFormatException ee) {
+						//BalloonTip fehler = new BalloonTip(textField, "keine g\u00fcltige Zahl");
+						//fehler.setCloseButton(null);
+						//TimingUtils.showTimedBalloon(fehler, 2000);
+						//fehler.setVisible(true);
+						return false;
+					}
+				case ">=":
+					try {
+						Integer.parseInt(frage.getAntwortenFF().get(0).getText());
+						if(textField.getText().length() >= i) {
+							return true;
+						} else {
+							//BalloonTip fehler = new BalloonTip(textField, "die Zahl ist nicht gr\u00f6\u00dfer oder gleich " + i + " Zeichen lang");
+							//fehler.setCloseButton(null);
+							//TimingUtils.showTimedBalloon(fehler, 2000);
+							//fehler.setVisible(true);
+							return false;
+						}
+					} catch (NumberFormatException eee) {
+						//BalloonTip fehler = new BalloonTip(textField, "keine g\u00fcltige Zahl");
+						//fehler.setCloseButton(null);
+						//TimingUtils.showTimedBalloon(fehler, 2000);
+						//fehler.setVisible(true);
+						return false;
+					}
+					default:
+						return true;
+				}	
+			}
+		} else {
+			return true;
+		}
+	}
+	
+	/**
+	 * Prueft, ob die gegebene Frage der Pfichtfrage genuegt.
+	 * @param frage FrageErstellen: die Frage
+	 * @param button MyButton: der Weiter Button
+	 * @return boolean
+	 */
+	private boolean checkPflichtfrage(Frage frage) {
+		if(frage.getFlags().indexOf("+") >= 0 && frage.getFrageLabel().isVisible()) {
+			if (frage.getArt() == "MC") {
+				boolean selected = false;
+				for (CheckBox checkbox : frage.getAntwortenMC()) {
+					if (checkbox.isSelected()) {
+						selected = true;
+						break;
+					}
+				}
+				if (selected) {
+					return true;
+				} else {
+//					BalloonTip fehler = new BalloonTip(button, "Das ist eine Pflichtfrage!");
+//					fehler.setCloseButton(null);
+//					TimingUtils.showTimedBalloon(fehler, 2000);
+//					fehler.setVisible(true);
+					return false;
+				}
+			} else {
+				if (frage.getFlags().indexOf("LIST") >= 0) {
+					for (ListView<String> listView : frage.getAntwortenLIST()) {
+						if (listView.getSelectionModel().isEmpty()) {
+//							BalloonTip fehler = new BalloonTip(button, "Das ist eine Pflichtfrage!");
+//							fehler.setCloseButton(null);
+//							TimingUtils.showTimedBalloon(fehler, 2000);
+//							fehler.setVisible(true);
+							return false;
+						} else {
+							return true;
+						}
+					}
+
+				} else if (frage.getFlags().indexOf("TEXT") >= 0) {
+					for (TextArea myText : frage.getAntwortenTEXT()) {
+						if (myText.getText().isEmpty()) {
+//							BalloonTip fehler = new BalloonTip(button, "Das ist eine Pflichtfrage!");
+//							fehler.setCloseButton(null);
+//							TimingUtils.showTimedBalloon(fehler, 2000);
+//							fehler.setVisible(true);
+							return false;
+						} else {
+							return true;
+						}
+					}
+				} else {
+					boolean selected = false;
+					for (TextField textField : frage.getAntwortenFF()) {
+						if (!textField.getText().equals("")) {
+							selected = true;
+							break;
+						}
+					}
+
+					if (selected) {
+						return true;
+					} else {
+//						BalloonTip fehler = new BalloonTip(button, "Das ist eine Pflichtfrage!");
+//						fehler.setCloseButton(null);
+//						TimingUtils.showTimedBalloon(fehler, 2000);
+//						fehler.setVisible(true);
+						return false;
+					}
+				}
+				return true;
+			}
+		} else {
+			return true;
 		}
 	}
 }

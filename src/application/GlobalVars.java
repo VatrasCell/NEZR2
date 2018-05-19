@@ -1,5 +1,8 @@
 package application;
 
+import java.util.Vector;
+
+import model.Frage;
 import model.Fragebogen;
 
 public class GlobalVars {
@@ -10,5 +13,6 @@ public class GlobalVars {
 	public static Fragebogen activFragebogen = null;
 	public static int page = 0;
 	public static int countPanel;
+	public static Vector<Vector<Frage>> fragenJePanel;
 	public static boolean everythingIsAwesome = true;
 }

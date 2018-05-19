@@ -3065,6 +3065,6 @@ public class Datenbank {
 		}
 		slashed = temp + slashed;
 
-		return slashed;
+		return slashed.replaceAll("\\\\", "");
 	}
 }
