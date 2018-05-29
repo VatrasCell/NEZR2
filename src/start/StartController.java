@@ -521,6 +521,11 @@ public class StartController {
 	}
 	
 	@FXML
+	private void adminLogin() {
+		ScreenController.activate(model.Scene.Login.scene(), "toAdmin", true);
+	}
+	
+	@FXML
 	private void next() {
 		Vector<Frage> fragen = SurveyService.getFragen(GlobalVars.activFragebogen);
 		makeFragebogen(fragen);

@@ -15,6 +15,8 @@ import javafx.scene.control.PasswordField;
 
 public class LoginController {
 	
+	public static boolean toAdmin = false;
+	
 	@FXML
 	private TextField username;
 	
@@ -50,8 +52,13 @@ public class LoginController {
 		if(!username.getText().equals("") && !password.getText().equals("")) {
 			if(LoginService.testDB(username.getText(), password.getText(), ip.getText(), Integer.parseInt(port.getText()), false)) {
 				//System.out.println("logged in");
-				ScreenController.addScreen("location", new Scene(FXMLLoader.load(getClass().getResource("../location/LocationView.fxml"))));
-				ScreenController.activate("location");
+				if(toAdmin) {
+					ScreenController.addScreen("admin", new Scene(FXMLLoader.load(getClass().getResource("../admin/AdminView.fxml"))));
+					ScreenController.activate("admin");
+				} else {
+					ScreenController.addScreen("location", new Scene(FXMLLoader.load(getClass().getResource("../location/LocationView.fxml"))));
+					ScreenController.activate("location");
+				}	
 			} else {
 				//System.out.println("login wrong values");
 			}

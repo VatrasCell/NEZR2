@@ -6,6 +6,7 @@ import java.util.HashMap;
 
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import login.LoginController;
 
 public class ScreenController {
 	private static HashMap<String, Scene> screenMap = new HashMap<>();
@@ -29,6 +30,23 @@ public class ScreenController {
 	public static void activate(String name) {
 		main.setScene(screenMap.get(name));
 		main.show();
+	}
+	
+	public static <T> void activate(String name, String key, T value) {
+		main.setScene(screenMap.get(name));
+		setParameter(name + "." + key, value);
+		main.show();
+	}
+	
+	private static <T> void setParameter(String key, T value) {
+		switch (key) {
+		case "login.toAdmin":
+			LoginController.toAdmin = (boolean) value;
+			break;
+
+		default:
+			break;
+		}
 	}
 	
 	public static Dimension getScreenSize() {

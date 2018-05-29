@@ -1,5 +1,6 @@
 package survey;
 
+import java.util.Optional;
 import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -8,12 +9,17 @@ import application.Datenbank;
 import application.GlobalVars;
 import application.ScreenController;
 import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.DialogPane;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import model.Frage;
+import model.Scene;
 
 public class SurveyController {
 	
@@ -39,6 +45,27 @@ public class SurveyController {
 		} else {
 			System.out.println("still page 1");
 		}
+	}
+	
+	@FXML
+	private void exit() {
+		Alert alert = new Alert(AlertType.CONFIRMATION);
+		alert.setTitle("Befragung abbrechen");
+		alert.setHeaderText("Wollen Sie die Befragung wirklich verlassen?\n"
+				+ "Alle Ihre eingetragenen Daten werden nicht gespeichert!");
+		alert.setContentText("Fortfahren?");
+		
+		DialogPane dialogPane = alert.getDialogPane();
+		dialogPane.getStylesheets().add(
+		   getClass().getResource("../application/application.css").toExternalForm());
+
+		Optional<ButtonType> result = alert.showAndWait();
+		if (result.get() == ButtonType.OK){
+			ScreenController.activate(Scene.Start.scene());
+		} else {
+		    // ... user chose CANCEL or closed the dialog
+		}
+		
 	}
 	
 	private boolean check() {

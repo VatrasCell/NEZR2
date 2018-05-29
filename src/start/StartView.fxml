@@ -42,7 +42,7 @@
             <Insets top="15.0" />
          </GridPane.margin>
       </Label>
-      <Button mnemonicParsing="false" text="Admin" GridPane.halignment="LEFT" GridPane.valignment="TOP">
+      <Button mnemonicParsing="false" onAction="#adminLogin" text="Admin" GridPane.halignment="LEFT" GridPane.valignment="TOP">
          <GridPane.margin>
             <Insets left="15.0" top="15.0" />
          </GridPane.margin>
