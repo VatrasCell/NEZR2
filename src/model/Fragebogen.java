@@ -6,6 +6,7 @@ public class Fragebogen {
 	private String name;
 	private String ort;
 	private boolean activ;
+	private boolean isFinal;
 	
 	/**
 	 * @return the id
@@ -67,6 +68,14 @@ public class Fragebogen {
 	public void setActiv(boolean activ) {
 		this.activ = activ;
 	}
+	public boolean isFinal() {
+		return isFinal;
+	}
+	public void setFinal(boolean isFinal) {
+		this.isFinal = isFinal;
+	}
+	
+	
 	
 	
 	

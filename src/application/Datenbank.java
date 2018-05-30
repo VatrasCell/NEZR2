@@ -1056,58 +1056,6 @@ public class Datenbank {
 	}
 
 	*//**
-	 * Gibt alle Frageboegen eines Standortes zurueck
-	 * 
-	 * @param standort
-	 *            String: der Standort
-	 * @return Vector FragebogenDialog aller Frageboegen des Standortes
-	 * @author Eric
-	 *//*
-	public static Vector<FragebogenDialog> getFragebogen(String standort) {
-		try {
-			myCon = DriverManager.getConnection(url, user, pwd);
-			mySQL = myCon.createStatement();
-			psSql = null;
-			mySQL = myCon.createStatement();
-			String statement = "SELECT idOrt FROM ort WHERE Ort=?";
-			psSql = myCon.prepareStatement(statement);
-			psSql.setString(1, slashUnicode(standort));
-			myRS = psSql.executeQuery();
-			Vector<FragebogenDialog> fragebogen = new Vector<FragebogenDialog>();
-
-			while (myRS.next()) {
-				idstandort = myRS.getInt("idOrt");
-			}
-
-			mySQL = null;
-			myRS = null;
-
-			mySQL = myCon.createStatement();
-			statement = "SELECT * FROM Fragebogen WHERE idOrt='" + idstandort + "'";
-			myRS = mySQL.executeQuery(statement);
-
-			while (myRS.next()) {
-				FragebogenDialog fb = new FragebogenDialog();
-				fb.setFragebogenName(unslashUnicode(myRS.getString("name")));
-				fb.setFragebogenDatum(myRS.getString("datum"));
-				fb.setFragebogenAktiv(myRS.getBoolean("aktiviert")); // anneNeu
-				fb.setFragebogenId(myRS.getInt("idFragebogen")); // anneNeuFlorian
-				fb.setFragebogenFinal(myRS.getBoolean("final"));
-				fragebogen.add(fb);
-			}
-			mySQL = null;
-			myRS = null;
-			myCon.close();
-			return fragebogen;
-		} catch (SQLException e) {
-			e.printStackTrace();
-			ErrorLog.fehlerBerichtB("ERROR",
-					Datenbank.class + ": " + Thread.currentThread().getStackTrace()[1].getLineNumber(), e.getMessage());
-		}
-		return null;
-	}
-
-	*//**
 	 * Gibt die Fragebogen ID des gegebenen Fragebogens zurueck
 	 * 
 	 * @param selectedFB
