@@ -2950,25 +2950,25 @@ public class Datenbank {
 	 */
 	public static String slashUnicode(String unSlashed) {
 		if (unSlashed.indexOf("Ä") >= 0) {
-			unSlashed = unSlashed.replaceAll("Ä", "\\\\\\u00c4");
+			unSlashed = unSlashed.replaceAll("Ä", "\\\\\\\\u00c4");
 		}
 		if (unSlashed.indexOf("ä") >= 0) {
-			unSlashed = unSlashed.replaceAll("ä", "\\\\\\u00e4");
+			unSlashed = unSlashed.replaceAll("ä", "\\\\\\\\u00e4");
 		}
 		if (unSlashed.indexOf("Ö") >= 0) {
-			unSlashed = unSlashed.replaceAll("Ö", "\\\\\\u00d6");
+			unSlashed = unSlashed.replaceAll("Ö", "\\\\\\\\u00d6");
 		}
 		if (unSlashed.indexOf("ö") >= 0) {
-			unSlashed = unSlashed.replaceAll("ö", "\\\\\\u00f6");
+			unSlashed = unSlashed.replaceAll("ö", "\\\\\\\\u00f6");
 		}
 		if (unSlashed.indexOf("Ü") >= 0) {
-			unSlashed = unSlashed.replaceAll("Ü", "\\\\\\u00dc");
+			unSlashed = unSlashed.replaceAll("Ü", "\\\\\\\\u00dc");
 		}
 		if (unSlashed.indexOf("ü") >= 0) {
-			unSlashed = unSlashed.replaceAll("ü", "\\\\\\u00fc");
+			unSlashed = unSlashed.replaceAll("ü", "\\\\\\\\u00fc");
 		}
 		if (unSlashed.indexOf("ß") >= 0) {
-			unSlashed = unSlashed.replaceAll("ß", "\\\\\\u00df");
+			unSlashed = unSlashed.replaceAll("ß", "\\\\\\\\u00df");
 		}
 		return unSlashed;
 

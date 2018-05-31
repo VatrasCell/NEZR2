@@ -44,7 +44,8 @@ public class AdminService extends Datenbank {
 			mySQL = myCon.createStatement();
 			statement = "SELECT * FROM Fragebogen WHERE idOrt='" + idstandort + "'";
 			myRS = mySQL.executeQuery(statement);
-
+			System.out.println(idstandort);
+			System.out.println(myRS.toString());
 			while (myRS.next()) {
 				Fragebogen fb = new Fragebogen();
 				fb.setName(unslashUnicode(myRS.getString("name")));
