@@ -9,7 +9,7 @@
    <top>
       <AnchorPane prefHeight="66.0" prefWidth="600.0" BorderPane.alignment="CENTER">
          <children>
-            <Button layoutX="14.0" layoutY="21.0" mnemonicParsing="false" text="Programm beenden" AnchorPane.leftAnchor="15.0" AnchorPane.topAnchor="15.0" />
+            <Button layoutX="14.0" layoutY="21.0" mnemonicParsing="false" onAction="#exit" text="Programm beenden" AnchorPane.leftAnchor="15.0" AnchorPane.topAnchor="15.0" />
             <Label alignment="TOP_CENTER" layoutX="238.0" layoutY="19.0" prefHeight="17.0" prefWidth="125.0" text="Fragebogen Übersicht" textAlignment="CENTER" AnchorPane.leftAnchor="238.0" AnchorPane.rightAnchor="237.0" AnchorPane.topAnchor="15.0" />
             <HBox alignment="CENTER" layoutX="47.0" layoutY="49.0" prefHeight="45.0" prefWidth="505.0" spacing="8.0" AnchorPane.leftAnchor="48.0" AnchorPane.rightAnchor="48.0" AnchorPane.topAnchor="48.0">
                <children>
@@ -23,14 +23,14 @@
                   <Button mnemonicParsing="false" text="Button" />
                </children>
             </HBox>
-            <Button layoutX="526.0" layoutY="15.0" mnemonicParsing="false" text="Logout" AnchorPane.rightAnchor="15.0" AnchorPane.topAnchor="15.0" />
+            <Button layoutX="526.0" layoutY="15.0" mnemonicParsing="false" onAction="#logout" text="Logout" AnchorPane.rightAnchor="15.0" AnchorPane.topAnchor="15.0" />
          </children>
       </AnchorPane>
    </top>
    <center>
       <AnchorPane prefHeight="173.0" prefWidth="600.0" BorderPane.alignment="CENTER">
          <children>
-            <TableView fx:id="tbl_fragebogen" layoutX="136.0" layoutY="30.0" prefHeight="200.0" prefWidth="382.0" AnchorPane.bottomAnchor="30.0" AnchorPane.leftAnchor="82.0" AnchorPane.rightAnchor="82.0" AnchorPane.topAnchor="30.0">
+            <TableView fx:id="tbl_fragebogen" editable="true" layoutX="136.0" layoutY="30.0" prefHeight="200.0" prefWidth="382.0" AnchorPane.bottomAnchor="30.0" AnchorPane.leftAnchor="82.0" AnchorPane.rightAnchor="82.0" AnchorPane.topAnchor="30.0">
               <columns>
                 <TableColumn fx:id="nameCol" maxWidth="136.0" minWidth="82.0" prefWidth="119.0" text="Name" />
                 <TableColumn fx:id="dateCol" minWidth="50.0" prefWidth="96.5" text="Erstelldatum" />

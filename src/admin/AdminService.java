@@ -55,8 +55,6 @@ public class AdminService extends Datenbank {
 				fb.setFinal(myRS.getBoolean("final"));
 				fragebogen.add(fb);
 			}
-			mySQL = null;
-			myRS = null;
 			myCon.close();
 			return fragebogen;
 		} catch (SQLException e) {
@@ -66,5 +64,61 @@ public class AdminService extends Datenbank {
 		}
 		return null;
 	}
+	
+	/**
+	 * Setzt den gegebenen Fragebogen auf aktiv und deaktiviert alle anderen
+	 * Frageboegen. Gibt bei Erfolg TRUE zurueck.
+	 * 
+	 * @param fb
+	 *            FragebogenDialog: der Fragebogen
+	 * @return boolean
+	 * @author Anne
+	 */
+	public static boolean updateFragebogen(Fragebogen fb) {
+		try {
+			Connection myCon = DriverManager.getConnection(url, user, pwd);
+			Statement mySQL = myCon.createStatement();
+			String statement = "UPDATE fragebogen SET aktiviert=TRUE WHERE idFragebogen=" + fb.getId();
+			mySQL.execute(statement);
 
+			mySQL = null;
+			mySQL = myCon.createStatement();
+			statement = "UPDATE fragebogen SET aktiviert=FALSE WHERE NOT idFragebogen=" + fb.getId();
+			mySQL.execute(statement);
+
+			myCon.close();
+			return true;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			//ErrorLog.fehlerBerichtB("ERROR",
+			//		Datenbank.class + ": " + Thread.currentThread().getStackTrace()[1].getLineNumber(), e.getMessage());
+		}
+		return false;
+	}
+
+	/**
+	 * Deaktiviert den gegebenen Fragebogen. Gibt bei Erfolg TRUE zurueck.
+	 * 
+	 * @param fb
+	 *            FragebogenDialog: der Fragebogen
+	 * @return boolean
+	 * @author Eric
+	 */
+	public static boolean disableFragebogen(Fragebogen fb) {
+		try {
+			// anneSuperNeu
+			Connection myCon = DriverManager.getConnection(url, user, pwd);
+			Statement mySQL = myCon.createStatement();
+			String statement = "UPDATE fragebogen SET aktiviert=FALSE WHERE idFragebogen=" + fb.getId();
+			mySQL.execute(statement);
+
+			myCon.close();
+			return true;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			//ErrorLog.fehlerBerichtB("ERROR",
+			//		Datenbank.class + ": " + Thread.currentThread().getStackTrace()[1].getLineNumber(), e.getMessage());
+		}
+		return false;
+	}
 }

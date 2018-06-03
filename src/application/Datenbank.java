@@ -50,7 +50,7 @@ public class Datenbank {
 	private static int idstandort = 0;
 
 	/**
-	 * Prüft, ob eine Frage doppelt vor kommt und gibt dem Duplikat einen
+	 * PrÃ¼ft, ob eine Frage doppelt vor kommt und gibt dem Duplikat einen
 	 * Suffix.
 	 * 
 	 * @param frage
@@ -127,7 +127,7 @@ public class Datenbank {
 	}
 
 	*//**
-	 * Speichert eine neue Freie Frage. Gibt bei Erfolg TRUE zurück.
+	 * Speichert eine neue Freie Frage. Gibt bei Erfolg TRUE zurÃ¼ck.
 	 * 
 	 * @param selectedFB
 	 *            FragebogenDialog
@@ -288,7 +288,7 @@ public class Datenbank {
 	}
 
 	*//**
-	 * Speichert eine neue Bewertungsfrage. Gibt bei Erfolg TRUE zurück.
+	 * Speichert eine neue Bewertungsfrage. Gibt bei Erfolg TRUE zurÃ¼ck.
 	 * 
 	 * @param selectedFB
 	 *            FragebogenDialog
@@ -478,7 +478,7 @@ public class Datenbank {
 	}
 
 	*//**
-	 * Speichert eine neue Multipe Choice Frage. Gibt bei Erfolg TRUE zurück.
+	 * Speichert eine neue Multipe Choice Frage. Gibt bei Erfolg TRUE zurÃ¼ck.
 	 * 
 	 * @param neueFrageMc
 	 *            Vector String
@@ -729,7 +729,7 @@ public class Datenbank {
 		}
 
 		if (isZahl) {
-			if (zahlArt.equals("Größer gleich Zahl")) {
+			if (zahlArt.equals("GrÃ¶ÃŸer gleich Zahl")) {
 				flag += " INT>=" + anzahlZeichen + " ";
 			}
 
@@ -779,7 +779,7 @@ public class Datenbank {
 			int reactFrageID = fragen.get(index).getFrageID();
 			flag += frageArt + reactFrageID + "A" + positionVec;
 		} else if (frageart == "BF") {
-			// Bewertungsantworten hinzufügen
+			// Bewertungsantworten hinzufÃ¼gen
 			String frageArt = String.valueOf(fragen.get(index).getArt());
 			int reactFrageID = fragen.get(index).getFrageID();
 			flag += frageArt + reactFrageID + "A" + positionVec;
@@ -976,7 +976,7 @@ public class Datenbank {
 	}
 
 	*//**
-	 * Gibt die ID der Antwort zurück. Ist die Antwort noch nicht vorhanden,
+	 * Gibt die ID der Antwort zurÃ¼ck. Ist die Antwort noch nicht vorhanden,
 	 * wird sie zuerst in der Datenbank gespeichert.
 	 * 
 	 * @param antwort
@@ -1033,7 +1033,7 @@ public class Datenbank {
 	}
 
 	*//**
-	 * Gibt die Anzahl an gespeicherten Befragungen zurück.
+	 * Gibt die Anzahl an gespeicherten Befragungen zurÃ¼ck.
 	 * 
 	 * @return int
 	 * @author Eric
@@ -1115,67 +1115,6 @@ public class Datenbank {
 						+ idstandort + ", FALSE)";
 				mySQL.execute(statement);
 			}
-			mySQL = null;
-			myRS = null;
-			myCon.close();
-			return true;
-		} catch (SQLException e) {
-			e.printStackTrace();
-			ErrorLog.fehlerBerichtB("ERROR",
-					Datenbank.class + ": " + Thread.currentThread().getStackTrace()[1].getLineNumber(), e.getMessage());
-		}
-		return false;
-	}
-
-	*//**
-	 * Setzt den gegebenen Fragebogen auf aktiv und deaktiviert alle anderen
-	 * Frageboegen. Gibt bei Erfolg TRUE zurueck.
-	 * 
-	 * @param fb
-	 *            FragebogenDialog: der Fragebogen
-	 * @return boolean
-	 * @author Anne
-	 *//*
-	public static boolean updateFragebogen(FragebogenDialog fb) {
-		try {
-			myCon = DriverManager.getConnection(url, user, pwd);
-			mySQL = myCon.createStatement();
-			String statement = "UPDATE fragebogen SET aktiviert=TRUE WHERE idFragebogen=" + fb.getFragebogenId();
-			mySQL.execute(statement);
-
-			mySQL = null;
-			mySQL = myCon.createStatement();
-			statement = "UPDATE fragebogen SET aktiviert=FALSE WHERE NOT idFragebogen=" + fb.getFragebogenId();
-			mySQL.execute(statement);
-
-			mySQL = null;
-			myRS = null;
-			myCon.close();
-			return true;
-		} catch (SQLException e) {
-			e.printStackTrace();
-			ErrorLog.fehlerBerichtB("ERROR",
-					Datenbank.class + ": " + Thread.currentThread().getStackTrace()[1].getLineNumber(), e.getMessage());
-		}
-		return false;
-	}
-
-	*//**
-	 * Deaktiviert den gegebenen Fragebogen. Gibt bei Erfolg TRUE zurueck.
-	 * 
-	 * @param fb
-	 *            FragebogenDialog: der Fragebogen
-	 * @return boolean
-	 * @author Eric
-	 *//*
-	public static boolean disableFragebogen(FragebogenDialog fb) {
-		try {
-			// anneSuperNeu
-			myCon = DriverManager.getConnection(url, user, pwd);
-			mySQL = myCon.createStatement();
-			String statement = "UPDATE fragebogen SET aktiviert=FALSE WHERE idFragebogen=" + fb.getFragebogenId();
-			mySQL.execute(statement);
-
 			mySQL = null;
 			myRS = null;
 			myCon.close();
@@ -1563,7 +1502,7 @@ public class Datenbank {
 	}
 
 	*//**
-	 * Updated die Flags, beim Löschen einer Antwort, auf die reagiert wird.
+	 * Updated die Flags, beim LÃ¶schen einer Antwort, auf die reagiert wird.
 	 * Gibt bei Erfolg TRUE zurueck.
 	 * 
 	 * @param frage
@@ -1585,7 +1524,7 @@ public class Datenbank {
 						+ "A%'";
 				myRS = mySQL.executeQuery(statement);
 
-				// Flags updaten, wenn eine Frage auf die zu löschende Frage
+				// Flags updaten, wenn eine Frage auf die zu lÃ¶schende Frage
 				// reagiert
 				while (myRS.next()) {
 					flag = myRS.getString("flags");
@@ -1612,7 +1551,7 @@ public class Datenbank {
 						+ "A%'";
 				myRS = mySQL.executeQuery(statement);
 
-				// Flags updaten, wenn eine Frage auf die zu löschende Frage
+				// Flags updaten, wenn eine Frage auf die zu lÃ¶schende Frage
 				// reagiert
 				while (myRS.next()) {
 					flag = myRS.getString("flags");
@@ -1639,7 +1578,7 @@ public class Datenbank {
 						+ "A%'";
 				myRS = mySQL.executeQuery(statement);
 
-				// Flags updaten, wenn eine Frage auf die zu löschende Frage
+				// Flags updaten, wenn eine Frage auf die zu lÃ¶schende Frage
 				// reagiert
 				while (myRS.next()) {
 					flag = myRS.getString("flags");
@@ -1666,7 +1605,7 @@ public class Datenbank {
 						+ "A%'";
 				myRS = mySQL.executeQuery(statement);
 
-				// Flags updaten, wenn eine Frage auf die zu löschende Frage
+				// Flags updaten, wenn eine Frage auf die zu lÃ¶schende Frage
 				// reagiert
 				while (myRS.next()) {
 					flag = myRS.getString("flags");
@@ -1800,7 +1739,7 @@ public class Datenbank {
 			myRS = null;
 			mySQL = null;
 
-			// Löschen der Relationen von Fragebogen zu MultipleChoice
+			// LÃ¶schen der Relationen von Fragebogen zu MultipleChoice
 			for (short i = 0; i < idsmc.size(); i++) {
 				mySQL = myCon.createStatement();
 				statement = "DELETE FROM Fb_has_Mc WHERE idMultipleChoice=" + idsmc.get(i) + " AND idFragebogen="
@@ -1809,7 +1748,7 @@ public class Datenbank {
 				mySQL = null;
 			}
 
-			// Löschen der Relationen von Fragebogen zu FreieFragen
+			// LÃ¶schen der Relationen von Fragebogen zu FreieFragen
 			for (short i = 0; i < idsff.size(); i++) {
 				mySQL = myCon.createStatement();
 				statement = "DELETE FROM Fb_has_Ff WHERE idFreieFragen=" + idsff.get(i) + " AND idFragebogen="
@@ -1823,9 +1762,9 @@ public class Datenbank {
 				statement = "SELECT idMultipleChoice FROM FB_has_MC WHERE idMultipleChoice=" + idsmc.get(i);
 				myRS = mySQL.executeQuery(statement);
 
-				// steht ID der MC Frage nach dem Löschen der Relation zum
+				// steht ID der MC Frage nach dem LÃ¶schen der Relation zum
 				// jeweiligen Fragebogen immernoch wo anders?
-				// Wenn nicht, darf die MC Frage gelöscht werden, denn sie kommt
+				// Wenn nicht, darf die MC Frage gelÃ¶scht werden, denn sie kommt
 				// in keinem anderen Fragebogen vor
 				if (!myRS.next()) {
 					mySQL = myCon.createStatement();
@@ -1844,9 +1783,9 @@ public class Datenbank {
 				mySQL = myCon.createStatement();
 				statement = "SELECT idFreieFragen FROM Fb_has_ff WHERE idFreieFragen=" + idsff.get(i);
 				myRS = mySQL.executeQuery(statement);
-				// steht ID der FF Frage nach dem Löschen der Relation zum
+				// steht ID der FF Frage nach dem LÃ¶schen der Relation zum
 				// jeweiligen Fragebogen immernoch wo anders?
-				// Wenn nicht, darf die FF Frage gelöscht werden, denn sie kommt
+				// Wenn nicht, darf die FF Frage gelÃ¶scht werden, denn sie kommt
 				// in keinem anderen Fragebogen vor
 				if (!myRS.next()) {
 					mySQL = myCon.createStatement();
@@ -1856,7 +1795,7 @@ public class Datenbank {
 				}
 			}
 
-			// Antworten löschen, wenn nicht 0-10 / ja / nein / ##### (Multiple
+			// Antworten lÃ¶schen, wenn nicht 0-10 / ja / nein / ##### (Multiple
 			// Choice Edition)
 			for (short j = 0; j < antmcnr.size(); j++) {
 				if (!antwortenmc.get(j).equals("0") && !antwortenmc.get(j).equals("1")
@@ -2107,7 +2046,7 @@ public class Datenbank {
 						+ "A%'";
 				myRS = mySQL.executeQuery(statement);
 
-				// Flags updaten, wenn eine Frage auf die zu löschende Frage
+				// Flags updaten, wenn eine Frage auf die zu lÃ¶schende Frage
 				// reagiert
 				while (myRS.next()) {
 					String flag = myRS.getString("flags");
@@ -2134,7 +2073,7 @@ public class Datenbank {
 						+ "A%'";
 				myRS = mySQL.executeQuery(statement);
 
-				// Flags updaten, wenn eine Frage auf die zu löschende Frage
+				// Flags updaten, wenn eine Frage auf die zu lÃ¶schende Frage
 				// reagiert
 				while (myRS.next()) {
 					String flag = myRS.getString("flags");
@@ -2189,7 +2128,7 @@ public class Datenbank {
 				myRS = null;
 				mySQL = null;
 
-				// Löschen der Relationen von Fragebogen zu MultipleChoice
+				// LÃ¶schen der Relationen von Fragebogen zu MultipleChoice
 				mySQL = myCon.createStatement();
 				statement = "DELETE FROM Fb_has_Mc WHERE idMultipleChoice=" + frage.getFrageID();
 				mySQL.execute(statement);
@@ -2200,7 +2139,7 @@ public class Datenbank {
 						+ "A%'";
 				myRS = mySQL.executeQuery(statement);
 
-				// Flags updaten, wenn eine Frage auf die zu löschende Frage
+				// Flags updaten, wenn eine Frage auf die zu lÃ¶schende Frage
 				// reagiert
 				while (myRS.next()) {
 					String flag = myRS.getString("flags");
@@ -2227,7 +2166,7 @@ public class Datenbank {
 						+ "A%'";
 				myRS = mySQL.executeQuery(statement);
 
-				// Flags updaten, wenn eine Frage auf die zu löschende Frage
+				// Flags updaten, wenn eine Frage auf die zu lÃ¶schende Frage
 				// reagiert
 				while (myRS.next()) {
 					String flag = myRS.getString("flags");
@@ -2249,7 +2188,7 @@ public class Datenbank {
 					}
 				}
 
-				// Löschen der Relationen von Fragebogen zu FreieFragen
+				// LÃ¶schen der Relationen von Fragebogen zu FreieFragen
 				mySQL = myCon.createStatement();
 				statement = "DELETE FROM Fb_has_Ff WHERE idFreieFragen=" + frage.getFrageID();
 				mySQL.execute(statement);
@@ -2261,9 +2200,9 @@ public class Datenbank {
 				statement = "SELECT idMultipleChoice FROM FB_has_MC WHERE idMultipleChoice=" + frage.getFrageID();
 				myRS = mySQL.executeQuery(statement);
 
-				// steht ID der MC Frage nach dem Löschen der Relation zum
+				// steht ID der MC Frage nach dem LÃ¶schen der Relation zum
 				// jeweiligen Fragebogen immernoch wo anders?
-				// Wenn nicht, darf die MC Frage gelöscht werden, denn sie kommt
+				// Wenn nicht, darf die MC Frage gelÃ¶scht werden, denn sie kommt
 				// in keinem anderen Fragebogen vor
 				if (!myRS.next()) {
 					mySQL = myCon.createStatement();
@@ -2281,9 +2220,9 @@ public class Datenbank {
 				statement = "SELECT idFreieFragen FROM Fb_has_ff WHERE idFreieFragen=" + frage.getFrageID();
 				myRS = mySQL.executeQuery(statement);
 
-				// steht ID der FF Frage nach dem Löschen der Relation zum
+				// steht ID der FF Frage nach dem LÃ¶schen der Relation zum
 				// jeweiligen Fragebogen immernoch wo anders?
-				// Wenn nicht, darf die FF Frage gelöscht werden, denn sie kommt
+				// Wenn nicht, darf die FF Frage gelÃ¶scht werden, denn sie kommt
 				// in keinem anderen Fragebogen vor
 				if (!myRS.next()) {
 					mySQL = myCon.createStatement();
@@ -2293,7 +2232,7 @@ public class Datenbank {
 				}
 			}
 
-			// Antworten löschen, wenn nicht 0-10 / ja / nein / ##### (Multiple
+			// Antworten lÃ¶schen, wenn nicht 0-10 / ja / nein / ##### (Multiple
 			// Choice Edition)
 			for (short j = 0; j < antmcnr.size(); j++) {
 				if (!antwortenmc.get(j).equals("0") && !antwortenmc.get(j).equals("1")
@@ -2324,9 +2263,9 @@ public class Datenbank {
 	 * Loescht die gegebene Antwort. Gibt bei Erfolg TRUE zurueck.
 	 * 
 	 * @param antids
-	 *            Vector<Integer>: ids der zu-löschendenen Antworten
+	 *            Vector<Integer>: ids der zu-lÃ¶schendenen Antworten
 	 * @param frage
-	 *            FrageErstellen: die zugehörige Frage
+	 *            FrageErstellen: die zugehÃ¶rige Frage
 	 * @return boolean
 	 *//*
 	// anneSehrNeu
@@ -2614,7 +2553,7 @@ public class Datenbank {
 		}
 	}
 
-	// Maximum an möglicher Position im Fragebogen herausfinden; für den Spinner
+	// Maximum an mÃ¶glicher Position im Fragebogen herausfinden; fÃ¼r den Spinner
 	// beim Fragen Erstellen/bearbeiten
 	*//**
 	 * Gibt das Maximum an moeglicher Position im Fragebogen zurueck.
@@ -2969,6 +2908,9 @@ public class Datenbank {
 		}
 		if (unSlashed.indexOf("ß") >= 0) {
 			unSlashed = unSlashed.replaceAll("ß", "\\\\\\\\u00df");
+		}
+		if (unSlashed.indexOf("ẞ") >= 0) {
+			unSlashed = unSlashed.replaceAll("ẞ", "\\\\\\\\x1e9e");
 		}
 		return unSlashed;
 

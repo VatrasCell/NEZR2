@@ -1,12 +1,16 @@
 package model;
 
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.value.ObservableBooleanValue;
+
 public class Fragebogen {
 	private int id;
 	private String date;
 	private String name;
 	private String ort;
-	private boolean activ;
-	private boolean isFinal;
+	private BooleanProperty activ = new SimpleBooleanProperty();
+	private BooleanProperty isFinal = new SimpleBooleanProperty();
 	
 	/**
 	 * @return the id
@@ -59,20 +63,20 @@ public class Fragebogen {
 	/**
 	 * @return the activ
 	 */
-	public boolean isActiv() {
+	public ObservableBooleanValue isActiv() {
 		return activ;
 	}
 	/**
 	 * @param activ the activ to set
 	 */
 	public void setActiv(boolean activ) {
-		this.activ = activ;
+		this.activ.set(activ);
 	}
-	public boolean isFinal() {
+	public ObservableBooleanValue isFinal() {
 		return isFinal;
 	}
 	public void setFinal(boolean isFinal) {
-		this.isFinal = isFinal;
+		this.isFinal.set(isFinal);
 	}
 	
 	
