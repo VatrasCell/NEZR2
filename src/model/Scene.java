@@ -5,7 +5,9 @@ public enum Scene {
 	Location("location"),
 	Login("login"),
 	Start("start"),
-	Admin("admin");
+	Admin("admin"),
+	QuestionList("questionList"),
+	Question("question");
 	
 	private String scene;
 

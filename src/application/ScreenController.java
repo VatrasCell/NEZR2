@@ -7,6 +7,8 @@ import java.util.HashMap;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import login.LoginController;
+import model.Fragebogen;
+import questionList.QuestionListController;
 
 public class ScreenController {
 	private static HashMap<String, Scene> screenMap = new HashMap<>();
@@ -39,10 +41,13 @@ public class ScreenController {
 	}
 	
 	private static <T> void setParameter(String key, T value) {
+		System.out.println(key);
 		switch (key) {
 		case "login.toAdmin":
 			LoginController.toAdmin = (boolean) value;
 			break;
+		case "questionList.fragebogen":
+			QuestionListController.fragebogen = (Fragebogen) value;
 
 		default:
 			break;

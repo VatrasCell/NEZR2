@@ -1,5 +1,6 @@
 package admin;
 
+import java.io.IOException;
 import java.util.Vector;
 
 import application.GlobalVars;
@@ -8,6 +9,8 @@ import javafx.beans.value.ObservableBooleanValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
@@ -16,7 +19,7 @@ import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.util.Callback;
 import model.Fragebogen;
-import model.Scene;
+import questionList.QuestionListController;
 
 public class AdminController {
 	
@@ -25,7 +28,6 @@ public class AdminController {
 	
 	@FXML
 	private TableView<Fragebogen> tbl_fragebogen;
-	
 	@FXML
 	private TableColumn<Fragebogen, String> nameCol;
 	@FXML
@@ -36,6 +38,8 @@ public class AdminController {
 	private TableColumn<Fragebogen, Boolean> finalCol = new TableColumn<>("Final");
 	@FXML
 	private TableColumn<Fragebogen, String> actionCol = new TableColumn<>("Bearbeiten");
+	@FXML
+	private TableColumn<Fragebogen, String> copCol = new TableColumn<>("Kopieren");
 	@FXML
 	private TableColumn<Fragebogen, String> delCol = new TableColumn<>("Löschen");
 	
@@ -111,7 +115,14 @@ public class AdminController {
                             setText(null);
                         } else {
                             btn.setOnAction(event -> {
-                            	//Fragebogen person = getTableView().getItems().get(getIndex());
+                            	try {
+                            		QuestionListController.fragebogen = getTableView().getItems().get(getIndex());
+									ScreenController.addScreen(model.Scene.QuestionList.scene(), 
+											new Scene(FXMLLoader.load(getClass().getResource("../questionList/QuestionListView.fxml"))));
+									ScreenController.activate(model.Scene.QuestionList.scene());
+								} catch (IOException e) {
+									e.printStackTrace();
+								}
                             });
                             setGraphic(btn);
                             setText(null);
@@ -124,6 +135,38 @@ public class AdminController {
 
         actionCol.setCellFactory(cellFactory);
         tbl_fragebogen.getColumns().add(actionCol);
+        
+        copCol.setCellValueFactory(new PropertyValueFactory<>("DUMMY"));
+        Callback<TableColumn<Fragebogen, String>, TableCell<Fragebogen, String>> cellFactoryCop
+                = //
+                new Callback<TableColumn<Fragebogen, String>, TableCell<Fragebogen, String>>() {
+            @Override
+            public TableCell<Fragebogen, String> call(final TableColumn<Fragebogen, String> param) {
+                final TableCell<Fragebogen, String> cell = new TableCell<Fragebogen, String>() {
+
+                    final Button btn = new Button("COP");
+
+                    @Override
+                    public void updateItem(String item, boolean empty) {
+                        super.updateItem(item, empty);
+                        if (empty) {
+                            setGraphic(null);
+                            setText(null);
+                        } else {
+                            btn.setOnAction(event -> {
+                            	//Fragebogen person = getTableView().getItems().get(getIndex());
+                            });
+                            setGraphic(btn);
+                            setText(null);
+                        }
+                    }
+                };
+                return cell;
+            }
+        };
+
+        copCol.setCellFactory(cellFactoryCop);
+        tbl_fragebogen.getColumns().add(copCol);
         
         delCol.setCellValueFactory(new PropertyValueFactory<>("DUMMY"));
         Callback<TableColumn<Fragebogen, String>, TableCell<Fragebogen, String>> cellFactoryDel
@@ -161,7 +204,7 @@ public class AdminController {
 	
 	@FXML
 	private void logout() {
-		ScreenController.activate(Scene.Start.scene());
+		ScreenController.activate(model.Scene.Start.scene());
 	}
 	
 	@FXML

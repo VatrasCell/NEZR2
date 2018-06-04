@@ -856,44 +856,6 @@ public class Datenbank {
 	}
 
 	*//**
-	 * Gibt alle Ueberschriften des gegebenen Fragebogen zurueck.
-	 * 
-	 * @param fb
-	 *            FrageobgenDialog: der Fragebogen
-	 * @return Vector FrageErstellen
-	 * @author Eric
-	 *//*
-	public static Vector<FrageErstellen> getUeberschriften(FragebogenDialog fb) {
-		Vector<FrageErstellen> ueberschriften = new Vector<FrageErstellen>();
-		try {
-			myCon = DriverManager.getConnection(url, user, pwd);
-			mySQL = myCon.createStatement();
-			String statment = "SELECT mc1.FrageMC, mc1.idMultipleChoice, Fragebogen.Datum, fb_has_mc.Position, fb_has_mc.Flags, Kategorie, Antwort FROM fragebogen JOIN fb_has_mc ON fragebogen.idFragebogen=fb_has_mc.idFragebogen JOIN multiplechoice mc1 ON fb_has_mc.idMultipleChoice=mc1.idMultipleChoice JOIN kategorie ON mc1.idKategorie=kategorie.idKategorie JOIN mc_has_a ON mc1.idMultipleChoice=mc_has_a.idMultipleChoice JOIN antworten ON mc_has_a.AntwortNr=antworten.AntwortNr WHERE Fragebogen.idFragebogen="
-					+ fb.getFragebogenId() + " AND antwort='#####'";
-			myRS = mySQL.executeQuery(statment);
-			while (myRS.next()) {
-				FrageErstellen frage = new FrageErstellen();
-				frage.setFrage(unslashUnicode(myRS.getString("FrageMC")));
-				frage.setFrageID(myRS.getInt("idMultipleChoice"));
-				frage.setKategorie(unslashUnicode(myRS.getString("Kategorie")));
-				frage.setDatum(myRS.getString("Datum"));
-				frage.setFlags("");
-				frage.setPosition(Integer.parseInt(myRS.getString("Position")));
-				frage.setArt("MC");
-				frage.setFragebogenID(fb.getFragebogenId());
-				frage.setAntwort_moeglichkeit(myRS.getString("Antwort"));
-				ueberschriften.add(frage);
-			}
-
-		} catch (SQLException e) {
-			ErrorLog.fehlerBerichtB("ERROR",
-					Datenbank.class + ": " + Thread.currentThread().getStackTrace()[1].getLineNumber(), e.getMessage());
-			e.printStackTrace();
-		}
-		return ueberschriften;
-	}
-
-	*//**
 	 * Speichert alle durch den Benutzer gegebenen Antworten in die Datenbank.
 	 * 
 	 * @param fragen
@@ -2306,34 +2268,6 @@ public class Datenbank {
 	}
 
 	*//**
-	 * Gibt alle Kategorien zurueck.
-	 * 
-	 * @return Vector String aller Kategorien
-	 *//*
-	public static Vector<String> getKategorie() {
-		try {
-			myCon = DriverManager.getConnection(url, user, pwd);
-			mySQL = myCon.createStatement();
-			String statement = "SELECT * FROM kategorie";
-			myRS = mySQL.executeQuery(statement);
-			Vector<String> kategorien = new Vector<String>();
-
-			while (myRS.next()) {
-				kategorien.add(unslashUnicode(myRS.getString("Kategorie")));
-			}
-			mySQL = null;
-			myRS = null;
-			myCon.close();
-			return kategorien;
-		} catch (SQLException e) {
-			e.printStackTrace();
-			ErrorLog.fehlerBerichtB("ERROR",
-					Datenbank.class + ": " + Thread.currentThread().getStackTrace()[1].getLineNumber(), e.getMessage());
-		}
-		return null;
-	}
-
-	*//**
 	 * Fuegt eine neue Kategorie der Datenbank hinzu. Gibt bei Erfolg TRUE
 	 * zurueck.
 	 * 
@@ -2367,49 +2301,6 @@ public class Datenbank {
 					Datenbank.class + ": " + Thread.currentThread().getStackTrace()[1].getLineNumber(), e.getMessage());
 		}
 		return false;
-	}
-
-	*//**
-	 * Gibt alle Antworten einer Frage zurueck.
-	 * 
-	 * @param frage
-	 *            FrageErstellen: die Frage
-	 * @return Vector String aller Antworten
-	 *//*
-	public static Vector<String> getAntworten(FrageErstellen frage) {
-		try {
-			myCon = DriverManager.getConnection(url, user, pwd);
-			mySQL = myCon.createStatement();
-			String text = slashUnicode(frage.getFrage()).replaceAll("\\\\", "\\\\\\\\");
-			String statement = "SELECT Antwort FROM fragebogen JOIN "
-					+ "fb_has_mc ON fragebogen.idFragebogen=fb_has_mc.idFragebogen JOIN "
-					+ "multiplechoice mc1 ON fb_has_mc.idMultipleChoice=mc1.idMultipleChoice JOIN "
-					+ "kategorie ON mc1.idKategorie=kategorie.idKategorie JOIN "
-					+ "mc_has_a ON mc1.idMultipleChoice=mc_has_a.idMultipleChoice JOIN "
-					+ "antworten ON mc_has_a.AntwortNr=antworten.AntwortNr " + "WHERE mc1.FrageMC='" + text + "' "
-					+ "UNION  " + "SELECT Antwort FROM fragebogen JOIN "
-					+ "fb_has_ff ON fragebogen.idFragebogen=fb_has_ff.idFragebogen JOIN "
-					+ "freiefragen ff1 ON fb_has_ff.idFreieFragen=ff1.idFreieFragen JOIN "
-					+ "kategorie ON ff1.idKategorie=kategorie.idKategorie JOIN freiefragen "
-					+ "JOIN ff_has_a ON ff1.idFreieFragen=ff_has_a.idFreieFragen JOIN "
-					+ "antworten ON ff_has_a.AntwortNr=antworten.AntwortNr " + "WHERE ff1.FrageFF='" + text + "'";
-			myRS = mySQL.executeQuery(statement);
-			Vector<String> antwortenVec = new Vector<String>();
-
-			while (myRS.next()) {
-				antwortenVec.addElement(unslashUnicode(myRS.getString("Antwort")));
-			}
-			mySQL = null;
-			myRS = null;
-			myCon.close();
-
-			return antwortenVec;
-		} catch (SQLException e) {
-			e.printStackTrace();
-			ErrorLog.fehlerBerichtB("ERROR",
-					Datenbank.class + ": " + Thread.currentThread().getStackTrace()[1].getLineNumber(), e.getMessage());
-		}
-		return null;
 	}
 
 	*//**
@@ -2555,54 +2446,6 @@ public class Datenbank {
 
 	// Maximum an mÃ¶glicher Position im Fragebogen herausfinden; fÃ¼r den Spinner
 	// beim Fragen Erstellen/bearbeiten
-	*//**
-	 * Gibt das Maximum an moeglicher Position im Fragebogen zurueck.
-	 * 
-	 * @param fb
-	 *            FragebogenDialog: der Fragebogen
-	 * @return int
-	 *//*
-	public static int getCountPosition(FragebogenDialog fb) {
-		int positionCount = 0;
-		int maxPosMc = 0;
-		int maxPosFf = 0;
-		try {
-			myCon = DriverManager.getConnection(url, user, pwd);
-			mySQL = myCon.createStatement();
-			String statement = "SELECT MAX(fb_has_mc.Position) AS position FROM fragebogen JOIN fb_has_mc ON fragebogen.idFragebogen=fb_has_mc.idFragebogen WHERE fragebogen.idFragebogen="
-					+ fb.getFragebogenId();
-			myRS = mySQL.executeQuery(statement);
-			if (myRS.next()) {
-				maxPosMc = myRS.getInt("position");
-			}
-
-			myRS = null;
-			mySQL = null;
-			mySQL = myCon.createStatement();
-			statement = "SELECT MAX(fb_has_ff.Position) AS position FROM fragebogen JOIN fb_has_ff ON fragebogen.idFragebogen=fb_has_ff.idFragebogen WHERE fragebogen.idFragebogen="
-					+ fb.getFragebogenId();
-			myRS = mySQL.executeQuery(statement);
-
-			if (myRS.next()) {
-				maxPosFf = myRS.getInt("position");
-			}
-			if (maxPosFf > maxPosMc) {
-				positionCount = maxPosFf;
-			} else {
-				positionCount = maxPosMc;
-			}
-
-			mySQL = null;
-			myRS = null;
-			myCon.close();
-		} catch (SQLException e) {
-			e.printStackTrace();
-			ErrorLog.fehlerBerichtB("ERROR",
-					Datenbank.class + ": " + Thread.currentThread().getStackTrace()[1].getLineNumber(), e.getMessage());
-		}
-		return positionCount;
-	}
-
 	*//**
 	 * ka
 	 * 
