@@ -41,7 +41,7 @@ public class QuestionListService extends Datenbank {
 				frage.addAntwort_moeglichkeit(myRS.getString("Antwort"));
 				ueberschriften.add(frage);
 			}
-
+			myCon.close();
 		} catch (SQLException e) {
 			//ErrorLog.fehlerBerichtB("ERROR",
 			//		Datenbank.class + ": " + Thread.currentThread().getStackTrace()[1].getLineNumber(), e.getMessage());

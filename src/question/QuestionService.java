@@ -42,8 +42,6 @@ public class QuestionService extends Datenbank {
 			while (myRS.next()) {
 				antwortenVec.addElement(unslashUnicode(myRS.getString("Antwort")));
 			}
-			mySQL = null;
-			myRS = null;
 			myCon.close();
 
 			return antwortenVec;
@@ -92,8 +90,6 @@ public class QuestionService extends Datenbank {
 				positionCount = maxPosMc;
 			}
 
-			mySQL = null;
-			myRS = null;
 			myCon.close();
 		} catch (SQLException e) {
 			e.printStackTrace();

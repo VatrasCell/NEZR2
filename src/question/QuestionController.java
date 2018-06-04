@@ -26,7 +26,7 @@ import model.Fragebogen;
 
 public class QuestionController {
 	public static Fragebogen fragebogen;
-	public static Frage frage;
+	public static Frage frage = new Frage();
 	private Vector<String> antworten;
 	private ObservableList<Antwort> data = FXCollections.observableArrayList();
 
@@ -103,8 +103,8 @@ public class QuestionController {
 	private void initialize() {
 		tbl_antworten.setItems(data);
 
-		nrCol.setCellValueFactory(new PropertyValueFactory<Antwort, String>("frage"));
-		antCol.setCellValueFactory(new PropertyValueFactory<Antwort, String>("kategorie"));
+		nrCol.setCellValueFactory(new PropertyValueFactory<Antwort, String>("nr"));
+		antCol.setCellValueFactory(new PropertyValueFactory<Antwort, String>("antwort"));
 
 		actionCol.setCellValueFactory(new PropertyValueFactory<>("DUMMY"));
 
@@ -185,7 +185,7 @@ public class QuestionController {
 				.collect(Collectors.toList());
 		ObservableList<Integer> list = FXCollections.observableArrayList(range);
 		posChoice.setItems(list);
-		posChoice.getSelectionModel().select(frage.getPosition());
+		posChoice.getSelectionModel().select(frage.getPosition() - 1);
 
 		ObservableList<String> listKat = FXCollections.observableArrayList(QuestionService.getKategorie());
 		katChoice.setItems(listKat);
@@ -196,7 +196,7 @@ public class QuestionController {
 		artChoice.setItems(listArt);
 
 		ObservableList<String> listZahl = FXCollections.observableArrayList("Genau wie die Zahl", "Kleiner gleich Zahl",
-				"Gr\\u00f6\\u00dfer gleich Zahl");
+				"Größer gleich Zahl");
 		zahlChoice.setItems(listZahl);
 
 		if (frage.getArt().equals("MC")) {
@@ -285,7 +285,7 @@ public class QuestionController {
 				zahlChoice.getSelectionModel().select("Kleiner gleich Zahl");
 				break;
 			case ">=":
-				zahlChoice.getSelectionModel().select("Gr\u00f6\u00dfer gleich Zahl");
+				zahlChoice.getSelectionModel().select("Größer gleich Zahl");
 				break;
 			}
 		} else {
@@ -298,7 +298,7 @@ public class QuestionController {
 		ScreenController.activate(model.Scene.QuestionList.scene());
 	}
 
-	private class Antwort {
+	public class Antwort {
 		private int nr;
 		private String antwort;
 
