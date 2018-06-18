@@ -7,8 +7,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.layout.BorderPane?>
 
-
-<BorderPane prefHeight="600.0" prefWidth="800.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8" fx:controller="question.QuestionController">
+<BorderPane prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="question.QuestionController">
    <top>
       <AnchorPane prefHeight="40.0" prefWidth="600.0" BorderPane.alignment="TOP_RIGHT">
          <children>
@@ -21,9 +20,9 @@
          <children>
             <HBox alignment="CENTER" layoutX="190.0" layoutY="19.0" prefHeight="33.0" prefWidth="210.0" spacing="8.0" AnchorPane.bottomAnchor="15.0" AnchorPane.leftAnchor="190.0" AnchorPane.rightAnchor="190.0" AnchorPane.topAnchor="0.0">
                <children>
-                  <Button mnemonicParsing="false" text="Vorschau" />
+                  <Button mnemonicParsing="false" onAction="#setPreview" text="Vorschau" />
                   <Button mnemonicParsing="false" onAction="#exit" text="Abbruch" />
-                  <Button mnemonicParsing="false" text="Speichern" />
+                  <Button fx:id="btnSave" mnemonicParsing="false" text="Speichern" />
                </children>
             </HBox>
          </children>

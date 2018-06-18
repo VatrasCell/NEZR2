@@ -19,10 +19,10 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.image.ImageView;
 import javafx.util.Callback;
 import model.Frage;
 import model.Fragebogen;
+import survey.SurveyService;
 
 public class QuestionController {
 	public static Fragebogen fragebogen;
@@ -65,6 +65,9 @@ public class QuestionController {
 	private CheckBox chckbxX;
 	@FXML
 	private CheckBox chckbxZahl;
+	
+	@FXML
+	private Button btnSave;
 
 	@FXML
 	private TableView<Antwort> tbl_antworten;
@@ -296,6 +299,607 @@ public class QuestionController {
 	@FXML
 	private void exit() {
 		ScreenController.activate(model.Scene.QuestionList.scene());
+	}
+	
+	@FXML
+	private void setPreview() {
+		if (checkFrageDaten()) {
+			Frage neueFrage = new Frage();
+			String vflags = flags;
+			neueFrage.setFrage(textFieldFE.getText());
+			neueFrage.setPosition((int)posChoice.getSelectionModel().getSelectedItem());
+			if(frage != null) {
+				neueFrage.setFrageID(frage.getFrageID());
+			}
+			
+			String selectedKat = katChoice.getSelectionModel().getSelectedItem().toString();
+			if (selectedKat.equals("")) {
+				selectedKat = katChoice.getItems().get(0).toString();
+			}						
+			neueFrage.setKategorie(selectedKat);
+			
+			boolean pflichtfrage = chckbxPflichtfrage.isSelected();                 // +
+	        boolean liste = chckbxListe.isSelected();                               // LIST
+	        boolean multipleChoice = chckbxMultipleChoice.isSelected();             // *
+	        boolean textarea = chckbxTextArea.isSelected();                        	// TEXT
+	        boolean ja_nein = chckbxJaNein.isSelected();   							// JN
+	        boolean x = chckbxX.isSelected();										//X
+	        //floNeu
+	        boolean isZahl = chckbxZahl.isSelected();									
+	        String zahlArt = (String) artChoice.getSelectionModel().getSelectedItem();			// INT<= | INT>= | INT==
+	        int anzahlZeichen = Integer.parseInt(zahlChoice.getValue());
+	        //
+	        if(!chckbxUeberschrift.isSelected()) {
+
+				Pattern MY_PATTERN = Pattern.compile("MC[0-9]+A[0-9]+");
+				Matcher mges = MY_PATTERN.matcher(vflags);
+
+				if (mges.find()) {
+					Pattern MY_PATTERN1 = Pattern.compile("MC[0-9]+");
+					Matcher m1 = MY_PATTERN1.matcher(mges.group(0));
+					Pattern MY_PATTERN2 = Pattern.compile("A[0-9]+");
+					Matcher m2 = MY_PATTERN2.matcher(mges.group(0));
+					if (m1.find() && m2.find()) {
+						int zahl = -1;
+						try {
+							zahl = Integer.parseInt(mges.group(0).substring(2, mges.group(0).indexOf("A")));
+						} catch (NumberFormatException en) {
+						}
+						if (pflichtfrage) {
+							QuestionService.updateFlags(fragebogen, "MC", zahl);
+						}
+						if (QuestionService.isPflichtfrage(fragebogen, "MC", zahl)) {
+							pflichtfrage = true;
+						}
+					}
+				}
+
+				Pattern MY_PATTERNFF = Pattern.compile("FF[0-9]+A[0-9]+");
+				Matcher mgesFF = MY_PATTERNFF.matcher(vflags);
+				if (mgesFF.find()) {
+					Pattern MY_PATTERN1 = Pattern.compile("FF[0-9]+");
+					Matcher m1 = MY_PATTERN1.matcher(mgesFF.group(0));
+					Pattern MY_PATTERN2 = Pattern.compile("A[0-9]+");
+					Matcher m2 = MY_PATTERN2.matcher(mgesFF.group(0));
+					if (m1.find() && m2.find()) {
+						int zahl = -1;
+						try {
+							zahl = Integer.parseInt(mgesFF.group(0).substring(2, mgesFF.group(0).indexOf("A")));
+						} catch (NumberFormatException en) {
+						}
+						if (pflichtfrage) {
+							QuestionService.updateFlags(fragebogen, "FF", zahl);
+						}
+						if (QuestionService.isPflichtfrage(fragebogen, "FF", zahl)) {
+							pflichtfrage = true;
+						}
+					}
+
+				}
+				if (artChoice.getSelectionModel().getSelectedItem().equals("Freie Frage")) {
+					vflags += QuestionService.getMoeglicheFlags(pflichtfrage, liste, multipleChoice, textarea,
+							ja_nein, isZahl, false, zahlArt, anzahlZeichen, "ff"); // floNeu
+					neueFrage.setFlags(vflags);
+					neueFrage.setArt("FF");
+				} else if (artChoice.getSelectionModel().getSelectedItem().equals("Multiple Choice")) {
+					Vector<String> ants = new Vector<String>();
+					if (ja_nein) {
+						ants.add("Ja");
+						ants.add("Nein");
+					} else {
+						for (Antwort item : tbl_antworten.getItems()) {
+						    ants.add(antCol.getCellObservableValue(item).getValue());
+						}
+					}
+
+					vflags += QuestionService.getMoeglicheFlags(pflichtfrage, liste, multipleChoice, textarea,
+							ja_nein, isZahl, x, zahlArt, anzahlZeichen, "mc"); // floNeu
+					neueFrage.setFlags(vflags);
+					neueFrage.setAntwort_moeglichkeit(ants);
+					neueFrage.setArt("MC");
+				} else if (artChoice.getSelectionModel().getSelectedItem().equals("Bewertungsfrage")) {
+					vflags += QuestionService.getMoeglicheFlags(pflichtfrage, liste, multipleChoice, textarea,
+							ja_nein, isZahl, false, zahlArt, anzahlZeichen, "bf"); // floNeu
+					neueFrage.setFlags(vflags);
+					Vector<String> antwort = new Vector<String>();
+					for (int i = 0; i < 11; i++) {
+						antwort.add(i + "");
+					}
+					neueFrage.setAntwort_moeglichkeit(antwort);
+					neueFrage.setArt("MC");
+				}
+
+				Vector<Frage> allFragen = SurveyService.getFragen(fragebogen);
+				Vector<Frage> fragen2 = new Vector<>();
+				int pos = neueFrage.getPosition();
+				for (int i = 0; i < allFragen.size(); i++) {
+					if (allFragen.get(i).getPosition() == pos) {
+						fragen2.add(allFragen.get(i));
+					}
+				}
+
+				boolean setIn = false;
+				for (int i = 0; i < fragen2.size(); i++) {
+					if (fragen2.get(i).getFrageID() == neueFrage.getFrageID()) {
+						if (!fragen2.get(i).getUeberschrift().equals("")) {
+							neueFrage.setUeberschrift(fragen2.get(i).getUeberschrift());
+						}
+						fragen2.set(i, neueFrage);
+						setIn = true;
+						break;
+					}
+				}
+
+				if (!setIn) {
+					fragen2.add(neueFrage);
+				}
+
+				for(Frage frage : fragen2) {
+					System.out.println(frage.getFrageID() + " - " + frage.getFrage());
+					System.out.println(frage.getArt());
+					System.out.println(frage.getFlags());
+					System.out.println("-----------------------------------------");
+				}
+
+				//makeVorschau(fragen2);
+	        } else {
+	        	Vector<Frage> allFragen = SurveyService.getFragen(fragebogen);
+				Vector<Frage> fragen2 = new Vector<>();
+				int pos = neueFrage.getPosition();
+				for (int i = 0; i < allFragen.size(); i++) {
+					if (allFragen.get(i).getPosition() == pos) {
+						allFragen.get(i).setUeberschrift(neueFrage.getFrage());
+						fragen2.add(allFragen.get(i));
+					}
+				}
+				
+				for(Frage frage : fragen2) {
+					System.out.println(frage.getFrageID() + " - " + frage.getFrage());
+					System.out.println(frage.getArt());
+					System.out.println(frage.getFlags());
+					System.out.println("-----------------------------------------");
+				}
+				
+	        	//makeVorschau(fragen2);
+	        }
+		} else {
+			System.out.println("Die Frage ist fehlerhaft und es kann deswegen keine Vorschau generiert werden!");
+			/*BalloonTip fehler = new BalloonTip(btnVorschauFE, "Die Frage ist fehlerhaft und es kann deswegen keine Vorschau generiert werden!");
+			fehler.setCloseButton(null);
+			TimingUtils.showTimedBalloon(fehler, 3000);
+			fehler.setVisible(true);*/
+		}
+	}
+	
+	/**
+	 * Erstellt das Panel und die dazugehoerigen Elemente fuer die Fragen Vorschau.
+	 * @param frage : FrageErstellen
+	 *//*
+	//TODO
+	private void makeVorschau(Vector<Frage> fragen) {
+		try {
+		Vector<BgPanel> allePanel = new Vector<>();
+		
+		Vector<Vector<FrageErstellen>> fragen2JePanel = new Vector<Vector<FrageErstellen>>();
+		Vector<FrageErstellen> temp = new Vector<FrageErstellen>();
+		for(int i = 0; i < fragen.size(); i++) {
+			if(i != 0 && (i) % FRAGEN == 0) {
+				fragen2JePanel.add(temp);
+				temp = new Vector<FrageErstellen>();
+				temp.addElement(fragen.get(i));
+			} else {
+				temp.addElement(fragen.get(i));
+			}
+			if(i == fragen.size() - 1) {
+				fragen2JePanel.add(temp);
+			}
+		}
+		
+		maxCountVor = fragen2JePanel.size();
+		
+		for(int z = 1; z <= maxCountVor; z++) {
+			BgPanel panel_1 = new BgPanel(false);
+			frame.getContentPane().add(panel_1, "panel_" + z + "_Vorschau");
+			panel_1.setLayout(new BorderLayout(0, 0));
+			
+			BgPanel panel_2 = new BgPanel(true);
+			panel_1.add(panel_2, BorderLayout.CENTER);
+			panel_2.setLayout(createMig(PROZEILE, (int)Math.ceil(fragen.get(z - 1).getAntwort_moeglichkeit().size() / PROZEILE), 0, 0, new int[]{100}, new int[]{100}));
+			
+			BgPanel panel_3 = new BgPanel(false);
+			panel_1.add(panel_3, BorderLayout.SOUTH);
+			panel_1.setPreferredSize(new Dimension(screenSize.width, 150));
+			panel_3.setLayout(createMig(3, 1, 100, 100, new int[] {98, 2}, new int[] {100}));
+			
+			MyProgressBar progressBar = new MyProgressBar(0, maxCountVor);
+			progressBar.setValue(z);
+			panel_2.add(progressBar, "span , align center, wrap");
+			
+			JLabel lblFragenr = new JLabel("Frage " + z + "/" + maxCountVor);
+			lblFragenr.setFont(new Font("Tahoma", Font.PLAIN, 32));
+			lblFragenr.setForeground(new Color(154, 188, 42));
+			panel_2.add(lblFragenr, "span, align center, wrap");
+			
+			//Erstellt ein Abbruch Button
+			MyButton btnAbbruch = new MyButton("x");
+			btnAbbruch.addActionListener(new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					cardLayout.show(frame.getContentPane(), "pnlFragenErstellung");
+				}
+			});
+			panel_3.add(btnAbbruch);
+			
+			//Erstellt ein Zurueck Button
+			MyButton btnZurck = new MyButton("<");
+			btnZurck.addActionListener(blVor);
+			if(z == 1) {
+				btnZurck.setEnabled(false);
+			}
+			panel_3.add(btnZurck);
+			
+			//Erstellt ein Weiter Button
+			btnWeiter = new MyButton(">");
+			if(z == maxCountVor) {
+				//btnWeiter.setEnabled(false);
+			}
+			btnWeiter.addActionListener(blVor);
+			panel_3.add(btnWeiter);
+			
+			
+			allePanel.addElement(panel_2);
+		}
+		
+		for(int z = 0; z < allePanel.size(); z++) {
+			boolean isBHeader = false;
+			boolean hasUeber = false;
+			//setEverythingIsAwesome(true);
+			Vector<FrageErstellen> frageObj = fragen2JePanel.get(z);
+
+			
+			//for(int y = 0; y < anzahl.get(z); y++) {
+			//	frageObj.addElement(stack.pop());
+			//}
+			
+			for(int y = 0; y < frageObj.size(); y++) {
+				if(!frageObj.get(y).getUeberschrift().equals("") && !hasUeber) {
+					String ueberschrift = frageObj.get(y).getUeberschrift();
+					Pattern MY_PATTERNs = Pattern.compile("#\\[[0-9]+\\]");
+					Matcher ms = MY_PATTERNs.matcher(ueberschrift);
+					if (ms.find()) {
+						ueberschrift = ueberschrift.substring(0, ms.start());	
+					}
+					MyHeadline lblUeber = new MyHeadline(ueberschrift);
+					lblUeber.setFont(new Font("Tahoma", Font.PLAIN, 40));
+					lblUeber.setForeground(new Color(236, 103, 8));
+					allePanel.get(z).add(lblUeber, "align center, span, wrap");
+					hasUeber = true;
+				}
+				
+				if(!isBHeader && frageObj.get(y).getFlags().indexOf("B") >= 0) {
+					
+					lblEins = new MyLabel("<html><div align=\"center\">sehr<br>schlecht</div></html>"); //anneSuperNeu
+					lblEins.setFont(new Font("Tahoma", Font.PLAIN, 20));
+					lblEins.setForeground(new Color(95, 55, 43));
+					lblEins.setVisible(true);
+					allePanel.get(z).add(lblEins, "center");
+					
+					for(int m = 0; m < 8; m++) {
+						JPanel empty = new JPanel();
+						empty.setVisible(false);
+						allePanel.get(z).add(empty, "");
+					}
+					
+					lblZehn = new MyLabel("sehr gut");  //anneSuperNeu
+					lblZehn.setFont(new Font("Tahoma", Font.PLAIN, 20));
+					lblZehn.setForeground(new Color(95, 55, 43));
+					lblZehn.setVisible(true);
+					allePanel.get(z).add(lblZehn, "center");
+					
+					isBHeader = true;
+					
+					lblNull = new MyLabel("<html><div align=\"center\">keine<br>Aussage</div></html>"); //anneSuperNeu
+					lblNull.setFont(new Font("Tahoma", Font.PLAIN, 20));
+					lblNull.setForeground(new Color(95, 55, 43));
+					lblNull.setVisible(true);
+					allePanel.get(z).add(lblNull, "center, wrap");
+				}
+				
+				//Fuegt eine Frage ein
+				Vector<MyCheckbox> checkBoxen = new Vector<MyCheckbox>();
+				boolean isMC = false;
+				String frage = frageObj.get(y).getFrage();
+				Pattern MY_PATTERNs = Pattern.compile("#\\[[0-9]+\\]");
+				Matcher ms = MY_PATTERNs.matcher(frage);
+				if (ms.find()) {
+					frage = frage.substring(0, ms.start());	
+				}
+				if(frageObj.get(y).getFlags().indexOf("*") >= 0) {
+					isMC = true;
+				}
+				
+				String add = "";
+				
+				if(frageObj.get(y).getFlags().indexOf("+") >= 0) {
+					add = " *";
+				}
+				
+				String frageAnzeige;
+				if(frage.length() >= 40) {
+					int index = frage.indexOf(" ", 15);
+					char[] string = frage.toCharArray();
+					string[index] = '\n';
+					frageAnzeige = frage.replaceAll("\n", "<br/>");
+					frageAnzeige = "<html><div align=\"center\">" + frageAnzeige + add + "</div></html>";
+					
+				} else {
+					frageAnzeige = frage + add;
+				}
+				
+				
+				MyLabel lblFrage = new MyLabel(frageAnzeige);
+				lblFrage.setFont(new Font("Tahoma", Font.PLAIN, 40));
+				lblFrage.setForeground(new Color(236, 103, 8));
+				
+				Pattern MY_PATTERN = Pattern.compile("MC[0-9]+A[0-9]+");
+				Matcher mges = MY_PATTERN.matcher(frageObj.get(y).getFlags());
+				if (mges.find()) {
+					lblFrage.setVisible(false);
+				}
+				
+				allePanel.get(z).add(lblFrage, "align center, span, wrap");
+				frageObj.get(y).setFrageLabel(lblFrage);
+				
+				if(frageObj.get(y).getArt() == "FF"){
+					
+					if(frageObj.get(y).getFlags().indexOf("TEXT") >= 0) {
+						//F�gt eine Textarea ein
+						MyTextArea textArea = new MyTextArea(10,50); //anneSuperNeu
+						textArea.setPreferredSize(new Dimension(200, 50));
+						allePanel.get(z).add(textArea, "span, center");
+						Vector<MyTextArea> textAreas = new Vector<MyTextArea>();
+						textAreas.add(textArea);
+						frageObj.get(y).setAntwortenTEXT(textAreas);
+					} else {
+						if(frageObj.get(y).getFlags().indexOf("LIST") >= 0) {
+							ErrorLog.fehlerBerichtB("ERROR",
+									Datenbank.class + ": " + Thread.currentThread().getStackTrace()[1].getLineNumber(), "Fehler");
+						} else {
+							//F�gt ein Textfeld ein
+							MyTextField textField = new MyTextField();
+							textField.setPreferredSize(new Dimension(200, 50));
+							
+							MY_PATTERN = Pattern.compile("MC[0-9]+A[0-9]+");
+							mges = MY_PATTERN.matcher(frageObj.get(y).getFlags());
+							if (mges.find()) {
+								textField.setVisible(false);
+							}
+							
+							
+							allePanel.get(z).add(textField, "wrap, span, center");
+							Vector<MyTextField> textFields = new Vector<MyTextField>();
+							textFields.add(textField);
+							frageObj.get(y).setAntwortenFF(textFields);
+						}
+					}
+					
+				} else if (frageObj.get(y).getArt() == "MC") {
+					
+					if(frageObj.get(y).getFlags().indexOf("LIST") >= 0) {
+						//Erstellt eine Liste
+						Vector<JScrollPane> antwortenLIST = new Vector<JScrollPane>();
+						JScrollPane scrollPane = new JScrollPane();
+						scrollPane.getVerticalScrollBar().setUI(new MyScrollBarUI());
+						allePanel.get(z).add(scrollPane, "span, center");
+						MyList liste = new MyList(frageObj.get(y).getAntwort_moeglichkeit());
+						scrollPane.setViewportView(liste);
+						
+						MY_PATTERN = Pattern.compile("MC[0-9]+A[0-9]+");
+						mges = MY_PATTERN.matcher(frageObj.get(y).getFlags());
+						if (mges.find()) {
+							scrollPane.setVisible(false);
+						}
+						
+						antwortenLIST.add(scrollPane);
+						frageObj.get(y).setAntwortenLIST(antwortenLIST);
+						continue;
+					}
+					
+					Vector<Integer> anzahlZeile = new Vector<Integer>();
+					int intAntworten = frageObj.get(y).getAntwort_moeglichkeit().size();
+					do {
+						if(intAntworten > PROZEILE) {
+							anzahlZeile.addElement(PROZEILE);
+							intAntworten -= PROZEILE;
+						}
+					} while(intAntworten > PROZEILE);
+					anzahlZeile.addElement(intAntworten);
+					
+					//Uebe die schleife aus, wenn count kleiner ist als die groesse der antwortmoeglichkeiten
+					Vector<MyCheckbox> checkboxs = new Vector<MyCheckbox>();
+					for(int count3 = 0; count3 < frageObj.get(y).getAntwort_moeglichkeit().size(); count3++){
+						//Erstellt eine Checkbox
+						String antwort = frageObj.get(y).getAntwort_moeglichkeit().get(count3);
+						
+						String antwortAnzeige = "";
+						if(antwort.length() >= 25) {
+							int index = antwort.indexOf(" ", 11);
+							if(index != -1) {
+								char[] string = antwort.toCharArray();
+								string[index] = '\n';
+								antwortAnzeige = new String(string);
+								antwortAnzeige = antwort.replace("\n", "<br/>");
+								antwortAnzeige = "<html><div>"
+										+ "" + antwort + "</div></html>";
+							}
+						} else {
+							antwortAnzeige = antwort;
+						}
+						MyCheckbox chckbxSda = new MyCheckbox(antwortAnzeige);
+						chckbxSda.setFont(new Font("Tahoma", Font.PLAIN, 28));
+						chckbxSda.setForeground(new Color(94, 56, 41));
+						
+						MY_PATTERN = Pattern.compile("MC[0-9]+A[0-9]+");
+						mges = MY_PATTERN.matcher(frageObj.get(y).getFlags());
+						if (mges.find()) {
+							chckbxSda.setVisible(false);
+						}
+						
+						checkBoxen.add(chckbxSda);
+						if(!isMC) {
+							chckbxSda.addActionListener(new ActionListener() {
+							@Override
+							public void actionPerformed(ActionEvent e) {
+								MyCheckbox jCheckBox = (MyCheckbox) e.getSource();
+							    boolean selected = jCheckBox.getModel().isSelected();
+								for(int i = 0; i < checkBoxen.size(); i++) {
+						        	checkBoxen.get(i).setSelected(false);
+						        }
+								jCheckBox.setSelected(selected);
+						        //String text = jCheckBox.getText();
+						        
+							}
+						});
+						} else {
+							chckbxSda.addActionListener(new ActionListener() {
+								@Override
+								public void actionPerformed(ActionEvent e) {
+									
+								}
+							});
+						}
+						
+						if(frageObj.get(y).getFlags().indexOf("B") >= 0) {
+							if(!frageObj.get(y).getFrageLabel().isVisible()) {
+								lblNull.setVisible(false);
+								lblEins.setVisible(false);
+								lblZehn.setVisible(false);
+							}
+							if((count3 == frageObj.get(y).getAntwort_moeglichkeit().size() - 1)) {
+								allePanel.get(z).add(chckbxSda);
+								
+								JPanel empty = new JPanel();
+								empty.setVisible(false);
+								allePanel.get(z).add(empty, "wrap");
+							} else {
+								allePanel.get(z).add(chckbxSda);
+							}
+							
+						} else {
+							if((count3 % (PROZEILE)) == (PROZEILE - 1)) {
+								allePanel.get(z).add(chckbxSda);
+								
+								JPanel empty = new JPanel();
+								empty.setVisible(false);
+								allePanel.get(z).add(empty, "wrap");
+							} else {
+								allePanel.get(z).add(chckbxSda);
+							}
+						}
+						checkboxs.addElement(chckbxSda);
+						
+						if(count3 == frageObj.get(y).getAntwort_moeglichkeit().size() - 1) {
+							for(int v = 0; v < anzahlZeile.size(); v++) {
+								while(anzahlZeile.get(v) != (PROZEILE)) {
+									anzahlZeile.set(v, anzahlZeile.get(v) + 1);
+									JPanel empty = new JPanel();
+									empty.setVisible(false);
+									if(anzahlZeile.get(v) == (PROZEILE)) {
+										allePanel.get(z).add(empty, "wrap");
+									} else {
+										allePanel.get(z).add(empty, "");
+									}
+								}
+							}
+						}	
+					}
+					frageObj.get(y).setAntwortenMC(checkboxs);
+				} else{
+					//Error nachricht, wenn das obere nicht zutrift
+					ErrorLog.fehlerBerichtB("ERROR",getClass() + ": " + Thread.currentThread().getStackTrace()[1].getLineNumber(), "Vorschau konnte nicht erstellt/ angezeigt werden!");
+				}	
+			}
+		}	
+		
+		for(int y = 0; y < fragen.size(); y++) {
+			Pattern MY_PATTERN = Pattern.compile("MC[0-9]+A[0-9]+");
+			Matcher mges = MY_PATTERN.matcher(fragen.get(y).getFlags());
+			
+			if (mges.find()) {
+
+				Pattern MY_PATTERN1 = Pattern.compile("MC[0-9]+");
+				Matcher m1 = MY_PATTERN1.matcher(mges.group(0));
+				Pattern MY_PATTERN2 = Pattern.compile("A[0-9]+");
+				Matcher m2 = MY_PATTERN2.matcher(mges.group(0));
+				Pattern MY_PATTERNint = Pattern.compile("INT[<>=]=[0-9]+");
+				Matcher mint = MY_PATTERNint.matcher(fragen.get(y).getFlags());
+				if (m1.find() && m2.find()) {
+					fragen.get(y).setTarget(fragen.get(getY(Integer.parseInt(m1.group(0).substring(2)), "MC", fragen)));
+					fragen.get(y).setListener(Integer.parseInt(m2.group(0).substring(1)), "MC");
+				}
+				if (mint.find()) {
+					fragen.get(y).setListener(0, mint.group(0));
+				}
+			}
+		}
+		
+		
+		for(int y = 0; y < fragen.size(); y++) {
+			Pattern MY_PATTERN = Pattern.compile("FF[0-9]+A[0-9]+");
+			Matcher mges = MY_PATTERN.matcher(fragen.get(y).getFlags());
+			if (mges.find()) {
+				Pattern MY_PATTERN1 = Pattern.compile("FF[0-9]+");
+				Matcher m1 = MY_PATTERN1.matcher(mges.group(0));
+				Pattern MY_PATTERN2 = Pattern.compile("A[0-9]+");
+				Matcher m2 = MY_PATTERN2.matcher(mges.group(0));
+				Pattern MY_PATTERNint = Pattern.compile("INT[<>=]=[0-9]+");
+				Matcher mint = MY_PATTERNint.matcher(fragen.get(y).getFlags());
+				if (m1.find() && m2.find()) {
+					fragen.get(y).setTarget(fragen.get(getY(Integer.parseInt(m1.group(0).substring(2)), "FF", fragen)));
+					fragen.get(y).setListener(Integer.parseInt(m2.group(0).substring(1)), "FF");
+					
+				}
+				if (mint.find()) {
+					fragen.get(y).setListener(0, mint.group(0));
+				}
+			}
+		}
+		cardLayout.show(frame.getContentPane(), "panel_1_Vorschau");
+		//TODO
+		
+		} catch (Exception e) {
+			ErrorLog.fehlerBerichtB("ERROR",getClass() + ": " + Thread.currentThread().getStackTrace()[1].getLineNumber(), e.getMessage());
+			e.printStackTrace();
+		}
+	}*/
+	
+	/**
+	 * Ueberprueft ob alle Bedingungen zum Speichern gegeben sind.
+	 */
+	public boolean checkFrageDaten() {
+		System.out.println(textFieldFE.getText());
+		System.out.println(artChoice.getSelectionModel().getSelectedItem());
+		if(!textFieldFE.getText().equals("")) {
+			if(!artChoice.getSelectionModel().getSelectedItem().equals("-- Art der Frage --")) {
+				if(tbl_antworten.getItems().size()<1 && artChoice.getSelectionModel().getSelectedItem().equals("Multiple Choice")) { //anneSehrNeu ? weiß nicht mehr
+					btnSave.setDisable(true);
+				} else {
+					btnSave.setDisable(false);
+				}
+			} else {
+				btnSave.setDisable(true);
+			}
+		} else {
+			btnSave.setDisable(true);
+		}
+		
+
+		if(!btnSave.isDisabled()) {
+			return true;
+		} else {
+			return false;
+		}		
 	}
 
 	public class Antwort {
