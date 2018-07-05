@@ -2,15 +2,21 @@ package survey;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Vector;
 
 import application.Datenbank;
+import application.GlobalVars;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.ListView;
+import javafx.scene.control.TextField;
 import model.Frage;
 import model.Fragebogen;
 import model.Ueberschrift;
+import question.QuestionService;
 
 public class SurveyService extends Datenbank {
 	/**
@@ -37,7 +43,7 @@ public class SurveyService extends Datenbank {
 			Vector<Frage> ffFragen = new Vector<Frage>();
 			Vector<Frage> mcFragen = new Vector<Frage>();
 
-			// Überschrift MUSS MC sein...
+			// ï¿½berschrift MUSS MC sein...
 			while (myRS.next()) {
 				boolean isUeberschrift = false;
 				boolean skip = false;
@@ -184,6 +190,107 @@ public class SurveyService extends Datenbank {
 					Datenbank.class + ": " + Thread.currentThread().getStackTrace()[1].getLineNumber(), e.getMessage());*/
 			e.printStackTrace();
 			return null;
+		}
+	}
+	
+	/**
+	 * Speichert alle durch den Benutzer gegebenen Antworten in die Datenbank.
+	 * 
+	 * @param fragen
+	 *            Vector Vector FrageErstellen: alle Fragen des Fragebogens
+	 * @author Julian und Eric
+	 */
+	public static void saveUmfrage(Vector<Vector<Frage>> fragen) {
+		try {
+			Connection myCon = DriverManager.getConnection(url, user, pwd);
+
+			String statement = "INSERT INTO Befragung VALUE(NULL, CURDATE(), ?)";
+			PreparedStatement psSql = myCon.prepareStatement(statement);
+			psSql.setInt(1, fragen.get(0).get(0).getFragebogenID());
+			psSql.executeUpdate();
+
+			int b_id = 0;
+
+			Statement mySQL = myCon.createStatement();
+			statement = "SELECT MAX(idBefragung) FROM Befragung";
+			ResultSet myRS = mySQL.executeQuery(statement);
+			if (myRS.next()) {
+				b_id = myRS.getInt("MAX(idBefragung)");
+
+				for (int i = 0; i < fragen.size(); i++) {
+					Vector<Frage> panel = fragen.get(i);
+					for (Frage frage : panel) {
+						if (frage.getArt() == "MC") {
+							if (frage.getAntwort().size() > 0) {
+								for (String antwort : frage.getAntwort()) {
+									antwort = antwort.replaceAll("<.*>", "");
+									myRS = null;
+									mySQL = null;
+									mySQL = myCon.createStatement();
+									statement = "SELECT B_has_MCid FROM B_has_MC WHERE idBefragung=" + b_id
+											+ " AND idMultipleChoice=" + frage.getFrageID() + " AND AntwortNr="
+											+ QuestionService.getAntwortID(antwort);
+									myRS = mySQL.executeQuery(statement);
+									if (!myRS.next()) {
+										myRS = null;
+										mySQL = null;
+										mySQL = myCon.createStatement();
+										statement = "INSERT INTO B_has_MC VALUE(NULL," + b_id + ", "
+												+ frage.getFrageID() + ", " + QuestionService.getAntwortID(antwort) + ")";
+										mySQL.executeUpdate(statement);
+									}
+								}
+							}
+						} else if (frage.getAntwort().size() > 0) {
+							for (String antwort : frage.getAntwort()) {
+								antwort = antwort.replaceAll("<.*>", "");
+								myRS = null;
+								mySQL = null;
+								mySQL = myCon.createStatement();
+								statement = "SELECT B_has_FFid FROM B_has_FF WHERE idBefragung=" + b_id
+										+ " AND idFreieFragen=" + frage.getFrageID() + " AND AntwortNr="
+										+ QuestionService.getAntwortID(antwort);
+								myRS = mySQL.executeQuery(statement);
+								if (!myRS.next()) {
+									myRS = null;
+									mySQL = null;
+									mySQL = myCon.createStatement();
+									statement = "INSERT INTO B_has_FF VALUE(NULL," + b_id + ", " + frage.getFrageID()
+											+ ", " + QuestionService.getAntwortID(antwort) + ")";
+									mySQL.executeUpdate(statement);
+								}
+							}
+						}
+					}
+				}
+			}
+			myCon.close();
+		} catch (SQLException e) {
+			//ErrorLog.fehlerBerichtB("ERROR",
+			//		Datenbank.class + ": " + Thread.currentThread().getStackTrace()[1].getLineNumber(), e.getMessage());
+			e.printStackTrace();
+		}
+		resetFragebogen();
+	}
+	
+	/**
+	 * Setzt den Vector "fragenJePanel" zurï¿½ck.
+	 */
+	public static void resetFragebogen() {
+		
+		for(Vector<Frage> fragen : GlobalVars.fragenJePanel) {
+			for(Frage frage : fragen) {
+				frage.setAntwort(null);
+				for(CheckBox checkbox : frage.getAntwortenMC()) {
+					checkbox.setSelected(false);
+				}
+				for(TextField textField : frage.getAntwortenFF()) {
+					textField.setText("");
+				}
+				for(ListView<String> list : frage.getAntwortenLIST()) {
+					list.getItems().clear();
+				}
+			}
 		}
 	}
 }

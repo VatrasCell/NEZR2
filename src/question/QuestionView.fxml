@@ -11,7 +11,7 @@
    <top>
       <AnchorPane prefHeight="40.0" prefWidth="600.0" BorderPane.alignment="TOP_RIGHT">
          <children>
-            <Label alignment="CENTER" layoutX="246.0" layoutY="12.0" prefHeight="17.0" prefWidth="109.0" text="Frage Bearbeiten" AnchorPane.leftAnchor="246.0" AnchorPane.rightAnchor="245.0" AnchorPane.topAnchor="15.0" />
+            <Label fx:id="lblQuestion" alignment="CENTER" layoutX="246.0" layoutY="12.0" prefHeight="17.0" prefWidth="109.0" text="Frage Bearbeiten" AnchorPane.leftAnchor="246.0" AnchorPane.rightAnchor="245.0" AnchorPane.topAnchor="15.0" />
          </children>
       </AnchorPane>
    </top>
@@ -22,7 +22,7 @@
                <children>
                   <Button mnemonicParsing="false" onAction="#setPreview" text="Vorschau" />
                   <Button mnemonicParsing="false" onAction="#exit" text="Abbruch" />
-                  <Button fx:id="btnSave" mnemonicParsing="false" text="Speichern" />
+                  <Button fx:id="btnSave" mnemonicParsing="false" onAction="#Save" text="Speichern" />
                </children>
             </HBox>
          </children>

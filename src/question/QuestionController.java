@@ -1,5 +1,7 @@
 package question;
 
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.List;
 import java.util.Vector;
 import java.util.regex.Matcher;
@@ -7,18 +9,30 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import application.GlobalVars;
 import application.ScreenController;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.geometry.Pos;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
+import javafx.scene.control.ProgressBar;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.util.Callback;
 import model.Frage;
 import model.Fragebogen;
@@ -30,7 +44,10 @@ public class QuestionController {
 	private Vector<String> antworten;
 	private ObservableList<Antwort> data = FXCollections.observableArrayList();
 
-	private String flags;
+	private String flags = "";
+	
+	@FXML
+	private Label lblQuestion;
 
 	@FXML
 	private TextField textFieldFE;
@@ -254,6 +271,7 @@ public class QuestionController {
 			if (frage.getFlags().contains(" ")) {
 				int indexSpace = frage.getFlags().indexOf(" ");
 				flags = frage.getFlags().substring(0, indexSpace);
+				System.out.println(flags);
 
 			}
 		}
@@ -302,10 +320,176 @@ public class QuestionController {
 	}
 	
 	@FXML
+	private void Save() {
+		if (checkFrageDaten()) {
+			Frage neueFrage = new Frage();
+			
+			String string;
+			
+			String oldFrage = frage.getFrage();
+			
+			Pattern MY_PATTERNs = Pattern.compile("#\\[[0-9]+\\]");
+			Matcher ms = MY_PATTERNs.matcher(oldFrage);
+			if (ms.find()) {
+				string = oldFrage.substring(0, ms.start());
+			} else {
+				string = oldFrage;
+			}
+			
+			if(!string.equals(textFieldFE.getText())) {
+				neueFrage.setFrage(QuestionService.duplicateFrage(textFieldFE.getText()));
+			} else {
+				neueFrage.setFrage(oldFrage);
+			}
+			oldFrage = "";
+			neueFrage.setPosition((int)posChoice.getValue());
+			if(frage != null) {
+				neueFrage.setFrageID(frage.getFrageID());
+			}
+			
+			if(artChoice.getSelectionModel().getSelectedItem().equals("Multiple Choice") || artChoice.getSelectionModel().getSelectedItem().equals("Bewertungsfrage")) {
+				neueFrage.setArt("MC");
+			} else if (artChoice.getSelectionModel().getSelectedItem().equals("Freie Frage")) {
+				neueFrage.setArt("FF");
+			}
+			
+			String selectedKat = katChoice.getSelectionModel().getSelectedItem().toString();
+			if (selectedKat.equals("")) {
+				selectedKat = katChoice.getItems().get(0).toString();
+			}						
+			neueFrage.setKategorie(selectedKat);
+			
+			boolean pflichtfrage = chckbxPflichtfrage.isSelected();                 // +
+	        boolean liste = chckbxListe.isSelected();                               // LIST
+	        boolean multipleChoice = chckbxMultipleChoice.isSelected();             // *
+	        boolean textarea = chckbxTextArea.isSelected();                         // TEXT
+	        boolean ja_nein = chckbxJaNein.isSelected();   							// JN
+	        boolean x = chckbxX.isSelected();
+	        //floNeu
+	        boolean isZahl = chckbxZahl.isSelected();									
+	        String zahlArt = (String) zahlChoice.getSelectionModel().getSelectedItem();			// INT<= | INT>= | INT==
+	        int anzahlZeichen = textFieldZahl.getText().equals("") ? 0 : Integer.parseInt(textFieldZahl.getText());
+	        //	
+			
+			Pattern MY_PATTERN = Pattern.compile("MC[0-9]+A[0-9]+");
+			Matcher mges = MY_PATTERN.matcher(flags);
+
+			if (mges.find()) {
+				Pattern MY_PATTERN1 = Pattern.compile("MC[0-9]+");
+				Matcher m1 = MY_PATTERN1.matcher(mges.group(0));
+				Pattern MY_PATTERN2 = Pattern.compile("A[0-9]+");
+				Matcher m2 = MY_PATTERN2.matcher(mges.group(0));
+				if (m1.find() && m2.find()) {
+					int zahl = -1;
+						try {
+							zahl = Integer.parseInt(mges.group(0).substring(2, mges.group(0).indexOf("A")));
+						} catch (NumberFormatException en) {
+						}
+						if(pflichtfrage) {
+							QuestionService.updateFlags(fragebogen, "MC", zahl);
+						}
+					if (QuestionService.isPflichtfrage(fragebogen, "MC", zahl)) {
+						pflichtfrage = true;
+					}
+				}
+			}
+
+			Pattern MY_PATTERNFF = Pattern.compile("FF[0-9]+A[0-9]+");
+			Matcher mgesFF = MY_PATTERNFF.matcher(flags);
+			if (mgesFF.find()) {
+				Pattern MY_PATTERN1 = Pattern.compile("FF[0-9]+");
+				Matcher m1 = MY_PATTERN1.matcher(mgesFF.group(0));
+				Pattern MY_PATTERN2 = Pattern.compile("A[0-9]+");
+				Matcher m2 = MY_PATTERN2.matcher(mgesFF.group(0));
+				if (m1.find() && m2.find()) {
+					int zahl = -1;
+					try {
+						zahl = Integer.parseInt(mgesFF.group(0).substring(2, mgesFF.group(0).indexOf("A")));
+					} catch (NumberFormatException en) {
+					}
+					if(pflichtfrage) {
+						QuestionService.updateFlags(fragebogen, "FF", zahl);
+					}
+					if (QuestionService.isPflichtfrage(fragebogen, "FF", zahl)) {
+						pflichtfrage = true;
+					}
+				}
+
+			}
+	        
+			if (artChoice.getSelectionModel().getSelectedItem().equals("Freie Frage")) {
+				flags += QuestionService.getMoeglicheFlags(pflichtfrage, liste, multipleChoice, textarea, ja_nein, isZahl, false, zahlArt, anzahlZeichen,  "ff"); //floNeu
+				neueFrage.setFlags(flags);
+				QuestionService.saveFreieFrage(fragebogen, neueFrage);					
+			}
+			if (artChoice.getSelectionModel().getSelectedItem().equals("Multiple Choice")) {
+				Vector<Integer> antIds = new Vector<Integer>();
+				Vector<Integer> antIdsRaus = new Vector<Integer>();
+				Vector<String> ants = new Vector<String>();
+				if (ja_nein) {
+					ants.add("Ja");
+					ants.add("Nein");
+				} else {
+					for (int i = 0; i < tbl_antworten.getItems().size(); i++) {
+						ants.add(tbl_antworten.getItems().get(i).getAntwort());
+					}
+				}
+				
+				//anneSehrNeu
+				if(lblQuestion.getText().equals("Frage Bearbeiten")) {
+					for(int i = 0; i < antworten.size(); i++) {
+						for(int j = 0; j < ants.size(); j++) {
+							if(!antworten.isEmpty() && antworten.get(i).equals(ants.get(j))) {
+								antworten.remove(i);
+							}
+						}
+					}
+				}
+			
+				if(lblQuestion.getText().equals("Frage Bearbeiten")) {
+					for(int i = 0; i < antworten.size(); i++){
+						int antId = QuestionService.getAntwortID(antworten.get(i));
+						antIdsRaus.add(antId);
+					}
+				}
+				
+				if(!antIdsRaus.isEmpty()) {
+					QuestionService.updateFlags(neueFrage);
+					QuestionService.deleteAntworten(antIdsRaus, neueFrage);
+				}
+				//
+				for(int i = 0; i < ants.size(); i++){
+					int antId = QuestionService.getAntwortID(ants.get(i));
+					antIds.add(antId);
+				}
+				flags += QuestionService.getMoeglicheFlags(pflichtfrage, liste, multipleChoice, textarea, ja_nein, isZahl, x, zahlArt, anzahlZeichen, "mc"); //floNeu
+				neueFrage.setFlags(flags);
+				QuestionService.saveMC(fragebogen, neueFrage, antIds);
+			}
+			if (artChoice.getSelectionModel().getSelectedItem().equals("Bewertungsfrage")) {
+				flags += QuestionService.getMoeglicheFlags(pflichtfrage, liste, multipleChoice, textarea, ja_nein, isZahl, false, zahlArt, anzahlZeichen, "bf"); //floNeu
+				neueFrage.setFlags(flags);
+				QuestionService.saveBewertungsfrage(fragebogen, neueFrage);
+			}
+		
+			ScreenController.activate(model.Scene.QuestionList.scene());
+			//pnlFrageErstellenLeeren();
+			//makeFragenTabelle(QuestionService.getFragen(fragebogen));
+			flags = "";
+			//cardLayout.show(frame.getContentPane(), "pnlFragenUebersicht");		
+		} else {
+			/*BalloonTip fehler = new BalloonTip(btnSpeichernFE, "Die Frage ist fehlerhaft und kann deswegen nicht gespeichert werden!");
+			fehler.setCloseButton(null);
+			TimingUtils.showTimedBalloon(fehler, 3000);
+			fehler.setVisible(true);*/
+		}
+	}
+	
+	@FXML
 	private void setPreview() {
 		if (checkFrageDaten()) {
 			Frage neueFrage = new Frage();
-			String vflags = flags;
+			String vflags = flags == null ? "" : flags;
 			neueFrage.setFrage(textFieldFE.getText());
 			neueFrage.setPosition((int)posChoice.getSelectionModel().getSelectedItem());
 			if(frage != null) {
@@ -327,7 +511,7 @@ public class QuestionController {
 	        //floNeu
 	        boolean isZahl = chckbxZahl.isSelected();									
 	        String zahlArt = (String) artChoice.getSelectionModel().getSelectedItem();			// INT<= | INT>= | INT==
-	        int anzahlZeichen = Integer.parseInt(zahlChoice.getValue());
+	        int anzahlZeichen = zahlChoice.getValue() == null ? 0 : Integer.parseInt(zahlChoice.getValue());
 	        //
 	        if(!chckbxUeberschrift.isSelected()) {
 
@@ -441,7 +625,8 @@ public class QuestionController {
 					System.out.println("-----------------------------------------");
 				}
 
-				//makeVorschau(fragen2);
+				makeVorschau(fragen2);
+				ScreenController.activate("survey_0_preview");
 	        } else {
 	        	Vector<Frage> allFragen = SurveyService.getFragen(fragebogen);
 				Vector<Frage> fragen2 = new Vector<>();
@@ -460,7 +645,8 @@ public class QuestionController {
 					System.out.println("-----------------------------------------");
 				}
 				
-	        	//makeVorschau(fragen2);
+	        	makeVorschau(fragen2);
+	        	ScreenController.activate("survey_0_preview");
 	        }
 		} else {
 			System.out.println("Die Frage ist fehlerhaft und es kann deswegen keine Vorschau generiert werden!");
@@ -474,140 +660,113 @@ public class QuestionController {
 	/**
 	 * Erstellt das Panel und die dazugehoerigen Elemente fuer die Fragen Vorschau.
 	 * @param frage : FrageErstellen
-	 *//*
+	 */
 	//TODO
 	private void makeVorschau(Vector<Frage> fragen) {
 		try {
-		Vector<BgPanel> allePanel = new Vector<>();
+		// TODO 
+		Vector<Vector<Frage>> fragenJePanel = new Vector<Vector<Frage>>();
+		/*------------------------- von Julian und Eric --------------------------*/
 		
-		Vector<Vector<FrageErstellen>> fragen2JePanel = new Vector<Vector<FrageErstellen>>();
-		Vector<FrageErstellen> temp = new Vector<FrageErstellen>();
-		for(int i = 0; i < fragen.size(); i++) {
-			if(i != 0 && (i) % FRAGEN == 0) {
-				fragen2JePanel.add(temp);
-				temp = new Vector<FrageErstellen>();
-				temp.addElement(fragen.get(i));
+		Vector<Scene> allePanel = new Vector<>();
+		
+		int countPanel = 0;
+		Vector<Integer> anzahl = new Vector<Integer>();
+		int temp = 1;
+		for(int v = 0; v < fragen.size(); v++) {
+			if(v + 1 != fragen.size() && fragen.get(v).getPosition() == fragen.get(v + 1).getPosition()) {
+				temp++;
 			} else {
-				temp.addElement(fragen.get(i));
-			}
-			if(i == fragen.size() - 1) {
-				fragen2JePanel.add(temp);
+				if(temp > GlobalVars.fragen) {
+					countPanel += (int)(Math.ceil(temp / GlobalVars.fragen));
+					while(temp > GlobalVars.fragen) {
+						anzahl.addElement(GlobalVars.fragen);
+						temp -= GlobalVars.fragen;
+					}
+					anzahl.addElement(temp);
+				} else {
+					anzahl.addElement(temp);
+				}
+				temp = 1;
 			}
 		}
 		
-		maxCountVor = fragen2JePanel.size();
 		
-		for(int z = 1; z <= maxCountVor; z++) {
-			BgPanel panel_1 = new BgPanel(false);
-			frame.getContentPane().add(panel_1, "panel_" + z + "_Vorschau");
-			panel_1.setLayout(new BorderLayout(0, 0));
+		
+		Deque<Frage> stack = new ArrayDeque<Frage>();
+		
+		for(int v = fragen.size() - 1; v >= 0; v--) {
+			stack.push(fragen.get(v));
+		}
+		
+		countPanel += fragen.get(fragen.size() - 1).getPosition();
+		int maxCount = countPanel;
+		
+		
+		for(int z = 1; z <= countPanel; z++) {
+			Scene scene = new Scene(FXMLLoader.load(getClass().getResource("../survey/SurveyPreView.fxml")));
 			
-			BgPanel panel_2 = new BgPanel(true);
-			panel_1.add(panel_2, BorderLayout.CENTER);
-			panel_2.setLayout(createMig(PROZEILE, (int)Math.ceil(fragen.get(z - 1).getAntwort_moeglichkeit().size() / PROZEILE), 0, 0, new int[]{100}, new int[]{100}));
+			ProgressBar progressBar = (ProgressBar)scene.lookup("#progressBar");
+			progressBar.setProgress((float)z/(float)countPanel);
 			
-			BgPanel panel_3 = new BgPanel(false);
-			panel_1.add(panel_3, BorderLayout.SOUTH);
-			panel_1.setPreferredSize(new Dimension(screenSize.width, 150));
-			panel_3.setLayout(createMig(3, 1, 100, 100, new int[] {98, 2}, new int[] {100}));
+			Label lbl_count = (Label)scene.lookup("#lbl_count");
+			lbl_count.setText("Frage " + z + "/" + maxCount);
 			
-			MyProgressBar progressBar = new MyProgressBar(0, maxCountVor);
-			progressBar.setValue(z);
-			panel_2.add(progressBar, "span , align center, wrap");
-			
-			JLabel lblFragenr = new JLabel("Frage " + z + "/" + maxCountVor);
-			lblFragenr.setFont(new Font("Tahoma", Font.PLAIN, 32));
-			lblFragenr.setForeground(new Color(154, 188, 42));
-			panel_2.add(lblFragenr, "span, align center, wrap");
-			
-			//Erstellt ein Abbruch Button
-			MyButton btnAbbruch = new MyButton("x");
-			btnAbbruch.addActionListener(new ActionListener() {
-				
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					cardLayout.show(frame.getContentPane(), "pnlFragenErstellung");
-				}
-			});
-			panel_3.add(btnAbbruch);
-			
-			//Erstellt ein Zurueck Button
-			MyButton btnZurck = new MyButton("<");
-			btnZurck.addActionListener(blVor);
-			if(z == 1) {
-				btnZurck.setEnabled(false);
-			}
-			panel_3.add(btnZurck);
-			
-			//Erstellt ein Weiter Button
-			btnWeiter = new MyButton(">");
-			if(z == maxCountVor) {
-				//btnWeiter.setEnabled(false);
-			}
-			btnWeiter.addActionListener(blVor);
-			panel_3.add(btnWeiter);
-			
-			
-			allePanel.addElement(panel_2);
+			allePanel.addElement(scene);
 		}
 		
 		for(int z = 0; z < allePanel.size(); z++) {
+			
+			VBox vBox = (VBox)allePanel.get(z).lookup("#vbox");
+			
 			boolean isBHeader = false;
 			boolean hasUeber = false;
-			//setEverythingIsAwesome(true);
-			Vector<FrageErstellen> frageObj = fragen2JePanel.get(z);
+			// setEverythingIsAwesome(true);
+			Vector<Frage> frageObj = new Vector<Frage>();
 
-			
-			//for(int y = 0; y < anzahl.get(z); y++) {
-			//	frageObj.addElement(stack.pop());
-			//}
+			for(int y = 0; y < anzahl.get(z); y++) {
+				frageObj.addElement(stack.pop());
+			}
 			
 			for(int y = 0; y < frageObj.size(); y++) {
 				if(!frageObj.get(y).getUeberschrift().equals("") && !hasUeber) {
+					
+					
 					String ueberschrift = frageObj.get(y).getUeberschrift();
 					Pattern MY_PATTERNs = Pattern.compile("#\\[[0-9]+\\]");
 					Matcher ms = MY_PATTERNs.matcher(ueberschrift);
 					if (ms.find()) {
 						ueberschrift = ueberschrift.substring(0, ms.start());	
 					}
-					MyHeadline lblUeber = new MyHeadline(ueberschrift);
-					lblUeber.setFont(new Font("Tahoma", Font.PLAIN, 40));
-					lblUeber.setForeground(new Color(236, 103, 8));
-					allePanel.get(z).add(lblUeber, "align center, span, wrap");
+					
+					Label lbl_headline = (Label)allePanel.get(z).lookup("#lbl_headline");
+					lbl_headline.setText(ueberschrift);
 					hasUeber = true;
 				}
 				
 				if(!isBHeader && frageObj.get(y).getFlags().indexOf("B") >= 0) {
 					
-					lblEins = new MyLabel("<html><div align=\"center\">sehr<br>schlecht</div></html>"); //anneSuperNeu
-					lblEins.setFont(new Font("Tahoma", Font.PLAIN, 20));
-					lblEins.setForeground(new Color(95, 55, 43));
-					lblEins.setVisible(true);
-					allePanel.get(z).add(lblEins, "center");
+					HBox hBox = new HBox();
+					//hBox.setAlignment(Pos.CENTER);
+					Label lblEins = new Label("sehr\nschlecht");
+					lblEins.setId("lblEins");
+					hBox.getChildren().add(lblEins);
+					Label lblZehn = new Label("sehr gut");
+					lblZehn.setId("lblZehn");
+					hBox.getChildren().add(lblZehn);
+					Label lblNull = new Label("keine\nAussage");
+					lblNull.setId("lblNull");
+					hBox.getChildren().add(lblNull);
 					
-					for(int m = 0; m < 8; m++) {
-						JPanel empty = new JPanel();
-						empty.setVisible(false);
-						allePanel.get(z).add(empty, "");
-					}
+					//TODO: add spacing
 					
-					lblZehn = new MyLabel("sehr gut");  //anneSuperNeu
-					lblZehn.setFont(new Font("Tahoma", Font.PLAIN, 20));
-					lblZehn.setForeground(new Color(95, 55, 43));
-					lblZehn.setVisible(true);
-					allePanel.get(z).add(lblZehn, "center");
-					
+					vBox.getChildren().add(hBox);
 					isBHeader = true;
 					
-					lblNull = new MyLabel("<html><div align=\"center\">keine<br>Aussage</div></html>"); //anneSuperNeu
-					lblNull.setFont(new Font("Tahoma", Font.PLAIN, 20));
-					lblNull.setForeground(new Color(95, 55, 43));
-					lblNull.setVisible(true);
-					allePanel.get(z).add(lblNull, "center, wrap");
 				}
 				
 				//Fuegt eine Frage ein
-				Vector<MyCheckbox> checkBoxen = new Vector<MyCheckbox>();
+				Vector<CheckBox> checkBoxen = new Vector<>();
 				boolean isMC = false;
 				String frage = frageObj.get(y).getFrage();
 				Pattern MY_PATTERNs = Pattern.compile("#\\[[0-9]+\\]");
@@ -619,7 +778,7 @@ public class QuestionController {
 					isMC = true;
 				}
 				
-				String add = "";
+				String add = "";			
 				
 				if(frageObj.get(y).getFlags().indexOf("+") >= 0) {
 					add = " *";
@@ -630,45 +789,47 @@ public class QuestionController {
 					int index = frage.indexOf(" ", 15);
 					char[] string = frage.toCharArray();
 					string[index] = '\n';
-					frageAnzeige = frage.replaceAll("\n", "<br/>");
-					frageAnzeige = "<html><div align=\"center\">" + frageAnzeige + add + "</div></html>";
+					//frageAnzeige = frage.replaceAll("\n", "<br/>");
+					frageAnzeige = frage + add;
 					
 				} else {
 					frageAnzeige = frage + add;
 				}
 				
-				
-				MyLabel lblFrage = new MyLabel(frageAnzeige);
-				lblFrage.setFont(new Font("Tahoma", Font.PLAIN, 40));
-				lblFrage.setForeground(new Color(236, 103, 8));
-				
+				Label lblFrage = new Label(frageAnzeige);
+				// System.out.println("frageObj.get(y).frageid = " + frageObj.get(y).getFrageID());
+				lblFrage.setId("lblFrage_" + frageObj.get(y).getFrageID());
 				Pattern MY_PATTERN = Pattern.compile("MC[0-9]+A[0-9]+");
 				Matcher mges = MY_PATTERN.matcher(frageObj.get(y).getFlags());
 				if (mges.find()) {
 					lblFrage.setVisible(false);
 				}
 				
-				allePanel.get(z).add(lblFrage, "align center, span, wrap");
+				// allePanel.get(z).add(lblFrage, "align center, span, wrap");
+				frageObj.get(y).setScene(allePanel.get(z));
 				frageObj.get(y).setFrageLabel(lblFrage);
+				vBox.getChildren().add(lblFrage);
+				
 				
 				if(frageObj.get(y).getArt() == "FF"){
 					
 					if(frageObj.get(y).getFlags().indexOf("TEXT") >= 0) {
 						//F�gt eine Textarea ein
-						MyTextArea textArea = new MyTextArea(10,50); //anneSuperNeu
-						textArea.setPreferredSize(new Dimension(200, 50));
-						allePanel.get(z).add(textArea, "span, center");
-						Vector<MyTextArea> textAreas = new Vector<MyTextArea>();
+						TextArea textArea = new TextArea(); //anneSuperNeu
+						//textArea.setPreferredSize(new Dimension(200, 50));
+						//allePanel.get(z).add(textArea, "span, center");
+						Vector<TextArea> textAreas = new Vector<TextArea>();
 						textAreas.add(textArea);
 						frageObj.get(y).setAntwortenTEXT(textAreas);
+						vBox.getChildren().add(textArea);
 					} else {
 						if(frageObj.get(y).getFlags().indexOf("LIST") >= 0) {
-							ErrorLog.fehlerBerichtB("ERROR",
-									Datenbank.class + ": " + Thread.currentThread().getStackTrace()[1].getLineNumber(), "Fehler");
+							//ErrorLog.fehlerBerichtB("ERROR",
+							//		Datenbank.class + ": " + Thread.currentThread().getStackTrace()[1].getLineNumber(), "Fehler");
 						} else {
 							//F�gt ein Textfeld ein
-							MyTextField textField = new MyTextField();
-							textField.setPreferredSize(new Dimension(200, 50));
+							TextField textField = new TextField();
+							//textField.setPreferredSize(new Dimension(200, 50));
 							
 							MY_PATTERN = Pattern.compile("MC[0-9]+A[0-9]+");
 							mges = MY_PATTERN.matcher(frageObj.get(y).getFlags());
@@ -677,10 +838,11 @@ public class QuestionController {
 							}
 							
 							
-							allePanel.get(z).add(textField, "wrap, span, center");
-							Vector<MyTextField> textFields = new Vector<MyTextField>();
+							//allePanel.get(z).add(textField, "wrap, span, center");
+							Vector<TextField> textFields = new Vector<TextField>();
 							textFields.add(textField);
 							frageObj.get(y).setAntwortenFF(textFields);
+							vBox.getChildren().add(textField);
 						}
 					}
 					
@@ -688,20 +850,20 @@ public class QuestionController {
 					
 					if(frageObj.get(y).getFlags().indexOf("LIST") >= 0) {
 						//Erstellt eine Liste
-						Vector<JScrollPane> antwortenLIST = new Vector<JScrollPane>();
-						JScrollPane scrollPane = new JScrollPane();
-						scrollPane.getVerticalScrollBar().setUI(new MyScrollBarUI());
-						allePanel.get(z).add(scrollPane, "span, center");
-						MyList liste = new MyList(frageObj.get(y).getAntwort_moeglichkeit());
-						scrollPane.setViewportView(liste);
-						
+						Vector<ListView<String>> antwortenLIST = new Vector<>();
+						// scrollPane.getVerticalScrollBar().setUI(new MyScrollBarUI());
+						//allePanel.get(z).add(scrollPane, "span, center");
+						ListView<String> liste = new ListView<String>();
+						liste.setItems(FXCollections.observableArrayList(frageObj.get(y).getAntwort_moeglichkeit()));
+
 						MY_PATTERN = Pattern.compile("MC[0-9]+A[0-9]+");
 						mges = MY_PATTERN.matcher(frageObj.get(y).getFlags());
 						if (mges.find()) {
-							scrollPane.setVisible(false);
+							liste.setVisible(false);
 						}
 						
-						antwortenLIST.add(scrollPane);
+						antwortenLIST.add(liste);
+						vBox.getChildren().add(liste);
 						frageObj.get(y).setAntwortenLIST(antwortenLIST);
 						continue;
 					}
@@ -709,16 +871,19 @@ public class QuestionController {
 					Vector<Integer> anzahlZeile = new Vector<Integer>();
 					int intAntworten = frageObj.get(y).getAntwort_moeglichkeit().size();
 					do {
-						if(intAntworten > PROZEILE) {
-							anzahlZeile.addElement(PROZEILE);
-							intAntworten -= PROZEILE;
+						if(intAntworten > GlobalVars.proZeile) {
+							anzahlZeile.addElement(GlobalVars.proZeile);
+							intAntworten -= GlobalVars.proZeile;
 						}
-					} while(intAntworten > PROZEILE);
+					} while(intAntworten > GlobalVars.proZeile);
 					anzahlZeile.addElement(intAntworten);
 					
+					HBox hBox = new HBox();
+					hBox.setAlignment(Pos.CENTER);
 					//Uebe die schleife aus, wenn count kleiner ist als die groesse der antwortmoeglichkeiten
-					Vector<MyCheckbox> checkboxs = new Vector<MyCheckbox>();
+					Vector<CheckBox> checkboxs = new Vector<>();
 					for(int count3 = 0; count3 < frageObj.get(y).getAntwort_moeglichkeit().size(); count3++){
+						
 						//Erstellt eine Checkbox
 						String antwort = frageObj.get(y).getAntwort_moeglichkeit().get(count3);
 						
@@ -729,25 +894,36 @@ public class QuestionController {
 								char[] string = antwort.toCharArray();
 								string[index] = '\n';
 								antwortAnzeige = new String(string);
-								antwortAnzeige = antwort.replace("\n", "<br/>");
-								antwortAnzeige = "<html><div>"
-										+ "" + antwort + "</div></html>";
+								antwortAnzeige = antwort;
 							}
 						} else {
 							antwortAnzeige = antwort;
 						}
-						MyCheckbox chckbxSda = new MyCheckbox(antwortAnzeige);
-						chckbxSda.setFont(new Font("Tahoma", Font.PLAIN, 28));
-						chckbxSda.setForeground(new Color(94, 56, 41));
+						
+						CheckBox chckbxSda = new CheckBox(antwortAnzeige);
+						//chckbxSda.setFont(new Font("Tahoma", Font.PLAIN, 28));
+						//chckbxSda.setForeground(new Color(94, 56, 41));
 						
 						MY_PATTERN = Pattern.compile("MC[0-9]+A[0-9]+");
 						mges = MY_PATTERN.matcher(frageObj.get(y).getFlags());
 						if (mges.find()) {
 							chckbxSda.setVisible(false);
 						}
-						
 						checkBoxen.add(chckbxSda);
 						if(!isMC) {
+							chckbxSda.selectedProperty().addListener(new ChangeListener<Boolean>() {
+						        public void changed(ObservableValue<? extends Boolean> ov,
+						                Boolean old_val, Boolean new_val) {
+						                    //System.out.println("!isMC" + ov + " - " + old_val + " - " + new_val);
+						                    if(new_val) {
+												for(int i = 0; i < checkBoxen.size(); i++) {
+													if(!checkBoxen.get(i).getText().equals(chckbxSda.getText()))
+														checkBoxen.get(i).setSelected(false);
+										        }
+						                    }
+						            }
+						        });
+							/*
 							chckbxSda.addActionListener(new ActionListener() {
 							@Override
 							public void actionPerformed(ActionEvent e) {
@@ -760,69 +936,80 @@ public class QuestionController {
 						        //String text = jCheckBox.getText();
 						        
 							}
-						});
+						});*/
 						} else {
-							chckbxSda.addActionListener(new ActionListener() {
-								@Override
-								public void actionPerformed(ActionEvent e) {
-									
-								}
-							});
+							chckbxSda.selectedProperty().addListener(new ChangeListener<Boolean>() {
+						        public void changed(ObservableValue<? extends Boolean> ov,
+						                Boolean old_val, Boolean new_val) {
+						                    //System.out.println(ov + " - " + old_val + " - " + new_val);
+						            }
+						        });
 						}
 						
 						if(frageObj.get(y).getFlags().indexOf("B") >= 0) {
+							/*TODO
 							if(!frageObj.get(y).getFrageLabel().isVisible()) {
 								lblNull.setVisible(false);
 								lblEins.setVisible(false);
 								lblZehn.setVisible(false);
-							}
+							}*/
 							if((count3 == frageObj.get(y).getAntwort_moeglichkeit().size() - 1)) {
-								allePanel.get(z).add(chckbxSda);
-								
-								JPanel empty = new JPanel();
-								empty.setVisible(false);
-								allePanel.get(z).add(empty, "wrap");
+								//allePanel.get(z).add(chckbxSda, "");
+								hBox.getChildren().add(chckbxSda);
+								//JPanel empty = new JPanel();
+								//empty.setVisible(false);
+								//allePanel.get(z).add(empty, "wrap");
 							} else {
-								allePanel.get(z).add(chckbxSda);
+								//allePanel.get(z).add(chckbxSda, "");
+								hBox.getChildren().add(chckbxSda);
 							}
 							
 						} else {
-							if((count3 % (PROZEILE)) == (PROZEILE - 1)) {
-								allePanel.get(z).add(chckbxSda);
-								
+							if((count3 % (GlobalVars.proZeile)) == (GlobalVars.proZeile - 1)) {
+								//allePanel.get(z).add(chckbxSda, "");
+								hBox.getChildren().add(chckbxSda);
+								/*
 								JPanel empty = new JPanel();
 								empty.setVisible(false);
-								allePanel.get(z).add(empty, "wrap");
+								allePanel.get(z).add(empty, "wrap");*/
 							} else {
-								allePanel.get(z).add(chckbxSda);
+								//allePanel.get(z).add(chckbxSda, "");
+								hBox.getChildren().add(chckbxSda);
 							}
 						}
 						checkboxs.addElement(chckbxSda);
 						
+						/*
 						if(count3 == frageObj.get(y).getAntwort_moeglichkeit().size() - 1) {
 							for(int v = 0; v < anzahlZeile.size(); v++) {
-								while(anzahlZeile.get(v) != (PROZEILE)) {
+								while(anzahlZeile.get(v) != (GlobalVars.proZeile)) {
 									anzahlZeile.set(v, anzahlZeile.get(v) + 1);
 									JPanel empty = new JPanel();
 									empty.setVisible(false);
-									if(anzahlZeile.get(v) == (PROZEILE)) {
+									if(anzahlZeile.get(v) == (GlobalVars.proZeile)) {
 										allePanel.get(z).add(empty, "wrap");
 									} else {
 										allePanel.get(z).add(empty, "");
 									}
 								}
 							}
-						}	
+						}*/	
 					}
+					vBox.getChildren().add(hBox);
 					frageObj.get(y).setAntwortenMC(checkboxs);
+					
 				} else{
-					//Error nachricht, wenn das obere nicht zutrift
-					ErrorLog.fehlerBerichtB("ERROR",getClass() + ": " + Thread.currentThread().getStackTrace()[1].getLineNumber(), "Vorschau konnte nicht erstellt/ angezeigt werden!");
+					//Error Nachricht, wenn das obere nicht zutrifft
+					//ErrorLog.fehlerBerichtB("ERROR",getClass() + ": " + Thread.currentThread().getStackTrace()[1].getLineNumber(), "Befragung konnte nicht erstellt/ angezeigt werden!");
 				}	
+				
 			}
+			fragenJePanel.addElement(frageObj);
+			
 		}	
 		
 		for(int y = 0; y < fragen.size(); y++) {
+			
 			Pattern MY_PATTERN = Pattern.compile("MC[0-9]+A[0-9]+");
 			Matcher mges = MY_PATTERN.matcher(fragen.get(y).getFlags());
 			
@@ -835,7 +1022,12 @@ public class QuestionController {
 				Pattern MY_PATTERNint = Pattern.compile("INT[<>=]=[0-9]+");
 				Matcher mint = MY_PATTERNint.matcher(fragen.get(y).getFlags());
 				if (m1.find() && m2.find()) {
+					try {
 					fragen.get(y).setTarget(fragen.get(getY(Integer.parseInt(m1.group(0).substring(2)), "MC", fragen)));
+					} catch (ArrayIndexOutOfBoundsException e) {
+						System.out.println("Fehler: " + Integer.parseInt(m1.group(0).substring(2)));
+						e.printStackTrace();
+					}
 					fragen.get(y).setListener(Integer.parseInt(m2.group(0).substring(1)), "MC");
 				}
 				if (mint.find()) {
@@ -843,7 +1035,6 @@ public class QuestionController {
 				}
 			}
 		}
-		
 		
 		for(int y = 0; y < fragen.size(); y++) {
 			Pattern MY_PATTERN = Pattern.compile("FF[0-9]+A[0-9]+");
@@ -865,14 +1056,41 @@ public class QuestionController {
 				}
 			}
 		}
-		cardLayout.show(frame.getContentPane(), "panel_1_Vorschau");
-		//TODO
+		
+		
+		for(int i = 0; i < allePanel.size(); ++i) {
+			ScreenController.addScreen("survey_" + i + "_preview", allePanel.get(i));
+		}
+		
+		GlobalVars.fragenJePanel = fragenJePanel;
+		GlobalVars.countPanel = countPanel;
 		
 		} catch (Exception e) {
-			ErrorLog.fehlerBerichtB("ERROR",getClass() + ": " + Thread.currentThread().getStackTrace()[1].getLineNumber(), e.getMessage());
+			// ErrorLog.fehlerBerichtB("ERROR",getClass() + ": " + Thread.currentThread().getStackTrace()[1].getLineNumber(), e.getMessage());
 			e.printStackTrace();
 		}
-	}*/
+	}
+	
+	/**
+	 * Gibt die Position des "FrageErstellen" Objektes in dem Vector "fragen" 
+	 * zurück welche die entsprechende Fragen- ID und Fragenart hat. F�r die Vorschau!
+	 * <p>
+	 * @param x int: Fragen- ID
+	 * @param s String: Fragenart
+	 * @param fragen Vector FrageErstellen: alle Fragen
+	 * @return Postition im Vector "fragen" als int.
+	 */
+	private int getY(int x, String s, Vector<Frage> fragen) {
+		// TODO 
+		
+		for(int i = 0; i < fragen.size(); i++) {
+			// System.out.println(fragen.get(i).getFrageID()+ " == " + x + " && " + fragen.get(i).getArt() + " == " + s);
+			if(x == fragen.get(i).getFrageID() && s.equals(fragen.get(i).getArt())) {
+				return i;
+			}
+		}
+		return -1;
+	}
 	
 	/**
 	 * Ueberprueft ob alle Bedingungen zum Speichern gegeben sind.

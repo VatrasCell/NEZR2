@@ -29,6 +29,8 @@ public class SurveyController {
 				GlobalVars.page++;
 				ScreenController.activate("survey_" + GlobalVars.page);
 			} else {
+				SurveyService.saveUmfrage(GlobalVars.fragenJePanel);
+				//cardLayout.show(frame.getContentPane(), "pnlDanke");
 				System.out.println("do Save");
 			}
 		} else {
@@ -61,6 +63,26 @@ public class SurveyController {
 		Optional<ButtonType> result = alert.showAndWait();
 		if (result.get() == ButtonType.OK){
 			ScreenController.activate(Scene.Start.scene());
+		} else {
+		    // ... user chose CANCEL or closed the dialog
+		}
+		
+	}
+	
+	@FXML
+	private void exitPreVeiw() {
+		Alert alert = new Alert(AlertType.CONFIRMATION);
+		alert.setTitle("Vorschau abbrechen");
+		alert.setHeaderText("Wollen Sie die Vorschau wirklich verlassen?");
+		alert.setContentText("Fortfahren?");
+		
+		DialogPane dialogPane = alert.getDialogPane();
+		dialogPane.getStylesheets().add(
+		   getClass().getResource("../application/application.css").toExternalForm());
+
+		Optional<ButtonType> result = alert.showAndWait();
+		if (result.get() == ButtonType.OK){
+			ScreenController.activate(Scene.Question.scene());
 		} else {
 		    // ... user chose CANCEL or closed the dialog
 		}
