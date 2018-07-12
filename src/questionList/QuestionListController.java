@@ -136,7 +136,8 @@ public class QuestionListController {
                             setText(null);
                         } else {
                             btn.setOnAction(event -> {
-                            	//Fragebogen person = getTableView().getItems().get(getIndex());
+                            	Frage frage = getTableView().getItems().get(getIndex());
+                            	QuestionListService.deleteFrage(frage);
                             });
                             setGraphic(btn);
                             setText(null);

@@ -78,9 +78,10 @@ public class Fragebogen {
 	public void setFinal(boolean isFinal) {
 		this.isFinal.set(isFinal);
 	}
-	
-	
-	
-	
+	@Override
+	public String toString() {
+		return "Fragebogen [id=" + id + ", date=" + date + ", name=" + name + ", ort=" + ort + ", activ=" + activ
+				+ ", isFinal=" + isFinal + "]";
+	}
 	
 }

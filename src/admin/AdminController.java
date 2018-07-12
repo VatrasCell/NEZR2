@@ -47,8 +47,12 @@ public class AdminController {
 	 * The constructor (is called before the initialize()-method).
 	 */
 	public AdminController() {
+		getData();
+	}
+	
+	private void getData() {
 		fragebogen = AdminService.getFragebogen(GlobalVars.standort);
-		System.out.println(fragebogen.toString());
+		//System.out.println(fragebogen.toString());
 		for(Fragebogen f : fragebogen) {
 			data.add(f);
 		}
@@ -154,7 +158,11 @@ public class AdminController {
                             setText(null);
                         } else {
                             btn.setOnAction(event -> {
-                            	//Fragebogen person = getTableView().getItems().get(getIndex());
+                            	Fragebogen fragebogen = getTableView().getItems().get(getIndex());
+                            	if(AdminService.copyFragebogen(fragebogen)) {
+                            		getData();
+                            		initialize();
+                            	}
                             });
                             setGraphic(btn);
                             setText(null);
