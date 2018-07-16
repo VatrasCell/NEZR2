@@ -174,7 +174,7 @@ public class QuestionController {
 									setText(null);
 								} else {
 									btn.setOnAction(event -> {
-										// Fragebogen person = getTableView().getItems().get(getIndex());
+										 Antwort antwort = getTableView().getItems().get(getIndex());
 									});
 									setGraphic(btn);
 									setText(null);

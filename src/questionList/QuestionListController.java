@@ -45,6 +45,11 @@ public class QuestionListController {
 	 * The constructor (is called before the initialize()-method).
 	 */
 	public QuestionListController() {
+		getData();
+	}
+	
+	private void getData() {
+		data.clear();
 		fragen = SurveyService.getFragen(fragebogen);
 		Vector<Frage> ueberschriften = QuestionListService.getUeberschriften(fragebogen);
 		for(int i = 0; i < ueberschriften.size(); i++) {
@@ -137,7 +142,10 @@ public class QuestionListController {
                         } else {
                             btn.setOnAction(event -> {
                             	Frage frage = getTableView().getItems().get(getIndex());
-                            	QuestionListService.deleteFrage(frage);
+                            	if(QuestionListService.deleteFrage(frage)) {
+                            		getData();
+                            		tbl_fragen.refresh();
+                            	}
                             });
                             setGraphic(btn);
                             setText(null);

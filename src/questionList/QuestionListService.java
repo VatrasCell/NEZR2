@@ -100,7 +100,7 @@ public class QuestionListService extends Datenbank {
 				}
 
 				mySQL = myCon.createStatement();
-				statement = "SELECT flags, idFreieFrage FROM FB_has_ff where flags LIKE '%__" + frage.getFrageID()
+				statement = "SELECT flags, idFreieFragen FROM FB_has_ff WHERE flags LIKE '%__" + frage.getFrageID()
 						+ "A%'";
 				myRS = mySQL.executeQuery(statement);
 

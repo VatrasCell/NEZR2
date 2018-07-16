@@ -15,7 +15,6 @@ import model.Frage;
 import model.Fragebogen;
 import question.QuestionService;
 import application.GlobalFuncs;
-import application.GlobalVars;
 
 public class AdminService extends Datenbank {
 	
@@ -153,8 +152,8 @@ public class AdminService extends Datenbank {
 			}
 			myRS = null;
 			Statement mySQL = myCon.createStatement();
-			statement = "INSERT INTO fragebogen VALUE(NULL, " + GlobalFuncs.getcurDate() + ", "
-					+ slashUnicode(fb.getName()) + ", FALSE, " + ortID + ", FALSE)";
+			statement = "INSERT INTO fragebogen VALUES(NULL, '" + GlobalFuncs.getcurDate() + "', '"
+					+ slashUnicode(fb.getName()) + "', FALSE, " + ortID + ", FALSE)";
 			mySQL.execute(statement);
 			mySQL = null;
 			myRS = null;
@@ -200,7 +199,7 @@ public class AdminService extends Datenbank {
 						if (frage.contains("\\")) {
 							frage = frage.replaceAll("\\\\", "\\\\\\\\");
 						}
-						statement = "INSERT INTO MultipleChoice VALUE(NULL, '" + frage + "', " + katID + ")";
+						statement = "INSERT INTO MultipleChoice VALUES(NULL, '" + frage + "', " + katID + ")";
 						mcFrage.setFrage(frage);
 						mySQL.execute(statement);
 
@@ -215,7 +214,7 @@ public class AdminService extends Datenbank {
 
 					mySQL = null;
 					mySQL = myCon.createStatement();
-					statement = "INSERT INTO Fb_has_MC VALUE(NULL, " + newID + ", " + newFragenID + ", " + position
+					statement = "INSERT INTO Fb_has_MC VALUES(NULL, " + newID + ", " + newFragenID + ", " + position
 							+ ", '" + flags + "')";
 					mcFrage.setPosition(position);
 					mcFrage.setFlags(flags);
@@ -231,7 +230,7 @@ public class AdminService extends Datenbank {
 					while (myRS4.next()) {
 						mySQL = null;
 						mySQL = myCon.createStatement();
-						statement = "INSERT INTO Mc_has_A VALUE(NULL, " + newFragenID + ", " + myRS4.getInt("AntwortNr")
+						statement = "INSERT INTO Mc_has_A VALUES(NULL, " + newFragenID + ", " + myRS4.getInt("AntwortNr")
 								+ ")";
 						mySQL.execute(statement);
 					}
@@ -274,7 +273,7 @@ public class AdminService extends Datenbank {
 							System.out.println(frage);
 							frage = frage.replaceAll("\\\\", "\\\\\\\\");
 						}
-						statement = "INSERT INTO FreieFragen VALUE(NULL, '" + frage + "', " + katID + ")";
+						statement = "INSERT INTO FreieFragen VALUES(NULL, '" + frage + "', " + katID + ")";
 						ffFrage.setFrage(frage);
 						mySQL.execute(statement);
 
@@ -320,7 +319,7 @@ public class AdminService extends Datenbank {
 
 					mySQL = null;
 					mySQL = myCon.createStatement();
-					statement = "INSERT INTO Fb_has_FF VALUE(NULL, " + newID + ", " + newFragenID + ", " + position
+					statement = "INSERT INTO Fb_has_FF VALUES(NULL, " + newID + ", " + newFragenID + ", " + position
 							+ ", '" + flags + "')";
 					ffFrage.setFrageID(newFragenID);
 					ffFrage.setFragebogenID(newID);
@@ -461,6 +460,287 @@ public class AdminService extends Datenbank {
 
 			myCon.close();
 			return true;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			//ErrorLog.fehlerBerichtB("ERROR",
+			//		Datenbank.class + ": " + Thread.currentThread().getStackTrace()[1].getLineNumber(), e.getMessage());
+		}
+		return false;
+	}
+	
+	/**
+	 * Loescht den gegebenen Fragebogen. Gibt bei Erfolg TRUE zurueck.
+	 * 
+	 * @param fb
+	 *            FragebogenDialog: der Fragebogen
+	 * @return boolean
+	 * @author Anne
+	 */
+	public static boolean deleteFragebogen(Fragebogen fb) {
+		Vector<Integer> idsmc = new Vector<Integer>(); // IDs der MC Fragen
+		Vector<Integer> idsff = new Vector<Integer>(); // IDs der Freien Fragen
+		Vector<Integer> antmcnr = new Vector<Integer>(); // IDs der Antworten
+															// aus MC Fragen
+		Vector<String> antwortenmc = new Vector<String>(); // Antworten zu MC
+															// Fragen
+
+		try {
+			// Multiple Choice ids mit Antworten
+			Connection myCon = DriverManager.getConnection(url, user, pwd);
+			Statement mySQL = myCon.createStatement();
+			String statement = "SELECT fb_has_mc.idMultipleChoice, Antworten.AntwortNr, Antworten.Antwort FROM fragebogen JOIN fb_has_mc ON fragebogen.idFragebogen=fb_has_mc.idFragebogen JOIN "
+					+ "multiplechoice mc1 ON fb_has_mc.idMultipleChoice=mc1.idMultipleChoice JOIN mc_has_a ON mc1.idMultipleChoice=mc_has_a.idMultipleChoice JOIN antworten "
+					+ "ON mc_has_a.AntwortNr=antworten.AntwortNr WHERE fragebogen.idFragebogen=" + fb.getId();
+			ResultSet myRS = mySQL.executeQuery(statement);
+
+			while (myRS.next()) {
+				if (!antmcnr.isEmpty()) {
+					for (int i = 0; i < antmcnr.size(); i++) {
+						if (myRS.getInt("AntwortNr") != antmcnr.get(i)
+								&& !myRS.getString("Antwort").equals(antwortenmc.get(i))) {
+							antmcnr.add(myRS.getInt("AntwortNr"));
+							antwortenmc.addElement(myRS.getString("Antwort"));
+							break;
+						}
+					}
+				} else {
+					antmcnr.add(myRS.getInt("AntwortNr"));
+					antwortenmc.addElement(myRS.getString("Antwort"));
+				}
+				idsmc.add(myRS.getInt("idMultipleChoice"));
+			}
+			myRS = null;
+			mySQL = null;
+
+			mySQL = myCon.createStatement();
+			statement = "SELECT fb_has_mc.idMultipleChoice, Antworten.AntwortNr, Antworten.Antwort FROM fragebogen JOIN fb_has_mc ON fragebogen.idFragebogen=fb_has_mc.idFragebogen JOIN "
+					+ "multiplechoice mc1 ON fb_has_mc.idMultipleChoice=mc1.idMultipleChoice JOIN mc_has_a ON mc1.idMultipleChoice=mc_has_a.idMultipleChoice JOIN antworten ON "
+					+ "mc_has_a.AntwortNr=antworten.AntwortNr WHERE fragebogen.idFragebogen!=" + fb.getId();
+			myRS = mySQL.executeQuery(statement);
+
+			// Antworten, die noch in einem anderen Fragebogen vorkommen, aus
+			// dem Vector entfernen
+			while (myRS.next()) {
+				for (int i = 0; i < antmcnr.size(); i++) {
+					if (myRS.getInt("AntwortNr") == antmcnr.get(i)) {
+						antmcnr.remove(i);
+					}
+				}
+			}
+			myRS = null;
+			mySQL = null;
+
+			// Freie Fragen mit id
+			mySQL = myCon.createStatement();
+			statement = "SELECT fb_has_ff.idFreieFragen FROM fb_has_ff WHERE idFragebogen=" + fb.getId();
+			myRS = mySQL.executeQuery(statement);
+
+			while (myRS.next()) {
+				idsff.add(myRS.getInt("idFreieFragen"));
+			}
+			myRS = null;
+			mySQL = null;
+
+			// LÃ¶schen der Relationen von Fragebogen zu MultipleChoice
+			for (short i = 0; i < idsmc.size(); i++) {
+				mySQL = myCon.createStatement();
+				statement = "DELETE FROM Fb_has_Mc WHERE idMultipleChoice=" + idsmc.get(i) + " AND idFragebogen="
+						+ fb.getId();
+				mySQL.execute(statement);
+				mySQL = null;
+			}
+
+			// LÃ¶schen der Relationen von Fragebogen zu FreieFragen
+			for (short i = 0; i < idsff.size(); i++) {
+				mySQL = myCon.createStatement();
+				statement = "DELETE FROM Fb_has_Ff WHERE idFreieFragen=" + idsff.get(i) + " AND idFragebogen="
+						+ fb.getId();
+				mySQL.execute(statement);
+				mySQL = null;
+			}
+
+			for (short i = 0; i < idsmc.size(); i++) {
+				mySQL = myCon.createStatement();
+				statement = "SELECT idMultipleChoice FROM FB_has_MC WHERE idMultipleChoice=" + idsmc.get(i);
+				myRS = mySQL.executeQuery(statement);
+
+				// steht ID der MC Frage nach dem LÃ¶schen der Relation zum
+				// jeweiligen Fragebogen immernoch wo anders?
+				// Wenn nicht, darf die MC Frage gelÃ¶scht werden, denn sie kommt
+				// in keinem anderen Fragebogen vor
+				if (!myRS.next()) {
+					mySQL = myCon.createStatement();
+					statement = "DELETE FROM MC_has_A WHERE idMultipleChoice=" + idsmc.get(i);
+					mySQL.execute(statement);
+					mySQL = null;
+
+					mySQL = myCon.createStatement();
+					statement = "DELETE FROM MultipleChoice WHERE idMultipleChoice=" + idsmc.get(i);
+					mySQL.execute(statement);
+					mySQL = null;
+				}
+			}
+
+			for (short i = 0; i < idsff.size(); i++) {
+				mySQL = myCon.createStatement();
+				statement = "SELECT idFreieFragen FROM Fb_has_ff WHERE idFreieFragen=" + idsff.get(i);
+				myRS = mySQL.executeQuery(statement);
+				// steht ID der FF Frage nach dem LÃ¶schen der Relation zum
+				// jeweiligen Fragebogen immernoch wo anders?
+				// Wenn nicht, darf die FF Frage gelÃ¶scht werden, denn sie kommt
+				// in keinem anderen Fragebogen vor
+				if (!myRS.next()) {
+					mySQL = myCon.createStatement();
+					statement = "DELETE FROM FreieFragen WHERE idFreieFragen=" + idsff.get(i);
+					mySQL.execute(statement);
+					mySQL = null;
+				}
+			}
+
+			// Antworten lÃ¶schen, wenn nicht 0-10 / ja / nein / ##### (Multiple
+			// Choice Edition)
+			for (short j = 0; j < antmcnr.size(); j++) {
+				if (!antwortenmc.get(j).equals("0") && !antwortenmc.get(j).equals("1")
+						&& !antwortenmc.get(j).equals("2") && !antwortenmc.get(j).equals("3")
+						&& !antwortenmc.get(j).equals("4") && !antwortenmc.get(j).equals("5")
+						&& !antwortenmc.get(j).equals("6") && !antwortenmc.get(j).equals("7")
+						&& !antwortenmc.get(j).equals("8") && !antwortenmc.get(j).equals("9")
+						&& !antwortenmc.get(j).equals("10") && !antwortenmc.get(j).equals("ja")
+						&& !antwortenmc.get(j).equals("nein") && !antwortenmc.get(j).equals("#####")) {
+					mySQL = myCon.createStatement();
+					statement = "DELETE FROM Antworten WHERE AntwortNr=" + antmcnr.get(j);
+					mySQL.execute(statement);
+					mySQL = null;
+				}
+			}
+
+			mySQL = null;
+
+			mySQL = myCon.createStatement();
+			statement = "DELETE FROM fragebogen WHERE idFragebogen=" + fb.getId();
+			mySQL.execute(statement);
+
+			mySQL = null;
+			myRS = null;
+			myCon.close();
+			return true;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			//ErrorLog.fehlerBerichtB("ERROR",
+			//		Datenbank.class + ": " + Thread.currentThread().getStackTrace()[1].getLineNumber(), e.getMessage());
+		}
+		return false;
+	}
+	
+	/**
+	 * Benennt den gegebenen Fragebogen um. Gibt bei Erfolg TRUE zurueck.
+	 * 
+	 * @param fb
+	 *            FragebogenDialog: der Fragebogen
+	 * @return boolean
+	 * @author Eric
+	 */
+	public static boolean renameFragebogen(Fragebogen fb) {
+		try {
+			Connection myCon = DriverManager.getConnection(url, user, pwd);
+			Statement mySQL = myCon.createStatement();
+			String statement = "UPDATE fragebogen SET Name='" + slashUnicode(fb.getName())
+					+ "' WHERE idFragebogen=" + fb.getId();
+			mySQL.execute(statement);
+
+			mySQL = null;
+			myCon.close();
+			return true;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			//ErrorLog.fehlerBerichtB("ERROR",
+			//		Datenbank.class + ": " + Thread.currentThread().getStackTrace()[1].getLineNumber(), e.getMessage());
+		}
+		return false;
+	}
+	
+	/**
+	 * Setzt den gegebenen Fragebogen auf final. Gibt bei Erfolg TRUE zurueck.
+	 * 
+	 * @param fb
+	 *            FragebogenDialog: der Fragebogen
+	 * @return boolean
+	 * @author Eric
+	 */
+	public static boolean setFinal(Fragebogen fb) {
+		try {
+			// anneSuperNeu
+			Connection myCon = DriverManager.getConnection(url, user, pwd);
+			Statement mySQL = myCon.createStatement();
+			String statement = "UPDATE fragebogen SET final=TRUE WHERE idFragebogen=" + fb.getId();
+			mySQL.execute(statement);
+
+			mySQL = null;
+			myCon.close();
+			return true;
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return false;
+	}
+
+	/**
+	 * Setzt den gegebenen Fragebogen auf nicht final. Gibt bei Erfolg TRUE
+	 * zurueck.
+	 * 
+	 * @param fb
+	 *            FragebogenDialog
+	 * @return boolean
+	 * @author Eric
+	 */
+	public static boolean setUnFinal(Fragebogen fb) {
+		try {
+			// anneSuperNeu
+			Connection myCon = DriverManager.getConnection(url, user, pwd);
+			Statement mySQL = myCon.createStatement();
+			String statement = "UPDATE fragebogen SET final=FALSE WHERE idFragebogen=" + fb.getId();
+			mySQL.execute(statement);
+
+			mySQL = null;
+			myCon.close();
+			return true;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			//ErrorLog.fehlerBerichtB("ERROR",
+			//		Datenbank.class + ": " + Thread.currentThread().getStackTrace()[1].getLineNumber(), e.getMessage());
+		}
+		return false;
+	}
+
+	/**
+	 * Prueft, ob der gegebenen Fragebogen final ist. Gibt bei Erfolg TRUE
+	 * zurueck.
+	 * 
+	 * @param fb
+	 *            FragebogenDialog: der Fragebogen
+	 * @return boolean
+	 * @author Eric
+	 */
+	public static boolean isFinal(Fragebogen fb) {
+		try {
+			// anneSuperNeu
+			Connection myCon = DriverManager.getConnection(url, user, pwd);
+			Statement mySQL = myCon.createStatement();
+			String statement = "SELECT idFragebogen FROM fragebogen WHERE final=TRUE AND idFragebogen="
+					+ fb.getId();
+			ResultSet myRS = mySQL.executeQuery(statement);
+
+			if (myRS.next()) {
+				mySQL = null;
+				myRS = null;
+				myCon.close();
+				return true;
+			} else {
+				mySQL = null;
+				myRS = null;
+				myCon.close();
+				return false;
+			}
 		} catch (SQLException e) {
 			e.printStackTrace();
 			//ErrorLog.fehlerBerichtB("ERROR",

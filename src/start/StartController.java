@@ -8,6 +8,8 @@ import java.util.regex.Pattern;
 
 import application.GlobalVars;
 import application.ScreenController;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -38,6 +40,9 @@ public class StartController {
 	
 	@FXML
 	ImageView imageView;
+	
+	private static StringProperty fragebogenText = new SimpleStringProperty();
+	private static StringProperty fragebogenWarn = new SimpleStringProperty();
 	
 	/**
 	 * The constructor (is called before the initialize()-method).
@@ -75,16 +80,15 @@ public class StartController {
 			break;
 		}
 		imageView.setImage(value);
-		
-		lbl_fragebogen.setText(
-			GlobalVars.activFragebogen == null ? "" : "Fragebogen: " + GlobalVars.activFragebogen.getName()	
-		); 
-		
-		lbl_warning.setText(
-				GlobalVars.activFragebogen == null ? "kein Fragebogen ausgewählt" : 
-				!GlobalVars.activFragebogen.getOrt().equals(GlobalVars.standort) ? "Fragebogen ist nicht für diesen Standort optimiert" : ""
-		);
-		
+		setStartText();
+		lbl_fragebogen.textProperty().bind(fragebogenText);
+		lbl_warning.textProperty().bind(fragebogenWarn);	
+	}
+	
+	public static void setStartText() {
+		fragebogenText.set(GlobalVars.activFragebogen == null ? "" : "Fragebogen: " + GlobalVars.activFragebogen.getName());
+		fragebogenWarn.set(GlobalVars.activFragebogen == null ? "kein Fragebogen ausgewählt" : 
+			!GlobalVars.activFragebogen.getOrt().equals(GlobalVars.standort) ? "Fragebogen ist nicht für diesen Standort optimiert" : "");
 	}
 	
 	/**

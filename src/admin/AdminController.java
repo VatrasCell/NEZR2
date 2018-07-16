@@ -1,6 +1,7 @@
 package admin;
 
 import java.io.IOException;
+import java.util.Optional;
 import java.util.Vector;
 
 import application.GlobalVars;
@@ -12,14 +13,17 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.DialogPane;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.util.Callback;
 import model.Fragebogen;
 import questionList.QuestionListController;
+import start.StartController;
 
 public class AdminController {
 	
@@ -41,6 +45,8 @@ public class AdminController {
 	@FXML
 	private TableColumn<Fragebogen, String> copCol = new TableColumn<>("Kopieren");
 	@FXML
+	private TableColumn<Fragebogen, String> renCol = new TableColumn<>("Umbenennen");
+	@FXML
 	private TableColumn<Fragebogen, String> delCol = new TableColumn<>("Löschen");
 	
 	/**
@@ -51,6 +57,7 @@ public class AdminController {
 	}
 	
 	private void getData() {
+		data.clear();
 		fragebogen = AdminService.getFragebogen(GlobalVars.standort);
 		//System.out.println(fragebogen.toString());
 		for(Fragebogen f : fragebogen) {
@@ -64,7 +71,6 @@ public class AdminController {
 	 */
 	@FXML
 	private void initialize() {
-		System.out.println(data.toString());
 		tbl_fragebogen.setItems(data);
 		
 		nameCol.setCellValueFactory(new PropertyValueFactory<Fragebogen, String>("name"));
@@ -79,9 +85,13 @@ public class AdminController {
             	cellValue.setActiv(newValue);
             	if(newValue) {
             		AdminService.updateFragebogen(cellValue);
+            		GlobalVars.activFragebogen = cellValue;
+            		StartController.setStartText();
+            		getData();
             	} else {
             		AdminService.disableFragebogen(cellValue);
-            	}          	
+            	}
+            	tbl_fragebogen.refresh();
             	});
 
             return property;
@@ -161,7 +171,7 @@ public class AdminController {
                             	Fragebogen fragebogen = getTableView().getItems().get(getIndex());
                             	if(AdminService.copyFragebogen(fragebogen)) {
                             		getData();
-                            		initialize();
+                            		tbl_fragebogen.refresh();
                             	}
                             });
                             setGraphic(btn);
@@ -175,6 +185,52 @@ public class AdminController {
 
         copCol.setCellFactory(cellFactoryCop);
         tbl_fragebogen.getColumns().add(copCol);
+        
+        renCol.setCellValueFactory(new PropertyValueFactory<>("DUMMY"));
+        Callback<TableColumn<Fragebogen, String>, TableCell<Fragebogen, String>> cellFactoryRen
+                = //
+                new Callback<TableColumn<Fragebogen, String>, TableCell<Fragebogen, String>>() {
+            @Override
+            public TableCell<Fragebogen, String> call(final TableColumn<Fragebogen, String> param) {
+                final TableCell<Fragebogen, String> cell = new TableCell<Fragebogen, String>() {
+
+                    final Button btn = new Button("REN");
+
+                    @Override
+                    public void updateItem(String item, boolean empty) {
+                        super.updateItem(item, empty);
+                        if (empty) {
+                            setGraphic(null);
+                            setText(null);
+                        } else {
+                            btn.setOnAction(event -> {
+                            	Fragebogen fragebogen = getTableView().getItems().get(getIndex());
+                            	TextInputDialog dialog = new TextInputDialog("");
+                            	dialog.setTitle("Fragebogen umbenennen");
+                            	dialog.setContentText("neuer Name:");
+                            	DialogPane dialogPane = dialog.getDialogPane();
+                        		dialogPane.getStylesheets().add(
+                        		   getClass().getResource("../application/application.css").toExternalForm());
+                        		
+                            	Optional<String> result = dialog.showAndWait();
+                            	result.ifPresent(name -> fragebogen.setName(name));
+                            	
+                            	if(AdminService.renameFragebogen(fragebogen)) {
+                            		getData();
+                            		tbl_fragebogen.refresh();
+                            	}
+                            });
+                            setGraphic(btn);
+                            setText(null);
+                        }
+                    }
+                };
+                return cell;
+            }
+        };
+
+        renCol.setCellFactory(cellFactoryRen);
+        tbl_fragebogen.getColumns().add(renCol);
         
         delCol.setCellValueFactory(new PropertyValueFactory<>("DUMMY"));
         Callback<TableColumn<Fragebogen, String>, TableCell<Fragebogen, String>> cellFactoryDel
@@ -194,7 +250,11 @@ public class AdminController {
                             setText(null);
                         } else {
                             btn.setOnAction(event -> {
-                            	//Fragebogen person = getTableView().getItems().get(getIndex());
+                            	Fragebogen fragebogen = getTableView().getItems().get(getIndex());
+                            	if(AdminService.deleteFragebogen(fragebogen)) {
+                            		getData();
+                            		tbl_fragebogen.refresh();
+                            	}
                             });
                             setGraphic(btn);
                             setText(null);
