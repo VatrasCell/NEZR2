@@ -30,8 +30,13 @@ public class ScreenController {
 	}
 
 	public static void activate(String name) {
+		Scene oldScene = main.getScene();
 		main.setScene(screenMap.get(name));
 		main.show();
+		if(oldScene != null) {
+			main.setMinHeight(oldScene.getHeight() + 15);
+			main.setMinWidth(oldScene.getWidth());
+		}
 	}
 	
 	public static <T> void activate(String name, String key, T value) {
