@@ -204,7 +204,7 @@ public class SurveyService extends Datenbank {
 		try {
 			Connection myCon = DriverManager.getConnection(url, user, pwd);
 
-			String statement = "INSERT INTO Befragung VALUE(NULL, CURDATE(), ?)";
+			String statement = "INSERT INTO Befragung VALUES(NULL, CURDATE(), ?)";
 			PreparedStatement psSql = myCon.prepareStatement(statement);
 			psSql.setInt(1, fragen.get(0).get(0).getFragebogenID());
 			psSql.executeUpdate();
@@ -235,7 +235,7 @@ public class SurveyService extends Datenbank {
 										myRS = null;
 										mySQL = null;
 										mySQL = myCon.createStatement();
-										statement = "INSERT INTO B_has_MC VALUE(NULL," + b_id + ", "
+										statement = "INSERT INTO B_has_MC VALUES(NULL," + b_id + ", "
 												+ frage.getFrageID() + ", " + QuestionService.getAntwortID(antwort) + ")";
 										mySQL.executeUpdate(statement);
 									}
@@ -255,7 +255,7 @@ public class SurveyService extends Datenbank {
 									myRS = null;
 									mySQL = null;
 									mySQL = myCon.createStatement();
-									statement = "INSERT INTO B_has_FF VALUE(NULL," + b_id + ", " + frage.getFrageID()
+									statement = "INSERT INTO B_has_FF VALUES(NULL," + b_id + ", " + frage.getFrageID()
 											+ ", " + QuestionService.getAntwortID(antwort) + ")";
 									mySQL.executeUpdate(statement);
 								}

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.image.*?>
 <?import javafx.scene.control.*?>
 <?import java.lang.*?>
 <?import javafx.scene.layout.*?>
@@ -9,21 +10,22 @@
    <top>
       <AnchorPane prefHeight="66.0" prefWidth="600.0" BorderPane.alignment="CENTER">
          <children>
-            <Button layoutX="14.0" layoutY="21.0" mnemonicParsing="false" onAction="#exit" text="Programm beenden" AnchorPane.leftAnchor="15.0" AnchorPane.topAnchor="15.0" />
             <Label alignment="TOP_CENTER" layoutX="238.0" layoutY="19.0" prefHeight="17.0" prefWidth="125.0" text="Fragebogen Übersicht" textAlignment="CENTER" AnchorPane.leftAnchor="238.0" AnchorPane.rightAnchor="237.0" AnchorPane.topAnchor="15.0" />
-            <HBox alignment="CENTER" layoutX="47.0" layoutY="49.0" prefHeight="45.0" prefWidth="505.0" spacing="8.0" AnchorPane.leftAnchor="48.0" AnchorPane.rightAnchor="48.0" AnchorPane.topAnchor="48.0">
+            <Button layoutX="526.0" layoutY="15.0" mnemonicParsing="false" onAction="#logout" text="Logout" AnchorPane.rightAnchor="15.0" AnchorPane.topAnchor="15.0" />
+            <HBox prefHeight="47.0" prefWidth="200.0" spacing="15.0" AnchorPane.leftAnchor="15.0" AnchorPane.topAnchor="15.0">
                <children>
-                  <Button mnemonicParsing="false" text="Button" />
-                  <Button mnemonicParsing="false" text="Button" />
-                  <Button mnemonicParsing="false" text="Button" />
-                  <Button mnemonicParsing="false" text="Button" />
-                  <Button mnemonicParsing="false" text="Button" />
-                  <Button mnemonicParsing="false" text="Button" />
-                  <Button mnemonicParsing="false" text="Button" />
-                  <Button mnemonicParsing="false" text="Button" />
+                  <Button mnemonicParsing="false" onAction="#exit" text="Programm beenden" textAlignment="CENTER" />
+                  <Button fx:id="btn_loc" mnemonicParsing="false">
+                     <graphic>
+                        <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../../bin/test/icons/standort_2.png" />
+                           </image>
+                        </ImageView>
+                     </graphic>
+                  </Button>
                </children>
             </HBox>
-            <Button layoutX="526.0" layoutY="15.0" mnemonicParsing="false" onAction="#logout" text="Logout" AnchorPane.rightAnchor="15.0" AnchorPane.topAnchor="15.0" />
          </children>
       </AnchorPane>
    </top>

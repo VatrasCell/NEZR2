@@ -640,7 +640,7 @@ public class QuestionService extends Datenbank {
 				mySQL = null;
 
 				mySQL = myCon.createStatement();
-				statement = "INSERT INTO FreieFragen VALUE(NULL, ? ," + idKategorie + ")";
+				statement = "INSERT INTO FreieFragen VALUES(NULL, ? ," + idKategorie + ")";
 				psSql = myCon.prepareStatement(statement);
 				psSql.setString(1, slashUnicode(frage.getFrage()));
 				psSql.executeUpdate();
@@ -685,7 +685,7 @@ public class QuestionService extends Datenbank {
 			} else {
 				mySQL.close();
 				mySQL = myCon.createStatement();
-				statement = "INSERT INTO Fb_has_FF VALUE (NULL," + idFragebogen + "," + idFreieFrage + ","
+				statement = "INSERT INTO Fb_has_FF VALUES (NULL," + idFragebogen + "," + idFreieFrage + ","
 						+ frage.getPosition() + ",'" + frage.getFlags() + "')";
 				mySQL.executeUpdate(statement);
 				mySQL = null;
@@ -731,7 +731,7 @@ public class QuestionService extends Datenbank {
 				id = myRS.getInt("AntwortNr");
 			} else {
 				myRS = null;
-				statement = "INSERT INTO Antworten VALUE(NULL, ?)";
+				statement = "INSERT INTO Antworten VALUES(NULL, ?)";
 				psSql = myCon.prepareStatement(statement);
 				psSql.setString(1, slashUnicode(antwort));
 				psSql.executeUpdate();
@@ -971,7 +971,7 @@ public class QuestionService extends Datenbank {
 			} else {
 				mySQL.close();
 				mySQL = myCon.createStatement();
-				statement = "INSERT INTO Fb_has_MC VALUE (NULL," + idFragebogen + "," + idMultipleChoice + ","
+				statement = "INSERT INTO Fb_has_MC VALUES (NULL," + idFragebogen + "," + idMultipleChoice + ","
 						+ frage.getPosition() + ",'" + frage.getFlags() + "')";
 				mySQL.executeUpdate(statement);
 				mySQL = null;
@@ -1079,7 +1079,7 @@ public class QuestionService extends Datenbank {
 			} else {
 				psSql = null;
 
-				statement = "INSERT INTO MultipleChoice VALUE(NULL, ? ," + idKategorie + ")";
+				statement = "INSERT INTO MultipleChoice VALUES(NULL, ? ," + idKategorie + ")";
 				psSql = myCon.prepareStatement(statement);
 				psSql.setString(1, slashUnicode(frage.getFrage()));
 				psSql.executeUpdate();
@@ -1123,7 +1123,7 @@ public class QuestionService extends Datenbank {
 			} else {
 				mySQL.close();
 				mySQL = myCon.createStatement();
-				statement = "INSERT INTO Fb_has_MC VALUE (NULL," + idFragebogen + "," + idBewertungsFrage + ","
+				statement = "INSERT INTO Fb_has_MC VALUES (NULL," + idFragebogen + "," + idBewertungsFrage + ","
 						+ frage.getPosition() + ",'" + frage.getFlags() + "')";
 				mySQL.executeUpdate(statement);
 				mySQL = null;
@@ -1147,7 +1147,7 @@ public class QuestionService extends Datenbank {
 				for (int i = 0; i <= 10; i++) {
 					int antwortNr = getAntwortID(String.valueOf(i));
 					mySQL = myCon.createStatement();
-					statement = "INSERT INTO MC_has_a VALUE (NULL, " + idBewertungsFrage + "," + antwortNr + ")";
+					statement = "INSERT INTO MC_has_a VALUES (NULL, " + idBewertungsFrage + "," + antwortNr + ")";
 					mySQL.executeUpdate(statement);
 					mySQL = null;
 				}
