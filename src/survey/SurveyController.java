@@ -1,5 +1,6 @@
 package survey;
 
+import java.io.IOException;
 import java.util.Optional;
 import java.util.Vector;
 import java.util.regex.Matcher;
@@ -9,6 +10,8 @@ import application.Datenbank;
 import application.GlobalVars;
 import application.ScreenController;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
@@ -18,20 +21,21 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import model.Frage;
-import model.Scene;
+
 
 public class SurveyController {
 	
 	@FXML
-	private void next() {
+	private void next() throws IOException {
 		if(check()) {
 			if(GlobalVars.page < GlobalVars.countPanel - 1) {
 				GlobalVars.page++;
 				ScreenController.activate("survey_" + GlobalVars.page);
 			} else {
 				SurveyService.saveUmfrage(GlobalVars.fragenJePanel);
-				//cardLayout.show(frame.getContentPane(), "pnlDanke");
-				System.out.println("do Save");
+				ScreenController.addScreen(model.Scene.Gratitude.scene(), 
+						new Scene(FXMLLoader.load(getClass().getResource("../gratitude/GratitudeView.fxml"))));
+				ScreenController.activate(model.Scene.Gratitude.scene());
 			}
 		} else {
 			System.out.println("everythingIsNOTAwesome");
@@ -62,7 +66,7 @@ public class SurveyController {
 
 		Optional<ButtonType> result = alert.showAndWait();
 		if (result.get() == ButtonType.OK){
-			ScreenController.activate(Scene.Start.scene());
+			ScreenController.activate(model.Scene.Start.scene());
 		} else {
 		    // ... user chose CANCEL or closed the dialog
 		}
@@ -82,7 +86,7 @@ public class SurveyController {
 
 		Optional<ButtonType> result = alert.showAndWait();
 		if (result.get() == ButtonType.OK){
-			ScreenController.activate(Scene.Question.scene());
+			ScreenController.activate(model.Scene.Question.scene());
 		} else {
 		    // ... user chose CANCEL or closed the dialog
 		}

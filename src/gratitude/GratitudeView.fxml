@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.image.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.layout.BorderPane?>
+
+
+<BorderPane prefHeight="400.0" prefWidth="600.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8" fx:controller="gratitude.GratitudeController">
+   <center>
+      <AnchorPane BorderPane.alignment="CENTER">
+         <children>
+            <ImageView fitHeight="105.0" fitWidth="166.0" layoutX="7.0" layoutY="115.0" pickOnBounds="true" preserveRatio="true" AnchorPane.bottomAnchor="15.0" AnchorPane.leftAnchor="15.0">
+               <image>
+                  <Image url="@../../bin/test/img/wanord.png" />
+               </image>
+            </ImageView>
+            <Label alignment="CENTER" layoutX="127.0" layoutY="135.0" prefHeight="56.0" prefWidth="347.0" text="Dieses Programm wurde von Schülerinnen und Schülern der Wirtschaftsakademie Nord entwickelt." textAlignment="CENTER" textFill="#542600" wrapText="true" AnchorPane.bottomAnchor="39.0" AnchorPane.leftAnchor="127.0" AnchorPane.rightAnchor="126.0">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Label>
+            <Button layoutX="281.0" layoutY="14.0" mnemonicParsing="false" onAction="#exit" text="OK">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Button>
+         </children>
+      </AnchorPane>
+   </center>
+   <top>
+      <AnchorPane prefHeight="137.0" prefWidth="600.0" BorderPane.alignment="CENTER">
+         <children>
+            <Label alignment="CENTER" layoutX="205.0" layoutY="14.0" prefHeight="70.0" prefWidth="190.0" text="Danke" textAlignment="CENTER" textFill="#dd6734" AnchorPane.leftAnchor="205.0" AnchorPane.rightAnchor="205.0" AnchorPane.topAnchor="14.0">
+               <font>
+                  <Font size="64.0" />
+               </font>
+            </Label>
+            <ImageView fitHeight="132.0" fitWidth="56.0" layoutX="530.0" layoutY="14.0" pickOnBounds="true" preserveRatio="true" AnchorPane.rightAnchor="15.0" AnchorPane.topAnchor="15.0">
+               <image>
+                  <Image url="@../../bin/test/img/logo_default.png" />
+               </image>
+            </ImageView>
+            <Label alignment="CENTER" layoutX="161.0" layoutY="117.0" prefHeight="53.0" prefWidth="279.0" text="Für Ihr Feedback!" textAlignment="CENTER" textFill="#5e2600" AnchorPane.leftAnchor="161.0" AnchorPane.rightAnchor="160.0" AnchorPane.topAnchor="117.0">
+               <font>
+                  <Font size="36.0" />
+               </font>
+            </Label>
+         </children>
+      </AnchorPane>
+   </top>
+</BorderPane>

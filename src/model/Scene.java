@@ -7,7 +7,8 @@ public enum Scene {
 	Start("start"),
 	Admin("admin"),
 	QuestionList("questionList"),
-	Question("question");
+	Question("question"),
+	Gratitude("gratitude");
 	
 	private String scene;
 

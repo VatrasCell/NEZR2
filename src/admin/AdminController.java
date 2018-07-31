@@ -15,7 +15,6 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
-import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
@@ -32,7 +31,6 @@ import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.util.Callback;
@@ -442,6 +440,11 @@ public class AdminController {
 	@FXML
 	private void logout() {
 		ScreenController.activate(model.Scene.Start.scene());
+	}
+	
+	@FXML
+	private void changeLocation() {
+		ScreenController.activate(model.Scene.Location.scene());
 	}
 	
 	@FXML

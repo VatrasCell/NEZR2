@@ -15,7 +15,7 @@
             <HBox prefHeight="47.0" prefWidth="200.0" spacing="15.0" AnchorPane.leftAnchor="15.0" AnchorPane.topAnchor="15.0">
                <children>
                   <Button mnemonicParsing="false" onAction="#exit" text="Programm beenden" textAlignment="CENTER" />
-                  <Button fx:id="btn_loc" mnemonicParsing="false">
+                  <Button fx:id="btn_loc" mnemonicParsing="false" onAction="#changeLocation">
                      <graphic>
                         <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
                            <image>
