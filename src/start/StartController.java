@@ -59,7 +59,7 @@ public class StartController {
 	private void initialize() {
 		Image value;
 		switch (GlobalVars.standort) {
-		case "R\\ügen":
+		case "Rügen":
 			value = new Image(".\\test\\img\\logo_nezr.png");
 			break;
 		case "Bayerischer Wald":
@@ -69,14 +69,14 @@ public class StartController {
 			value = new Image(".\\test\\img\\logo_saar.png");
 			break;
 		case "Schwarzwald":
-			value = new Image(".\\test\\img\\logo_saar.png");
+			value = new Image(".\\test\\img\\logo_sw.png");
 			break;
 		case "Lipno":
 			value = new Image(".\\test\\img\\logo_lipno_de.png");
 			break;
 
 		default:
-			value = new Image(".\\test\\img\\logo_sw.png");
+			value = new Image(".\\test\\img\\logo_default.png");
 			break;
 		}
 		imageView.setImage(value);
