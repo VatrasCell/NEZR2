@@ -5,6 +5,8 @@ import java.time.LocalDate;
 import java.util.Optional;
 import java.util.Vector;
 
+import org.controlsfx.control.Notifications;
+
 import application.GlobalVars;
 import application.ScreenController;
 import export.ExportController;
@@ -322,8 +324,12 @@ public class AdminController {
                             	Optional<Pair<String, String>> result = getDatePickerDialog();
                             	result.ifPresent(dates -> {
                         		    //System.out.println("Von=" + usernamePassword.getKey() + ", Bis=" + usernamePassword.getValue());
-                            		exportController.excelNeu(fragebogen.getId() + "_" + fragebogen.getOrt() + "_" + fragebogen.getName() + ".xlsx", fragebogen, 
-                            		dates.getKey(), dates.getValue());
+                            		if( exportController.excelNeu(fragebogen.getId() + "_" + fragebogen.getOrt() + "_" + fragebogen.getName() + ".xlsx", fragebogen, 
+                            		dates.getKey(), dates.getValue())) {
+                            			Notifications.create().title("Excel Export").text("Export erfolgreich abgeschlossen.").show();
+                            		} else {
+                            			Notifications.create().title("Excel Export").text("Ein Fehler ist aufgetreten.").showError();
+                            		}
                         		});
                             });
                             setGraphic(btn);
@@ -401,7 +407,7 @@ public class AdminController {
 		//dialog.setGraphic(new ImageView(this.getClass().getResource("login.png").toString()));
 
 		// Set the button types.
-		ButtonType okButtonType = new ButtonType("Login", ButtonData.OK_DONE);
+		ButtonType okButtonType = new ButtonType("Export", ButtonData.OK_DONE);
 		dialog.getDialogPane().getButtonTypes().addAll(okButtonType, ButtonType.CANCEL);
 
 		// Create the username and password labels and fields.

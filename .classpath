@@ -17,5 +17,8 @@
 	<classpathentry kind="lib" path="lib/poi/poi-ooxml-schemas-3.15.jar"/>
 	<classpathentry kind="lib" path="lib/poi/poi-scratchpad-3.15.jar"/>
 	<classpathentry kind="lib" path="lib/poi/xmlbeans-5.1.2.jar"/>
+	<classpathentry kind="lib" path="lib/controlsfx-8.40.14.jar"/>
+	<classpathentry kind="lib" path="lib/controlsfx-samples-8.40.14.jar"/>
+	<classpathentry kind="lib" path="lib/fxsampler-1.0.10.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
