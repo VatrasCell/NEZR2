@@ -23,6 +23,9 @@
                            </image>
                         </ImageView>
                      </graphic>
+                     <tooltip>
+                        <Tooltip text="Standort wechseln" />
+                     </tooltip>
                   </Button>
                </children>
             </HBox>
@@ -47,6 +50,9 @@
       </AnchorPane>
    </center>
    <bottom>
-      <AnchorPane prefHeight="48.0" prefWidth="600.0" BorderPane.alignment="CENTER" />
+      <AnchorPane prefHeight="48.0" prefWidth="600.0" BorderPane.alignment="CENTER">
+         <children>
+            <Button layoutX="79.0" layoutY="2.0" mnemonicParsing="false" onAction="#newFragebogen" text="neu" />
+         </children></AnchorPane>
    </bottom>
 </BorderPane>

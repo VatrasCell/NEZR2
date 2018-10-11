@@ -63,7 +63,7 @@
                         <Insets left="8.0" />
                      </GridPane.margin>
                   </ChoiceBox>
-                  <Button mnemonicParsing="false" text="Neue Kategorie" GridPane.columnIndex="1" GridPane.rowIndex="3">
+                  <Button mnemonicParsing="false" onAction="#createCategory" text="Neue Kategorie" GridPane.columnIndex="1" GridPane.rowIndex="3">
                      <GridPane.margin>
                         <Insets left="8.0" />
                      </GridPane.margin>
@@ -100,7 +100,7 @@
                   <CheckBox fx:id="chckbxListe" mnemonicParsing="false" text="Liste" GridPane.columnIndex="1" />
                   <CheckBox fx:id="chckbxTextArea" mnemonicParsing="false" text="Textarea" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                   <CheckBox fx:id="chckbxZahl" mnemonicParsing="false" text="Zahl" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-                  <Button mnemonicParsing="false" prefHeight="25.0" prefWidth="114.0" text="Frage reagiert auf" GridPane.rowIndex="4" />
+                  <Button mnemonicParsing="false" onAction="#react" prefHeight="25.0" prefWidth="114.0" text="Frage reagiert auf" GridPane.rowIndex="4" />
                   <ChoiceBox fx:id="zahlChoice" prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="3" />
                   <TextField fx:id="textFieldZahl" GridPane.columnIndex="1" GridPane.rowIndex="4" />
                </children>
@@ -114,7 +114,7 @@
                   <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
                </columnResizePolicy>
             </TableView>
-            <Button layoutX="322.0" layoutY="224.0" mnemonicParsing="false" text="Neue Antwort" AnchorPane.rightAnchor="187.0" AnchorPane.topAnchor="224.0" />
+            <Button layoutX="322.0" layoutY="224.0" mnemonicParsing="false" onAction="#createAnswer" text="Neue Antwort" AnchorPane.rightAnchor="187.0" AnchorPane.topAnchor="224.0" />
          </children>
       </AnchorPane>
    </center>

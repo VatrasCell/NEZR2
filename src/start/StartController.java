@@ -6,6 +6,7 @@ import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import application.GlobalFuncs;
 import application.GlobalVars;
 import application.ScreenController;
 import javafx.beans.property.SimpleStringProperty;
@@ -99,6 +100,10 @@ public class StartController {
 		// TODO 
 		Vector<Vector<Frage>> fragenJePanel = new Vector<Vector<Frage>>();
 		/*------------------------- von Julian und Eric --------------------------*/
+		//System.out.println((ScreenController.getMain().getHeight() * 3f / (744f - 305f)));
+		//System.out.println(ScreenController.getMain().getHeight() * 0.0069);
+		//System.out.println(ScreenController.getMain().getHeight());
+		GlobalVars.fragen = Math.round(((float)ScreenController.getMain().getHeight() * 0.0069f));
 		
 		Vector<Scene> allePanel = new Vector<>();
 		

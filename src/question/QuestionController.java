@@ -3,11 +3,14 @@ package question;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.List;
+import java.util.Optional;
 import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+
+import org.controlsfx.control.Notifications;
 
 import application.GlobalVars;
 import application.ScreenController;
@@ -22,6 +25,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.DialogPane;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.ProgressBar;
@@ -30,6 +34,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -40,7 +45,7 @@ import survey.SurveyService;
 
 public class QuestionController {
 	public static Fragebogen fragebogen;
-	public static Frage frage = new Frage();
+	public static Frage frage;
 	private Vector<String> antworten;
 	private ObservableList<Antwort> data = FXCollections.observableArrayList();
 
@@ -112,7 +117,6 @@ public class QuestionController {
 			antwort.setAntwort(antworten.get(i));
 			data.add(antwort);
 		}
-
 	}
 
 	/**
@@ -201,7 +205,7 @@ public class QuestionController {
 			string = frage.getFrage();
 		}
 		textFieldFE.setText(string);
-		List<Integer> range = IntStream.range(1, QuestionService.getCountPosition(fragebogen) + 1).boxed()
+		List<Integer> range = IntStream.range(1, QuestionService.getCountPosition(fragebogen) + 2).boxed()
 				.collect(Collectors.toList());
 		ObservableList<Integer> list = FXCollections.observableArrayList(range);
 		posChoice.setItems(list);
@@ -276,11 +280,15 @@ public class QuestionController {
 			}
 		}
 		if (frage.getArt().equals("MC")) {
-			if (frage.getAntwort_moeglichkeit().get(0).equals("#####")) {
-				chckbxUeberschrift.setSelected(true);
+			if(frage.getAntwort_moeglichkeit().size() > 0) {
+				if (frage.getAntwort_moeglichkeit().get(0).equals("#####")) {
+					chckbxUeberschrift.setSelected(true);
+				} else {
+					chckbxUeberschrift.setSelected(false);
+				}
 			} else {
 				chckbxUeberschrift.setSelected(false);
-			}
+			}		
 		}
 
 		// anneSehrNeu
@@ -657,14 +665,59 @@ public class QuestionController {
 		}
 	}
 	
+	@FXML
+	private void createAnswer() {
+		TextInputDialog dialog = new TextInputDialog("");
+		dialog.setTitle("Antwort anlegen");
+    	dialog.setContentText("Name:");
+    	DialogPane dialogPane = dialog.getDialogPane();
+		dialogPane.getStylesheets().add(
+		   getClass().getResource("../application/application.css").toExternalForm());
+		
+    	Optional<String> result = dialog.showAndWait();
+    	result.ifPresent(name -> {
+    		Antwort antwort = new Antwort();
+    		antwort.setNr(data.size() + 1);
+    		antwort.setAntwort(name);
+    		data.add(antwort);
+        	Notifications.create().title("Antwort anlegen").text("Antwort \"" + name + "\" wurde erfolgreich angelegt.").show();
+    	});
+		
+	}
+	
+	@FXML
+	private void createCategory() {
+		TextInputDialog dialog = new TextInputDialog("");
+		dialog.setTitle("Kategorie anlegen");
+    	dialog.setContentText("Name:");
+    	DialogPane dialogPane = dialog.getDialogPane();
+		dialogPane.getStylesheets().add(
+		   getClass().getResource("../application/application.css").toExternalForm());
+		
+    	Optional<String> result = dialog.showAndWait();
+    	result.ifPresent(name -> {
+    		if(QuestionService.createKategorie(name)) {
+    			ObservableList<String> listKat = FXCollections.observableArrayList(QuestionService.getKategorie());
+    			katChoice.setItems(listKat);
+    			katChoice.getSelectionModel().select(name);
+        		Notifications.create().title("Kategorie anlegen").text("Kategorie \"" + name + "\" wurde erfolgreich angelegt.").show();
+    		} else {
+    			Notifications.create().title("Kategorie anlegen").text("Ein Fehler ist aufgetreten.").showError();
+    		}
+    	});
+	}
+	
+	@FXML
+	private void react() {
+		//TODO
+	}
+	
 	/**
 	 * Erstellt das Panel und die dazugehoerigen Elemente fuer die Fragen Vorschau.
 	 * @param frage : FrageErstellen
 	 */
-	//TODO
 	private void makeVorschau(Vector<Frage> fragen) {
 		try {
-		// TODO 
 		Vector<Vector<Frage>> fragenJePanel = new Vector<Vector<Frage>>();
 		/*------------------------- von Julian und Eric --------------------------*/
 		
@@ -947,7 +1000,7 @@ public class QuestionController {
 						}
 						
 						if(frageObj.get(y).getFlags().indexOf("B") >= 0) {
-							/*TODO
+							/*
 							if(!frageObj.get(y).getFrageLabel().isVisible()) {
 								lblNull.setVisible(false);
 								lblEins.setVisible(false);
@@ -1081,8 +1134,6 @@ public class QuestionController {
 	 * @return Postition im Vector "fragen" als int.
 	 */
 	private int getY(int x, String s, Vector<Frage> fragen) {
-		// TODO 
-		
 		for(int i = 0; i < fragen.size(); i++) {
 			// System.out.println(fragen.get(i).getFrageID()+ " == " + x + " && " + fragen.get(i).getArt() + " == " + s);
 			if(x == fragen.get(i).getFrageID() && s.equals(fragen.get(i).getArt())) {

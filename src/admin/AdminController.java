@@ -22,6 +22,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.ChoiceDialog;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.DialogPane;
@@ -199,10 +200,24 @@ public class AdminController {
                         } else {
                             btn.setOnAction(event -> {
                             	Fragebogen fragebogen = getTableView().getItems().get(getIndex());
-                            	if(AdminService.copyFragebogen(fragebogen)) {
-                            		getData();
-                            		tbl_fragebogen.refresh();
-                            	}
+                            	
+                            	ChoiceDialog<String> dialog = new ChoiceDialog<>(GlobalVars.standort, GlobalVars.standorte);
+                            	dialog.setTitle("Fragebogen kopieren");
+                            	dialog.setHeaderText("Fragebogen kopieren");
+                            	dialog.setContentText("Standort wählen:");
+
+                            	Optional<String> result = dialog.showAndWait();
+                            	result.ifPresent(ort -> {
+		                            	if(AdminService.copyFragebogen(fragebogen, ort)) {
+		                            		getData();
+		                            		tbl_fragebogen.refresh();
+		                            		Notifications.create().title("Fragebogen kopieren").text("Der Fragebogen \"" + fragebogen.getName() + "\" wurde erfolgreich\nnach \"" + ort  + "\" kopiert.").show();
+	                            		} else {
+	                            			Notifications.create().title("Excel Export").text("Ein Fehler ist aufgetreten.").showError();
+	                            		}
+                            		}
+                            	);
+                            	
                             });
                             setGraphic(btn);
                             setText(null);
@@ -379,7 +394,10 @@ public class AdminController {
                         			if(AdminService.deleteFragebogen(fragebogen)) {
                                 		getData();
                                 		tbl_fragebogen.refresh();
-                                	}
+                                		Notifications.create().title("Fragebogen löschen").text("Fragebogen \"" + fragebogen.getName() + "\" wurde erfolgreich abgeschlossen.").show();
+                            		} else {
+                            			Notifications.create().title("Fragebogen löschen").text("Ein Fehler ist aufgetreten.").showError();
+                            		}
                         		} else {
                         		    // ... user chose CANCEL or closed the dialog
                         		}
@@ -441,6 +459,24 @@ public class AdminController {
 
 		Optional<Pair<String, String>> result = dialog.showAndWait();
 		return result;
+	}
+	
+	@FXML
+	private void newFragebogen() {
+		TextInputDialog dialog = new TextInputDialog("");
+    	dialog.setTitle("Fragebogen erstellen");
+    	dialog.setContentText("Name:");
+    	DialogPane dialogPane = dialog.getDialogPane();
+		dialogPane.getStylesheets().add(
+		   getClass().getResource("../application/application.css").toExternalForm());
+		
+    	Optional<String> result = dialog.showAndWait();
+    	result.ifPresent(name -> {
+    		if(AdminService.createFragebogen(name)) {
+        		getData();
+        		tbl_fragebogen.refresh();
+        	}
+    	});
 	}
 	
 	@FXML

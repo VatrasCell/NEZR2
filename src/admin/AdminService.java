@@ -10,11 +10,14 @@ import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.controlsfx.control.Notifications;
+
 import application.Datenbank;
 import model.Frage;
 import model.Fragebogen;
 import question.QuestionService;
 import application.GlobalFuncs;
+import application.GlobalVars;
 
 public class AdminService extends Datenbank {
 	
@@ -28,27 +31,13 @@ public class AdminService extends Datenbank {
 	 */
 	public static Vector<Fragebogen> getFragebogen(String standort) {
 		try {
-			int idstandort = -1;
-			Connection myCon = DriverManager.getConnection(url, user, pwd);
-			Statement mySQL = myCon.createStatement();
-			PreparedStatement psSql = null;
-			mySQL = myCon.createStatement();
-			String statement = "SELECT idOrt FROM ort WHERE Ort=?";
-			psSql = myCon.prepareStatement(statement);
-			psSql.setString(1, slashUnicode(standort));
-			ResultSet myRS = psSql.executeQuery();
 			Vector<Fragebogen> fragebogen = new Vector<>();
+			Connection myCon = DriverManager.getConnection(url, user, pwd);
+			int idstandort = getStandortId(standort);
 
-			while (myRS.next()) {
-				idstandort = myRS.getInt("idOrt");
-			}
-
-			mySQL = null;
-			myRS = null;
-
-			mySQL = myCon.createStatement();
-			statement = "SELECT * FROM Fragebogen WHERE idOrt='" + idstandort + "'";
-			myRS = mySQL.executeQuery(statement);
+			Statement mySQL = myCon.createStatement();
+			String statement = "SELECT * FROM Fragebogen WHERE idOrt='" + idstandort + "'";
+			ResultSet myRS = mySQL.executeQuery(statement);
 			//System.out.println(idstandort);
 			//System.out.println(myRS.toString());
 			while (myRS.next()) {
@@ -136,30 +125,22 @@ public class AdminService extends Datenbank {
 	 * @return boolean
 	 * @author Eric
 	 */
-	public static boolean copyFragebogen(Fragebogen fb) {
+	public static boolean copyFragebogen(Fragebogen fb, String ort) {
 		int oldID = fb.getId();
 		System.out.println(fb.toString());
 		int newID = -1;
 		try {
 			Connection myCon = DriverManager.getConnection(url, user, pwd);
-			int ortID = -1;
-			String statement = "SELECT idOrt FROM Ort WHERE ort=?";
-			PreparedStatement psSql = myCon.prepareStatement(statement);
-			psSql.setString(1, slashUnicode(fb.getOrt()));
-			ResultSet myRS = psSql.executeQuery();
-			if (myRS.next()) {
-				ortID = myRS.getInt("idOrt");
-			}
-			myRS = null;
+			int ortID = getStandortId(ort);
 			Statement mySQL = myCon.createStatement();
-			statement = "INSERT INTO fragebogen VALUES(NULL, '" + GlobalFuncs.getcurDate() + "', '"
+		 	String statement = "INSERT INTO fragebogen VALUES(NULL, '" + GlobalFuncs.getcurDate() + "', '"
 					+ slashUnicode(fb.getName()) + "', FALSE, " + ortID + ", FALSE)";
 			mySQL.execute(statement);
 			mySQL = null;
-			myRS = null;
+			
 			mySQL = myCon.createStatement();
 			statement = "SELECT MAX(idFragebogen) FROM fragebogen";
-			myRS = mySQL.executeQuery(statement);
+			ResultSet myRS = mySQL.executeQuery(statement);
 			if (myRS.next()) {
 				newID = myRS.getInt("MAX(idFragebogen)");
 
@@ -747,5 +728,53 @@ public class AdminService extends Datenbank {
 			//		Datenbank.class + ": " + Thread.currentThread().getStackTrace()[1].getLineNumber(), e.getMessage());
 		}
 		return false;
+	}
+	
+	public static boolean createFragebogen(String name) {
+		try {
+			Connection myCon = DriverManager.getConnection(url, user, pwd);
+			Statement mySQL = myCon.createStatement();
+			String statement = "SELECT Name FROM fragebogen WHERE Name='" + name + "'";
+			ResultSet myRS = mySQL.executeQuery(statement);
+
+			if (myRS.next()) {
+				Notifications.create().title("Fragebogen erstellen").text("Ein Fragebogen mit dem Namen existiert bereits!").showError();
+			} else {
+				mySQL = null;
+				myRS = null;
+				mySQL = myCon.createStatement();
+				statement = "INSERT INTO fragebogen VALUES(NULL, '" + GlobalFuncs.getcurDate() + "', '" + name + "', FALSE, "
+						+ getStandortId(GlobalVars.standort) + ", FALSE)";
+				mySQL.execute(statement);
+			}
+			mySQL = null;
+			myRS = null;
+			myCon.close();
+			return true;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			//ErrorLog.fehlerBerichtB("ERROR",
+			//		Datenbank.class + ": " + Thread.currentThread().getStackTrace()[1].getLineNumber(), e.getMessage());
+		}
+		return false;
+	}
+	
+	public static int getStandortId(String ort) {
+		Connection myCon;
+		int ortID = -1;
+		try {
+			myCon = DriverManager.getConnection(url, user, pwd);			
+			String statement = "SELECT idOrt FROM Ort WHERE ort=?";
+			PreparedStatement psSql = myCon.prepareStatement(statement);
+			psSql.setString(1, slashUnicode(ort));
+			ResultSet myRS = psSql.executeQuery();
+			if (myRS.next()) {
+				ortID = myRS.getInt("idOrt");
+			}
+			myRS = null;	
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return ortID;
 	}
 }

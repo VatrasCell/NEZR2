@@ -3,6 +3,7 @@ package login;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
+import location.LocationService;
 
 import java.io.IOException;
 
@@ -56,6 +57,7 @@ public class LoginController {
 					ScreenController.addScreen("admin", new Scene(FXMLLoader.load(getClass().getResource("../admin/AdminView.fxml"))));
 					ScreenController.activate("admin");
 				} else {
+					GlobalVars.standorte = LocationService.getStandort();
 					ScreenController.addScreen("location", new Scene(FXMLLoader.load(getClass().getResource("../location/LocationView.fxml"))));
 					ScreenController.activate("location");
 				}	

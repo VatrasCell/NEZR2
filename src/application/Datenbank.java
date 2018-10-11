@@ -1,28 +1,9 @@
 package application;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
-
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
 
 import java.util.ArrayList;
-import java.util.Vector;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import javax.swing.DefaultListModel;
-
-import org.h2.tools.RunScript;
 
 // import export.ExcelCell;
 // import fragebogen.*;
@@ -35,20 +16,21 @@ import org.h2.tools.RunScript;
  */
 public class Datenbank {
 	
-	private static Connection myCon = null; // Verbindung zur DB
+	/*private static Connection myCon = null; // Verbindung zur DB
 	private static Statement mySQL = null; // Zum Statement erstellen
 	private static PreparedStatement psSql = null; // Zum PreparedStatement
 													// erstellen
 	private static ResultSet myRS = null; // Ergebnisse der Abfrage
-
+	 */
 	protected static String db = "nezr_v5"; // Datenbankname
 	protected static String url = ""; // URL der Datenbank useSSL=false
 	protected static String user = ""; // Login-ID
 	protected static String pwd = ""; // Passwort
 
+	/*
 	private static int fehler = 0;
 	private static int idstandort = 0;
-
+	 */
 	/**
 	 * Gibt die flags fuer das "reagiert auf" zurueck.
 	 * 
@@ -196,37 +178,8 @@ public class Datenbank {
 	 *            String: Name des Fragebogens
 	 * @return boolean
 	 * @author Anne
-	 *//*
-	public static boolean setFragebogen(String fbName) {
-		try {
-			myCon = DriverManager.getConnection(url, user, pwd);
-			mySQL = myCon.createStatement();
-			String statement = "SELECT Name FROM fragebogen WHERE Name='" + fbName + "'";
-			myRS = mySQL.executeQuery(statement);
-
-			if (myRS.next()) {
-
-			} else {
-				mySQL = null;
-				myRS = null;
-				mySQL = myCon.createStatement();
-				statement = "INSERT INTO fragebogen VALUE(NULL, '" + Main.getcurDate() + "', '" + fbName + "', FALSE, "
-						+ idstandort + ", FALSE)";
-				mySQL.execute(statement);
-			}
-			mySQL = null;
-			myRS = null;
-			myCon.close();
-			return true;
-		} catch (SQLException e) {
-			e.printStackTrace();
-			ErrorLog.fehlerBerichtB("ERROR",
-					Datenbank.class + ": " + Thread.currentThread().getStackTrace()[1].getLineNumber(), e.getMessage());
-		}
-		return false;
-	}
-
-	*//**
+	 */
+	/**
 	 * Prueft, ob ein Fragebogen "fehlerfrei" fuer die Befragung ist. Gibt bei
 	 * Erfolg TRUE zurueck.
 	 * 
@@ -355,42 +308,6 @@ public class Datenbank {
 
 		}
 		return null;
-	}
-
-	*//**
-	 * Fuegt eine neue Kategorie der Datenbank hinzu. Gibt bei Erfolg TRUE
-	 * zurueck.
-	 * 
-	 * @param kat
-	 *            String: die Kategorie
-	 * @return boolean
-	 *//*
-	public static boolean setKategorie(String kat) {
-		try {
-			myCon = DriverManager.getConnection(url, user, pwd);
-			mySQL = myCon.createStatement();
-			String statement = "SELECT Kategorie FROM kategorie WHERE Kategorie='" + kat + "'";
-			myRS = mySQL.executeQuery(statement);
-
-			if (myRS.next()) {
-
-			} else {
-				mySQL = null;
-				myRS = null;
-				mySQL = myCon.createStatement();
-				statement = "INSERT INTO kategorie VALUE(NULL, '" + kat + "')";
-				mySQL.execute(statement);
-			}
-			mySQL = null;
-			myRS = null;
-			myCon.close();
-			return true;
-		} catch (SQLException e) {
-			e.printStackTrace();
-			ErrorLog.fehlerBerichtB("ERROR",
-					Datenbank.class + ": " + Thread.currentThread().getStackTrace()[1].getLineNumber(), e.getMessage());
-		}
-		return false;
 	}
 
 	*//**

@@ -21,7 +21,7 @@ public class Frage implements Comparable<Frage>, Comparator<Frage> {
 	private String kategorie;
 	private String datum;
 	private String flags;
-	private int Position;
+	private int position;
 	private String ueberschrift = "";
 	private Vector<String> antwort_moeglichkeit = new Vector<String>();
 	private Vector<String> antwort = new Vector<String>();
@@ -33,6 +33,22 @@ public class Frage implements Comparable<Frage>, Comparator<Frage> {
 	private Vector<TextArea> antwortenTEXT = new Vector<>();
 	private Frage target;
 	private int fragebogenID;
+	
+	
+	/**
+	 * 
+	 */
+	public Frage() {
+		super();
+	}
+	
+	public Frage(int size) {
+		this.frage = "";
+		this.art = "MC";
+		this.position = ++size;
+		this.flags = "";
+	}
+	
 	/**
 	 * @return the frage
 	 */
@@ -109,13 +125,13 @@ public class Frage implements Comparable<Frage>, Comparator<Frage> {
 	 * @return the position
 	 */
 	public int getPosition() {
-		return Position;
+		return position;
 	}
 	/**
 	 * @param position the position to set
 	 */
 	public void setPosition(int position) {
-		Position = position;
+		this.position = position;
 	}
 	/**
 	 * @return the ueberschrift
@@ -276,7 +292,7 @@ public class Frage implements Comparable<Frage>, Comparator<Frage> {
 	@Override
 	public String toString() {
 		return "Frage [frage=" + frage + ", art=" + art + ", kategorie=" + kategorie + ", flags=" + flags
-				+ ", Position=" + Position + ", ueberschrift=" + ueberschrift + ", antwort_moeglichkeit="
+				+ ", Position=" + position + ", ueberschrift=" + ueberschrift + ", antwort_moeglichkeit="
 				+ antwort_moeglichkeit + "]";
 	}	
 	

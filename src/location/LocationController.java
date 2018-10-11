@@ -22,7 +22,7 @@ public class LocationController {
 	 */
 	public LocationController() {
 		// Create some sample data for the ComboBox and ListView.
-		for (String standort : LocationService.getStandort()) {
+		for (String standort : GlobalVars.standorte) {
 			choiceBoxData.add(standort);
 		}
 	}

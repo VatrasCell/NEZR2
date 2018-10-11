@@ -10,6 +10,8 @@ import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.controlsfx.control.Notifications;
+
 import application.Datenbank;
 import model.Frage;
 import model.Fragebogen;
@@ -1160,6 +1162,42 @@ public class QuestionService extends Datenbank {
 			myCon.close();
 			return true;
 
+		} catch (SQLException e) {
+			e.printStackTrace();
+			//ErrorLog.fehlerBerichtB("ERROR",
+			//		Datenbank.class + ": " + Thread.currentThread().getStackTrace()[1].getLineNumber(), e.getMessage());
+		}
+		return false;
+	}
+	
+	/**
+	 * Fuegt eine neue Kategorie der Datenbank hinzu. Gibt bei Erfolg TRUE
+	 * zurueck.
+	 * 
+	 * @param kat
+	 *            String: die Kategorie
+	 * @return boolean
+	 */
+	public static boolean createKategorie(String kat) {
+		try {
+			Connection myCon = DriverManager.getConnection(url, user, pwd);
+			Statement mySQL = myCon.createStatement();
+			String statement = "SELECT Kategorie FROM kategorie WHERE Kategorie='" + kat + "'";
+			ResultSet myRS = mySQL.executeQuery(statement);
+
+			if (myRS.next()) {
+				Notifications.create().title("Kategorie anlegen").text("Die Kategorie existiert bereits!").showError();
+			} else {
+				mySQL = null;
+				myRS = null;
+				mySQL = myCon.createStatement();
+				statement = "INSERT INTO kategorie VALUES(NULL, '" + kat + "')";
+				mySQL.execute(statement);
+			}
+			mySQL = null;
+			myRS = null;
+			myCon.close();
+			return true;
 		} catch (SQLException e) {
 			e.printStackTrace();
 			//ErrorLog.fehlerBerichtB("ERROR",

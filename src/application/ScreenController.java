@@ -1,7 +1,5 @@
 package application;
 
-import java.awt.Dimension;
-import java.awt.Toolkit;
 import java.util.HashMap;
 
 import javafx.scene.Scene;
@@ -58,33 +56,11 @@ public class ScreenController {
 			break;
 		}
 	}
-	
-	public static Dimension getScreenSize() {
-		return Toolkit.getDefaultToolkit().getScreenSize();
-		// return new Dimension((int)main.getWidth(), (int)main.getHeight());
-	}
-	
-	/**
-	 * Gibt die Bildschirmhöhe zur�ck.
-	 * <p>
-	 * @param d Dimension: die Bildschirmgröße von Toolkit.getDefaultToolkit().getScreenSize().
-	 * @return die Höhe des Bildschirmes als int.
-	 */
-	public static int getScreenHeight(Dimension d) {
-		Double heightDouble = d.getHeight();
-		Integer heightInt = Integer.valueOf(heightDouble.intValue());
-		return heightInt;
-	}
 
 	/**
-	 * Gibt die Bildschirmbreite zurück.
-	 * <p>
-	 * @param d die Bildschirmgröße von Toolkit.getDefaultToolkit().getScreenSize().
-	 * @return die Breite des Bildschirmes als int.
+	 * @return the main
 	 */
-	public static int getScreenWidth(Dimension d) {
-		Double widthDouble = d.getWidth();
-		Integer widthInt = Integer.valueOf(widthDouble.intValue());
-		return widthInt;
+	public static Stage getMain() {
+		return main;
 	}
 }
