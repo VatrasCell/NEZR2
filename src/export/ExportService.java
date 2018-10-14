@@ -9,6 +9,7 @@ import java.sql.Statement;
 import java.util.Vector;
 
 import application.Datenbank;
+import flag.SymbolType;
 import model.Frage;
 
 public class ExportService extends Datenbank {
@@ -49,8 +50,8 @@ public class ExportService extends Datenbank {
 	 */
 	public static Vector<ExcelCell> getAntwortenPosition(Frage frage, String von, String bis) {
 		Vector<ExcelCell> re = new Vector<ExcelCell>();
-		if (((frage.getArt().equals("MC")) && (frage.getFlags().indexOf("B") >= 0))
-				|| (frage.getFlags().indexOf("LIST") >= 0) || (frage.getFlags().indexOf("JN") >= 0)) {
+		if (((frage.getArt().equals("MC")) && (frage.getFlags().is(SymbolType.B)))
+				|| (frage.getFlags().is(SymbolType.LIST)) || (frage.getFlags().is(SymbolType.JN))) {
 			try {
 				Connection myCon = DriverManager.getConnection(url, user, pwd);
 				Statement mySQL = myCon.createStatement();

@@ -4,6 +4,8 @@ import java.util.Comparator;
 import java.util.Vector;
 
 import application.GlobalVars;
+import flag.FlagList;
+import flag.SymbolType;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 
@@ -20,7 +22,7 @@ public class Frage implements Comparable<Frage>, Comparator<Frage> {
 	private String art;
 	private String kategorie;
 	private String datum;
-	private String flags;
+	private FlagList flags;
 	private int position;
 	private String ueberschrift = "";
 	private Vector<String> antwort_moeglichkeit = new Vector<String>();
@@ -46,7 +48,7 @@ public class Frage implements Comparable<Frage>, Comparator<Frage> {
 		this.frage = "";
 		this.art = "MC";
 		this.position = ++size;
-		this.flags = "";
+		this.flags = new FlagList();
 	}
 	
 	/**
@@ -109,18 +111,21 @@ public class Frage implements Comparable<Frage>, Comparator<Frage> {
 	public void setDatum(String datum) {
 		this.datum = datum;
 	}
+
 	/**
 	 * @return the flags
 	 */
-	public String getFlags() {
+	public FlagList getFlags() {
 		return flags;
 	}
+
 	/**
 	 * @param flags the flags to set
 	 */
-	public void setFlags(String flags) {
+	public void setFlags(FlagList flags) {
 		this.flags = flags;
 	}
+
 	/**
 	 * @return the position
 	 */
@@ -319,7 +324,7 @@ public class Frage implements Comparable<Frage>, Comparator<Frage> {
 						for(int i = 0; i < antwortenLIST.size(); i++) {
 							antwortenLIST.get(i).setVisible(true);
 						}
-						if(getFlags().indexOf("B") >= 0) {
+						if(getFlags().is(SymbolType.B)) {
 							scene.lookup("#lblNull").setVisible(true);
 							scene.lookup("#lblEins").setVisible(true);
 							scene.lookup("#lblZehn").setVisible(true);
@@ -336,7 +341,7 @@ public class Frage implements Comparable<Frage>, Comparator<Frage> {
 						for(int i = 0; i < antwortenLIST.size(); i++) {
 							antwortenLIST.get(i).setVisible(false);
 						}
-						if(getFlags().indexOf("B") >= 0) {
+						if(getFlags().is(SymbolType.B)) {
 							scene.lookup("#lblNull").setVisible(false);
 							scene.lookup("#lblEins").setVisible(false);
 							scene.lookup("#lblZehn").setVisible(false);

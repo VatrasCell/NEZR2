@@ -18,6 +18,7 @@ import model.Fragebogen;
 import question.QuestionService;
 import application.GlobalFuncs;
 import application.GlobalVars;
+import flag.FlagList;
 
 public class AdminService extends Datenbank {
 	
@@ -125,6 +126,7 @@ public class AdminService extends Datenbank {
 	 * @return boolean
 	 * @author Eric
 	 */
+	/*
 	public static boolean copyFragebogen(Fragebogen fb, String ort) {
 		int oldID = fb.getId();
 		System.out.println(fb.toString());
@@ -198,7 +200,7 @@ public class AdminService extends Datenbank {
 					statement = "INSERT INTO Fb_has_MC VALUES(NULL, " + newID + ", " + newFragenID + ", " + position
 							+ ", '" + flags + "')";
 					mcFrage.setPosition(position);
-					mcFrage.setFlags(flags);
+					mcFrage.setFlags(new FlagList(flags));
 					mcFrage.setFrageID(newFragenID);
 					mcFrage.setFragebogenID(newID);
 					mySQL.execute(statement);
@@ -296,7 +298,7 @@ public class AdminService extends Datenbank {
 					 * oldMcId - Integer.parseInt(data.get(0)); String flag2 =
 					 * "FF" + (newFragenID + diff) + m2.group(0); flags =
 					 * flags.replace(mgesFF.group(0), flag2); } }
-					 */
+					 
 
 					mySQL = null;
 					mySQL = myCon.createStatement();
@@ -305,7 +307,7 @@ public class AdminService extends Datenbank {
 					ffFrage.setFrageID(newFragenID);
 					ffFrage.setFragebogenID(newID);
 					ffFrage.setPosition(position);
-					ffFrage.setFlags(flags);
+					ffFrage.setFlags(new FlagList(flags));
 					mySQL.execute(statement);
 
 					ffFragen.add(ffFrage);
@@ -446,6 +448,11 @@ public class AdminService extends Datenbank {
 			//ErrorLog.fehlerBerichtB("ERROR",
 			//		Datenbank.class + ": " + Thread.currentThread().getStackTrace()[1].getLineNumber(), e.getMessage());
 		}
+		return false;
+	}
+	*/
+	public static boolean copyFragebogen(Fragebogen fb, String ort) {
+		//TODO
 		return false;
 	}
 	

@@ -1,14 +1,15 @@
 package survey;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
 import java.util.Vector;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import application.Datenbank;
 import application.GlobalVars;
 import application.ScreenController;
+import flag.Number;
+import flag.SymbolType;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -106,7 +107,7 @@ public class SurveyController {
 		if(GlobalVars.everythingIsAwesome) {
 			for(Frage frage : GlobalVars.fragenJePanel.get(GlobalVars.page)) {
 				if(frage.getArt() == "MC") {
-					if(frage.getFlags().indexOf("LIST") >= 0) {
+					if(frage.getFlags().is(SymbolType.LIST)) {
 						Vector<String> antwort = new Vector<String>();
 						for(ListView<String> listView : frage.getAntwortenLIST()) {
 							if(listView.isVisible()) {
@@ -126,7 +127,7 @@ public class SurveyController {
 						frage.setAntwort(antwort);
 					}
 				} else {
-					if(frage.getFlags().indexOf("TEXT") >= 0) {
+					if(frage.getFlags().is(SymbolType.TEXT)) {
 						Vector<String> antwort = new Vector<String>();
 						for(TextArea textArea : frage.getAntwortenTEXT()) {
 							if(!textArea.getText().equals("") && textArea.isVisible()) {
@@ -158,14 +159,7 @@ public class SurveyController {
 	 * @param frage FrageErstellen: die Frage
 	 * @return boolean
 	 */
-	/**
-	 * @param frage
-	 * @return
-	 */
-	/**
-	 * @param frage
-	 * @return
-	 */
+	/*
 	private boolean checkInt(Frage frage) {
 		Pattern MY_PATTERNint = Pattern.compile("INT[<>=]=[0-9]+");
 		Matcher mint = MY_PATTERNint.matcher(frage.getFlags());
@@ -244,6 +238,77 @@ public class SurveyController {
 		} else {
 			return true;
 		}
+	}*/
+	
+	private boolean checkInt(Frage frage) {
+		TextField textField = frage.getAntwortenFF().get(0);
+		if(textField.getText().equals("")) {
+			return true;
+		}
+		List<Number> numbers = frage.getFlags().getAll(Number.class);
+		for (Number number : numbers) {
+			switch (number.getOperator()) {
+			case EQ:
+				try {
+					Integer.parseInt(frage.getAntwortenFF().get(0).getText());
+					if(textField.getText().length() == number.getDigits()) {
+						continue;
+					} else {
+//						BalloonTip fehler = new BalloonTip(textField, "die Zahl ist nicht gleich " + i + " Zeichen lang");
+//						fehler.getStyle();
+//						fehler.setCloseButton(null);
+//						TimingUtils.showTimedBalloon(fehler, 2000);
+//						fehler.setVisible(true);
+						return false;
+					}
+				} catch (NumberFormatException eeee) {
+//					BalloonTip fehler = new BalloonTip(textField, "keine g\u00fcltige Zahl");
+//					fehler.setCloseButton(null);
+//					TimingUtils.showTimedBalloon(fehler, 2000);
+//					fehler.setVisible(true);
+					return false;
+				}
+			case LTE:
+				try {
+					Integer.parseInt(frage.getAntwortenFF().get(0).getText());
+					if(textField.getText().length() <= number.getDigits()) {
+						continue;
+					} else {
+//						BalloonTip fehler = new BalloonTip(textField, "die Zahl ist nicht kleiner oder gleich " + i + " Zeichen lang");
+//						fehler.setCloseButton(null);
+//						TimingUtils.showTimedBalloon(fehler, 2000);
+//						fehler.setVisible(true);
+						return false;
+					}
+				} catch (NumberFormatException ee) {
+					//BalloonTip fehler = new BalloonTip(textField, "keine g\u00fcltige Zahl");
+					//fehler.setCloseButton(null);
+					//TimingUtils.showTimedBalloon(fehler, 2000);
+					//fehler.setVisible(true);
+					return false;
+				}
+			case GTE:
+				try {
+					Integer.parseInt(frage.getAntwortenFF().get(0).getText());
+					if(textField.getText().length() >= number.getDigits()) {
+						continue;
+					} else {
+						//BalloonTip fehler = new BalloonTip(textField, "die Zahl ist nicht gr\u00f6\u00dfer oder gleich " + i + " Zeichen lang");
+						//fehler.setCloseButton(null);
+						//TimingUtils.showTimedBalloon(fehler, 2000);
+						//fehler.setVisible(true);
+						return false;
+					}
+				} catch (NumberFormatException eee) {
+					//BalloonTip fehler = new BalloonTip(textField, "keine g\u00fcltige Zahl");
+					//fehler.setCloseButton(null);
+					//TimingUtils.showTimedBalloon(fehler, 2000);
+					//fehler.setVisible(true);
+					return false;
+				}
+			}
+		}
+		return true;
 	}
 	
 	/**
@@ -253,7 +318,7 @@ public class SurveyController {
 	 * @return boolean
 	 */
 	private boolean checkPflichtfrage(Frage frage) {
-		if(frage.getFlags().indexOf("+") >= 0 && frage.getFrageLabel().isVisible()) {
+		if(frage.getFlags().is(SymbolType.REQUIRED) && frage.getFrageLabel().isVisible()) {
 			if (frage.getArt() == "MC") {
 				boolean selected = false;
 				for (CheckBox checkbox : frage.getAntwortenMC()) {
@@ -272,7 +337,7 @@ public class SurveyController {
 					return false;
 				}
 			} else {
-				if (frage.getFlags().indexOf("LIST") >= 0) {
+				if (frage.getFlags().is(SymbolType.LIST)) {
 					for (ListView<String> listView : frage.getAntwortenLIST()) {
 						if (listView.getSelectionModel().isEmpty()) {
 //							BalloonTip fehler = new BalloonTip(button, "Das ist eine Pflichtfrage!");
@@ -285,7 +350,7 @@ public class SurveyController {
 						}
 					}
 
-				} else if (frage.getFlags().indexOf("TEXT") >= 0) {
+				} else if (frage.getFlags().is(SymbolType.TEXT)) {
 					for (TextArea myText : frage.getAntwortenTEXT()) {
 						if (myText.getText().isEmpty()) {
 //							BalloonTip fehler = new BalloonTip(button, "Das ist eine Pflichtfrage!");

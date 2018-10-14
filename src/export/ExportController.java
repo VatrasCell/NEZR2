@@ -20,6 +20,7 @@ import org.apache.poi.ss.util.RegionUtil;
 import org.apache.poi.ss.util.WorkbookUtil;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
+import flag.SymbolType;
 import model.Frage;
 import model.Fragebogen;
 import survey.SurveyService;
@@ -101,8 +102,8 @@ public class ExportController {
 				faRow.createCell(over).setCellValue(this.crHelper.createRichTextString(frage.getFrage()));
 				faRow.getCell(over).setCellStyle(formatTableHead);
 				makeAntwortenToExecel(frage, "", over, von, bis);
-			} else if (/*(frage.getFlags().indexOf("B") >= 0) || */(frage.getFlags().indexOf("X") >= 0) && (frage.getFlags().indexOf("JN") >= 0)
-					|| (frage.getFlags().indexOf("LIST") >= 0)) {
+			} else if (/*(frage.getFlags().indexOf("B") >= 0) || */(frage.getFlags().is(SymbolType.JNExcel)) && (frage.getFlags().is(SymbolType.JN))
+					|| (frage.getFlags().is(SymbolType.LIST))) {
 				/*if (frage.getKategorie().equals(frage.getFrage())false) {
 					for (int j = 0; j < frage.getAntwort_moeglichkeit().size(); j++) {
 						faRow.createCell(over + j).setCellValue(
@@ -117,7 +118,7 @@ public class ExportController {
 
 					over += frage.getAntwort_moeglichkeit().size() - 1;
 					anzahl += frage.getAntwort_moeglichkeit().size() - 1;
-				} else*/ if ((frage.getFlags().indexOf("X") >= 0) && (frage.getFlags().indexOf("JN") >= 0)) {
+				} else*/ if ((frage.getFlags().is(SymbolType.JNExcel)) && (frage.getFlags().is(SymbolType.JN))) {
 					faRow.createCell(over).setCellValue(this.crHelper.createRichTextString(frage.getFrage()));
 					faRow.getCell(over).setCellStyle(formatTableHead);
 					makeAntwortenToExecel(frage, "ja", over, von, bis);

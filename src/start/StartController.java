@@ -9,6 +9,7 @@ import java.util.regex.Pattern;
 import application.GlobalFuncs;
 import application.GlobalVars;
 import application.ScreenController;
+import flag.SymbolType;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
@@ -181,7 +182,7 @@ public class StartController {
 					hasUeber = true;
 				}
 				
-				if(!isBHeader && frageObj.get(y).getFlags().indexOf("B") >= 0) {
+				if(!isBHeader && frageObj.get(y).getFlags().is(SymbolType.B)) {
 					
 					HBox hBox = new HBox();
 					//hBox.setAlignment(Pos.CENTER);
@@ -211,13 +212,13 @@ public class StartController {
 				if (ms.find()) {
 					frage = frage.substring(0, ms.start());	
 				}
-				if(frageObj.get(y).getFlags().indexOf("*") >= 0) {
+				if(frageObj.get(y).getFlags().is(SymbolType.MC)) {
 					isMC = true;
 				}
 				
 				String add = "";			
 				
-				if(frageObj.get(y).getFlags().indexOf("+") >= 0) {
+				if(frageObj.get(y).getFlags().is(SymbolType.REQUIRED)) {
 					add = " *";
 				}
 				
@@ -250,7 +251,7 @@ public class StartController {
 				
 				if(frageObj.get(y).getArt() == "FF"){
 					
-					if(frageObj.get(y).getFlags().indexOf("TEXT") >= 0) {
+					if(frageObj.get(y).getFlags().is(SymbolType.TEXT)) {
 						//F�gt eine Textarea ein
 						TextArea textArea = new TextArea(); //anneSuperNeu
 						//textArea.setPreferredSize(new Dimension(200, 50));
@@ -260,7 +261,7 @@ public class StartController {
 						frageObj.get(y).setAntwortenTEXT(textAreas);
 						vBox.getChildren().add(textArea);
 					} else {
-						if(frageObj.get(y).getFlags().indexOf("LIST") >= 0) {
+						if(frageObj.get(y).getFlags().is(SymbolType.LIST)) {
 							//ErrorLog.fehlerBerichtB("ERROR",
 							//		Datenbank.class + ": " + Thread.currentThread().getStackTrace()[1].getLineNumber(), "Fehler");
 						} else {
@@ -383,7 +384,7 @@ public class StartController {
 						        });
 						}
 						
-						if(frageObj.get(y).getFlags().indexOf("B") >= 0) {
+						if(frageObj.get(y).getFlags().is(SymbolType.B)) {
 							/*TODO
 							if(!frageObj.get(y).getFrageLabel().isVisible()) {
 								lblNull.setVisible(false);

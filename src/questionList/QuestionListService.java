@@ -10,6 +10,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import application.Datenbank;
+import flag.FlagList;
 import model.Frage;
 import model.Fragebogen;
 
@@ -36,7 +37,7 @@ public class QuestionListService extends Datenbank {
 				frage.setFrageID(myRS.getInt("idMultipleChoice"));
 				frage.setKategorie(unslashUnicode(myRS.getString("Kategorie")));
 				frage.setDatum(myRS.getString("Datum"));
-				frage.setFlags("");
+				frage.setFlags(new FlagList());
 				frage.setPosition(Integer.parseInt(myRS.getString("Position")));
 				frage.setArt("MC");
 				frage.setFragebogenID(fb.getId());

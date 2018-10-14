@@ -10,6 +10,7 @@ import java.util.Vector;
 
 import application.Datenbank;
 import application.GlobalVars;
+import flag.FlagList;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
@@ -60,7 +61,7 @@ public class SurveyService extends Datenbank {
 					fragenObj.setFrageID(myRS.getInt("idMultipleChoice"));
 					fragenObj.setKategorie(unslashUnicode(myRS.getString("Kategorie")));
 					fragenObj.setDatum(myRS.getString("Datum"));
-					fragenObj.setFlags(myRS.getString("Flags"));
+					fragenObj.setFlags(new FlagList(myRS.getString("Flags")));
 					fragenObj.setPosition(Integer.parseInt(myRS.getString("Position")));
 					fragenObj.setArt("MC");
 					fragenObj.setFragebogenID(fb.getId());
@@ -111,7 +112,7 @@ public class SurveyService extends Datenbank {
 					fragenObj.setFrageID(myRS.getInt("idFreieFragen"));
 					fragenObj.setKategorie(unslashUnicode(myRS.getString("Kategorie")));
 					fragenObj.setDatum(myRS.getString("Datum"));
-					fragenObj.setFlags(myRS.getString("Flags"));
+					fragenObj.setFlags(new FlagList(myRS.getString("Flags")));
 					fragenObj.setPosition(Integer.parseInt(myRS.getString("Position")));
 					fragenObj.setArt("FF");
 					fragenObj.setFragebogenID(fb.getId());
