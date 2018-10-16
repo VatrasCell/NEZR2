@@ -2,6 +2,7 @@ package start;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
+import java.util.List;
 import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -9,6 +10,8 @@ import java.util.regex.Pattern;
 import application.GlobalFuncs;
 import application.GlobalVars;
 import application.ScreenController;
+import flag.Number;
+import flag.React;
 import flag.SymbolType;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
@@ -441,53 +444,16 @@ public class StartController {
 		
 		for(int y = 0; y < fragen.size(); y++) {
 			
-			Pattern MY_PATTERN = Pattern.compile("MC[0-9]+A[0-9]+");
-			Matcher mges = MY_PATTERN.matcher(fragen.get(y).getFlags());
-			
-			if (mges.find()) {
-
-				Pattern MY_PATTERN1 = Pattern.compile("MC[0-9]+");
-				Matcher m1 = MY_PATTERN1.matcher(mges.group(0));
-				Pattern MY_PATTERN2 = Pattern.compile("A[0-9]+");
-				Matcher m2 = MY_PATTERN2.matcher(mges.group(0));
-				Pattern MY_PATTERNint = Pattern.compile("INT[<>=]=[0-9]+");
-				Matcher mint = MY_PATTERNint.matcher(fragen.get(y).getFlags());
-				if (m1.find() && m2.find()) {
-					try {
-					fragen.get(y).setTarget(fragen.get(getY(Integer.parseInt(m1.group(0).substring(2)), "MC", fragen)));
-					} catch (ArrayIndexOutOfBoundsException e) {
-						System.out.println("Fehler: " + Integer.parseInt(m1.group(0).substring(2)));
-						e.printStackTrace();
-					}
-					fragen.get(y).setListener(Integer.parseInt(m2.group(0).substring(1)), "MC");
-				}
-				if (mint.find()) {
-					fragen.get(y).setListener(0, mint.group(0));
-				}
+			List<React> reacts = fragen.get(y).getFlags().getAll(React.class);
+			List<Number> numbers = fragen.get(y).getFlags().getAll(Number.class);
+			for (React react : reacts) {
+				fragen.get(y).setTarget(fragen.get(getY(react.getQuestionId(), react.getQuestionType().toString(), fragen)));
+				fragen.get(y).setListener(react.getAnswerPos(), react.getQuestionType().toString());
+			}
+			for (Number number : numbers) {
+				fragen.get(y).setListener(0, number.toString());
 			}
 		}
-		
-		for(int y = 0; y < fragen.size(); y++) {
-			Pattern MY_PATTERN = Pattern.compile("FF[0-9]+A[0-9]+");
-			Matcher mges = MY_PATTERN.matcher(fragen.get(y).getFlags());
-			if (mges.find()) {
-				Pattern MY_PATTERN1 = Pattern.compile("FF[0-9]+");
-				Matcher m1 = MY_PATTERN1.matcher(mges.group(0));
-				Pattern MY_PATTERN2 = Pattern.compile("A[0-9]+");
-				Matcher m2 = MY_PATTERN2.matcher(mges.group(0));
-				Pattern MY_PATTERNint = Pattern.compile("INT[<>=]=[0-9]+");
-				Matcher mint = MY_PATTERNint.matcher(fragen.get(y).getFlags());
-				if (m1.find() && m2.find()) {
-					fragen.get(y).setTarget(fragen.get(getY(Integer.parseInt(m1.group(0).substring(2)), "FF", fragen)));
-					fragen.get(y).setListener(Integer.parseInt(m2.group(0).substring(1)), "FF");
-					
-				}
-				if (mint.find()) {
-					fragen.get(y).setListener(0, mint.group(0));
-				}
-			}
-		}
-		
 		
 		for(int i = 0; i < allePanel.size(); ++i) {
 			ScreenController.addScreen("survey_" + i, allePanel.get(i));

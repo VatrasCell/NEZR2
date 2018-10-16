@@ -45,14 +45,14 @@ import model.Frage;
 import model.Fragebogen;
 import survey.SurveyService;
 import flag.Number;
+import flag.QuestionType;
+import flag.React;
 
 public class QuestionController {
 	public static Fragebogen fragebogen;
 	public static Frage frage;
 	private Vector<String> antworten;
 	private ObservableList<Antwort> data = FXCollections.observableArrayList();
-
-	private FlagList flags = new FlagList();
 	
 	@FXML
 	private Label lblQuestion;
@@ -338,6 +338,14 @@ public class QuestionController {
 			
 			String oldFrage = frage.getFrage();
 			
+			FlagList flags;
+			
+			if(frage.getFlags().size() > 0) {
+				flags = frage.getFlags();
+			} else {
+				flags = new FlagList();
+			}
+			
 			Pattern MY_PATTERNs = Pattern.compile("#\\[[0-9]+\\]");
 			Matcher ms = MY_PATTERNs.matcher(oldFrage);
 			if (ms.find()) {
@@ -369,6 +377,7 @@ public class QuestionController {
 			}						
 			neueFrage.setKategorie(selectedKat);
 			
+			
 			boolean pflichtfrage = chckbxPflichtfrage.isSelected();                 // +
 	        boolean liste = chckbxListe.isSelected();                               // LIST
 	        boolean multipleChoice = chckbxMultipleChoice.isSelected();             // *
@@ -380,55 +389,19 @@ public class QuestionController {
 	        String zahlArt = (String) zahlChoice.getSelectionModel().getSelectedItem();			// INT<= | INT>= | INT==
 	        int anzahlZeichen = textFieldZahl.getText().equals("") ? 0 : Integer.parseInt(textFieldZahl.getText());
 	        //	
-			
-			Pattern MY_PATTERN = Pattern.compile("MC[0-9]+A[0-9]+");
-			Matcher mges = MY_PATTERN.matcher(flags);
-
-			if (mges.find()) {
-				Pattern MY_PATTERN1 = Pattern.compile("MC[0-9]+");
-				Matcher m1 = MY_PATTERN1.matcher(mges.group(0));
-				Pattern MY_PATTERN2 = Pattern.compile("A[0-9]+");
-				Matcher m2 = MY_PATTERN2.matcher(mges.group(0));
-				if (m1.find() && m2.find()) {
-					int zahl = -1;
-						try {
-							zahl = Integer.parseInt(mges.group(0).substring(2, mges.group(0).indexOf("A")));
-						} catch (NumberFormatException en) {
-						}
-						if(pflichtfrage) {
-							QuestionService.updateFlags(fragebogen, "MC", zahl);
-						}
-					if (QuestionService.isPflichtfrage(fragebogen, "MC", zahl)) {
-						pflichtfrage = true;
-					}
+	        
+	        List<React> mcList = flags.getAll(React.class);
+	        for (React react : mcList) {
+	        	if(pflichtfrage) {
+					QuestionService.updateFlags(fragebogen, react.getQuestionType().toString(), react.getQuestionId());
 				}
-			}
-
-			Pattern MY_PATTERNFF = Pattern.compile("FF[0-9]+A[0-9]+");
-			Matcher mgesFF = MY_PATTERNFF.matcher(flags);
-			if (mgesFF.find()) {
-				Pattern MY_PATTERN1 = Pattern.compile("FF[0-9]+");
-				Matcher m1 = MY_PATTERN1.matcher(mgesFF.group(0));
-				Pattern MY_PATTERN2 = Pattern.compile("A[0-9]+");
-				Matcher m2 = MY_PATTERN2.matcher(mgesFF.group(0));
-				if (m1.find() && m2.find()) {
-					int zahl = -1;
-					try {
-						zahl = Integer.parseInt(mgesFF.group(0).substring(2, mgesFF.group(0).indexOf("A")));
-					} catch (NumberFormatException en) {
-					}
-					if(pflichtfrage) {
-						QuestionService.updateFlags(fragebogen, "FF", zahl);
-					}
-					if (QuestionService.isPflichtfrage(fragebogen, "FF", zahl)) {
-						pflichtfrage = true;
-					}
-				}
-
+		        if (QuestionService.isPflichtfrage(fragebogen, react.getQuestionType().toString(), react.getQuestionId())) {
+		        	pflichtfrage = true;
+		        }
 			}
 	        
 			if (artChoice.getSelectionModel().getSelectedItem().equals("Freie Frage")) {
-				flags += QuestionService.getMoeglicheFlags(pflichtfrage, liste, multipleChoice, textarea, ja_nein, isZahl, false, zahlArt, anzahlZeichen,  "ff"); //floNeu
+				flags = QuestionService.getMoeglicheFlags(flags, pflichtfrage, liste, multipleChoice, textarea, ja_nein, isZahl, false, zahlArt, anzahlZeichen, "ff"); //floNeu
 				neueFrage.setFlags(flags);
 				QuestionService.saveFreieFrage(fragebogen, neueFrage);					
 			}
@@ -472,12 +445,12 @@ public class QuestionController {
 					int antId = QuestionService.getAntwortID(ants.get(i));
 					antIds.add(antId);
 				}
-				flags += QuestionService.getMoeglicheFlags(pflichtfrage, liste, multipleChoice, textarea, ja_nein, isZahl, x, zahlArt, anzahlZeichen, "mc"); //floNeu
+				flags = QuestionService.getMoeglicheFlags(flags, pflichtfrage, liste, multipleChoice, textarea, ja_nein, isZahl, x, zahlArt, anzahlZeichen, "mc"); //floNeu
 				neueFrage.setFlags(flags);
 				QuestionService.saveMC(fragebogen, neueFrage, antIds);
 			}
 			if (artChoice.getSelectionModel().getSelectedItem().equals("Bewertungsfrage")) {
-				flags += QuestionService.getMoeglicheFlags(pflichtfrage, liste, multipleChoice, textarea, ja_nein, isZahl, false, zahlArt, anzahlZeichen, "bf"); //floNeu
+				flags = QuestionService.getMoeglicheFlags(flags, pflichtfrage, liste, multipleChoice, textarea, ja_nein, isZahl, false, zahlArt, anzahlZeichen, "bf"); //floNeu
 				neueFrage.setFlags(flags);
 				QuestionService.saveBewertungsfrage(fragebogen, neueFrage);
 			}
@@ -485,7 +458,6 @@ public class QuestionController {
 			ScreenController.activate(model.Scene.QuestionList.scene());
 			//pnlFrageErstellenLeeren();
 			//makeFragenTabelle(QuestionService.getFragen(fragebogen));
-			flags = "";
 			//cardLayout.show(frame.getContentPane(), "pnlFragenUebersicht");		
 		} else {
 			/*BalloonTip fehler = new BalloonTip(btnSpeichernFE, "Die Frage ist fehlerhaft und kann deswegen nicht gespeichert werden!");
@@ -497,9 +469,10 @@ public class QuestionController {
 	
 	@FXML
 	private void setPreview() {
+		/* TODO neue Preview Methodik
 		if (checkFrageDaten()) {
 			Frage neueFrage = new Frage();
-			String vflags = flags == null ? "" : flags;
+			FlagList vflags = flags == null ? "" : flags;
 			neueFrage.setFrage(textFieldFE.getText());
 			neueFrage.setPosition((int)posChoice.getSelectionModel().getSelectedItem());
 			if(frage != null) {
@@ -663,8 +636,9 @@ public class QuestionController {
 			/*BalloonTip fehler = new BalloonTip(btnVorschauFE, "Die Frage ist fehlerhaft und es kann deswegen keine Vorschau generiert werden!");
 			fehler.setCloseButton(null);
 			TimingUtils.showTimedBalloon(fehler, 3000);
-			fehler.setVisible(true);*/
+			fehler.setVisible(true);
 		}
+		*/
 	}
 	
 	@FXML
@@ -799,7 +773,7 @@ public class QuestionController {
 					hasUeber = true;
 				}
 				
-				if(!isBHeader && frageObj.get(y).getFlags().indexOf("B") >= 0) {
+				if(!isBHeader && frageObj.get(y).getFlags().is(SymbolType.B)) {
 					
 					HBox hBox = new HBox();
 					//hBox.setAlignment(Pos.CENTER);
@@ -829,13 +803,13 @@ public class QuestionController {
 				if (ms.find()) {
 					frage = frage.substring(0, ms.start());	
 				}
-				if(frageObj.get(y).getFlags().indexOf("*") >= 0) {
+				if(frageObj.get(y).getFlags().is(SymbolType.MC)) {
 					isMC = true;
 				}
 				
 				String add = "";			
 				
-				if(frageObj.get(y).getFlags().indexOf("+") >= 0) {
+				if(frageObj.get(y).getFlags().is(SymbolType.REQUIRED)) {
 					add = " *";
 				}
 				
@@ -854,9 +828,7 @@ public class QuestionController {
 				Label lblFrage = new Label(frageAnzeige);
 				// System.out.println("frageObj.get(y).frageid = " + frageObj.get(y).getFrageID());
 				lblFrage.setId("lblFrage_" + frageObj.get(y).getFrageID());
-				Pattern MY_PATTERN = Pattern.compile("MC[0-9]+A[0-9]+");
-				Matcher mges = MY_PATTERN.matcher(frageObj.get(y).getFlags());
-				if (mges.find()) {
+				if (frageObj.get(y).getFlags().hasMCReact()) {
 					lblFrage.setVisible(false);
 				}
 				
@@ -868,7 +840,7 @@ public class QuestionController {
 				
 				if(frageObj.get(y).getArt() == "FF"){
 					
-					if(frageObj.get(y).getFlags().indexOf("TEXT") >= 0) {
+					if(frageObj.get(y).getFlags().is(SymbolType.TEXT)) {
 						//F�gt eine Textarea ein
 						TextArea textArea = new TextArea(); //anneSuperNeu
 						//textArea.setPreferredSize(new Dimension(200, 50));
@@ -878,7 +850,7 @@ public class QuestionController {
 						frageObj.get(y).setAntwortenTEXT(textAreas);
 						vBox.getChildren().add(textArea);
 					} else {
-						if(frageObj.get(y).getFlags().indexOf("LIST") >= 0) {
+						if(frageObj.get(y).getFlags().is(SymbolType.LIST)) {
 							//ErrorLog.fehlerBerichtB("ERROR",
 							//		Datenbank.class + ": " + Thread.currentThread().getStackTrace()[1].getLineNumber(), "Fehler");
 						} else {
@@ -886,9 +858,7 @@ public class QuestionController {
 							TextField textField = new TextField();
 							//textField.setPreferredSize(new Dimension(200, 50));
 							
-							MY_PATTERN = Pattern.compile("MC[0-9]+A[0-9]+");
-							mges = MY_PATTERN.matcher(frageObj.get(y).getFlags());
-							if (mges.find()) {
+							if (frageObj.get(y).getFlags().hasMCReact()) {
 								textField.setVisible(false);
 							}
 							
@@ -903,7 +873,7 @@ public class QuestionController {
 					
 				} else if (frageObj.get(y).getArt() == "MC") {
 					
-					if(frageObj.get(y).getFlags().indexOf("LIST") >= 0) {
+					if(frageObj.get(y).getFlags().is(SymbolType.LIST)) {
 						//Erstellt eine Liste
 						Vector<ListView<String>> antwortenLIST = new Vector<>();
 						// scrollPane.getVerticalScrollBar().setUI(new MyScrollBarUI());
@@ -911,9 +881,7 @@ public class QuestionController {
 						ListView<String> liste = new ListView<String>();
 						liste.setItems(FXCollections.observableArrayList(frageObj.get(y).getAntwort_moeglichkeit()));
 
-						MY_PATTERN = Pattern.compile("MC[0-9]+A[0-9]+");
-						mges = MY_PATTERN.matcher(frageObj.get(y).getFlags());
-						if (mges.find()) {
+						if (frageObj.get(y).getFlags().hasMCReact()) {
 							liste.setVisible(false);
 						}
 						
@@ -959,9 +927,7 @@ public class QuestionController {
 						//chckbxSda.setFont(new Font("Tahoma", Font.PLAIN, 28));
 						//chckbxSda.setForeground(new Color(94, 56, 41));
 						
-						MY_PATTERN = Pattern.compile("MC[0-9]+A[0-9]+");
-						mges = MY_PATTERN.matcher(frageObj.get(y).getFlags());
-						if (mges.find()) {
+						if (frageObj.get(y).getFlags().hasMCReact()) {
 							chckbxSda.setVisible(false);
 						}
 						checkBoxen.add(chckbxSda);
@@ -1001,7 +967,7 @@ public class QuestionController {
 						        });
 						}
 						
-						if(frageObj.get(y).getFlags().indexOf("B") >= 0) {
+						if(frageObj.get(y).getFlags().is(SymbolType.B)) {
 							/*
 							if(!frageObj.get(y).getFrageLabel().isVisible()) {
 								lblNull.setVisible(false);
@@ -1065,53 +1031,16 @@ public class QuestionController {
 		
 		for(int y = 0; y < fragen.size(); y++) {
 			
-			Pattern MY_PATTERN = Pattern.compile("MC[0-9]+A[0-9]+");
-			Matcher mges = MY_PATTERN.matcher(fragen.get(y).getFlags());
-			
-			if (mges.find()) {
-
-				Pattern MY_PATTERN1 = Pattern.compile("MC[0-9]+");
-				Matcher m1 = MY_PATTERN1.matcher(mges.group(0));
-				Pattern MY_PATTERN2 = Pattern.compile("A[0-9]+");
-				Matcher m2 = MY_PATTERN2.matcher(mges.group(0));
-				Pattern MY_PATTERNint = Pattern.compile("INT[<>=]=[0-9]+");
-				Matcher mint = MY_PATTERNint.matcher(fragen.get(y).getFlags());
-				if (m1.find() && m2.find()) {
-					try {
-					fragen.get(y).setTarget(fragen.get(getY(Integer.parseInt(m1.group(0).substring(2)), "MC", fragen)));
-					} catch (ArrayIndexOutOfBoundsException e) {
-						System.out.println("Fehler: " + Integer.parseInt(m1.group(0).substring(2)));
-						e.printStackTrace();
-					}
-					fragen.get(y).setListener(Integer.parseInt(m2.group(0).substring(1)), "MC");
-				}
-				if (mint.find()) {
-					fragen.get(y).setListener(0, mint.group(0));
-				}
+			List<React> reacts = fragen.get(y).getFlags().getAll(React.class);
+			List<Number> numbers = fragen.get(y).getFlags().getAll(Number.class);
+			for (React react : reacts) {
+				fragen.get(y).setTarget(fragen.get(getY(react.getQuestionId(), react.getQuestionType().toString(), fragen)));
+				fragen.get(y).setListener(react.getAnswerPos(), react.getQuestionType().toString());
 			}
-		}
-		
-		for(int y = 0; y < fragen.size(); y++) {
-			Pattern MY_PATTERN = Pattern.compile("FF[0-9]+A[0-9]+");
-			Matcher mges = MY_PATTERN.matcher(fragen.get(y).getFlags());
-			if (mges.find()) {
-				Pattern MY_PATTERN1 = Pattern.compile("FF[0-9]+");
-				Matcher m1 = MY_PATTERN1.matcher(mges.group(0));
-				Pattern MY_PATTERN2 = Pattern.compile("A[0-9]+");
-				Matcher m2 = MY_PATTERN2.matcher(mges.group(0));
-				Pattern MY_PATTERNint = Pattern.compile("INT[<>=]=[0-9]+");
-				Matcher mint = MY_PATTERNint.matcher(fragen.get(y).getFlags());
-				if (m1.find() && m2.find()) {
-					fragen.get(y).setTarget(fragen.get(getY(Integer.parseInt(m1.group(0).substring(2)), "FF", fragen)));
-					fragen.get(y).setListener(Integer.parseInt(m2.group(0).substring(1)), "FF");
-					
-				}
-				if (mint.find()) {
-					fragen.get(y).setListener(0, mint.group(0));
-				}
+			for (Number number : numbers) {
+				fragen.get(y).setListener(0, number.toString());
 			}
-		}
-		
+		}	
 		
 		for(int i = 0; i < allePanel.size(); ++i) {
 			ScreenController.addScreen("survey_" + i + "_preview", allePanel.get(i));

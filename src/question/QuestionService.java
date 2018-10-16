@@ -13,6 +13,11 @@ import java.util.regex.Pattern;
 import org.controlsfx.control.Notifications;
 
 import application.Datenbank;
+import flag.FlagList;
+import flag.Number;
+import flag.NumberOperator;
+import flag.Symbol;
+import flag.SymbolType;
 import model.Frage;
 import model.Fragebogen;
 
@@ -154,49 +159,48 @@ public class QuestionService extends Datenbank {
 	 * @return String flag
 	 * @author Florian
 	 */
-	public static String getMoeglicheFlags(boolean pflichtfrage, boolean liste, boolean multipleChoice,
+	public static FlagList getMoeglicheFlags(FlagList flags, boolean pflichtfrage, boolean liste, boolean multipleChoice,
 			boolean textarea, boolean ja_nein, boolean isZahl, boolean isX, String zahlArt, int anzahlZeichen,
 			String art) {
-		String flag = "";
 		if (pflichtfrage) {
-			flag += " + ";
+			flags.add(new Symbol(SymbolType.REQUIRED));
 		}
 		if (liste) {
-			flag += " LIST ";
+			flags.add(new Symbol(SymbolType.LIST));
 		}
 		if (multipleChoice) {
-			flag += " * ";
+			flags.add(new Symbol(SymbolType.MC));
 		}
 		if (textarea) {
-			flag += " TEXT ";
+			flags.add(new Symbol(SymbolType.TEXT));
 		}
 		if (ja_nein) {
-			flag += " JN ";
+			flags.add(new Symbol(SymbolType.JN));
 			if (isX) {
-				flag += " X ";
+				flags.add(new Symbol(SymbolType.JNExcel));
 			}
 		}
 
 		if (isZahl) {
 			if (zahlArt.equals("Größer gleich Zahl")) {
-				flag += " INT>=" + anzahlZeichen + " ";
+				flags.add(new Number(NumberOperator.GTE, anzahlZeichen));
 			}
 
 			if (zahlArt.equals("Kleiner gleich Zahl")) {
-				flag += " INT<=" + anzahlZeichen + " ";
+				flags.add(new Number(NumberOperator.LTE, anzahlZeichen));
 			}
 
 			if (zahlArt.equals("Genau wie die Zahl")) {
-				flag += " INT==" + anzahlZeichen + " ";
+				flags.add(new Number(NumberOperator.EQ, anzahlZeichen));
 			}
 		}
 
 		//
 
 		if (art.equals("bf")) {
-			flag += " B ";
+			flags.add(new Symbol(SymbolType.B));
 		}
-		return flag;
+		return flags;
 	}
 	
 	/**

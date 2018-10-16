@@ -240,13 +240,13 @@ public class SurveyController {
 		}
 	}*/
 	
-	private boolean checkInt(Frage frage) {
-		TextField textField = frage.getAntwortenFF().get(0);
-		if(textField.getText().equals("")) {
-			return true;
-		}
+	private boolean checkInt(Frage frage) {		
 		List<Number> numbers = frage.getFlags().getAll(Number.class);
 		for (Number number : numbers) {
+			TextField textField = frage.getAntwortenFF().get(0);
+			if(textField.getText().equals("")) {
+				return true;
+			}
 			switch (number.getOperator()) {
 			case EQ:
 				try {
