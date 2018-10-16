@@ -16,9 +16,11 @@ import application.Datenbank;
 import model.Frage;
 import model.Fragebogen;
 import question.QuestionService;
+import survey.SurveyService;
 import application.GlobalFuncs;
 import application.GlobalVars;
 import flag.FlagList;
+import flag.SymbolType;
 
 public class AdminService extends Datenbank {
 	
@@ -452,8 +454,26 @@ public class AdminService extends Datenbank {
 	}
 	*/
 	public static boolean copyFragebogen(Fragebogen fb, String ort) {
+		Fragebogen newFb = fb;
+		newFb.setId(createFragebogen(fb.getName(), ort));
+		Vector<Frage> fragen = SurveyService.getFragen(fb);
+		for (Frage frage : fragen) {
+			if(frage.getArt() == "FF") {
+				QuestionService.saveFreieFrage(newFb, frage);
+			} else {
+				if(frage.getFlags().is(SymbolType.B)) {
+					QuestionService.saveBewertungsfrage(newFb, frage);
+				} else {
+					Vector<Integer> antIds = new Vector<>();
+					for (String answer : frage.getAntwort_moeglichkeit()) {
+						antIds.add(QuestionService.getAntwortID(answer));
+					} 
+					QuestionService.saveMC(newFb, frage, antIds);
+				}
+			}
+		}
 		//TODO
-		return false;
+		return true;
 	}
 	
 	/**
@@ -737,34 +757,36 @@ public class AdminService extends Datenbank {
 		return false;
 	}
 	
-	public static boolean createFragebogen(String name) {
+	public static int createFragebogen(String name) {
+		return createFragebogen(name, GlobalVars.standort);
+	}
+	
+	public static int createFragebogen(String name, String ort) {
 		try {
 			Connection myCon = DriverManager.getConnection(url, user, pwd);
 			Statement mySQL = myCon.createStatement();
-			String statement = "SELECT Name FROM fragebogen WHERE Name='" + name + "'";
-			ResultSet myRS = mySQL.executeQuery(statement);
-
-			if (myRS.next()) {
-				Notifications.create().title("Fragebogen erstellen").text("Ein Fragebogen mit dem Namen existiert bereits!").showError();
-			} else {
-				mySQL = null;
-				myRS = null;
-				mySQL = myCon.createStatement();
-				statement = "INSERT INTO fragebogen VALUES(NULL, '" + GlobalFuncs.getcurDate() + "', '" + name + "', FALSE, "
-						+ getStandortId(GlobalVars.standort) + ", FALSE)";
-				mySQL.execute(statement);
-			}
+			String statement = "INSERT INTO fragebogen VALUES(NULL, '" + GlobalFuncs.getcurDate() + "', '" + name + "', FALSE, "
+					+ getStandortId(ort) + ", FALSE)";
+			mySQL.execute(statement);
 			mySQL = null;
-			myRS = null;
+			
+			mySQL = myCon.createStatement();
+			statement = "SELECT MAX(idFragebogen) FROM fragebogen";
+			ResultSet myRS = mySQL.executeQuery(statement);
+			int id = -1;
+			if (myRS.next()) {
+				id = myRS.getInt("MAX(idFragebogen)");
+			}
+			
 			myCon.close();
-			return true;
+			return id;
 		} catch (SQLException e) {
 			e.printStackTrace();
 			//ErrorLog.fehlerBerichtB("ERROR",
 			//		Datenbank.class + ": " + Thread.currentThread().getStackTrace()[1].getLineNumber(), e.getMessage());
 		}
-		return false;
-	}
+		return -1;
+	}	
 	
 	public static int getStandortId(String ort) {
 		Connection myCon;

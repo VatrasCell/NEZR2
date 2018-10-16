@@ -237,9 +237,8 @@ public class StartController {
 				Label lblFrage = new Label(frageAnzeige);
 				// System.out.println("frageObj.get(y).frageid = " + frageObj.get(y).getFrageID());
 				lblFrage.setId("lblFrage_" + frageObj.get(y).getFrageID());
-				Pattern MY_PATTERN = Pattern.compile("MC[0-9]+A[0-9]+");
-				Matcher mges = MY_PATTERN.matcher(frageObj.get(y).getFlags());
-				if (mges.find()) {
+
+				if (frageObj.get(y).getFlags().hasMCReact()) {
 					lblFrage.setVisible(false);
 				}
 				
@@ -269,9 +268,7 @@ public class StartController {
 							TextField textField = new TextField();
 							//textField.setPreferredSize(new Dimension(200, 50));
 							
-							MY_PATTERN = Pattern.compile("MC[0-9]+A[0-9]+");
-							mges = MY_PATTERN.matcher(frageObj.get(y).getFlags());
-							if (mges.find()) {
+							if (frageObj.get(y).getFlags().hasFFReact()) {
 								textField.setVisible(false);
 							}
 							
@@ -286,7 +283,7 @@ public class StartController {
 					
 				} else if (frageObj.get(y).getArt() == "MC") {
 					
-					if(frageObj.get(y).getFlags().indexOf("LIST") >= 0) {
+					if(frageObj.get(y).getFlags().is(SymbolType.LIST)) {
 						//Erstellt eine Liste
 						Vector<ListView<String>> antwortenLIST = new Vector<>();
 						// scrollPane.getVerticalScrollBar().setUI(new MyScrollBarUI());
@@ -294,9 +291,7 @@ public class StartController {
 						ListView<String> liste = new ListView<String>();
 						liste.setItems(FXCollections.observableArrayList(frageObj.get(y).getAntwort_moeglichkeit()));
 
-						MY_PATTERN = Pattern.compile("MC[0-9]+A[0-9]+");
-						mges = MY_PATTERN.matcher(frageObj.get(y).getFlags());
-						if (mges.find()) {
+						if (frageObj.get(y).getFlags().hasMCReact()) {
 							liste.setVisible(false);
 						}
 						
@@ -342,9 +337,7 @@ public class StartController {
 						//chckbxSda.setFont(new Font("Tahoma", Font.PLAIN, 28));
 						//chckbxSda.setForeground(new Color(94, 56, 41));
 						
-						MY_PATTERN = Pattern.compile("MC[0-9]+A[0-9]+");
-						mges = MY_PATTERN.matcher(frageObj.get(y).getFlags());
-						if (mges.find()) {
+						if (frageObj.get(y).getFlags().hasMCReact()) {
 							chckbxSda.setVisible(false);
 						}
 						checkBoxen.add(chckbxSda);

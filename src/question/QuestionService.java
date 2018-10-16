@@ -178,7 +178,7 @@ public class QuestionService extends Datenbank {
 		}
 
 		if (isZahl) {
-			if (zahlArt.equals("GrÃ¶ÃŸer gleich Zahl")) {
+			if (zahlArt.equals("Größer gleich Zahl")) {
 				flag += " INT>=" + anzahlZeichen + " ";
 			}
 

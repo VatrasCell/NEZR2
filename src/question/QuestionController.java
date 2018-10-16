@@ -14,6 +14,8 @@ import org.controlsfx.control.Notifications;
 
 import application.GlobalVars;
 import application.ScreenController;
+import flag.FlagList;
+import flag.SymbolType;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -42,6 +44,7 @@ import javafx.util.Callback;
 import model.Frage;
 import model.Fragebogen;
 import survey.SurveyService;
+import flag.Number;
 
 public class QuestionController {
 	public static Fragebogen fragebogen;
@@ -49,7 +52,7 @@ public class QuestionController {
 	private Vector<String> antworten;
 	private ObservableList<Antwort> data = FXCollections.observableArrayList();
 
-	private String flags = "";
+	private FlagList flags = new FlagList();
 	
 	@FXML
 	private Label lblQuestion;
@@ -224,7 +227,7 @@ public class QuestionController {
 		zahlChoice.setItems(listZahl);
 
 		if (frage.getArt().equals("MC")) {
-			if (frage.getFlags().contains("B")) {
+			if (frage.getFlags().is(SymbolType.B)) {
 				artChoice.getSelectionModel().select("Bewertungsfrage");
 			} else {
 				artChoice.getSelectionModel().select("Multiple Choice");
@@ -233,34 +236,34 @@ public class QuestionController {
 			artChoice.getSelectionModel().select("Freie Frage");
 		}
 
-		if (frage.getFlags().contains("*")) {
+		if (frage.getFlags().is(SymbolType.MC)) {
 			chckbxMultipleChoice.setSelected(true);
 		} else {
 			chckbxMultipleChoice.setSelected(false);
 		}
 
-		if (frage.getFlags().contains("LIST")) {
+		if (frage.getFlags().is(SymbolType.LIST)) {
 			chckbxListe.setSelected(true);
 		} else {
 			chckbxListe.setSelected(false);
 		}
 
-		if (frage.getFlags().contains("TEXT")) {
+		if (frage.getFlags().is(SymbolType.TEXT)) {
 			chckbxTextArea.setSelected(true);
 		} else {
 			chckbxTextArea.setSelected(false);
 		}
 
-		if (frage.getFlags().contains("+")) {
+		if (frage.getFlags().is(SymbolType.REQUIRED)) {
 			chckbxPflichtfrage.setSelected(true);
 		} else {
 			chckbxPflichtfrage.setSelected(false);
 		}
 
-		if (frage.getFlags().contains("JN")) {
+		if (frage.getFlags().is(SymbolType.JN)) {
 			chckbxJaNein.setSelected(true);
 			//imageView.setVisible(true);
-			if (frage.getFlags().contains("X")) {
+			if (frage.getFlags().is(SymbolType.JNExcel)) {
 				chckbxX.setSelected(true);
 				// image.showQRImage();
 			} else {
@@ -271,6 +274,7 @@ public class QuestionController {
 			//imageView.setVisible(false);
 			chckbxJaNein.setSelected(false);
 		}
+		/*TODO was macht das?!
 		if (frage.getFlags().contains("A")) {
 			if (frage.getFlags().contains(" ")) {
 				int indexSpace = frage.getFlags().indexOf(" ");
@@ -278,7 +282,7 @@ public class QuestionController {
 				System.out.println(flags);
 
 			}
-		}
+		}*/
 		if (frage.getArt().equals("MC")) {
 			if(frage.getAntwort_moeglichkeit().size() > 0) {
 				if (frage.getAntwort_moeglichkeit().get(0).equals("#####")) {
@@ -298,22 +302,20 @@ public class QuestionController {
 		 * 1).toString()); }
 		 */
 
-		Pattern MY_PATTERNint = Pattern.compile("INT[<>=]=[0-9]+");
-		Matcher mint = MY_PATTERNint.matcher(frage.getFlags());
+		List<Number> numbers = frage.getFlags().getAll(Number.class);
 
-		if (mint.find()) {
-			String s = mint.group(0);
-			textFieldZahl.setText(s.substring(5));
+		if (numbers.size() > 0) {
+			Number number = numbers.get(0);
+			textFieldZahl.setText(number.getDigits() + "");
 			chckbxZahl.setSelected(true);
-			String op = s.substring(3, 5);
-			switch (op) {
-			case "==":
+			switch (number.getOperator()) {
+			case EQ:
 				zahlChoice.getSelectionModel().select("Genau wie die Zahl");
 				break;
-			case "<=":
+			case LTE:
 				zahlChoice.getSelectionModel().select("Kleiner gleich Zahl");
 				break;
-			case ">=":
+			case GTE:
 				zahlChoice.getSelectionModel().select("Größer gleich Zahl");
 				break;
 			}

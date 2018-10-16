@@ -472,7 +472,7 @@ public class AdminController {
 		
     	Optional<String> result = dialog.showAndWait();
     	result.ifPresent(name -> {
-    		if(AdminService.createFragebogen(name)) {
+    		if(AdminService.createFragebogen(name) != -1) {
         		getData();
         		tbl_fragebogen.refresh();
         	}

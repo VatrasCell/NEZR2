@@ -133,6 +133,24 @@ public class FlagList {
 		return null;
 	}
 	
+	public boolean hasMCReact() {
+		for (Flag flag : list) {
+			if(flag.getClass() == React.class)
+				if(((React)flag).getQuestionType() == QuestionType.MC)
+					return true;
+		}
+		return false;
+	}
+	
+	public boolean hasFFReact() {
+		for (Flag flag : list) {
+			if(flag.getClass() == React.class)
+				if(((React)flag).getQuestionType() == QuestionType.FF)
+					return true;
+		}
+		return false;
+	}
+	
 	public String createFlagString() {
 		List<String> flags = new ArrayList<>();
 		for (Flag flag : list) {
