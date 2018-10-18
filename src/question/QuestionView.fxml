@@ -22,7 +22,7 @@
                <children>
                   <Button mnemonicParsing="false" onAction="#setPreview" text="Vorschau" />
                   <Button mnemonicParsing="false" onAction="#exit" text="Abbruch" />
-                  <Button fx:id="btnSave" mnemonicParsing="false" onAction="#Save" text="Speichern" />
+                  <Button fx:id="btnSave" mnemonicParsing="false" onAction="#save" text="Speichern" />
                </children>
             </HBox>
          </children>

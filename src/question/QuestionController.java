@@ -151,6 +151,8 @@ public class QuestionController {
 									setText(null);
 								} else {
 									btn.setOnAction(event -> {
+										//TODO edit Antwort
+										Antwort antwort = getTableView().getItems().get(getIndex());
 									});
 									setGraphic(btn);
 									setText(null);
@@ -181,6 +183,7 @@ public class QuestionController {
 									setText(null);
 								} else {
 									btn.setOnAction(event -> {
+										//TODO delete Antwort
 										 Antwort antwort = getTableView().getItems().get(getIndex());
 									});
 									setGraphic(btn);
@@ -330,7 +333,7 @@ public class QuestionController {
 	}
 	
 	@FXML
-	private void Save() {
+	private void save() {
 		if (checkFrageDaten()) {
 			Frage neueFrage = new Frage();
 			
@@ -1078,11 +1081,12 @@ public class QuestionController {
 	 * Ueberprueft ob alle Bedingungen zum Speichern gegeben sind.
 	 */
 	public boolean checkFrageDaten() {
+		//TODO Button nicht hier blockieren; dynamische Validierung?!
 		System.out.println(textFieldFE.getText());
 		System.out.println(artChoice.getSelectionModel().getSelectedItem());
 		if(!textFieldFE.getText().equals("")) {
 			if(!artChoice.getSelectionModel().getSelectedItem().equals("-- Art der Frage --")) {
-				if(tbl_antworten.getItems().size()<1 && artChoice.getSelectionModel().getSelectedItem().equals("Multiple Choice")) { //anneSehrNeu ? weiß nicht mehr
+				if((tbl_antworten.getItems().size()<1 || chckbxJaNein.isSelected())&& artChoice.getSelectionModel().getSelectedItem().equals("Multiple Choice")) { //anneSehrNeu ? weiß nicht mehr
 					btnSave.setDisable(true);
 				} else {
 					btnSave.setDisable(false);
