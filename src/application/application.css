@@ -442,7 +442,7 @@
  *                                                                             *
  ******************************************************************************/
 .list-view:focused .list-cell:filled:focused:selected {
-	-fx-background-color: -swatch-light-grey;
+	-fx-background-color: rgb(245.0, 245.0, 245.0);
 	-fx-text-fill: -swatch-500;
 }
 

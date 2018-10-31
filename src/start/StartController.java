@@ -24,12 +24,15 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.ProgressBar;
+import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import model.Frage;
@@ -292,6 +295,37 @@ public class StartController {
 						// scrollPane.getVerticalScrollBar().setUI(new MyScrollBarUI());
 						//allePanel.get(z).add(scrollPane, "span, center");
 						ListView<String> liste = new ListView<String>();
+						liste.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+						
+						liste.setCellFactory(lv -> {
+				            ListCell<String> cell = new ListCell<String>() {
+				                @Override
+				                protected void updateItem(String item, boolean empty) {
+				                    super.updateItem(item, empty);
+				                    setText(empty ? null : item);
+				                }
+				            };
+
+				            cell.addEventFilter(MouseEvent.MOUSE_PRESSED, e -> {
+				                if (cell.isEmpty()) {
+				                    return ;
+				                }
+
+				                int index = cell.getIndex() ;
+				                if (liste.getSelectionModel().getSelectedIndices().contains(index)) {
+				                    liste.getSelectionModel().clearSelection(index);
+				                } else {
+				                    liste.getSelectionModel().select(index);
+				                }
+
+				                liste.requestFocus();
+
+				                e.consume();
+				            });
+
+				            return cell ;
+				        });
+						
 						liste.setItems(FXCollections.observableArrayList(frageObj.get(y).getAntwort_moeglichkeit()));
 
 						if (frageObj.get(y).getFlags().hasMCReact()) {
