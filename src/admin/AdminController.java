@@ -17,7 +17,6 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
-import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar.ButtonData;
@@ -160,7 +159,7 @@ public class AdminController {
                             	try {
                             		QuestionListController.fragebogen = getTableView().getItems().get(getIndex());
 									ScreenController.addScreen(model.Scene.QuestionList.scene(), 
-											new Scene(FXMLLoader.load(getClass().getResource("../questionList/QuestionListView.fxml"))));
+											FXMLLoader.load(getClass().getResource("../questionList/QuestionListView.fxml")));
 									ScreenController.activate(model.Scene.QuestionList.scene());
 								} catch (IOException e) {
 									e.printStackTrace();

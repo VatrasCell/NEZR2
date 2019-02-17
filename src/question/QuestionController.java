@@ -39,6 +39,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.util.Callback;
 import model.Frage;
@@ -700,7 +701,7 @@ public class QuestionController {
 		Vector<Vector<Frage>> fragenJePanel = new Vector<Vector<Frage>>();
 		/*------------------------- von Julian und Eric --------------------------*/
 		
-		Vector<Scene> allePanel = new Vector<>();
+		Vector<Pane> allePanel = new Vector<>();
 		
 		int countPanel = 0;
 		Vector<Integer> anzahl = new Vector<Integer>();
@@ -736,7 +737,7 @@ public class QuestionController {
 		
 		
 		for(int z = 1; z <= countPanel; z++) {
-			Scene scene = new Scene(FXMLLoader.load(getClass().getResource("../survey/SurveyPreView.fxml")));
+			Pane scene = FXMLLoader.load(getClass().getResource("../survey/SurveyPreView.fxml"));
 			
 			ProgressBar progressBar = (ProgressBar)scene.lookup("#progressBar");
 			progressBar.setProgress((float)z/(float)countPanel);

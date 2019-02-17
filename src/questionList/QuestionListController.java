@@ -8,8 +8,6 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.geometry.Insets;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
@@ -110,7 +108,7 @@ public class QuestionListController {
                             	QuestionController.frage = getTableView().getItems().get(getIndex());
                             	try {
 									ScreenController.addScreen(model.Scene.Question.scene(), 
-											new Scene(FXMLLoader.load(getClass().getResource("../question/QuestionView.fxml"))));
+											FXMLLoader.load(getClass().getResource("../question/QuestionView.fxml")));
 											ScreenController.activate(model.Scene.Question.scene());
 								} catch (IOException e) {
 									// TODO Auto-generated catch block
@@ -186,7 +184,7 @@ public class QuestionListController {
     	QuestionController.frage = new Frage(fragen.size());
     	try {
 			ScreenController.addScreen(model.Scene.Question.scene(), 
-					new Scene(FXMLLoader.load(getClass().getResource("../question/QuestionView.fxml"))));
+					FXMLLoader.load(getClass().getResource("../question/QuestionView.fxml")));
 					ScreenController.activate(model.Scene.Question.scene());
 		} catch (IOException e) {
 			// TODO Auto-generated catch block

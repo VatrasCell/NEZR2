@@ -9,12 +9,12 @@ import flag.SymbolType;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 
-import javafx.scene.Scene;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.Pane;
 
 public class Frage implements Comparable<Frage>, Comparator<Frage> {
 	private String frage;
@@ -28,7 +28,7 @@ public class Frage implements Comparable<Frage>, Comparator<Frage> {
 	private Vector<String> antwort_moeglichkeit = new Vector<String>();
 	private Vector<String> antwort = new Vector<String>();
 	private Label frageLabel;
-	private Scene scene;
+	private Pane scene;
 	private Vector<CheckBox> antwortenMC = new Vector<>();
 	private Vector<TextField> antwortenFF = new Vector<>();
 	private Vector<ListView<String>> antwortenLIST = new Vector<>();
@@ -253,13 +253,13 @@ public class Frage implements Comparable<Frage>, Comparator<Frage> {
 	/**
 	 * @return the scene
 	 */
-	public Scene getScene() {
+	public Pane getScene() {
 		return scene;
 	}
 	/**
 	 * @param scene the scene to set
 	 */
-	public void setScene(Scene scene) {
+	public void setScene(Pane scene) {
 		this.scene = scene;
 	}
 	/**

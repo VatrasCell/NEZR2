@@ -1,6 +1,5 @@
 package login;
 
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import location.LocationService;
@@ -54,11 +53,11 @@ public class LoginController {
 			if(LoginService.testDB(username.getText(), password.getText(), ip.getText(), Integer.parseInt(port.getText()), false)) {
 				//System.out.println("logged in");
 				if(toAdmin) {
-					ScreenController.addScreen("admin", new Scene(FXMLLoader.load(getClass().getResource("../admin/AdminView.fxml"))));
+					ScreenController.addScreen("admin", FXMLLoader.load(getClass().getResource("../admin/AdminView.fxml")));
 					ScreenController.activate("admin");
 				} else {
 					GlobalVars.standorte = LocationService.getStandort();
-					ScreenController.addScreen("location", new Scene(FXMLLoader.load(getClass().getResource("../location/LocationView.fxml"))));
+					ScreenController.addScreen("location", FXMLLoader.load(getClass().getResource("../location/LocationView.fxml")));
 					ScreenController.activate("location");
 				}	
 			} else {

@@ -5,8 +5,6 @@ import java.io.IOException;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.stage.Stage;
-import location.LocationService;
-import javafx.scene.Scene;
 
 
 public class Main extends Application {
@@ -21,7 +19,8 @@ public class Main extends Application {
 		
 		ScreenController.setRootScene(primaryStage);
 		
-		ScreenController.addScreen("login", new Scene(FXMLLoader.load(getClass().getResource("../login/LoginView.fxml"))));
+		ScreenController.addScreen("login", FXMLLoader.load(getClass().getResource("../login/LoginView.fxml")));	
+		
 		if(!GlobalVars.DEVMODE) {
 			ScreenController.activate("login");
 		}

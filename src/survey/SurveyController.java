@@ -12,7 +12,6 @@ import flag.Number;
 import flag.SymbolType;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
@@ -35,7 +34,7 @@ public class SurveyController {
 			} else {
 				SurveyService.saveUmfrage(GlobalVars.fragenJePanel);
 				ScreenController.addScreen(model.Scene.Gratitude.scene(), 
-						new Scene(FXMLLoader.load(getClass().getResource("../gratitude/GratitudeView.fxml"))));
+						FXMLLoader.load(getClass().getResource("../gratitude/GratitudeView.fxml")));
 				ScreenController.activate(model.Scene.Gratitude.scene());
 			}
 		} else {

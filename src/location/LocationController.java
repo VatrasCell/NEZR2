@@ -8,7 +8,6 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Scene;
 import javafx.scene.control.ChoiceBox;
 
 public class LocationController {
@@ -43,7 +42,7 @@ public class LocationController {
 	private void next() {
 		GlobalVars.standort = choiceBox.getValue();
 		try {
-			ScreenController.addScreen("start", new Scene(FXMLLoader.load(getClass().getResource("../start/StartView.fxml"))));
+			ScreenController.addScreen("start", FXMLLoader.load(getClass().getResource("../start/StartView.fxml")));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

@@ -34,6 +34,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import model.Frage;
 import survey.SurveyService;
@@ -112,7 +113,7 @@ public class StartController {
 		//System.out.println(ScreenController.getMain().getHeight());
 		GlobalVars.fragen = Math.round(((float)ScreenController.getMain().getHeight() * 0.0069f));
 		
-		Vector<Scene> allePanel = new Vector<>();
+		Vector<Pane> allePanel = new Vector<>();
 		
 		int countPanel = 0;
 		Vector<Integer> anzahl = new Vector<Integer>();
@@ -148,7 +149,7 @@ public class StartController {
 		
 		
 		for(int z = 1; z <= countPanel; z++) {
-			Scene scene = new Scene(FXMLLoader.load(getClass().getResource("../survey/SurveyView.fxml")));
+			Pane scene = FXMLLoader.load(getClass().getResource("../survey/SurveyView.fxml"));
 			
 			ProgressBar progressBar = (ProgressBar)scene.lookup("#progressBar");
 			progressBar.setProgress((float)z/(float)countPanel);
