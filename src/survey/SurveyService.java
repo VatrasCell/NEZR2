@@ -6,6 +6,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Vector;
 
 import application.Datenbank;
@@ -201,7 +203,7 @@ public class SurveyService extends Datenbank {
 	 *            Vector Vector FrageErstellen: alle Fragen des Fragebogens
 	 * @author Julian und Eric
 	 */
-	public static void saveUmfrage(Vector<Vector<Frage>> fragen) {
+	public static void saveUmfrage(List<ArrayList<Frage>> fragen) {
 		try {
 			Connection myCon = DriverManager.getConnection(url, user, pwd);
 
@@ -219,7 +221,7 @@ public class SurveyService extends Datenbank {
 				b_id = myRS.getInt("MAX(idBefragung)");
 
 				for (int i = 0; i < fragen.size(); i++) {
-					Vector<Frage> panel = fragen.get(i);
+					ArrayList<Frage> panel = fragen.get(i);
 					for (Frage frage : panel) {
 						if (frage.getArt() == "MC") {
 							if (frage.getAntwort().size() > 0) {
@@ -279,7 +281,7 @@ public class SurveyService extends Datenbank {
 	 */
 	public static void resetFragebogen() {
 		
-		for(Vector<Frage> fragen : GlobalVars.fragenJePanel) {
+		for(ArrayList<Frage> fragen : GlobalVars.fragenJePanel) {
 			for(Frage frage : fragen) {
 				frage.setAntwort(null);
 				for(CheckBox checkbox : frage.getAntwortenMC()) {

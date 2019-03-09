@@ -14,6 +14,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.DialogPane;
@@ -24,6 +25,14 @@ import model.Frage;
 
 
 public class SurveyController {
+	
+	/**
+	 * Initializes the controller class. This method is automatically called after
+	 * the fxml file has been loaded.
+	 */
+	@FXML
+	private void initialize() {
+	}
 	
 	@FXML
 	private void next() throws IOException {
@@ -95,6 +104,7 @@ public class SurveyController {
 	
 	private boolean check() {
 		GlobalVars.everythingIsAwesome = true;
+		if(GlobalVars.IGNORE_CHECK && GlobalVars.DEVMODE) return true;
 		for(Frage frage : GlobalVars.fragenJePanel.get(GlobalVars.page)) {
             if(!checkInt(frage) || !checkPflichtfrage(frage)) {
             	GlobalVars.everythingIsAwesome = false;

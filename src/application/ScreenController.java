@@ -38,17 +38,17 @@ public class ScreenController {
 	public static void setRootScene(Stage main) {
 		ScreenController.main = main;
 
-//		ScreenController.main.widthProperty().addListener((obs, oldVal, newVal) -> {
-//			if (!((Double) oldVal).isNaN()) {
-//				resizeNodesWidth((double) newVal);
-//			}
-//		});
+		ScreenController.main.widthProperty().addListener((obs, oldVal, newVal) -> {
+			if (!((Double) oldVal).isNaN()) {
+				resizeNodesWidth((double) newVal);
+			}
+		});
 
-//		ScreenController.main.heightProperty().addListener((obs, oldVal, newVal) -> {
-//			if (!((Double) oldVal).isNaN()) {
-//				resizeNodesHeight((double) newVal);
-//			}
-//		});
+		ScreenController.main.heightProperty().addListener((obs, oldVal, newVal) -> {
+			if (!((Double) oldVal).isNaN()) {
+				resizeNodesHeight((double) newVal);
+			}
+		});
 	}
 
 	public static void addScreen(String name, Pane pane) {
@@ -72,9 +72,9 @@ public class ScreenController {
 		fontSize.bind(scene.widthProperty().add(scene.heightProperty()).divide(85));
 		scene.styleProperty().bind(Bindings.concat("-fx-font-size: ", fontSize.asString(), ";"));
 		main.getScene().setRoot(scene);
-		//nodes = getAllNodes(scene);
+		nodes = getAllNodes(scene);
 		main.show();
-		//setListMap();
+		setListMap();
 		System.out.println("activate " + name);
 	}
 
@@ -154,19 +154,9 @@ public class ScreenController {
 		for (int i = 0; i < nodes.size(); ++i) {
 			Node node = nodes.get(i);
 			double value = nodeSizes.get(i).get("nodeWidth") / nodeSizes.get(i).get("stageWidth") * width * FACTOR;
-			// if(node instanceof Parent) {
-			// Parent parent = (Parent) node;
-			// if (parent.getChildrenUnmodifiable().size() == 1) {
-			// if (node instanceof Control) {
-			// Control control = (Control)node;
-			// //System.out.println("get: " + control.getPrefWidth());
-			// control.setPrefWidth(value);
-			// }
-			// }
-			// }
 			if (node instanceof ImageView) {
 				ImageView imageView = (ImageView) node;
-				imageView.setFitWidth(value / FACTOR);
+				//imageView.setFitWidth(value / FACTOR);
 			}
 		}
 	}
@@ -176,18 +166,9 @@ public class ScreenController {
 		for (int i = 0; i < nodes.size(); ++i) {
 			Node node = nodes.get(i);
 			double value = nodeSizes.get(i).get("nodeHeight") / nodeSizes.get(i).get("stageHeight") * heigth;
-			// if(node instanceof Parent) {
-			// Parent parent = (Parent) node;
-			// if (parent.getChildrenUnmodifiable().size() == 1) {
-			// if(node instanceof Control) {
-			// Control control = (Control)node;
-			// control.setPrefHeight(value);
-			// }
-			// }
-			// }
 			if (node instanceof ImageView) {
 				ImageView imageView = (ImageView) node;
-				imageView.setFitHeight(value);
+				//imageView.setFitHeight(value);
 			}
 		}
 	}

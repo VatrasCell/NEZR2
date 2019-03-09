@@ -1,6 +1,7 @@
 package question;
 
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Deque;
 import java.util.List;
 import java.util.Optional;
@@ -698,7 +699,7 @@ public class QuestionController {
 	 */
 	private void makeVorschau(Vector<Frage> fragen) {
 		try {
-		Vector<Vector<Frage>> fragenJePanel = new Vector<Vector<Frage>>();
+		List<ArrayList<Frage>> fragenJePanel = new ArrayList<ArrayList<Frage>>();
 		/*------------------------- von Julian und Eric --------------------------*/
 		
 		Vector<Pane> allePanel = new Vector<>();
@@ -755,10 +756,10 @@ public class QuestionController {
 			boolean isBHeader = false;
 			boolean hasUeber = false;
 			// setEverythingIsAwesome(true);
-			Vector<Frage> frageObj = new Vector<Frage>();
+			ArrayList<Frage> frageObj = new ArrayList<Frage>();
 
 			for(int y = 0; y < anzahl.get(z); y++) {
-				frageObj.addElement(stack.pop());
+				frageObj.add(stack.pop());
 			}
 			
 			for(int y = 0; y < frageObj.size(); y++) {
@@ -1029,7 +1030,7 @@ public class QuestionController {
 				}	
 				
 			}
-			fragenJePanel.addElement(frageObj);
+			fragenJePanel.add(frageObj);
 			
 		}	
 		
