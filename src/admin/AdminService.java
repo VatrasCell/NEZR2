@@ -72,7 +72,7 @@ public class AdminService extends Datenbank {
 	 * @return boolean
 	 * @author Anne
 	 */
-	public static boolean updateFragebogen(Fragebogen fb) {
+	public static boolean activateFragebogen(Fragebogen fb) {
 		try {
 			Connection myCon = DriverManager.getConnection(url, user, pwd);
 			Statement mySQL = myCon.createStatement();

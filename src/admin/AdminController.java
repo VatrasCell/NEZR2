@@ -108,13 +108,14 @@ public class AdminController {
             property.addListener((observable, oldValue, newValue) -> {
             	cellValue.setActiv(newValue);
             	if(newValue) {
-            		AdminService.updateFragebogen(cellValue);
+            		AdminService.activateFragebogen(cellValue);
             		GlobalVars.activFragebogen = cellValue;
-            		StartController.setStartText();
-            		getData();
             	} else {
             		AdminService.disableFragebogen(cellValue);
+            		GlobalVars.activFragebogen = null;
             	}
+            	StartController.setStartText();
+        		getData();
             	tbl_fragebogen.refresh();
             	});
 

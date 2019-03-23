@@ -15,7 +15,6 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.layout.Pane;
-import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.DialogPane;
@@ -27,6 +26,8 @@ import model.Frage;
 
 public class SurveyController {
 	
+	private static boolean isPreview;
+
 	@FXML
 	Pane pane;
 	
@@ -74,10 +75,14 @@ public class SurveyController {
 				GlobalVars.page++;
 				ScreenController.activate("survey_" + GlobalVars.page);
 			} else {
-				SurveyService.saveUmfrage(GlobalVars.fragenJePanel);
-				ScreenController.addScreen(model.Scene.Gratitude.scene(), 
-						FXMLLoader.load(getClass().getResource("../gratitude/GratitudeView.fxml")));
-				ScreenController.activate(model.Scene.Gratitude.scene());
+				if(!isPreview) {
+					SurveyService.saveUmfrage(GlobalVars.fragenJePanel);
+					ScreenController.addScreen(model.Scene.Gratitude.scene(), 
+							FXMLLoader.load(getClass().getResource("../gratitude/GratitudeView.fxml")));
+					ScreenController.activate(model.Scene.Gratitude.scene());
+				} else {
+					System.out.println("still page " + GlobalVars.page);
+				}
 			}
 		} else {
 			System.out.println("everythingIsNOTAwesome");
@@ -96,23 +101,26 @@ public class SurveyController {
 	
 	@FXML
 	private void exit() {
-		Alert alert = new Alert(AlertType.CONFIRMATION);
-		alert.setTitle("Befragung abbrechen");
-		alert.setHeaderText("Wollen Sie die Befragung wirklich verlassen?\n"
-				+ "Alle Ihre eingetragenen Daten werden nicht gespeichert!");
-		alert.setContentText("Fortfahren?");
-		
-		DialogPane dialogPane = alert.getDialogPane();
-		dialogPane.getStylesheets().add(
-		   getClass().getResource("../application/application.css").toExternalForm());
-
-		Optional<ButtonType> result = alert.showAndWait();
-		if (result.get() == ButtonType.OK){
-			ScreenController.activate(model.Scene.Start.scene());
+		if(isPreview) {
+			ScreenController.activate(model.Scene.Question.scene());
 		} else {
-		    // ... user chose CANCEL or closed the dialog
-		}
-		
+			Alert alert = new Alert(AlertType.CONFIRMATION);
+			alert.setTitle("Befragung abbrechen");
+			alert.setHeaderText("Wollen Sie die Befragung wirklich verlassen?\n"
+					+ "Alle Ihre eingetragenen Daten werden nicht gespeichert!");
+			alert.setContentText("Fortfahren?");
+			
+			DialogPane dialogPane = alert.getDialogPane();
+			dialogPane.getStylesheets().add(
+			   getClass().getResource("../application/application.css").toExternalForm());
+
+			Optional<ButtonType> result = alert.showAndWait();
+			if (result.get() == ButtonType.OK){
+				ScreenController.activate(model.Scene.Start.scene());
+			} else {
+			    // ... user chose CANCEL or closed the dialog
+			}
+		}			
 	}
 	
 	@FXML
@@ -428,5 +436,19 @@ public class SurveyController {
 		} else {
 			return true;
 		}
+	}
+	
+	/**
+	 * @return the isPreview
+	 */
+	public static boolean isPreview() {
+		return isPreview;
+	}
+
+	/**
+	 * @param isPreview the isPreview to set
+	 */
+	public static void setPreview(boolean isPreview) {
+		SurveyController.isPreview = isPreview;
 	}
 }
