@@ -31,7 +31,6 @@ import javafx.scene.control.ProgressBar;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
@@ -48,9 +47,9 @@ public class StartController {
 
 	@FXML
 	Label lbl_warning;
-
+	
 	@FXML
-	ImageView imageView;
+	Pane pane;
 
 	private static StringProperty fragebogenText = new SimpleStringProperty();
 	private static StringProperty fragebogenWarn = new SimpleStringProperty();
@@ -68,32 +67,36 @@ public class StartController {
 	 */
 	@FXML
 	private void initialize() {
-		Image value;
+		String value;
 		switch (GlobalVars.standort) {
 		case "Rügen":
-			value = new Image(".\\test\\img\\logo_nezr.png");
+			value = "../test/img/logo_nezr.png";
 			break;
 		case "Bayerischer Wald":
-			value = new Image(".\\test\\img\\logo_bw.png");
+			value = "../test/img/logo_bw.png";
 			break;
 		case "Saarschleife":
-			value = new Image(".\\test\\img\\logo_saar.png");
+			value = "../test/img/logo_saar.png";
 			break;
 		case "Schwarzwald":
-			value = new Image(".\\test\\img\\logo_sw.png");
+			value = "../test/img/logo_sw.png";
 			break;
 		case "Lipno":
-			value = new Image(".\\test\\img\\logo_lipno_de.png");
+			value = "../test/img/logo_lipno_de.png";
 			break;
 
 		default:
-			value = new Image(".\\test\\img\\logo_default.png");
+			value = "../test/img/logo_default.png";
 			break;
 		}
-		imageView.setImage(value);
-		imageView.setPreserveRatio(true);
-		imageView.setSmooth(true);
-		imageView.setCache(true); 
+		
+		String image = this.getClass().getResource(value).toExternalForm();
+		pane.setStyle("-fx-background-image: url('" + image + "');" +
+				"-fx-background-repeat: no-repeat;" +
+	  			"-fx-background-attachment: fixed;" +
+				"-fx-background-size: 10% auto;" +
+	  			"-fx-background-position: 98% 5%;");
+		
 		setStartText();
 		lbl_fragebogen.textProperty().bind(fragebogenText);
 		lbl_warning.textProperty().bind(fragebogenWarn);

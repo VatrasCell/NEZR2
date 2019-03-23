@@ -14,6 +14,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.layout.Pane;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
@@ -26,12 +27,44 @@ import model.Frage;
 
 public class SurveyController {
 	
+	@FXML
+	Pane pane;
+	
 	/**
 	 * Initializes the controller class. This method is automatically called after
 	 * the fxml file has been loaded.
 	 */
 	@FXML
 	private void initialize() {
+		String value;
+		switch (GlobalVars.standort) {
+		case "Rügen":
+			value = "../test/img/logo_nezr.png";
+			break;
+		case "Bayerischer Wald":
+			value = "../test/img/logo_bw.png";
+			break;
+		case "Saarschleife":
+			value = "../test/img/logo_saar.png";
+			break;
+		case "Schwarzwald":
+			value = "../test/img/logo_sw.png";
+			break;
+		case "Lipno":
+			value = "../test/img/logo_lipno_de.png";
+			break;
+
+		default:
+			value = "../test/img/logo_default.png";
+			break;
+		}
+		
+		String image = this.getClass().getResource(value).toExternalForm();
+		pane.setStyle("-fx-background-image: url('" + image + "');" +
+				"-fx-background-repeat: no-repeat;" +
+	  			"-fx-background-attachment: fixed;" +
+				"-fx-background-size: 10% auto;" +
+	  			"-fx-background-position: 98% 5%;");
 	}
 	
 	@FXML
