@@ -510,7 +510,7 @@ public class StartController {
 
 	@FXML
 	private void adminLogin() {
-		ScreenController.activate(model.Scene.Login.scene(), "toAdmin", true);
+		ScreenController.activate(model.Scene.LOGIN, "toAdmin", true);
 	}
 
 	@FXML

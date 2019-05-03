@@ -3,3 +3,5 @@ exportSQL/*
 bin/**
 .settings/*
 /bin/
+.idea/
+nezr2.iml

@@ -77,9 +77,9 @@ public class SurveyController {
 			} else {
 				if(!isPreview) {
 					SurveyService.saveUmfrage(GlobalVars.fragenJePanel);
-					ScreenController.addScreen(model.Scene.Gratitude.scene(), 
+					ScreenController.addScreen(model.Scene.GRATITUDE, 
 							FXMLLoader.load(getClass().getResource("../gratitude/GratitudeView.fxml")));
-					ScreenController.activate(model.Scene.Gratitude.scene());
+					ScreenController.activate(model.Scene.GRATITUDE);
 				} else {
 					System.out.println("still page " + GlobalVars.page);
 				}
@@ -102,7 +102,7 @@ public class SurveyController {
 	@FXML
 	private void exit() {
 		if(isPreview) {
-			ScreenController.activate(model.Scene.Question.scene());
+			ScreenController.activate(model.Scene.QUESTION);
 		} else {
 			Alert alert = new Alert(AlertType.CONFIRMATION);
 			alert.setTitle("Befragung abbrechen");
@@ -116,7 +116,7 @@ public class SurveyController {
 
 			Optional<ButtonType> result = alert.showAndWait();
 			if (result.get() == ButtonType.OK){
-				ScreenController.activate(model.Scene.Start.scene());
+				ScreenController.activate(model.Scene.START);
 			} else {
 			    // ... user chose CANCEL or closed the dialog
 			}
@@ -136,7 +136,7 @@ public class SurveyController {
 
 		Optional<ButtonType> result = alert.showAndWait();
 		if (result.get() == ButtonType.OK){
-			ScreenController.activate(model.Scene.Question.scene());
+			ScreenController.activate(model.Scene.QUESTION);
 		} else {
 		    // ... user chose CANCEL or closed the dialog
 		}

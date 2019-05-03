@@ -1,22 +1,13 @@
 package model;
 
-public enum Scene {
-	Survey("survey_"),
-	Location("location"),
-	Login("login"),
-	Start("start"),
-	Admin("admin"),
-	QuestionList("questionList"),
-	Question("question"),
-	Gratitude("gratitude");
-	
-	private String scene;
-
-	Scene(String scene) {
-        this.scene = scene;
-    }
-
-    public String scene() {
-        return scene;
-    }
+public class Scene {
+	public static final String SURVEY = "survey_";
+	public static final String LOCATION = "location";
+	public static final String LOGIN = "login";
+	public static final String START = "start";
+	public static final String ADMIN = "admin";
+	public static final String QUESTIONLIST = "questionList";
+	public static final String QUESTION = "question";
+	public static final String GRATITUDE = "gratitude";
+	public static final String REACT = "react";
 }

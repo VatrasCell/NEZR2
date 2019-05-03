@@ -1,5 +1,6 @@
 package question;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.Vector;
@@ -16,6 +17,8 @@ import flag.SymbolType;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
@@ -315,7 +318,7 @@ public class QuestionController {
 	
 	@FXML
 	private void exit() {
-		ScreenController.activate(model.Scene.QuestionList.scene());
+		ScreenController.activate(model.Scene.QUESTIONLIST);
 	}
 	
 	@FXML
@@ -444,7 +447,7 @@ public class QuestionController {
 				QuestionService.saveBewertungsfrage(fragebogen, neueFrage);
 			}
 		
-			ScreenController.activate(model.Scene.QuestionList.scene());
+			ScreenController.activate(model.Scene.QUESTIONLIST);
 			//pnlFrageErstellenLeeren();
 			//makeFragenTabelle(QuestionService.getFragen(fragebogen));
 			//cardLayout.show(frame.getContentPane(), "pnlFragenUebersicht");		
@@ -508,7 +511,13 @@ public class QuestionController {
 	
 	@FXML
 	private void react() {
-		//TODO
+		try {
+			ScreenController.addScreen(model.Scene.REACT, FXMLLoader.load(getClass().getResource("../react/ReactView.fxml")));
+			ScreenController.activate(model.Scene.REACT);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	/**

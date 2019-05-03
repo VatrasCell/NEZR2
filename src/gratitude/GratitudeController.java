@@ -7,7 +7,7 @@ public class GratitudeController {
 	
 	@FXML
 	private void exit() {
-		ScreenController.activate(model.Scene.Start.scene());
+		ScreenController.activate(model.Scene.START);
 	}
 
 }

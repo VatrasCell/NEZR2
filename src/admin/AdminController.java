@@ -159,9 +159,9 @@ public class AdminController {
                             btn.setOnAction(event -> {
                             	try {
                             		QuestionListController.fragebogen = getTableView().getItems().get(getIndex());
-									ScreenController.addScreen(model.Scene.QuestionList.scene(), 
+									ScreenController.addScreen(model.Scene.QUESTIONLIST, 
 											FXMLLoader.load(getClass().getResource("../questionList/QuestionListView.fxml")));
-									ScreenController.activate(model.Scene.QuestionList.scene());
+									ScreenController.activate(model.Scene.QUESTIONLIST);
 								} catch (IOException e) {
 									e.printStackTrace();
 								}
@@ -205,6 +205,9 @@ public class AdminController {
                             	dialog.setTitle("Fragebogen kopieren");
                             	dialog.setHeaderText("Fragebogen kopieren");
                             	dialog.setContentText("Standort wählen:");
+                            	DialogPane dialogPane = dialog.getDialogPane();
+                            	dialogPane.getStylesheets().add(
+                             		   getClass().getResource("../application/application.css").toExternalForm());
 
                             	Optional<String> result = dialog.showAndWait();
                             	result.ifPresent(ort -> {
@@ -420,15 +423,14 @@ public class AdminController {
 		// Create the custom dialog.
 		Dialog<Pair<String, String>> dialog = new Dialog<>();
 		dialog.setTitle("Excel Export");
+		
+		DialogPane dialogPane = dialog.getDialogPane();
+    	dialogPane.getStylesheets().add(
+     		   getClass().getResource("../application/application.css").toExternalForm());
 
-		// Set the icon (must be included in the project).
-		//dialog.setGraphic(new ImageView(this.getClass().getResource("login.png").toString()));
-
-		// Set the button types.
 		ButtonType okButtonType = new ButtonType("Export", ButtonData.OK_DONE);
 		dialog.getDialogPane().getButtonTypes().addAll(okButtonType, ButtonType.CANCEL);
 
-		// Create the username and password labels and fields.
 		GridPane grid = new GridPane();
 		grid.setHgap(10);
 		grid.setVgap(10);
@@ -446,10 +448,8 @@ public class AdminController {
 
 		dialog.getDialogPane().setContent(grid);
 
-		// Request focus on the username field by default.
 		Platform.runLater(() -> von.requestFocus());
 
-		// Convert the result to a username-password-pair when the login button is clicked.
 		dialog.setResultConverter(dialogButton -> {
 		    if (dialogButton == okButtonType) {
 		        return new Pair<>(von.getValue().toString(), bis.getValue().toString());
@@ -481,12 +481,12 @@ public class AdminController {
 	
 	@FXML
 	private void logout() {
-		ScreenController.activate(model.Scene.Start.scene());
+		ScreenController.activate(model.Scene.START);
 	}
 	
 	@FXML
 	private void changeLocation() {
-		ScreenController.activate(model.Scene.Location.scene());
+		ScreenController.activate(model.Scene.LOCATION);
 	}
 	
 	@FXML
