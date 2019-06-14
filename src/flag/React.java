@@ -60,13 +60,6 @@ public class React extends Flag {
 		this.answerPos = answerPos;
 	}
 	
-	/**
-	 * @return the aNSWER
-	 */
-	public String getANSWER() {
-		return ANSWER;
-	}
-	
 	@Override
 	public String toString() {
 		return questionType.toString() + questionId + ANSWER + answerPos;

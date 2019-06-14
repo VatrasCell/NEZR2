@@ -203,6 +203,17 @@ public class FlagList {
 		return list;
 	}
 	
+	public <T extends Flag> void replaceAll(Class<T> c, List<T> list) {
+		for (int i = 0; i < this.list.size(); ++i) {
+			if(this.list.get(i).getClass() == c) {
+				this.list.remove(i);
+			}
+		}
+		
+		this.list.addAll(list);
+		possibleFlags = getPossibleFlags();
+	}
+	
 	@SuppressWarnings("unchecked")
 	public <T extends Flag> List<T> getAll(Class<T> c) {
 		List<T> results = new ArrayList<>();

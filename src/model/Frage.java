@@ -296,6 +296,134 @@ public class Frage implements Comparable<Frage>, Comparator<Frage> {
 	 */
 	@Override
 	public String toString() {
+		return frage;
+	}	
+	
+	/* (non-Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((antwort == null) ? 0 : antwort.hashCode());
+		result = prime * result + ((antwort_moeglichkeit == null) ? 0 : antwort_moeglichkeit.hashCode());
+		result = prime * result + ((antwortenFF == null) ? 0 : antwortenFF.hashCode());
+		result = prime * result + ((antwortenLIST == null) ? 0 : antwortenLIST.hashCode());
+		result = prime * result + ((antwortenMC == null) ? 0 : antwortenMC.hashCode());
+		result = prime * result + ((antwortenTEXT == null) ? 0 : antwortenTEXT.hashCode());
+		result = prime * result + ((art == null) ? 0 : art.hashCode());
+		result = prime * result + ((datum == null) ? 0 : datum.hashCode());
+		result = prime * result + ((flags == null) ? 0 : flags.hashCode());
+		result = prime * result + ((frage == null) ? 0 : frage.hashCode());
+		result = prime * result + frageID;
+		result = prime * result + ((frageLabel == null) ? 0 : frageLabel.hashCode());
+		result = prime * result + fragebogenID;
+		result = prime * result + ((kategorie == null) ? 0 : kategorie.hashCode());
+		result = prime * result + position;
+		result = prime * result + ((scene == null) ? 0 : scene.hashCode());
+		result = prime * result + ((target == null) ? 0 : target.hashCode());
+		result = prime * result + ((ueberschrift == null) ? 0 : ueberschrift.hashCode());
+		return result;
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Frage other = (Frage) obj;
+		if (antwort == null) {
+			if (other.antwort != null)
+				return false;
+		} else if (!antwort.equals(other.antwort))
+			return false;
+		if (antwort_moeglichkeit == null) {
+			if (other.antwort_moeglichkeit != null)
+				return false;
+		} else if (!antwort_moeglichkeit.equals(other.antwort_moeglichkeit))
+			return false;
+		if (antwortenFF == null) {
+			if (other.antwortenFF != null)
+				return false;
+		} else if (!antwortenFF.equals(other.antwortenFF))
+			return false;
+		if (antwortenLIST == null) {
+			if (other.antwortenLIST != null)
+				return false;
+		} else if (!antwortenLIST.equals(other.antwortenLIST))
+			return false;
+		if (antwortenMC == null) {
+			if (other.antwortenMC != null)
+				return false;
+		} else if (!antwortenMC.equals(other.antwortenMC))
+			return false;
+		if (antwortenTEXT == null) {
+			if (other.antwortenTEXT != null)
+				return false;
+		} else if (!antwortenTEXT.equals(other.antwortenTEXT))
+			return false;
+		if (art == null) {
+			if (other.art != null)
+				return false;
+		} else if (!art.equals(other.art))
+			return false;
+		if (datum == null) {
+			if (other.datum != null)
+				return false;
+		} else if (!datum.equals(other.datum))
+			return false;
+		if (flags == null) {
+			if (other.flags != null)
+				return false;
+		} else if (!flags.equals(other.flags))
+			return false;
+		if (frage == null) {
+			if (other.frage != null)
+				return false;
+		} else if (!frage.equals(other.frage))
+			return false;
+		if (frageID != other.frageID)
+			return false;
+		if (frageLabel == null) {
+			if (other.frageLabel != null)
+				return false;
+		} else if (!frageLabel.equals(other.frageLabel))
+			return false;
+		if (fragebogenID != other.fragebogenID)
+			return false;
+		if (kategorie == null) {
+			if (other.kategorie != null)
+				return false;
+		} else if (!kategorie.equals(other.kategorie))
+			return false;
+		if (position != other.position)
+			return false;
+		if (scene == null) {
+			if (other.scene != null)
+				return false;
+		} else if (!scene.equals(other.scene))
+			return false;
+		if (target == null) {
+			if (other.target != null)
+				return false;
+		} else if (!target.equals(other.target))
+			return false;
+		if (ueberschrift == null) {
+			if (other.ueberschrift != null)
+				return false;
+		} else if (!ueberschrift.equals(other.ueberschrift))
+			return false;
+		return true;
+	}
+
+	public String toDebugString() {
 		return "Frage [frage=" + frage + ", art=" + art + ", kategorie=" + kategorie + ", flags=" + flags
 				+ ", Position=" + position + ", ueberschrift=" + ueberschrift + ", antwort_moeglichkeit="
 				+ antwort_moeglichkeit + "]";

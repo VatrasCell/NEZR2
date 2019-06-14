@@ -33,7 +33,7 @@ public class ScreenController {
 
 	private static final double FACTOR = 1.1;
 
-	private static final String styleSheet = "application.css";
+	public static final String styleSheet = "application.css";
 
 	public static void setRootScene(Stage main) {
 		ScreenController.main = main;
@@ -84,7 +84,7 @@ public class ScreenController {
 	}
 
 	private static <T> void setParameter(String key, T value) {
-		System.out.println(key);
+		//System.out.println(key);
 		switch (key) {
 		case "login.toAdmin":
 			LoginController.toAdmin = (boolean) value;
@@ -147,7 +147,7 @@ public class ScreenController {
 			}
 		});
 
-		System.out.println(nodeSizes.toString());
+		//System.out.println(nodeSizes.toString());
 	}
 
 	private static void resizeNodesWidth(Double width) {

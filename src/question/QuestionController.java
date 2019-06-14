@@ -33,6 +33,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.util.Callback;
 import model.Frage;
 import model.Fragebogen;
+import react.ReactController;
 import start.StartController;
 import flag.Number;
 import flag.React;
@@ -511,6 +512,9 @@ public class QuestionController {
 	
 	@FXML
 	private void react() {
+		ReactController.frage = frage;
+		ReactController.fragebogen = fragebogen;
+		
 		try {
 			ScreenController.addScreen(model.Scene.REACT, FXMLLoader.load(getClass().getResource("../react/ReactView.fxml")));
 			ScreenController.activate(model.Scene.REACT);
