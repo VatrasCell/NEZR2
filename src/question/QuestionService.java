@@ -680,7 +680,7 @@ public class QuestionService extends Datenbank {
 				mySQL = null;
 				myRS = null;
 				mySQL = myCon.createStatement();
-				statement = "UPDATE FB_HAS_FF SET Flags='" + frage.getFlags() + "' WHERE idRelFBFF=" + idRelFBFF;
+				statement = "UPDATE FB_HAS_FF SET Flags='" + frage.getFlags().createFlagString() + "' WHERE idRelFBFF=" + idRelFBFF;
 				mySQL.executeUpdate(statement);
 
 				mySQL = null;
@@ -692,7 +692,7 @@ public class QuestionService extends Datenbank {
 				mySQL.close();
 				mySQL = myCon.createStatement();
 				statement = "INSERT INTO Fb_has_FF VALUES (NULL," + idFragebogen + "," + idFreieFrage + ","
-						+ frage.getPosition() + ",'" + frage.getFlags() + "')";
+						+ frage.getPosition() + ",'" + frage.getFlags().createFlagString() + "')";
 				mySQL.executeUpdate(statement);
 				mySQL = null;
 				myRS = null;
@@ -966,7 +966,7 @@ public class QuestionService extends Datenbank {
 				mySQL = null;
 				myRS = null;
 				mySQL = myCon.createStatement();
-				statement = "UPDATE FB_HAS_MC SET Flags='" + frage.getFlags() + "' WHERE idRelFBMC=" + idRelFBMC;
+				statement = "UPDATE FB_HAS_MC SET Flags='" + frage.getFlags().createFlagString() + "' WHERE idRelFBMC=" + idRelFBMC;
 				mySQL.executeUpdate(statement);
 
 				mySQL = null;
@@ -978,7 +978,7 @@ public class QuestionService extends Datenbank {
 				mySQL.close();
 				mySQL = myCon.createStatement();
 				statement = "INSERT INTO Fb_has_MC VALUES (NULL," + idFragebogen + "," + idMultipleChoice + ","
-						+ frage.getPosition() + ",'" + frage.getFlags() + "')";
+						+ frage.getPosition() + ",'" + frage.getFlags().createFlagString() + "')";
 				mySQL.executeUpdate(statement);
 				mySQL = null;
 				myRS = null;
@@ -1118,7 +1118,7 @@ public class QuestionService extends Datenbank {
 				mySQL = null;
 				myRS = null;
 				mySQL = myCon.createStatement();
-				statement = "UPDATE FB_HAS_MC SET Flags='" + frage.getFlags() + "' WHERE idRelFBMC=" + idRelFBMC;
+				statement = "UPDATE FB_HAS_MC SET Flags='" + frage.getFlags().createFlagString() + "' WHERE idRelFBMC=" + idRelFBMC;
 				mySQL.executeUpdate(statement);
 
 				mySQL = null;
@@ -1130,7 +1130,7 @@ public class QuestionService extends Datenbank {
 				mySQL.close();
 				mySQL = myCon.createStatement();
 				statement = "INSERT INTO Fb_has_MC VALUES (NULL," + idFragebogen + "," + idBewertungsFrage + ","
-						+ frage.getPosition() + ",'" + frage.getFlags() + "')";
+						+ frage.getPosition() + ",'" + frage.getFlags().createFlagString() + "')";
 				mySQL.executeUpdate(statement);
 				mySQL = null;
 				myRS = null;
