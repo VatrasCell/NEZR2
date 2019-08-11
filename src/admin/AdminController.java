@@ -129,7 +129,14 @@ public class AdminController {
             ObservableBooleanValue property = cellValue.isFinal();
 
             // Add listener to handler change
-            property.addListener((observable, oldValue, newValue) -> cellValue.setFinal(newValue));
+            property.addListener((observable, oldValue, newValue) -> {
+            	if(newValue) {
+            		AdminService.setFinal(cellValue);
+            	} else {
+            		AdminService.setUnFinal(cellValue);
+            	}
+            	cellValue.setFinal(newValue);
+            });
 
             return property;
         });
