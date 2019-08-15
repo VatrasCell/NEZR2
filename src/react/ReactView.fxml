@@ -42,7 +42,7 @@
                   <Insets />
                </HBox.margin>
             </Button>
-            <Button mnemonicParsing="false" onAction="#save" text="Spiechern" />
+            <Button mnemonicParsing="false" onAction="#save" text="Speichern" />
             <Button mnemonicParsing="false" onAction="#exit" text="Abbruch" />
          </children>
          <BorderPane.margin>
