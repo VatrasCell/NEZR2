@@ -108,7 +108,7 @@ public class QuestionListController {
                             	QuestionController.frage = getTableView().getItems().get(getIndex());
                             	try {
 									ScreenController.addScreen(model.Scene.QUESTION, 
-											FXMLLoader.load(getClass().getResource("../question/QuestionView.fxml")));
+											FXMLLoader.load(getClass().getClassLoader().getResource("view/QuestionView.fxml")));
 											ScreenController.activate(model.Scene.QUESTION);
 								} catch (IOException e) {
 									// TODO Auto-generated catch block
@@ -184,7 +184,7 @@ public class QuestionListController {
     	QuestionController.frage = new Frage(fragen.size());
     	try {
 			ScreenController.addScreen(model.Scene.QUESTION, 
-					FXMLLoader.load(getClass().getResource("../question/QuestionView.fxml")));
+					FXMLLoader.load(getClass().getClassLoader().getResource("view/QuestionView.fxml")));
 					ScreenController.activate(model.Scene.QUESTION);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block

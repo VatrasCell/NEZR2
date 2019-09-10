@@ -50,14 +50,14 @@ public class LoginController {
 	private void login(ActionEvent event) throws IOException {
 		//System.out.println("doLogin");
 		if(!username.getText().equals("") && !password.getText().equals("")) {
-			if(LoginService.testDB(username.getText(), password.getText(), ip.getText(), Integer.parseInt(port.getText()), false)) {
+			if(LoginService.testDB(username.getText(), password.getText())) {
 				//System.out.println("logged in");
 				if(toAdmin) {
-					ScreenController.addScreen("admin", FXMLLoader.load(getClass().getResource("../admin/AdminView.fxml")));
+					ScreenController.addScreen("admin", FXMLLoader.load(getClass().getClassLoader().getResource("view/AdminView.fxml")));
 					ScreenController.activate("admin");
 				} else {
 					GlobalVars.standorte = LocationService.getStandort();
-					ScreenController.addScreen("location", FXMLLoader.load(getClass().getResource("../location/LocationView.fxml")));
+					ScreenController.addScreen("location", FXMLLoader.load(getClass().getClassLoader().getResource("view/LocationView.fxml")));
 					ScreenController.activate("location");
 				}	
 			} else {

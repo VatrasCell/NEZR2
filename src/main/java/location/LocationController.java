@@ -42,7 +42,7 @@ public class LocationController {
 	private void next() {
 		GlobalVars.standort = choiceBox.getValue();
 		try {
-			ScreenController.addScreen("start", FXMLLoader.load(getClass().getResource("../start/StartView.fxml")));
+			ScreenController.addScreen("start", FXMLLoader.load(getClass().getClassLoader().getResource("view/StartView.fxml")));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

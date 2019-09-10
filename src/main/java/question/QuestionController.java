@@ -18,7 +18,6 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
@@ -475,7 +474,7 @@ public class QuestionController {
     	dialog.setContentText("Name:");
     	DialogPane dialogPane = dialog.getDialogPane();
 		dialogPane.getStylesheets().add(
-		   getClass().getResource("../application/application.css").toExternalForm());
+		   getClass().getClassLoader().getResource("../application/application.css").toExternalForm());
 		
     	Optional<String> result = dialog.showAndWait();
     	result.ifPresent(name -> {
@@ -495,7 +494,7 @@ public class QuestionController {
     	dialog.setContentText("Name:");
     	DialogPane dialogPane = dialog.getDialogPane();
 		dialogPane.getStylesheets().add(
-		   getClass().getResource("../application/application.css").toExternalForm());
+		   getClass().getClassLoader().getResource("../application/application.css").toExternalForm());
 		
     	Optional<String> result = dialog.showAndWait();
     	result.ifPresent(name -> {
@@ -516,7 +515,7 @@ public class QuestionController {
 		ReactController.fragebogen = fragebogen;
 		
 		try {
-			ScreenController.addScreen(model.Scene.REACT, FXMLLoader.load(getClass().getResource("../react/ReactView.fxml")));
+			ScreenController.addScreen(model.Scene.REACT, FXMLLoader.load(getClass().getClassLoader().getResource("view/ReactView.fxml")));
 			ScreenController.activate(model.Scene.REACT);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block

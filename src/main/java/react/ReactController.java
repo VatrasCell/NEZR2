@@ -175,7 +175,7 @@ public class ReactController {
 		okButton.setDisable(true);
 		dialog.setResizable(true);
 		dialog.getDialogPane().getStylesheets()
-				.add(ScreenController.class.getResource(ScreenController.styleSheet).toExternalForm());
+				.add(ScreenController.class.getClassLoader().getResource(ScreenController.styleSheet).toExternalForm());
 
 		HBox hBox = new HBox(8);
 

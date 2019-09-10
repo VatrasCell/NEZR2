@@ -75,27 +75,27 @@ public class StartController {
 		String value;
 		switch (GlobalVars.standort) {
 		case "Rügen":
-			value = "../test/img/logo_nezr.png";
+			value = "images/img/logo_nezr.png";
 			break;
 		case "Bayerischer Wald":
-			value = "../test/img/logo_bw.png";
+			value = "images/img/logo_bw.png";
 			break;
 		case "Saarschleife":
-			value = "../test/img/logo_saar.png";
+			value = "images/img/logo_saar.png";
 			break;
 		case "Schwarzwald":
-			value = "../test/img/logo_sw.png";
+			value = "images/img/logo_sw.png";
 			break;
 		case "Lipno":
-			value = "../test/img/logo_lipno_de.png";
+			value = "images/img/logo_lipno_de.png";
 			break;
 
 		default:
-			value = "../test/img/logo_default.png";
+			value = "images/img/logo_default.png";
 			break;
 		}
 		
-		String image = this.getClass().getResource(value).toExternalForm();
+		String image = this.getClass().getClassLoader().getResource(value).toExternalForm();
 		pane.setStyle("-fx-background-image: url('" + image + "');" +
 				"-fx-background-repeat: no-repeat;" +
 	  			"-fx-background-attachment: fixed;" +
@@ -135,7 +135,7 @@ public class StartController {
 			// create panel
 			Pane scene = null;
 			try {
-				scene = FXMLLoader.load(StartController.class.getResource("../survey/SurveyView2.fxml"));
+				scene = FXMLLoader.load(StartController.class.getClassLoader().getResource("view/SurveyView2.fxml"));
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

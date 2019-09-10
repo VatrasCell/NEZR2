@@ -167,7 +167,7 @@ public class AdminController {
                             	try {
                             		QuestionListController.fragebogen = getTableView().getItems().get(getIndex());
 									ScreenController.addScreen(model.Scene.QUESTIONLIST, 
-											FXMLLoader.load(getClass().getResource("../questionList/QuestionListView.fxml")));
+											FXMLLoader.load(getClass().getClassLoader().getResource("view/QuestionListView.fxml")));
 									ScreenController.activate(model.Scene.QUESTIONLIST);
 								} catch (IOException e) {
 									e.printStackTrace();
@@ -214,7 +214,7 @@ public class AdminController {
                             	dialog.setContentText("Standort wählen:");
                             	DialogPane dialogPane = dialog.getDialogPane();
                             	dialogPane.getStylesheets().add(
-                             		   getClass().getResource("../application/application.css").toExternalForm());
+                             		   getClass().getClassLoader().getResource("../application/application.css").toExternalForm());
 
                             	Optional<String> result = dialog.showAndWait();
                             	result.ifPresent(ort -> {
@@ -267,7 +267,7 @@ public class AdminController {
                             	dialog.setContentText("neuer Name:");
                             	DialogPane dialogPane = dialog.getDialogPane();
                         		dialogPane.getStylesheets().add(
-                        		   getClass().getResource("../application/application.css").toExternalForm());
+                        		   getClass().getClassLoader().getResource("../application/application.css").toExternalForm());
                         		
                             	Optional<String> result = dialog.showAndWait();
                             	result.ifPresent(name -> fragebogen.setName(name));
@@ -397,7 +397,7 @@ public class AdminController {
                         		
                         		DialogPane dialogPane = alert.getDialogPane();
                         		dialogPane.getStylesheets().add(
-                        		   getClass().getResource("../application/application.css").toExternalForm());
+                        		   getClass().getClassLoader().getResource("../application/application.css").toExternalForm());
 
                         		Optional<ButtonType> result = alert.showAndWait();
                         		if (result.get() == ButtonType.OK){
@@ -433,7 +433,7 @@ public class AdminController {
 		
 		DialogPane dialogPane = dialog.getDialogPane();
     	dialogPane.getStylesheets().add(
-     		   getClass().getResource("../application/application.css").toExternalForm());
+     		   getClass().getClassLoader().getResource("../application/application.css").toExternalForm());
 
 		ButtonType okButtonType = new ButtonType("Export", ButtonData.OK_DONE);
 		dialog.getDialogPane().getButtonTypes().addAll(okButtonType, ButtonType.CANCEL);
@@ -475,7 +475,7 @@ public class AdminController {
     	dialog.setContentText("Name:");
     	DialogPane dialogPane = dialog.getDialogPane();
 		dialogPane.getStylesheets().add(
-		   getClass().getResource("../application/application.css").toExternalForm());
+		   getClass().getClassLoader().getResource("../application/application.css").toExternalForm());
 		
     	Optional<String> result = dialog.showAndWait();
     	result.ifPresent(name -> {

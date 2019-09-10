@@ -40,27 +40,27 @@ public class SurveyController {
 		String value;
 		switch (GlobalVars.standort) {
 		case "Rügen":
-			value = "../test/img/logo_nezr.png";
+			value = "images/img/logo_nezr.png";
 			break;
 		case "Bayerischer Wald":
-			value = "../test/img/logo_bw.png";
+			value = "images/img/logo_bw.png";
 			break;
 		case "Saarschleife":
-			value = "../test/img/logo_saar.png";
+			value = "images/img/logo_saar.png";
 			break;
 		case "Schwarzwald":
-			value = "../test/img/logo_sw.png";
+			value = "images/img/logo_sw.png";
 			break;
 		case "Lipno":
-			value = "../test/img/logo_lipno_de.png";
+			value = "images/img/logo_lipno_de.png";
 			break;
 
 		default:
-			value = "../test/img/logo_default.png";
+			value = "images/img/logo_default.png";
 			break;
 		}
 		
-		String image = this.getClass().getResource(value).toExternalForm();
+		String image = this.getClass().getClassLoader().getResource(value).toExternalForm();
 		pane.setStyle("-fx-background-image: url('" + image + "');" +
 				"-fx-background-repeat: no-repeat;" +
 	  			"-fx-background-attachment: fixed;" +
@@ -78,7 +78,7 @@ public class SurveyController {
 				if(!isPreview) {
 					SurveyService.saveUmfrage(GlobalVars.fragenJePanel);
 					ScreenController.addScreen(model.Scene.GRATITUDE, 
-							FXMLLoader.load(getClass().getResource("../gratitude/GratitudeView.fxml")));
+							FXMLLoader.load(getClass().getClassLoader().getResource("view/GratitudeView.fxml")));
 					ScreenController.activate(model.Scene.GRATITUDE);
 				} else {
 					System.out.println("still page " + GlobalVars.page);
@@ -112,7 +112,7 @@ public class SurveyController {
 			
 			DialogPane dialogPane = alert.getDialogPane();
 			dialogPane.getStylesheets().add(
-			   getClass().getResource("../application/application.css").toExternalForm());
+			   getClass().getClassLoader().getResource("../application/application.css").toExternalForm());
 
 			Optional<ButtonType> result = alert.showAndWait();
 			if (result.get() == ButtonType.OK){
@@ -132,7 +132,7 @@ public class SurveyController {
 		
 		DialogPane dialogPane = alert.getDialogPane();
 		dialogPane.getStylesheets().add(
-		   getClass().getResource("../application/application.css").toExternalForm());
+		   getClass().getClassLoader().getResource("../application/application.css").toExternalForm());
 
 		Optional<ButtonType> result = alert.showAndWait();
 		if (result.get() == ButtonType.OK){
