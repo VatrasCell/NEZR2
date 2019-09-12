@@ -5,32 +5,14 @@ import java.io.IOException;
 
 import java.util.ArrayList;
 
-// import export.ExcelCell;
-// import fragebogen.*;
-
-/**
- * @author Alle
- * @version 0.5.5
- *          <p>
- *          Klasse fuer alle Datenbankzugriffe.
- */
 public class Datenbank {
-	
-	/*private static Connection myCon = null; // Verbindung zur DB
-	private static Statement mySQL = null; // Zum Statement erstellen
-	private static PreparedStatement psSql = null; // Zum PreparedStatement
-													// erstellen
-	private static ResultSet myRS = null; // Ergebnisse der Abfrage
-	 */
-	protected static String db = "nezr_v5"; // Datenbankname
+
+	protected final static String DB_NAME = "nezr_v5"; // Datenbankname
+	protected final static String DB_PATH = "./h2/bin/data/"; // Datenbank Datei Pfad
 	protected static String url = ""; // URL der Datenbank useSSL=false
 	protected static String user = ""; // Login-ID
 	protected static String pwd = ""; // Passwort
 
-	/*
-	private static int fehler = 0;
-	private static int idstandort = 0;
-	 */
 	/**
 	 * Gibt die flags fuer das "reagiert auf" zurueck.
 	 * 
@@ -427,15 +409,15 @@ public class Datenbank {
 			String statement = "";
 			switch (art) {
 			case 0:
-				statement = "cmd /c .\\mysqldump -u " + user + " -p" + pwd + " --no-data " + db + " > exportSQL\\"
+				statement = "cmd /c .\\mysqldump -u " + user + " -p" + pwd + " --no-data " + DB_NAME + " > exportSQL\\"
 						+ name;
 				break;
 			case 1:
-				statement = "cmd /c .\\mysqldump -u " + user + " -p" + pwd + " --no-create-info " + db
+				statement = "cmd /c .\\mysqldump -u " + user + " -p" + pwd + " --no-create-info " + DB_NAME
 						+ " > exportSQL\\" + name;
 				break;
 			case 2:
-				statement = "cmd /c .\\mysqldump -u " + user + " -p" + pwd + "" + db
+				statement = "cmd /c .\\mysqldump -u " + user + " -p" + pwd + "" + DB_NAME
 						+ " > exportSQL\\" + name;
 				break;
 			}

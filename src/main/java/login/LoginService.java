@@ -1,10 +1,8 @@
 package login;
 
 import java.io.File;
-import java.io.PrintStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.SQLException;
 
 import application.Datenbank;
 
@@ -22,7 +20,8 @@ public class LoginService extends Datenbank {
 	 */
 	public static boolean testDB(String user, String pwd) {
 		System.out.println("search db...");
-		File f = new File("./h2/bin/data/nezr_v5.mv.db");
+		String path = String.format("%s%s.mv.db", DB_PATH, DB_NAME);
+		File f = new File(path);
 		if (!f.exists() && f.isDirectory()) {
 			System.out.println("DB file is missing");
 			return false;
@@ -30,7 +29,7 @@ public class LoginService extends Datenbank {
 
 		Connection connection;
 		try {
-			String url = String.format("jdbc:h2:./h2/bin/data/%s;MODE=MySQL", db);
+			String url = String.format("jdbc:h2:%s%s;MODE=MySQL", DB_PATH, DB_NAME);
 			connection = DriverManager.getConnection(url, user,
 					pwd);
 
