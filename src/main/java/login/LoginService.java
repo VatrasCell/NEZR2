@@ -6,6 +6,8 @@ import java.sql.DriverManager;
 
 import application.Datenbank;
 
+import static application.GlobalFuncs.getURL;
+
 public class LoginService extends Datenbank {
 
 	/**

@@ -6,6 +6,7 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.stage.Stage;
 
+import static application.GlobalFuncs.getURL;
 
 public class Main extends Application {
 	@Override
@@ -19,7 +20,7 @@ public class Main extends Application {
 		
 		ScreenController.setRootScene(primaryStage);
 		
-		ScreenController.addScreen("login", FXMLLoader.load(getClass().getClassLoader().getResource("view/LoginView.fxml")));
+		ScreenController.addScreen("login", FXMLLoader.load(getURL("view/LoginView.fxml")));
 		
 		if(!GlobalVars.DEVMODE) {
 			ScreenController.activate("login");

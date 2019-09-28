@@ -5,6 +5,7 @@ import javafx.scene.control.TextField;
 import location.LocationService;
 
 import java.io.IOException;
+import java.util.Objects;
 
 import application.GlobalVars;
 import application.ScreenController;
@@ -12,6 +13,8 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.PasswordField;
+
+import static application.GlobalFuncs.getURL;
 
 public class LoginController {
 	
@@ -24,12 +27,6 @@ public class LoginController {
 	private PasswordField password;
 	
 	@FXML
-	private TextField ip;
-	
-	@FXML
-	private TextField port;
-	
-	@FXML
 	private Button btn_login;
 	
 	@FXML
@@ -40,8 +37,6 @@ public class LoginController {
 		if(GlobalVars.DEVMODE) {
 			username.setText("root");
 			password.setText("1234");
-			ip.setText("1234");
-			port.setText("1234");
 			login(new ActionEvent());
 		}
 	}
@@ -53,11 +48,11 @@ public class LoginController {
 			if(LoginService.testDB(username.getText(), password.getText())) {
 				//System.out.println("logged in");
 				if(toAdmin) {
-					ScreenController.addScreen("admin", FXMLLoader.load(getClass().getClassLoader().getResource("view/AdminView.fxml")));
+					ScreenController.addScreen("admin", FXMLLoader.load(getURL("view/AdminView.fxml")));
 					ScreenController.activate("admin");
 				} else {
 					GlobalVars.standorte = LocationService.getStandort();
-					ScreenController.addScreen("location", FXMLLoader.load(getClass().getClassLoader().getResource("view/LocationView.fxml")));
+					ScreenController.addScreen("location", FXMLLoader.load(getURL("view/LocationView.fxml")));
 					ScreenController.activate("location");
 				}	
 			} else {

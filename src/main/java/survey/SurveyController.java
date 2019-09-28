@@ -23,6 +23,9 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import model.Frage;
 
+import static application.GlobalFuncs.getURL;
+import static application.ScreenController.styleSheet;
+
 
 public class SurveyController {
 	
@@ -111,8 +114,7 @@ public class SurveyController {
 			alert.setContentText("Fortfahren?");
 			
 			DialogPane dialogPane = alert.getDialogPane();
-			dialogPane.getStylesheets().add(
-			   getClass().getClassLoader().getResource("../application/application.css").toExternalForm());
+			dialogPane.getStylesheets().add(getURL(styleSheet).toExternalForm());
 
 			Optional<ButtonType> result = alert.showAndWait();
 			if (result.get() == ButtonType.OK){
@@ -364,7 +366,6 @@ public class SurveyController {
 	/**
 	 * Prueft, ob die gegebene Frage der Pfichtfrage genuegt.
 	 * @param frage FrageErstellen: die Frage
-	 * @param button MyButton: der Weiter Button
 	 * @return boolean
 	 */
 	private boolean checkPflichtfrage(Frage frage) {

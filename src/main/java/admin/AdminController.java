@@ -41,6 +41,9 @@ import model.Fragebogen;
 import questionList.QuestionListController;
 import start.StartController;
 
+import static application.GlobalFuncs.getURL;
+import static application.ScreenController.styleSheet;
+
 public class AdminController {
 	
 	private Vector<Fragebogen> fragebogen;
@@ -213,8 +216,7 @@ public class AdminController {
                             	dialog.setHeaderText("Fragebogen kopieren");
                             	dialog.setContentText("Standort wählen:");
                             	DialogPane dialogPane = dialog.getDialogPane();
-                            	dialogPane.getStylesheets().add(
-                             		   getClass().getClassLoader().getResource("../application/application.css").toExternalForm());
+                            	dialogPane.getStylesheets().add(getURL(styleSheet).toExternalForm());
 
                             	Optional<String> result = dialog.showAndWait();
                             	result.ifPresent(ort -> {

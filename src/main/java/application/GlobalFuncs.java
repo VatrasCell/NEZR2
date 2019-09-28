@@ -2,8 +2,10 @@ package application;
 
 import java.awt.Dimension;
 import java.awt.Toolkit;
+import java.net.URL;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Objects;
 
 public class GlobalFuncs {
 	
@@ -17,34 +19,34 @@ public class GlobalFuncs {
 		return dtf.format(localDate);
 	}
 	
-	public static Dimension getScreenSize() {
-		return Toolkit.getDefaultToolkit().getScreenSize();
-		// return new Dimension((int)main.getWidth(), (int)main.getHeight());
-	}
-	
 	/**
 	 * Gibt die Bildschirmhöhe zur�ck.
 	 * <p>
-	 * @param d Dimension: die Bildschirmgröße von Toolkit.getDefaultToolkit().getScreenSize().
 	 * @return die Höhe des Bildschirmes als int.
 	 */
 	public static int getScreenHeight() {
 		Dimension d = getScreenSize();
-		Double heightDouble = d.getHeight();
-		Integer heightInt = Integer.valueOf(heightDouble.intValue());
-		return heightInt;
+		double heightDouble = d.getHeight();
+		return (int) heightDouble;
 	}
 
 	/**
 	 * Gibt die Bildschirmbreite zurück.
 	 * <p>
-	 * @param d die Bildschirmgröße von Toolkit.getDefaultToolkit().getScreenSize().
 	 * @return die Breite des Bildschirmes als int.
 	 */
 	public static int getScreenWidth() {
 		Dimension d = getScreenSize();
-		Double widthDouble = d.getWidth();
-		Integer widthInt = Integer.valueOf(widthDouble.intValue());
-		return widthInt;
+		double widthDouble = d.getWidth();
+		return (int) widthDouble;
+	}
+
+	public static URL getURL(String url) {
+		return Objects.requireNonNull(GlobalFuncs.class.getClassLoader().getResource(url));
+	}
+
+	private static Dimension getScreenSize() {
+		return Toolkit.getDefaultToolkit().getScreenSize();
+		// return new Dimension((int)main.getWidth(), (int)main.getHeight());
 	}
 }

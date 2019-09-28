@@ -10,7 +10,7 @@
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.RowConstraints?>
 
-<BorderPane id="sc_login" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="login.LoginController">
+<BorderPane id="sc_login" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="login.LoginController">
    <center>
       <GridPane prefHeight="210.0" prefWidth="600.0" BorderPane.alignment="CENTER">
         <columnConstraints>
@@ -35,16 +35,6 @@
                   <Insets left="15.0" />
                </GridPane.margin>
             </Label>
-            <Label maxWidth="1.7976931348623157E308" text="IP:" textAlignment="RIGHT" GridPane.rowIndex="2">
-               <GridPane.margin>
-                  <Insets left="15.0" />
-               </GridPane.margin>
-            </Label>
-            <Label maxWidth="1.7976931348623157E308" text="Port:" GridPane.rowIndex="3">
-               <GridPane.margin>
-                  <Insets left="15.0" />
-               </GridPane.margin>
-            </Label>
             <TextField id="username" fx:id="username" GridPane.columnIndex="1">
                <GridPane.margin>
                   <Insets right="15.0" />
@@ -55,16 +45,6 @@
                   <Insets right="15.0" />
                </GridPane.margin>
             </PasswordField>
-            <TextField id="ip" fx:id="ip" GridPane.columnIndex="1" GridPane.rowIndex="2">
-               <GridPane.margin>
-                  <Insets right="15.0" />
-               </GridPane.margin>
-            </TextField>
-            <TextField id="port" fx:id="port" GridPane.columnIndex="1" GridPane.rowIndex="3">
-               <GridPane.margin>
-                  <Insets right="15.0" />
-               </GridPane.margin>
-            </TextField>
             <Button id="btn_login" fx:id="btn_login" mnemonicParsing="false" onAction="#login" text="Login" GridPane.columnIndex="1" GridPane.rowIndex="4">
                <GridPane.margin>
                   <Insets left="15.0" top="15.0" />
