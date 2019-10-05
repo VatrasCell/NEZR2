@@ -1,8 +1,10 @@
 package login;
 
 import java.io.File;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.util.Objects;
 
 import application.Datenbank;
 
@@ -23,15 +25,15 @@ public class LoginService extends Datenbank {
 	public static boolean testDB(String user, String pwd) {
 		System.out.println("search db...");
 		String path = String.format("%s%s.mv.db", DB_PATH, DB_NAME);
-		File f = new File(path);
-		if (!f.exists() && f.isDirectory()) {
-			System.out.println("DB file is missing");
-			return false;
-		}
+
+        String absPath = Objects.requireNonNull(
+        		LoginService.class.getClassLoader()
+						.getResource(path))
+				.getPath().replace(".mv.db", "");
 
 		Connection connection;
 		try {
-			String url = String.format("jdbc:h2:%s%s;MODE=MySQL", DB_PATH, DB_NAME);
+			String url = String.format("jdbc:h2:%s;MODE=MySQL", absPath);
 			connection = DriverManager.getConnection(url, user,
 					pwd);
 

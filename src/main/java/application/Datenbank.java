@@ -8,7 +8,7 @@ import java.util.ArrayList;
 public class Datenbank {
 
 	protected final static String DB_NAME = "nezr_v5"; // Datenbankname
-	protected final static String DB_PATH = "./nezr2/h2/bin/data/"; // Datenbank Datei Pfad
+	protected final static String DB_PATH = "db/"; // Datenbank Datei Pfad
 	protected static String url = ""; // URL der Datenbank useSSL=false
 	protected static String user = ""; // Login-ID
 	protected static String pwd = ""; // Passwort
