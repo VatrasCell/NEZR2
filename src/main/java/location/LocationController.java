@@ -10,6 +10,8 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.ChoiceBox;
 
+import static application.GlobalFuncs.getURL;
+
 public class LocationController {
 	
 	@FXML
@@ -21,9 +23,7 @@ public class LocationController {
 	 */
 	public LocationController() {
 		// Create some sample data for the ComboBox and ListView.
-		for (String standort : GlobalVars.standorte) {
-			choiceBoxData.add(standort);
-		}
+        choiceBoxData.addAll(GlobalVars.standorte);
 	}
 	
 	/**
@@ -42,7 +42,7 @@ public class LocationController {
 	private void next() {
 		GlobalVars.standort = choiceBox.getValue();
 		try {
-			ScreenController.addScreen("start", FXMLLoader.load(getClass().getClassLoader().getResource("view/StartView.fxml")));
+			ScreenController.addScreen("start", FXMLLoader.load(getURL("view/StartView.fxml")));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

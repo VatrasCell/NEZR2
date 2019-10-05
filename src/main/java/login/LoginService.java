@@ -1,10 +1,7 @@
 package login;
 
-import java.io.File;
-import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.util.Objects;
 
 import application.Datenbank;
 
@@ -26,10 +23,7 @@ public class LoginService extends Datenbank {
 		System.out.println("search db...");
 		String path = String.format("%s%s.mv.db", DB_PATH, DB_NAME);
 
-        String absPath = Objects.requireNonNull(
-        		LoginService.class.getClassLoader()
-						.getResource(path))
-				.getPath().replace(".mv.db", "");
+        String absPath = getURL(path).getPath().replace(".mv.db", "");
 
 		Connection connection;
 		try {

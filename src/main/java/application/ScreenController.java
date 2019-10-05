@@ -21,6 +21,8 @@ import login.LoginController;
 import model.Fragebogen;
 import questionList.QuestionListController;
 
+import static application.GlobalFuncs.getURL;
+
 public class ScreenController {
 	private static HashMap<String, Pane> screenMap = new HashMap<>();
 	private static Stage main;
@@ -52,7 +54,7 @@ public class ScreenController {
 	}
 
 	public static void addScreen(String name, Pane pane) {
-		pane.getStylesheets().add(ScreenController.class.getClassLoader().getResource(styleSheet).toExternalForm());
+		pane.getStylesheets().add(getURL(styleSheet).toExternalForm());
 		screenMap.put(name, pane);
 	}
 
