@@ -1,6 +1,4 @@
 package questionList;
-import java.io.IOException;
-import java.util.Vector;
 
 import application.GlobalVars;
 import application.ScreenController;
@@ -20,9 +18,14 @@ import model.Fragebogen;
 import question.QuestionController;
 import survey.SurveyService;
 
+import java.io.IOException;
+import java.util.ArrayList;
+
+import static application.GlobalFuncs.getURL;
+
 public class QuestionListController {
 	public static Fragebogen fragebogen;
-	private Vector<Frage> fragen;
+	private ArrayList<Frage> fragen;
 	private ObservableList<Frage> data = FXCollections.observableArrayList();
 	
 	@FXML
@@ -52,20 +55,18 @@ public class QuestionListController {
 	private void getData() {
 		data.clear();
 		fragen = SurveyService.getFragen(fragebogen);
-		Vector<Frage> ueberschriften = QuestionListService.getUeberschriften(fragebogen);
-		for(int i = 0; i < ueberschriften.size(); i++) {
-			int pos = ueberschriften.get(i).getPosition();
-			for(int j = 0; j < fragen.size(); j++) {
-				if(fragen.get(j).getPosition() == pos) {
-					fragen.add(j, ueberschriften.get(i));
+		ArrayList<Frage> ueberschriften = QuestionListService.getUeberschriften(fragebogen);
+		for (Frage frage : ueberschriften) {
+			int pos = frage.getPosition();
+			for (int j = 0; j < fragen.size(); j++) {
+				if (fragen.get(j).getPosition() == pos) {
+					fragen.add(j, frage);
 					break;
 				}
 			}
 		}
 		//System.out.println(fragebogen.toString());
-		for(Frage f : fragen) {
-			data.add(f);
-		}
+		data.addAll(fragen);
 	}
 	
 	/**
@@ -76,10 +77,10 @@ public class QuestionListController {
 	private void initialize() {
 		tbl_fragen.setItems(data);
 		
-		nameCol.setCellValueFactory(new PropertyValueFactory<Frage, String>("frage"));
-		katCol.setCellValueFactory(new PropertyValueFactory<Frage, String>("kategorie"));
-		posCol.setCellValueFactory(new PropertyValueFactory<Frage, Integer>("Position"));
-		artCol.setCellValueFactory(new PropertyValueFactory<Frage, String>("art"));
+		nameCol.setCellValueFactory(new PropertyValueFactory<>("frage"));
+		katCol.setCellValueFactory(new PropertyValueFactory<>("kategorie"));
+		posCol.setCellValueFactory(new PropertyValueFactory<>("Position"));
+		artCol.setCellValueFactory(new PropertyValueFactory<>("art"));
 		
 		actionCol.setCellValueFactory(new PropertyValueFactory<>("DUMMY"));
 
@@ -88,39 +89,38 @@ public class QuestionListController {
                 new Callback<TableColumn<Frage, String>, TableCell<Frage, String>>() {
             @Override
             public TableCell<Frage, String> call(final TableColumn<Frage, String> param) {
-            	ImageView imgView = new ImageView(GlobalVars.img_edt);
+            	ImageView imgView = new ImageView(GlobalVars.IMG_EDT);
             	imgView.setFitHeight(30);
         		imgView.setFitWidth(30);
-                final TableCell<Frage, String> cell = new TableCell<Frage, String>() {
-                	
-            		Button btn = new Button("", imgView);
-                    //final Button btn = new Button("EDIT");
+				return new TableCell<Frage, String>() {
 
-                    @Override
-                    public void updateItem(String item, boolean empty) {
-                        super.updateItem(item, empty);
-                        if (empty) {
-                            setGraphic(null);
-                            setText(null);
-                        } else {
-                            btn.setOnAction(event -> {
-                            	QuestionController.fragebogen = fragebogen;
-                            	QuestionController.frage = getTableView().getItems().get(getIndex());
-                            	try {
-									ScreenController.addScreen(model.Scene.QUESTION, 
-											FXMLLoader.load(getClass().getClassLoader().getResource("view/QuestionView.fxml")));
+					Button btn = new Button("", imgView);
+					//final Button btn = new Button("EDIT");
+
+					@Override
+					public void updateItem(String item, boolean empty) {
+						super.updateItem(item, empty);
+						if (empty) {
+							setGraphic(null);
+							setText(null);
+						} else {
+							btn.setOnAction(event -> {
+								QuestionController.fragebogen = fragebogen;
+								QuestionController.frage = getTableView().getItems().get(getIndex());
+								try {
+									ScreenController.addScreen(model.Scene.QUESTION,
+											FXMLLoader.load(getURL("view/QuestionView.fxml")));
 											ScreenController.activate(model.Scene.QUESTION);
 								} catch (IOException e) {
 									// TODO Auto-generated catch block
 									e.printStackTrace();
 								}
-                            });
-                            setGraphic(btn);
-                            setText(null);
-                        }
-                    }
-                };
-                return cell;
+							});
+							setGraphic(btn);
+							setText(null);
+						}
+					}
+				};
             }
         };
 
@@ -134,34 +134,33 @@ public class QuestionListController {
                 new Callback<TableColumn<Frage, String>, TableCell<Frage, String>>() {
             @Override
             public TableCell<Frage, String> call(final TableColumn<Frage, String> param) {
-            	ImageView imgView = new ImageView(GlobalVars.img_del);
+            	ImageView imgView = new ImageView(GlobalVars.IMG_DEL);
             	imgView.setFitHeight(30);
         		imgView.setFitWidth(30);
-        		
-                final TableCell<Frage, String> cell = new TableCell<Frage, String>() {
-                	Button btn = new Button("", imgView);
-                    //final Button btn = new Button("DEL");
 
-                    @Override
-                    public void updateItem(String item, boolean empty) {
-                        super.updateItem(item, empty);
-                        if (empty) {
-                            setGraphic(null);
-                            setText(null);
-                        } else {
-                            btn.setOnAction(event -> {
-                            	Frage frage = getTableView().getItems().get(getIndex());
-                            	if(QuestionListService.deleteFrage(frage)) {
-                            		getData();
-                            		tbl_fragen.refresh();
-                            	}
-                            });
-                            setGraphic(btn);
-                            setText(null);
-                        }
-                    }
-                };
-                return cell;
+				return new TableCell<Frage, String>() {
+					Button btn = new Button("", imgView);
+					//final Button btn = new Button("DEL");
+
+					@Override
+					public void updateItem(String item, boolean empty) {
+						super.updateItem(item, empty);
+						if (empty) {
+							setGraphic(null);
+							setText(null);
+						} else {
+							btn.setOnAction(event -> {
+								Frage frage = getTableView().getItems().get(getIndex());
+								if(QuestionListService.deleteFrage(frage)) {
+									getData();
+									tbl_fragen.refresh();
+								}
+							});
+							setGraphic(btn);
+							setText(null);
+						}
+					}
+				};
             }
         };
 
@@ -184,7 +183,7 @@ public class QuestionListController {
     	QuestionController.frage = new Frage(fragen.size());
     	try {
 			ScreenController.addScreen(model.Scene.QUESTION, 
-					FXMLLoader.load(getClass().getClassLoader().getResource("view/QuestionView.fxml")));
+					FXMLLoader.load(getURL("view/QuestionView.fxml")));
 					ScreenController.activate(model.Scene.QUESTION);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block

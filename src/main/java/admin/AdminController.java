@@ -1,12 +1,5 @@
 package admin;
 
-import java.io.IOException;
-import java.time.LocalDate;
-import java.util.Optional;
-import java.util.Vector;
-
-import org.controlsfx.control.Notifications;
-
 import application.GlobalVars;
 import application.ScreenController;
 import export.ExportController;
@@ -38,15 +31,21 @@ import javafx.scene.layout.GridPane;
 import javafx.util.Callback;
 import javafx.util.Pair;
 import model.Fragebogen;
+import org.controlsfx.control.Notifications;
 import questionList.QuestionListController;
 import start.StartController;
+
+import java.io.IOException;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Optional;
 
 import static application.GlobalFuncs.getURL;
 import static application.ScreenController.styleSheet;
 
 public class AdminController {
 	
-	private Vector<Fragebogen> fragebogen;
+	private ArrayList<Fragebogen> fragebogen;
 	private ObservableList<Fragebogen> data = FXCollections.observableArrayList();
 	
 	
@@ -152,7 +151,7 @@ public class AdminController {
                 new Callback<TableColumn<Fragebogen, String>, TableCell<Fragebogen, String>>() {
             @Override
             public TableCell<Fragebogen, String> call(final TableColumn<Fragebogen, String> param) {
-            	ImageView imgView = new ImageView(GlobalVars.img_edt);
+            	ImageView imgView = new ImageView(GlobalVars.IMG_EDT);
             	imgView.setFitHeight(30);
         		imgView.setFitWidth(30);
         		Button btn = new Button("", imgView);
@@ -194,7 +193,7 @@ public class AdminController {
                 new Callback<TableColumn<Fragebogen, String>, TableCell<Fragebogen, String>>() {
             @Override
             public TableCell<Fragebogen, String> call(final TableColumn<Fragebogen, String> param) {
-            	ImageView imgView = new ImageView(GlobalVars.img_cop);
+            	ImageView imgView = new ImageView(GlobalVars.IMG_COP);
             	imgView.setFitHeight(30);
         		imgView.setFitWidth(30);
                 final TableCell<Fragebogen, String> cell = new TableCell<Fragebogen, String>() {
@@ -249,7 +248,7 @@ public class AdminController {
                 new Callback<TableColumn<Fragebogen, String>, TableCell<Fragebogen, String>>() {
             @Override
             public TableCell<Fragebogen, String> call(final TableColumn<Fragebogen, String> param) {
-            	ImageView imgView = new ImageView(GlobalVars.img_ren);
+            	ImageView imgView = new ImageView(GlobalVars.IMG_REN);
             	imgView.setFitHeight(30);
         		imgView.setFitWidth(30);
                 final TableCell<Fragebogen, String> cell = new TableCell<Fragebogen, String>() {
@@ -297,7 +296,7 @@ public class AdminController {
                 new Callback<TableColumn<Fragebogen, String>, TableCell<Fragebogen, String>>() {
             @Override
             public TableCell<Fragebogen, String> call(final TableColumn<Fragebogen, String> param) {
-            	ImageView imgView = new ImageView(GlobalVars.img_sql);
+            	ImageView imgView = new ImageView(GlobalVars.IMG_SQL);
             	imgView.setFitHeight(30);
         		imgView.setFitWidth(30);
                 final TableCell<Fragebogen, String> cell = new TableCell<Fragebogen, String>() {
@@ -332,7 +331,7 @@ public class AdminController {
                 new Callback<TableColumn<Fragebogen, String>, TableCell<Fragebogen, String>>() {
             @Override
             public TableCell<Fragebogen, String> call(final TableColumn<Fragebogen, String> param) {
-            	ImageView imgView = new ImageView(GlobalVars.img_xls);
+            	ImageView imgView = new ImageView(GlobalVars.IMG_XLS);
             	imgView.setFitHeight(30);
         		imgView.setFitWidth(30);
                 final TableCell<Fragebogen, String> cell = new TableCell<Fragebogen, String>() {
@@ -377,7 +376,7 @@ public class AdminController {
                 new Callback<TableColumn<Fragebogen, String>, TableCell<Fragebogen, String>>() {
             @Override
             public TableCell<Fragebogen, String> call(final TableColumn<Fragebogen, String> param) {
-            	ImageView imgView = new ImageView(GlobalVars.img_del);
+            	ImageView imgView = new ImageView(GlobalVars.IMG_DEL);
             	imgView.setFitHeight(30);
         		imgView.setFitWidth(30);
                 final TableCell<Fragebogen, String> cell = new TableCell<Fragebogen, String>() {

@@ -1,9 +1,9 @@
 package login;
 
+import application.Datenbank;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
-
-import application.Datenbank;
 
 import static application.GlobalFuncs.getURL;
 

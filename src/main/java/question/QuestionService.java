@@ -1,17 +1,5 @@
 package question;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.Vector;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import org.controlsfx.control.Notifications;
-
 import application.Datenbank;
 import flag.FlagList;
 import flag.Number;
@@ -20,6 +8,17 @@ import flag.Symbol;
 import flag.SymbolType;
 import model.Frage;
 import model.Fragebogen;
+import org.controlsfx.control.Notifications;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class QuestionService extends Datenbank {
 	/**
@@ -27,9 +26,9 @@ public class QuestionService extends Datenbank {
 	 * 
 	 * @param frage
 	 *            FrageErstellen: die Frage
-	 * @return Vector String aller Antworten
+	 * @return ArrayList String aller Antworten
 	 */
-	public static Vector<String> getAntworten(Frage frage) {
+	public static ArrayList<String> getAnswers(Frage frage) {
 		try {
 			Connection myCon = DriverManager.getConnection(url, user, pwd);
 			Statement mySQL = myCon.createStatement();
@@ -47,14 +46,14 @@ public class QuestionService extends Datenbank {
 					+ "JOIN ff_has_a ON ff1.idFreieFragen=ff_has_a.idFreieFragen JOIN "
 					+ "antworten ON ff_has_a.AntwortNr=antworten.AntwortNr " + "WHERE ff1.FrageFF='" + text + "'";
 			ResultSet myRS = mySQL.executeQuery(statement);
-			Vector<String> antwortenVec = new Vector<String>();
+			ArrayList<String> answers = new ArrayList<>();
 
 			while (myRS.next()) {
-				antwortenVec.addElement(unslashUnicode(myRS.getString("Antwort")));
+				answers.add(unslashUnicode(myRS.getString("Antwort")));
 			}
 			myCon.close();
 
-			return antwortenVec;
+			return answers;
 		} catch (SQLException e) {
 			e.printStackTrace();
 			//ErrorLog.fehlerBerichtB("ERROR",
@@ -112,15 +111,15 @@ public class QuestionService extends Datenbank {
 	/**
 	 * Gibt alle Kategorien zurueck.
 	 * 
-	 * @return Vector String aller Kategorien
+	 * @return ArrayList String aller Kategorien
 	 */
-	public static Vector<String> getKategorie() {
+	public static ArrayList<String> getKategorie() {
 		try {
 			Connection myCon = DriverManager.getConnection(url, user, pwd);
 			Statement mySQL = myCon.createStatement();
 			String statement = "SELECT * FROM kategorie";
 			ResultSet myRS = mySQL.executeQuery(statement);
-			Vector<String> kategorien = new Vector<String>();
+			ArrayList<String> kategorien = new ArrayList<String>();
 
 			while (myRS.next()) {
 				kategorien.add(unslashUnicode(myRS.getString("Kategorie")));
@@ -765,21 +764,21 @@ public class QuestionService extends Datenbank {
 	 * Loescht die gegebene Antwort. Gibt bei Erfolg TRUE zurueck.
 	 * 
 	 * @param antids
-	 *            Vector<Integer>: ids der zu-lÃ¶schendenen Antworten
+	 *            ArrayList<Integer>: ids der zu-lÃ¶schendenen Antworten
 	 * @param frage
 	 *            FrageErstellen: die zugehÃ¶rige Frage
 	 * @return boolean
 	 */
 	// anneSehrNeu
-	public static boolean deleteAntworten(Vector<Integer> antids, Frage frage) {
+	public static boolean deleteAntworten(ArrayList<Integer> antids, Frage frage) {
 		String statement;
 
 		try {
 			Connection myCon = DriverManager.getConnection(url, user, pwd);
 
-			for (int i = 0; i < antids.size(); i++) {
+			for (Integer antid : antids) {
 				Statement mySQL = myCon.createStatement();
-				statement = "DELETE FROM MC_has_A WHERE AntwortNr=" + antids.get(i) + " AND idMultipleChoice="
+				statement = "DELETE FROM MC_has_A WHERE AntwortNr=" + antid + " AND idMultipleChoice="
 						+ frage.getFrageID();
 				mySQL.execute(statement);
 				mySQL = null;
@@ -806,17 +805,9 @@ public class QuestionService extends Datenbank {
 	
 	/**
 	 * Speichert eine neue Multipe Choice Frage. Gibt bei Erfolg TRUE zurÃ¼ck.
-	 * 
-	 * @param neueFrageMc
-	 *            Vector String
-	 * @param selectedFB
-	 *            FragebogenDialog
-	 * @param spinnerValue
-	 *            Object
-	 * @return boolean
 	 * @author Eric
 	 */
-	public static boolean saveMC(Fragebogen selectedFB, Frage frage, Vector<Integer> antIds) {
+	public static boolean saveMC(Fragebogen selectedFB, Frage frage, ArrayList<Integer> antIds) {
 
 		try {
 			Connection myCon = DriverManager.getConnection(url, user, pwd);
@@ -912,8 +903,8 @@ public class QuestionService extends Datenbank {
 			mySQL = null;
 			psSql = null;
 
-			Vector<Integer> relAlt = new Vector<Integer>();
-			Vector<Integer> relNeu = new Vector<Integer>();
+			ArrayList<Integer> relAlt = new ArrayList<Integer>();
+			ArrayList<Integer> relNeu = new ArrayList<Integer>();
 			mySQL = myCon.createStatement();
 			statement = "SELECT idRelMCA FROM MC_has_A WHERE idMultipleChoice=" + idMultipleChoice;
 			myRS = mySQL.executeQuery(statement);
@@ -997,16 +988,6 @@ public class QuestionService extends Datenbank {
 	
 	/**
 	 * Speichert eine neue Bewertungsfrage. Gibt bei Erfolg TRUE zurÃ¼ck.
-	 * 
-	 * @param selectedFB
-	 *            FragebogenDialog
-	 * @param spinnerValue
-	 *            Object
-	 * @param frage
-	 *            String
-	 * @param kat
-	 *            String
-	 * @return boolean
 	 * @author Anne
 	 */
 	public static boolean saveBewertungsfrage(Fragebogen selectedFB, Frage frage) {

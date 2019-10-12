@@ -1,15 +1,5 @@
 package survey;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Vector;
-
 import application.Datenbank;
 import application.GlobalVars;
 import flag.FlagList;
@@ -21,15 +11,24 @@ import model.Fragebogen;
 import model.Ueberschrift;
 import question.QuestionService;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
+
 public class SurveyService extends Datenbank {
 	/**
-	 * Erstellt einen Vector aus allen Fragen, welche im ausgewählten Fragebogen
+	 * Erstellt einen ArrayList aus allen Fragen, welche im ausgewählten Fragebogen
 	 * sind.
 	 * 
-	 * @return Vector FrageErstellen
+	 * @return ArrayList FrageErstellen
 	 * @author Julian und Eric
 	 */
-	public static Vector<Frage> getFragen(Fragebogen fb) {
+	public static ArrayList<Frage> getFragen(Fragebogen fb) {
 		try {
 			System.out.println("FragebogenID: " + fb.getId());
 			Connection myCon = DriverManager.getConnection(url, user, pwd);
@@ -38,13 +37,13 @@ public class SurveyService extends Datenbank {
 					+ fb.getId();
 			ResultSet myRS = mySQL.executeQuery(statment);
 
-			Vector<String> antworten = new Vector<String>();
-			Vector<Integer> pos = new Vector<Integer>();
-			Vector<String> alleFragen = new Vector<String>();
-			Vector<Ueberschrift> ueberschriften = new Vector<Ueberschrift>();
+			ArrayList<String> antworten = new ArrayList<>();
+			ArrayList<Integer> pos = new ArrayList<>();
+			ArrayList<String> alleFragen = new ArrayList<>();
+			ArrayList<Ueberschrift> ueberschriften = new ArrayList<>();
 
-			Vector<Frage> ffFragen = new Vector<Frage>();
-			Vector<Frage> mcFragen = new Vector<Frage>();
+			ArrayList<Frage> ffFragen = new ArrayList<>();
+			ArrayList<Frage> mcFragen = new ArrayList<>();
 
 			// �berschrift MUSS MC sein...
 			while (myRS.next()) {
@@ -53,7 +52,7 @@ public class SurveyService extends Datenbank {
 				String frage = "";
 				frage = unslashUnicode(myRS.getString("FrageMC"));
 				if (!myRS.getString("Antwort").equals("#####")) {
-					alleFragen.addElement(frage);
+					alleFragen.add(frage);
 				}
 
 				if ((mcFragen.isEmpty() || !mcFragen.get(mcFragen.size() - 1).getFrage().equals(frage))
@@ -81,17 +80,17 @@ public class SurveyService extends Datenbank {
 						fragenObj.setUeberschrift(ueberschriften.get(iii).getUeberschrift());
 					}
 
-					mcFragen.addElement(fragenObj);
+					mcFragen.add(fragenObj);
 				} else {
 					if (myRS.getString("Antwort").equals("#####")) {
 						skip = true;
-						ueberschriften.addElement(new Ueberschrift(Integer.parseInt(myRS.getString("Position")),
+						ueberschriften.add(new Ueberschrift(Integer.parseInt(myRS.getString("Position")),
 								unslashUnicode(myRS.getString("FrageMC"))));
 					}
 				}
 
 				if ((mcFragen.isEmpty() || mcFragen.get(mcFragen.size() - 1).getFrage().equals(frage)) && !skip) {
-					antworten.addElement(unslashUnicode(myRS.getString("Antwort")));
+					antworten.add(unslashUnicode(myRS.getString("Antwort")));
 				}
 			}
 
@@ -106,7 +105,7 @@ public class SurveyService extends Datenbank {
 				boolean isUeberschrift = false;
 				boolean skip = false;
 				String frage = unslashUnicode(myRS.getString("FrageFF"));
-				alleFragen.addElement(frage);
+				alleFragen.add(frage);
 				if ((ffFragen.isEmpty() || 
 						!ffFragen.get(ffFragen.size() - 1).getFrage().equals(frage))/* && !myRS.getString("Antwort").equals("#####")*/) {
 					Frage fragenObj = new Frage();
@@ -132,31 +131,31 @@ public class SurveyService extends Datenbank {
 						fragenObj.setUeberschrift(ueberschriften.get(iii).getUeberschrift());
 					}
 
-					ffFragen.addElement(fragenObj);
+					ffFragen.add(fragenObj);
 				} else {
 					if (myRS.getString("Antwort").equals("#####")) {
 						skip = true;
-						ueberschriften.addElement(new Ueberschrift(Integer.parseInt(myRS.getString("Position")),
+						ueberschriften.add(new Ueberschrift(Integer.parseInt(myRS.getString("Position")),
 								unslashUnicode(myRS.getString("FrageMC"))));
 					}
 				}
 
 				if ((ffFragen.isEmpty() || ffFragen.get(ffFragen.size() - 1).getFrage().equals(frage)) && !skip) {
-					antworten.addElement("");
+					antworten.add("");
 				}
 			}
 
-			Vector<Frage> fragen = new Vector<Frage>();
+			ArrayList<Frage> fragen = new ArrayList<Frage>();
 
 			for (int z = 0; z < mcFragen.size(); z++) {
-				fragen.addElement(mcFragen.get(z));
+				fragen.add(mcFragen.get(z));
 			}
 
 			for (int z = 0; z < ffFragen.size(); z++) {
-				fragen.addElement(ffFragen.get(z));
+				fragen.add(ffFragen.get(z));
 			}
 
-			alleFragen.addElement("DUMMY");
+			alleFragen.add("DUMMY");
 
 			int count = 1;
 			for (int i = 0; i < alleFragen.size() - 1; i++) {
@@ -164,7 +163,7 @@ public class SurveyService extends Datenbank {
 				if (alleFragen.get(i).equals(alleFragen.get(i + 1))) {
 					count++;
 				} else {
-					pos.addElement(count);
+					pos.add(count);
 					count = 1;
 				}
 			}
@@ -200,7 +199,7 @@ public class SurveyService extends Datenbank {
 	 * Speichert alle durch den Benutzer gegebenen Antworten in die Datenbank.
 	 * 
 	 * @param fragen
-	 *            Vector Vector FrageErstellen: alle Fragen des Fragebogens
+	 *            ArrayList ArrayList FrageErstellen: alle Fragen des Fragebogens
 	 * @author Julian und Eric
 	 */
 	public static void saveUmfrage(List<ArrayList<Frage>> fragen) {
@@ -277,7 +276,7 @@ public class SurveyService extends Datenbank {
 	}
 	
 	/**
-	 * Setzt den Vector "fragenJePanel" zur�ck.
+	 * Setzt den ArrayList "fragenJePanel" zur�ck.
 	 */
 	public static void resetFragebogen() {
 		

@@ -1,29 +1,29 @@
 package location;
 
+import application.Datenbank;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.Vector;
-
-import application.Datenbank;
+import java.util.ArrayList;
 
 public class LocationService extends Datenbank {
 	/**
 	 * Gibt alle Standorte zurueck
 	 * 
-	 * @return Vector String aller Standorte
+	 * @return ArrayList String aller Standorte
 	 * @author Florian und Elias
 	 */
-	public static Vector<String> getStandort() {
+	public static ArrayList<String> getStandort() {
 
 		try {
 			Connection myCon = DriverManager.getConnection(url, user, pwd);
 			Statement mySQL = myCon.createStatement();
 			String statement = "SELECT * FROM ort";
 			ResultSet myRS = mySQL.executeQuery(statement);
-			Vector<String> ort = new Vector<String>();
+			ArrayList<String> ort = new ArrayList<String>();
 			while (myRS.next()) {
 				ort.add(unslashUnicode(myRS.getString("Ort")));
 			}

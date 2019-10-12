@@ -1,18 +1,18 @@
 package questionList;
 
+import application.Datenbank;
+import flag.FlagList;
+import model.Frage;
+import model.Fragebogen;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.Vector;
+import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import application.Datenbank;
-import flag.FlagList;
-import model.Frage;
-import model.Fragebogen;
 
 public class QuestionListService extends Datenbank {
 	/**
@@ -20,11 +20,11 @@ public class QuestionListService extends Datenbank {
 	 * 
 	 * @param fb
 	 *            FrageobgenDialog: der Fragebogen
-	 * @return Vector FrageErstellen
+	 * @return ArrayList FrageErstellen
 	 * @author Eric
 	 */
-	public static Vector<Frage> getUeberschriften(Fragebogen fb) {
-		Vector<Frage> ueberschriften = new Vector<>();
+	public static ArrayList<Frage> getUeberschriften(Fragebogen fb) {
+		ArrayList<Frage> ueberschriften = new ArrayList<>();
 		try {
 			Connection myCon = DriverManager.getConnection(url, user, pwd);
 			Statement mySQL = myCon.createStatement();
@@ -62,9 +62,9 @@ public class QuestionListService extends Datenbank {
 	 */
 	// anneSehrNeu
 	public static boolean deleteFrage(Frage frage) {
-		Vector<Integer> antmcnr = new Vector<Integer>(); // IDs der Antworten
+		ArrayList<Integer> antmcnr = new ArrayList<Integer>(); // IDs der Antworten
 															// aus MC Fragen
-		Vector<String> antwortenmc = new Vector<String>(); // Antworten zu MC
+		ArrayList<String> antwortenmc = new ArrayList<String>(); // Antworten zu MC
 															// Fragen
 		String statement;
 		int start = -1;
@@ -138,17 +138,17 @@ public class QuestionListService extends Datenbank {
 							if (myRS.getInt("AntwortNr") != antmcnr.get(i)
 									&& !myRS.getString("Antwort").equals(antwortenmc.get(i))) {
 								antmcnr.add(myRS.getInt("AntwortNr"));
-								antwortenmc.addElement(myRS.getString("Antwort"));
+								antwortenmc.add(myRS.getString("Antwort"));
 							}
 						}
 					} else {
 						antmcnr.add(myRS.getInt("AntwortNr"));
-						antwortenmc.addElement(myRS.getString("Antwort"));
+						antwortenmc.add(myRS.getString("Antwort"));
 					}
 				}
 
 				// Antworten, die noch in einem anderen Fragebogen vorkommen,
-				// aus dem Vector entfernen
+				// aus dem ArrayList entfernen
 				while (myRS.next()) {
 					for (int i = 0; i < antmcnr.size(); i++) {
 						if (myRS.getInt("AntwortNr") == antmcnr.get(i)) {

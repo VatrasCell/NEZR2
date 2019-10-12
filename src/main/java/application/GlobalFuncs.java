@@ -1,7 +1,7 @@
 package application;
 
-import java.awt.Dimension;
-import java.awt.Toolkit;
+import java.awt.*;
+import java.io.InputStream;
 import java.net.URL;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -41,8 +41,12 @@ public class GlobalFuncs {
 		return (int) widthDouble;
 	}
 
-	public static URL getURL(String url) {
-		return Objects.requireNonNull(GlobalFuncs.class.getClassLoader().getResource(url));
+	public static URL getURL(String path) {
+		return Objects.requireNonNull(GlobalFuncs.class.getClassLoader().getResource(path));
+	}
+
+	public static InputStream getInputStream(String path) {
+		return Objects.requireNonNull(GlobalFuncs.class.getClassLoader().getResourceAsStream(path));
 	}
 
 	private static Dimension getScreenSize() {

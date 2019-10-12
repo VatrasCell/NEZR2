@@ -1,12 +1,13 @@
 package application;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Vector;
-
 import javafx.scene.image.Image;
 import model.Frage;
 import model.Fragebogen;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static application.GlobalFuncs.getInputStream;
 
 public class GlobalVars {
 	public static final boolean DEVMODE = true;
@@ -17,14 +18,14 @@ public class GlobalVars {
 	public static Fragebogen activFragebogen = null;
 	public static int page = 0;
 	public static int countPanel;
-	public static List<ArrayList<Frage>> fragenJePanel = new ArrayList<ArrayList<Frage>>();
+	public static List<ArrayList<Frage>> fragenJePanel = new ArrayList<>();
 	public static boolean everythingIsAwesome = true;
-	public static Vector<String> standorte;
+	public static ArrayList<String> standorte;
 	
-	public static final Image img_del = new Image(GlobalVars.class.getClassLoader().getResourceAsStream("images/icons/delete_2.png"));
-	public static final Image img_cop = new Image(GlobalVars.class.getClassLoader().getResourceAsStream("images/icons/copy_2.png"));
-	public static final Image img_edt = new Image(GlobalVars.class.getClassLoader().getResourceAsStream("images/icons/edit_2.png"));
-	public static final Image img_ren = new Image(GlobalVars.class.getClassLoader().getResourceAsStream("images/icons/rename.png"));
-	public static final Image img_sql = new Image(GlobalVars.class.getClassLoader().getResourceAsStream("images/icons/sql_2.png"));
-	public static final Image img_xls = new Image(GlobalVars.class.getClassLoader().getResourceAsStream("images/icons/xls_2.png"));
+	public static final Image IMG_DEL = new Image(getInputStream("images/icons/delete_2.png"));
+	public static final Image IMG_COP = new Image(getInputStream("images/icons/copy_2.png"));
+	public static final Image IMG_EDT = new Image(getInputStream("images/icons/edit_2.png"));
+	public static final Image IMG_REN = new Image(getInputStream("images/icons/rename.png"));
+	public static final Image IMG_SQL = new Image(getInputStream("images/icons/sql_2.png"));
+	public static final Image IMG_XLS = new Image(getInputStream("images/icons/xls_2.png"));
 }

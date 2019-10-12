@@ -1,7 +1,5 @@
 package location;
 
-import java.io.IOException;
-
 import application.GlobalVars;
 import application.ScreenController;
 import javafx.collections.FXCollections;
@@ -9,6 +7,8 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.ChoiceBox;
+
+import java.io.IOException;
 
 import static application.GlobalFuncs.getURL;
 

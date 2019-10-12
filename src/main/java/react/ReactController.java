@@ -1,10 +1,5 @@
 package react;
 
-import java.text.MessageFormat;
-import java.util.List;
-import java.util.Optional;
-import java.util.Vector;
-
 import application.ScreenController;
 import flag.Flag;
 import flag.FlagList;
@@ -37,10 +32,15 @@ import model.Fragebogen;
 import question.QuestionController;
 import survey.SurveyService;
 
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
 public class ReactController {
 
 	public static Frage frage;
-	public static Vector<Frage> fragen;
+	public static ArrayList<Frage> fragen;
 	public static Fragebogen fragebogen;
 	
 	private final int MAX_COUNT_REACTIONS = 1;
@@ -251,7 +251,7 @@ public class ReactController {
 	}
 
 	/**
-	 * Gibt die Position des "FrageErstellen" Objektes in dem Vector "fragen" zurück
+	 * Gibt die Position des "FrageErstellen" Objektes in dem ArrayList "fragen" zurück
 	 * welche die entsprechende Fragen- ID und Fragenart hat. F�r die Vorschau!
 	 * <p>
 	 * 
@@ -260,10 +260,10 @@ public class ReactController {
 	 * @param s
 	 *            String: Fragenart
 	 * @param fragen
-	 *            Vector FrageErstellen: alle Fragen
-	 * @return Postition im Vector "fragen" als int.
+	 *            ArrayList FrageErstellen: alle Fragen
+	 * @return Postition im ArrayList "fragen" als int.
 	 */
-	private static int getY(int x, String s, Vector<Frage> fragen) {
+	private static int getY(int x, String s, ArrayList<Frage> fragen) {
 		// TODO
 
 		for (int i = 0; i < fragen.size(); i++) {

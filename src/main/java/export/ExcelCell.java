@@ -1,6 +1,6 @@
 package export;
 
-import java.util.Vector;
+import java.util.ArrayList;
 
 /**
  * @author Eric
@@ -8,12 +8,12 @@ import java.util.Vector;
  */
 public class ExcelCell {
 	private int idBefragung;
-	private Vector<String> antworten;
+	private ArrayList<String> antworten;
 
 	public ExcelCell() {
 	}
 
-	public ExcelCell(int idBefragung, Vector<String> antworten) {
+	public ExcelCell(int idBefragung, ArrayList<String> antworten) {
 		this.idBefragung = idBefragung;
 		this.antworten = antworten;
 	}
@@ -26,11 +26,11 @@ public class ExcelCell {
 		this.idBefragung = idBefragung;
 	}
 
-	public Vector<String> getAntworten() {
+	public ArrayList<String> getAntworten() {
 		return this.antworten;
 	}
 
-	public void setAntworten(Vector<String> antworten) {
+	public void setAntworten(ArrayList<String> antworten) {
 		this.antworten = antworten;
 	}
 }

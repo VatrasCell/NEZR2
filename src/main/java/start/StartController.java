@@ -1,14 +1,5 @@
 package start;
 
-import java.io.IOException;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Deque;
-import java.util.List;
-import java.util.Vector;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import application.GlobalVars;
 import application.ScreenController;
 import flag.Number;
@@ -41,6 +32,14 @@ import model.Frage;
 import model.PanelInfo;
 import survey.SurveyController;
 import survey.SurveyService;
+
+import java.io.IOException;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Deque;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class StartController {
 
@@ -117,7 +116,7 @@ public class StartController {
 						: "");
 	}
 
-	public static void makeFragebogen(Vector<Frage> fragen, boolean isPreview) {
+	public static void makeFragebogen(ArrayList<Frage> fragen, boolean isPreview) {
 		
 		SurveyController.setPreview(isPreview);
 		
@@ -244,7 +243,7 @@ public class StartController {
 			TextArea textArea = new TextArea(); // anneSuperNeu
 			// textArea.setPreferredSize(new Dimension(200, 50));
 			// allePanel.get(z).add(textArea, "span, center");
-			Vector<TextArea> textAreas = new Vector<TextArea>();
+			ArrayList<TextArea> textAreas = new ArrayList<TextArea>();
 			textAreas.add(textArea);
 			frage.setAntwortenTEXT(textAreas);
 			return (T) textArea;
@@ -263,7 +262,7 @@ public class StartController {
 				}
 
 				// allePanel.get(z).add(textField, "wrap, span, center");
-				Vector<TextField> textFields = new Vector<TextField>();
+				ArrayList<TextField> textFields = new ArrayList<TextField>();
 				textFields.add(textField);
 				frage.setAntwortenFF(textFields);
 				return (T) textField;
@@ -275,7 +274,7 @@ public class StartController {
 
 	private static ListView<String> createMCListView(Frage frage) {
 		// Erstellt eine Liste
-		Vector<ListView<String>> antwortenLIST = new Vector<>();
+		ArrayList<ListView<String>> antwortenLIST = new ArrayList<>();
 		// scrollPane.getVerticalScrollBar().setUI(new MyScrollBarUI());
 		// allePanel.get(z).add(scrollPane, "span, center");
 		ListView<String> liste = new ListView<String>();
@@ -338,7 +337,7 @@ public class StartController {
 		//hBox.setSpacing(32);
 		// Uebe die schleife aus, wenn count kleiner ist als die groesse der
 		// antwortmoeglichkeiten
-		Vector<CheckBox> checkboxs = new Vector<>();
+		ArrayList<CheckBox> checkboxs = new ArrayList<>();
 		
 		for (int count3 = 0; count3 < frage.getAntwort_moeglichkeit().size(); count3++) {
 
@@ -443,7 +442,7 @@ public class StartController {
 					hBox.getChildren().add(chckbxSda);
 				}
 			}
-			checkboxs.addElement(chckbxSda);
+			checkboxs.add(chckbxSda);
 
 			/*
 			 * if(count3 == frageObj.get(y).getAntwort_moeglichkeit().size() - 1) { for(int
@@ -483,7 +482,7 @@ public class StartController {
 	}
 
 	/**
-	 * Gibt die Position des "FrageErstellen" Objektes in dem Vector "fragen" zurück
+	 * Gibt die Position des "FrageErstellen" Objektes in dem ArrayList "fragen" zurück
 	 * welche die entsprechende Fragen- ID und Fragenart hat. F�r die Vorschau!
 	 * <p>
 	 * 
@@ -492,10 +491,10 @@ public class StartController {
 	 * @param s
 	 *            String: Fragenart
 	 * @param fragen
-	 *            Vector FrageErstellen: alle Fragen
-	 * @return Postition im Vector "fragen" als int.
+	 *            ArrayList FrageErstellen: alle Fragen
+	 * @return Postition im ArrayList "fragen" als int.
 	 */
-	private static int getY(int x, String s, Vector<Frage> fragen) {
+	private static int getY(int x, String s, ArrayList<Frage> fragen) {
 		// TODO
 
 		for (int i = 0; i < fragen.size(); i++) {
@@ -515,7 +514,7 @@ public class StartController {
 
 	@FXML
 	private void next() {
-		Vector<Frage> fragen = SurveyService.getFragen(GlobalVars.activFragebogen);
+		ArrayList<Frage> fragen = SurveyService.getFragen(GlobalVars.activFragebogen);
 		makeFragebogen(fragen, false);
 		GlobalVars.page = 0;
 		ScreenController.activate("survey_0");

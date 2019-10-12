@@ -1,26 +1,22 @@
 package admin;
 
+import application.Datenbank;
+import application.GlobalFuncs;
+import application.GlobalVars;
+import flag.SymbolType;
+import model.Frage;
+import model.Fragebogen;
+import question.QuestionService;
+import survey.SurveyService;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.Vector;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import org.controlsfx.control.Notifications;
-
-import application.Datenbank;
-import model.Frage;
-import model.Fragebogen;
-import question.QuestionService;
-import survey.SurveyService;
-import application.GlobalFuncs;
-import application.GlobalVars;
-import flag.FlagList;
-import flag.SymbolType;
+import java.util.ArrayList;
+import java.util.Objects;
 
 public class AdminService extends Datenbank {
 	
@@ -29,12 +25,12 @@ public class AdminService extends Datenbank {
 	 * 
 	 * @param standort
 	 *            String: der Standort
-	 * @return Vector FragebogenDialog aller Frageboegen des Standortes
+	 * @return ArrayList FragebogenDialog aller Frageboegen des Standortes
 	 * @author Eric
 	 */
-	public static Vector<Fragebogen> getFragebogen(String standort) {
+	public static ArrayList<Fragebogen> getFragebogen(String standort) {
 		try {
-			Vector<Fragebogen> fragebogen = new Vector<>();
+			ArrayList<Fragebogen> fragebogen = new ArrayList<>();
 			Connection myCon = DriverManager.getConnection(url, user, pwd);
 			int idstandort = getStandortId(standort);
 
@@ -155,18 +151,18 @@ public class AdminService extends Datenbank {
 				statement = "SELECT idMultipleChoice, Position, Flags FROM Fb_has_MC WHERE idFragebogen=" + oldID;
 				myRS = mySQL.executeQuery(statement);
 
-				Vector<Vector<String>> vecs = new Vector<Vector<String>>();
+				ArrayList<ArrayList<String>> vecs = new ArrayList<ArrayList<String>>();
 				while (myRS.next()) {
-					Vector<String> vec = new Vector<String>();
+					ArrayList<String> vec = new ArrayList<String>();
 					vec.add(myRS.getInt("idMultipleChoice") + "");
 					vec.add(myRS.getInt("Position") + "");
 					vec.add(myRS.getString("Flags"));
 					vecs.add(vec);
 				}
 
-				Vector<Frage> mcFragen = new Vector<>();
+				ArrayList<Frage> mcFragen = new ArrayList<>();
 
-				for (Vector<String> data : vecs) {
+				for (ArrayList<String> data : vecs) {
 					Frage mcFrage = new Frage();
 					int newFragenID = -1;
 					int position = Integer.parseInt(data.get(1));
@@ -229,17 +225,17 @@ public class AdminService extends Datenbank {
 				mySQL = myCon.createStatement();
 				statement = "SELECT idFreieFragen, Position, Flags FROM Fb_has_FF WHERE idFragebogen=" + oldID;
 				myRS = mySQL.executeQuery(statement);
-				Vector<Vector<String>> vecs2 = new Vector<Vector<String>>();
+				ArrayList<ArrayList<String>> vecs2 = new ArrayList<ArrayList<String>>();
 				while (myRS.next()) {
-					Vector<String> vec = new Vector<String>();
+					ArrayList<String> vec = new ArrayList<String>();
 					vec.add(myRS.getInt("idFreieFragen") + "");
 					vec.add(myRS.getInt("Position") + "");
 					vec.add(myRS.getString("Flags"));
 					vecs2.add(vec);
 				}
 
-				Vector<Frage> ffFragen = new Vector<>();
-				for (Vector<String> data : vecs2) {
+				ArrayList<Frage> ffFragen = new ArrayList<>();
+				for (ArrayList<String> data : vecs2) {
 					Frage ffFrage = new Frage();
 					int newFragenID = -1;
 					int position = Integer.parseInt(data.get(1));
@@ -454,21 +450,20 @@ public class AdminService extends Datenbank {
 	}
 	*/
 	public static boolean copyFragebogen(Fragebogen fb, String ort) {
-		Fragebogen newFb = fb;
-		newFb.setId(createFragebogen(fb.getName(), ort));
-		Vector<Frage> fragen = SurveyService.getFragen(fb);
-		for (Frage frage : fragen) {
-			if(frage.getArt() == "FF") {
-				QuestionService.saveFreieFrage(newFb, frage);
+		fb.setId(createFragebogen(fb.getName(), ort));
+		ArrayList<Frage> fragen = SurveyService.getFragen(fb);
+		for (Frage frage : Objects.requireNonNull(fragen)) {
+			if(frage.getArt().equals("FF")) {
+				QuestionService.saveFreieFrage(fb, frage);
 			} else {
 				if(frage.getFlags().is(SymbolType.B)) {
-					QuestionService.saveBewertungsfrage(newFb, frage);
+					QuestionService.saveBewertungsfrage(fb, frage);
 				} else {
-					Vector<Integer> antIds = new Vector<>();
+					ArrayList<Integer> antIds = new ArrayList<>();
 					for (String answer : frage.getAntwort_moeglichkeit()) {
 						antIds.add(QuestionService.getAntwortID(answer));
 					} 
-					QuestionService.saveMC(newFb, frage, antIds);
+					QuestionService.saveMC(fb, frage, antIds);
 				}
 			}
 		}
@@ -485,11 +480,11 @@ public class AdminService extends Datenbank {
 	 * @author Anne
 	 */
 	public static boolean deleteFragebogen(Fragebogen fb) {
-		Vector<Integer> idsmc = new Vector<Integer>(); // IDs der MC Fragen
-		Vector<Integer> idsff = new Vector<Integer>(); // IDs der Freien Fragen
-		Vector<Integer> antmcnr = new Vector<Integer>(); // IDs der Antworten
+		ArrayList<Integer> idsmc = new ArrayList<Integer>(); // IDs der MC Fragen
+		ArrayList<Integer> idsff = new ArrayList<Integer>(); // IDs der Freien Fragen
+		ArrayList<Integer> antmcnr = new ArrayList<Integer>(); // IDs der Antworten
 															// aus MC Fragen
-		Vector<String> antwortenmc = new Vector<String>(); // Antworten zu MC
+		ArrayList<String> antwortenmc = new ArrayList<String>(); // Antworten zu MC
 															// Fragen
 
 		try {
@@ -507,13 +502,13 @@ public class AdminService extends Datenbank {
 						if (myRS.getInt("AntwortNr") != antmcnr.get(i)
 								&& !myRS.getString("Antwort").equals(antwortenmc.get(i))) {
 							antmcnr.add(myRS.getInt("AntwortNr"));
-							antwortenmc.addElement(myRS.getString("Antwort"));
+							antwortenmc.add(myRS.getString("Antwort"));
 							break;
 						}
 					}
 				} else {
 					antmcnr.add(myRS.getInt("AntwortNr"));
-					antwortenmc.addElement(myRS.getString("Antwort"));
+					antwortenmc.add(myRS.getString("Antwort"));
 				}
 				idsmc.add(myRS.getInt("idMultipleChoice"));
 			}
@@ -527,7 +522,7 @@ public class AdminService extends Datenbank {
 			myRS = mySQL.executeQuery(statement);
 
 			// Antworten, die noch in einem anderen Fragebogen vorkommen, aus
-			// dem Vector entfernen
+			// dem ArrayList entfernen
 			while (myRS.next()) {
 				for (int i = 0; i < antmcnr.size(); i++) {
 					if (myRS.getInt("AntwortNr") == antmcnr.get(i)) {

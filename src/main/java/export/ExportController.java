@@ -1,10 +1,8 @@
 package export;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.Vector;
-
+import flag.SymbolType;
+import model.Frage;
+import model.Fragebogen;
 import org.apache.poi.ss.usermodel.BorderStyle;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
@@ -19,18 +17,19 @@ import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.ss.util.RegionUtil;
 import org.apache.poi.ss.util.WorkbookUtil;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-
-import flag.SymbolType;
-import model.Frage;
-import model.Fragebogen;
 import survey.SurveyService;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.ArrayList;
 
 public class ExportController {
 	
 	private Workbook wb = new XSSFWorkbook();
 	private Sheet sheet = this.wb.createSheet(WorkbookUtil.createSafeSheetName("NEZR"));
 	private CreationHelper crHelper = this.wb.getCreationHelper();
-	private Vector<Row> rows = new Vector<Row>();
+	private ArrayList<Row> rows = new ArrayList<Row>();
 	
 	/**
 	  * Erstellt Excel Datei nach neuer Vorlage.
@@ -41,7 +40,7 @@ public class ExportController {
 	  * @return boolean
 	 */
 	public boolean excelNeu(String Path, Fragebogen fb, String von, String bis) {
-		 Vector<Frage> fragen = SurveyService.getFragen(fb);
+		 ArrayList<Frage> fragen = SurveyService.getFragen(fb);
 		 
 		 Row infoRow = this.sheet.createRow(0);
 		 Row katRow = this.sheet.createRow(2);
@@ -49,14 +48,14 @@ public class ExportController {
 
 		 infoRow.createCell(0).setCellValue(this.crHelper.createRichTextString("\"" + fb.getName() + "\" erstellt am " + fb.getDate() + " mit Befragungen vom " + von + " bis zum " + bis));
 		 for (int i = 0; i < ExportService.getAnzahlBefragung(); i++) {
-			 this.rows.addElement(this.sheet.createRow(4 + i));
+			 this.rows.add(this.sheet.createRow(4 + i));
 		 }
 
 		 katRow.setHeightInPoints(6.0F * this.sheet.getDefaultRowHeightInPoints());
 
-		 Vector<String> kats = new Vector<String>();
-		 Vector<Integer> pos = new Vector<Integer>();
-		 Vector<CellRangeAddress> katsCells = new Vector<CellRangeAddress>();
+		 ArrayList<String> kats = new ArrayList<String>();
+		 ArrayList<Integer> pos = new ArrayList<Integer>();
+		 ArrayList<CellRangeAddress> katsCells = new ArrayList<CellRangeAddress>();
 		 String katOld = "";
 		 int anzahl = 0;
 
@@ -72,12 +71,12 @@ public class ExportController {
 					 CellRangeAddress cellRangeAddress = new CellRangeAddress( 2,  2,
 							 over - anzahl,  over - 1);
 
-					 katsCells.addElement(cellRangeAddress);
+					 katsCells.add(cellRangeAddress);
 					 this.sheet.addMergedRegion(cellRangeAddress);
-					 pos.addElement(Integer.valueOf(over - anzahl));
+					 pos.add(Integer.valueOf(over - anzahl));
 				}
 				 else if (anzahl != 0) {
-					 pos.addElement(Integer.valueOf(over - 1));
+					 pos.add(Integer.valueOf(over - 1));
 				}
 
 				 katOld = frage.getFrage();
@@ -144,7 +143,7 @@ public class ExportController {
 			}
 
 			if (i == fragen.size() - 1) {
-				pos.addElement(Integer.valueOf(over));
+				pos.add(Integer.valueOf(over));
 			}
 			 i++;
 		}
@@ -152,18 +151,18 @@ public class ExportController {
 		for (int j = 0; j < kats.size(); j++) {
 			String kat = (String) kats.get(j);
 
-			Vector<String> word = new Vector<String>();
+			ArrayList<String> word = new ArrayList<String>();
 
 			while ((kat.length() >= 12) && (kat.indexOf(" ", 10) != -1)) {
-				word.addElement(kat.substring(0, kat.indexOf(" ", 10)));
+				word.add(kat.substring(0, kat.indexOf(" ", 10)));
 				if (kat.indexOf(" ", 10) != -1) {
 					kat = kat.substring(kat.indexOf(" ", 10));
 				} else {
-					word.addElement(kat);
+					word.add(kat);
 				}
 			}
 
-			word.addElement(kat);
+			word.add(kat);
 
 			kat = "";
 
@@ -235,7 +234,7 @@ public class ExportController {
 	 * @param pos int: Position in Tabelle
 	 */
 	private void makeAntwortenToExecel(Frage frage, String antwort, int pos, String von, String bis) {
-		Vector<ExcelCell> antPos = new Vector<ExcelCell>();
+		ArrayList<ExcelCell> antPos = new ArrayList<ExcelCell>();
 		if (antwort.equals("")) {
 			antPos = ExportService.getAntwortenPosition(frage, von, bis);
 		} else {

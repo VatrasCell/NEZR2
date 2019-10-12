@@ -1,16 +1,16 @@
 package export;
 
+import application.Datenbank;
+import flag.SymbolType;
+import model.Frage;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.Vector;
-
-import application.Datenbank;
-import flag.SymbolType;
-import model.Frage;
+import java.util.ArrayList;
 
 public class ExportService extends Datenbank {
 	/**
@@ -37,7 +37,7 @@ public class ExportService extends Datenbank {
 	}
 	
 	/**
-	 * Erstellt einen Vector aus Excel Zellen anhand des FrageErstellen
+	 * Erstellt einen ArrayList aus Excel Zellen anhand des FrageErstellen
 	 * Objektes.
 	 * 
 	 * @param frage
@@ -46,10 +46,10 @@ public class ExportService extends Datenbank {
 	 *            String: Datum
 	 * @param bis
 	 *            Srring: Datum
-	 * @return Vector
+	 * @return ArrayList
 	 */
-	public static Vector<ExcelCell> getAntwortenPosition(Frage frage, String von, String bis) {
-		Vector<ExcelCell> re = new Vector<ExcelCell>();
+	public static ArrayList<ExcelCell> getAntwortenPosition(Frage frage, String von, String bis) {
+		ArrayList<ExcelCell> re = new ArrayList<ExcelCell>();
 		if (((frage.getArt().equals("MC")) && (frage.getFlags().is(SymbolType.B)))
 				|| (frage.getFlags().is(SymbolType.LIST)) || (frage.getFlags().is(SymbolType.JN))) {
 			try {
@@ -61,15 +61,15 @@ public class ExportService extends Datenbank {
 								+ " AND (b2.Datum BETWEEN '" + von + "' AND '" + bis + "')");
 
 				int old = -1;
-				Vector<String> strings = new Vector<String>();
+				ArrayList<String> strings = new ArrayList<String>();
 				while (myRS.next()) {
 					if (old != myRS.getInt("idBefragung")) {
-						strings = new Vector<String>();
-						strings.addElement(unslashUnicode(myRS.getString("antwort")));
-						re.addElement(new ExcelCell(myRS.getInt("idBefragung"), strings));
+						strings = new ArrayList<String>();
+						strings.add(unslashUnicode(myRS.getString("antwort")));
+						re.add(new ExcelCell(myRS.getInt("idBefragung"), strings));
 						old = myRS.getInt("idBefragung");
 					} else {
-						strings.addElement(unslashUnicode(myRS.getString("antwort")));
+						strings.add(unslashUnicode(myRS.getString("antwort")));
 					}
 				}
 				myCon.close();
@@ -88,15 +88,15 @@ public class ExportService extends Datenbank {
 								+ " AND (b2.Datum BETWEEN '" + von + "' AND '" + bis + "')");
 
 				int old = -1;
-				Vector<String> strings = new Vector<String>();
+				ArrayList<String> strings = new ArrayList<String>();
 				while (myRS.next()) {
 					if (old != myRS.getInt("idBefragung")) {
-						strings = new Vector<String>();
-						strings.addElement(unslashUnicode(myRS.getString("antwort")));
-						re.addElement(new ExcelCell(myRS.getInt("idBefragung"), strings));
+						strings = new ArrayList<String>();
+						strings.add(unslashUnicode(myRS.getString("antwort")));
+						re.add(new ExcelCell(myRS.getInt("idBefragung"), strings));
 						old = myRS.getInt("idBefragung");
 					} else {
-						strings.addElement(unslashUnicode(myRS.getString("antwort")));
+						strings.add(unslashUnicode(myRS.getString("antwort")));
 					}
 				}
 				myCon.close();
@@ -110,7 +110,7 @@ public class ExportService extends Datenbank {
 	}
 
 	/**
-	 * Erstellt einen Vector aus Excel Zellen anhand des FrageErstellen Objektes
+	 * Erstellt einen ArrayList aus Excel Zellen anhand des FrageErstellen Objektes
 	 * und der Antwort.
 	 * 
 	 * @param frage
@@ -121,10 +121,10 @@ public class ExportService extends Datenbank {
 	 *            String: Datum
 	 * @param bis
 	 *            Srring: Datum
-	 * @return Vector
+	 * @return ArrayList
 	 */
-	public static Vector<ExcelCell> getAntwortenPosition(Frage frage, String antwort, String von, String bis) {
-		Vector<ExcelCell> re = new Vector<ExcelCell>();
+	public static ArrayList<ExcelCell> getAntwortenPosition(Frage frage, String antwort, String von, String bis) {
+		ArrayList<ExcelCell> re = new ArrayList<ExcelCell>();
 		try {
 			Connection myCon = DriverManager.getConnection(url, user, pwd);
 			String statement = "SELECT b2.idBefragung FROM Antworten a JOIN B_has_MC b ON a.AntwortNr = b.AntwortNr JOIN Befragung b2 ON b.idBefragung = b2.idBefragung WHERE idFragebogen=? AND idMultipleChoice=? AND antwort=? AND (b2.Datum BETWEEN ? AND ?)";
@@ -137,15 +137,15 @@ public class ExportService extends Datenbank {
 			ResultSet myRS = psSql.executeQuery();
 
 			int old = -1;
-			Vector<String> strings = new Vector<String>();
+			ArrayList<String> strings = new ArrayList<String>();
 			while (myRS.next()) {
 				if (old != myRS.getInt("idBefragung")) {
-					strings = new Vector<String>();
-					strings.addElement("1");
-					re.addElement(new ExcelCell(myRS.getInt("idBefragung"), strings));
+					strings = new ArrayList<String>();
+					strings.add("1");
+					re.add(new ExcelCell(myRS.getInt("idBefragung"), strings));
 					old = myRS.getInt("idBefragung");
 				} else {
-					strings.addElement("1");
+					strings.add("1");
 				}
 			}
 			myCon.close();

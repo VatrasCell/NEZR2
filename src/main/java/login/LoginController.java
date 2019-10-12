@@ -1,18 +1,16 @@
 package login;
 
-import javafx.scene.control.Button;
-import javafx.scene.control.TextField;
-import location.LocationService;
-
-import java.io.IOException;
-import java.util.Objects;
-
 import application.GlobalVars;
 import application.ScreenController;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
+import javafx.scene.control.TextField;
+import location.LocationService;
+
+import java.io.IOException;
 
 import static application.GlobalFuncs.getURL;
 

@@ -1,11 +1,5 @@
 package application;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
@@ -20,6 +14,12 @@ import javafx.stage.Stage;
 import login.LoginController;
 import model.Fragebogen;
 import questionList.QuestionListController;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 import static application.GlobalFuncs.getURL;
 

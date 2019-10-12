@@ -2,7 +2,6 @@ package application;
 
 import java.io.File;
 import java.io.IOException;
-
 import java.util.ArrayList;
 
 public class Datenbank {
@@ -19,16 +18,16 @@ public class Datenbank {
 	 * @param fb
 	 *            FragebogenDialog: der Fragebogen
 	 * @param index
-	 *            int: Position im Vector
+	 *            int: Position im ArrayList
 	 * @param positionVec
-	 *            int: Postition der Antwort im Vector
+	 *            int: Postition der Antwort im ArrayList
 	 * @param frageart
 	 *            String
 	 * @return String flag
 	 * @author Florian
 	 *//*
 	public static String getFlags(FragebogenDialog fb, int index, int positionVec, String frageart) {
-		Vector<FrageErstellen> fragen = getFragen(fb);
+		ArrayList<FrageErstellen> fragen = getFragen(fb);
 		String flag = "";
 		if (frageart == "FF") {
 			// flag = flag + ""; // flag + art_der_frage + IdderReagierenden
@@ -52,13 +51,13 @@ public class Datenbank {
 	}
 
 	*//**
-	 * Erzeugt aus dem Vector FrageErstellen eine DefaultListModel der Fragen.
+	 * Erzeugt aus dem ArrayList FrageErstellen eine DefaultListModel der Fragen.
 	 * 
 	 * @return DefaultListModel String
 	 * @author Anne und Florian
 	 *//*
 	public static DefaultListModel<String> getFragen_react(FragebogenDialog fb, FrageErstellen fr) {
-		Vector<FrageErstellen> fragen = getFragen(fb);
+		ArrayList<FrageErstellen> fragen = getFragen(fb);
 		DefaultListModel<String> listFragen = new DefaultListModel<>();
 
 		String frage = "";
@@ -66,27 +65,27 @@ public class Datenbank {
 		for (int i = 0; i < fragen.size(); i++) {
 			frage = fragen.get(i).getFrage();
 			if (fragen.get(i).getFrageID() != fr.getFrageID()) {
-				listFragen.addElement(frage);
+				listFragen.add(frage);
 			}
 		}
 		return listFragen;
 	}
 
 	*//**
-	 * Erzeugt aus dem Vector FrageErstellen eine DefaultListModel der Fragen.
+	 * Erzeugt aus dem ArrayList FrageErstellen eine DefaultListModel der Fragen.
 	 * 
 	 * @return DefaultListModel String
 	 * @author Anne und Florian
 	 *//*
 	public static DefaultListModel<String> getFragen_react(FragebogenDialog fb) {
-		Vector<FrageErstellen> fragen = getFragen(fb);
+		ArrayList<FrageErstellen> fragen = getFragen(fb);
 		DefaultListModel<String> listFragen = new DefaultListModel<>();
 
 		String frage = "";
 
 		for (int i = 0; i < fragen.size(); i++) {
 			frage = fragen.get(i).getFrage();
-			listFragen.addElement(frage);
+			listFragen.add(frage);
 		}
 		return listFragen;
 	}
@@ -101,18 +100,18 @@ public class Datenbank {
 	 * @author Anne und Florian
 	 *//*
 	public static DefaultListModel<String> getAntworten_react(FragebogenDialog fb, int index) {
-		Vector<FrageErstellen> fragen = getFragen(fb);
+		ArrayList<FrageErstellen> fragen = getFragen(fb);
 		DefaultListModel<String> listAntworten = new DefaultListModel<>();
 
 		for (int i = 0; i < fragen.get(index).getAntwort_moeglichkeit().size(); i++) {
 			if (fragen.get(index).getAntwort_moeglichkeit().get(i).equals("")) {
 				if (fragen.get(index).getFlags().indexOf("TEXT") >= 0) {
-					listAntworten.addElement("Textarea");
+					listAntworten.add("Textarea");
 				} else {
-					listAntworten.addElement("Textfeld");
+					listAntworten.add("Textfeld");
 				}
 			} else {
-				listAntworten.addElement(fragen.get(index).getAntwort_moeglichkeit().get(i));
+				listAntworten.add(fragen.get(index).getAntwort_moeglichkeit().get(i));
 			}
 		}
 		return listAntworten;
@@ -172,7 +171,7 @@ public class Datenbank {
 	 *//*
 	public static boolean isFbValid(FragebogenDialog fb) {
 		try {
-			Vector<FrageErstellen> fragen = getFragen(fb);
+			ArrayList<FrageErstellen> fragen = getFragen(fb);
 			if (fragen.size() == 0) {
 				return false;
 			}
@@ -438,9 +437,9 @@ public class Datenbank {
 	 * 
 	 * @return
 	 *//*
-	public static Vector<String> exp_formular_namen() {
+	public static ArrayList<String> exp_formular_namen() {
 
-		Vector<String> ret = new Vector<String>();
+		ArrayList<String> ret = new ArrayList<String>();
 		try {
 			myCon = DriverManager.getConnection(url, user, pwd);
 			mySQL = myCon.createStatement();

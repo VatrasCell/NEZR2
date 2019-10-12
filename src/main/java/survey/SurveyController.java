@@ -1,10 +1,5 @@
 package survey;
 
-import java.io.IOException;
-import java.util.List;
-import java.util.Optional;
-import java.util.Vector;
-
 import application.Datenbank;
 import application.GlobalVars;
 import application.ScreenController;
@@ -14,14 +9,19 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
-import javafx.scene.layout.Pane;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.DialogPane;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.Pane;
 import model.Frage;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 import static application.GlobalFuncs.getURL;
 import static application.ScreenController.styleSheet;
@@ -160,40 +160,40 @@ public class SurveyController {
 			for(Frage frage : GlobalVars.fragenJePanel.get(GlobalVars.page)) {
 				if(frage.getArt() == "MC") {
 					if(frage.getFlags().is(SymbolType.LIST)) {
-						Vector<String> antwort = new Vector<String>();
+						ArrayList<String> antwort = new ArrayList<String>();
 						for(ListView<String> listView : frage.getAntwortenLIST()) {
 							if(listView.isVisible()) {
 								for(String value : listView.getSelectionModel().getSelectedItems()) {
-									antwort.addElement(value);
+									antwort.add(value);
 								}
 							}
 						}
 						frage.setAntwort(antwort);
 					} else {
-						Vector<String> antwort = new Vector<String>();
+						ArrayList<String> antwort = new ArrayList<String>();
 						for(CheckBox checkbox : frage.getAntwortenMC()) {
 							if(checkbox.isSelected() && checkbox.isVisible()) {
-								antwort.addElement(checkbox.getText());
+								antwort.add(checkbox.getText());
 							}
 						}
 						frage.setAntwort(antwort);
 					}
 				} else {
 					if(frage.getFlags().is(SymbolType.TEXT)) {
-						Vector<String> antwort = new Vector<String>();
+						ArrayList<String> antwort = new ArrayList<String>();
 						for(TextArea textArea : frage.getAntwortenTEXT()) {
 							if(!textArea.getText().equals("") && textArea.isVisible()) {
 								String string = textArea.getText();
-								antwort.addElement(Datenbank.slashUnicode(string));
+								antwort.add(Datenbank.slashUnicode(string));
 							}
 						}
 						frage.setAntwort(antwort);
 					} else {
-						Vector<String> antwort = new Vector<String>();
+						ArrayList<String> antwort = new ArrayList<String>();
 						for(TextField textField : frage.getAntwortenFF()) {
 							if(!textField.getText().equals("") && textField.isVisible()) {
 								String string = textField.getText();
-								antwort.addElement(Datenbank.slashUnicode(string));
+								antwort.add(Datenbank.slashUnicode(string));
 							}
 						}
 						frage.setAntwort(antwort);

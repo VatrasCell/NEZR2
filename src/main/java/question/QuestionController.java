@@ -1,18 +1,10 @@
 package question;
 
-import java.io.IOException;
-import java.util.List;
-import java.util.Optional;
-import java.util.Vector;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-
-import org.controlsfx.control.Notifications;
-
+import application.GlobalVars;
 import application.ScreenController;
 import flag.FlagList;
+import flag.Number;
+import flag.React;
 import flag.SymbolType;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -29,18 +21,30 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.image.ImageView;
 import javafx.util.Callback;
 import model.Frage;
 import model.Fragebogen;
+import org.controlsfx.control.Notifications;
 import react.ReactController;
 import start.StartController;
-import flag.Number;
-import flag.React;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
+import static application.GlobalFuncs.getURL;
 
 public class QuestionController {
 	public static Fragebogen fragebogen;
 	public static Frage frage;
-	private Vector<String> antworten;
+	private ArrayList<String> answers;
 	private ObservableList<Antwort> data = FXCollections.observableArrayList();
 	
 	@FXML
@@ -102,11 +106,11 @@ public class QuestionController {
 	 */
 	public QuestionController() {
 		// fuer die Generierung der Antwortentabelle
-		antworten = QuestionService.getAntworten(frage);
-		for (int i = 0; i < antworten.size(); ++i) {
+		answers = QuestionService.getAnswers(frage);
+		for (int i = 0; i < Objects.requireNonNull(answers).size(); ++i) {
 			Antwort antwort = new Antwort();
 			antwort.setNr(i + 1);
-			antwort.setAntwort(antworten.get(i));
+			antwort.setAntwort(answers.get(i));
 			data.add(antwort);
 		}
 	}
@@ -119,8 +123,8 @@ public class QuestionController {
 	private void initialize() {
 		tbl_antworten.setItems(data);
 
-		nrCol.setCellValueFactory(new PropertyValueFactory<Antwort, String>("nr"));
-		antCol.setCellValueFactory(new PropertyValueFactory<Antwort, String>("antwort"));
+		nrCol.setCellValueFactory(new PropertyValueFactory<>("nr"));
+		antCol.setCellValueFactory(new PropertyValueFactory<>("antwort"));
 
 		actionCol.setCellValueFactory(new PropertyValueFactory<>("DUMMY"));
 
@@ -128,9 +132,12 @@ public class QuestionController {
 				new Callback<TableColumn<Antwort, String>, TableCell<Antwort, String>>() {
 					@Override
 					public TableCell<Antwort, String> call(final TableColumn<Antwort, String> param) {
-						final TableCell<Antwort, String> cell = new TableCell<Antwort, String>() {
+						ImageView imgView = new ImageView(GlobalVars.IMG_EDT);
+						imgView.setFitHeight(30);
+						imgView.setFitWidth(30);
+						return new TableCell<Antwort, String>() {
 
-							final Button btn = new Button("EDIT");
+							final Button btn = new Button("", imgView);
 
 							@Override
 							public void updateItem(String item, boolean empty) {
@@ -148,7 +155,6 @@ public class QuestionController {
 								}
 							}
 						};
-						return cell;
 					}
 				};
 
@@ -160,9 +166,12 @@ public class QuestionController {
 				new Callback<TableColumn<Antwort, String>, TableCell<Antwort, String>>() {
 					@Override
 					public TableCell<Antwort, String> call(final TableColumn<Antwort, String> param) {
-						final TableCell<Antwort, String> cell = new TableCell<Antwort, String>() {
+						ImageView imgView = new ImageView(GlobalVars.IMG_DEL);
+						imgView.setFitHeight(30);
+						imgView.setFitWidth(30);
+						return new TableCell<Antwort, String>() {
 
-							final Button btn = new Button("DEL");
+							final Button btn = new Button("", imgView);
 
 							@Override
 							public void updateItem(String item, boolean empty) {
@@ -180,7 +189,6 @@ public class QuestionController {
 								}
 							}
 						};
-						return cell;
 					}
 				};
 
@@ -192,7 +200,7 @@ public class QuestionController {
 
 	private void fillScene() {
 		String string;
-		Pattern MY_PATTERN = Pattern.compile("#\\[[0-9]+\\]");
+		Pattern MY_PATTERN = Pattern.compile("#\\[[0-9]+]");
 		Matcher m = MY_PATTERN.matcher(frage.getFrage());
 		if (m.find()) {
 			string = frage.getFrage().substring(0, m.start());
@@ -289,8 +297,8 @@ public class QuestionController {
 
 		// anneSehrNeu
 		/*
-		 * antworten = new Vector<String>(); for (short i = 0; i <
-		 * tableFE.getRowCount(); i++) { antworten.add(tableFE.getValueAt(i,
+		 * answers = new ArrayList<String>(); for (short i = 0; i <
+		 * tableFE.getRowCount(); i++) { answers.add(tableFE.getValueAt(i,
 		 * 1).toString()); }
 		 */
 
@@ -338,7 +346,7 @@ public class QuestionController {
 				flags = new FlagList();
 			}
 			
-			Pattern MY_PATTERNs = Pattern.compile("#\\[[0-9]+\\]");
+			Pattern MY_PATTERNs = Pattern.compile("#\\[[0-9]+]");
 			Matcher ms = MY_PATTERNs.matcher(oldFrage);
 			if (ms.find()) {
 				string = oldFrage.substring(0, ms.start());
@@ -393,14 +401,14 @@ public class QuestionController {
 			}
 	        
 			if (artChoice.getSelectionModel().getSelectedItem().equals("Freie Frage")) {
-				flags = QuestionService.getMoeglicheFlags(flags, pflichtfrage, liste, multipleChoice, textarea, ja_nein, isZahl, false, zahlArt, anzahlZeichen, "ff"); //floNeu
+				QuestionService.getMoeglicheFlags(flags, pflichtfrage, liste, multipleChoice, textarea, ja_nein, isZahl, false, zahlArt, anzahlZeichen, "ff");//floNeu
 				neueFrage.setFlags(flags);
 				QuestionService.saveFreieFrage(fragebogen, neueFrage);					
 			}
 			if (artChoice.getSelectionModel().getSelectedItem().equals("Multiple Choice")) {
-				Vector<Integer> antIds = new Vector<Integer>();
-				Vector<Integer> antIdsRaus = new Vector<Integer>();
-				Vector<String> ants = new Vector<String>();
+				ArrayList<Integer> antIds = new ArrayList<>();
+				ArrayList<Integer> antIdsRaus = new ArrayList<>();
+				ArrayList<String> ants = new ArrayList<>();
 				if (ja_nein) {
 					ants.add("Ja");
 					ants.add("Nein");
@@ -412,18 +420,18 @@ public class QuestionController {
 				
 				//anneSehrNeu
 				if(lblQuestion.getText().equals("Frage Bearbeiten")) {
-					for(int i = 0; i < antworten.size(); i++) {
-						for(int j = 0; j < ants.size(); j++) {
-							if(!antworten.isEmpty() && antworten.get(i).equals(ants.get(j))) {
-								antworten.remove(i);
+					for(int i = 0; i < answers.size(); i++) {
+						for (String ant : ants) {
+							if (!answers.isEmpty() && answers.get(i).equals(ant)) {
+								answers.remove(i);
 							}
 						}
 					}
 				}
 			
 				if(lblQuestion.getText().equals("Frage Bearbeiten")) {
-					for(int i = 0; i < antworten.size(); i++){
-						int antId = QuestionService.getAntwortID(antworten.get(i));
+					for (String answer : answers) {
+						int antId = QuestionService.getAntwortID(answer);
 						antIdsRaus.add(antId);
 					}
 				}
@@ -433,16 +441,16 @@ public class QuestionController {
 					QuestionService.deleteAntworten(antIdsRaus, neueFrage);
 				}
 				//
-				for(int i = 0; i < ants.size(); i++){
-					int antId = QuestionService.getAntwortID(ants.get(i));
+				for (String ant : ants) {
+					int antId = QuestionService.getAntwortID(ant);
 					antIds.add(antId);
 				}
-				flags = QuestionService.getMoeglicheFlags(flags, pflichtfrage, liste, multipleChoice, textarea, ja_nein, isZahl, x, zahlArt, anzahlZeichen, "mc"); //floNeu
+				QuestionService.getMoeglicheFlags(flags, pflichtfrage, liste, multipleChoice, textarea, ja_nein, isZahl, x, zahlArt, anzahlZeichen, "mc");//floNeu
 				neueFrage.setFlags(flags);
 				QuestionService.saveMC(fragebogen, neueFrage, antIds);
 			}
 			if (artChoice.getSelectionModel().getSelectedItem().equals("Bewertungsfrage")) {
-				flags = QuestionService.getMoeglicheFlags(flags, pflichtfrage, liste, multipleChoice, textarea, ja_nein, isZahl, false, zahlArt, anzahlZeichen, "bf"); //floNeu
+				QuestionService.getMoeglicheFlags(flags, pflichtfrage, liste, multipleChoice, textarea, ja_nein, isZahl, false, zahlArt, anzahlZeichen, "bf");//floNeu
 				neueFrage.setFlags(flags);
 				QuestionService.saveBewertungsfrage(fragebogen, neueFrage);
 			}
@@ -461,7 +469,7 @@ public class QuestionController {
 	
 	@FXML
 	private void setPreview() {
-		Vector<Frage> fragen = new Vector<>();
+		ArrayList<Frage> fragen = new ArrayList<>();
 		fragen.add(frage);
 		StartController.makeFragebogen(fragen, true);
 		ScreenController.activate("survey_0");
@@ -473,8 +481,7 @@ public class QuestionController {
 		dialog.setTitle("Antwort anlegen");
     	dialog.setContentText("Name:");
     	DialogPane dialogPane = dialog.getDialogPane();
-		dialogPane.getStylesheets().add(
-		   getClass().getClassLoader().getResource("../application/application.css").toExternalForm());
+		dialogPane.getStylesheets().add(getURL("style/application.css").toExternalForm());
 		
     	Optional<String> result = dialog.showAndWait();
     	result.ifPresent(name -> {
@@ -493,8 +500,7 @@ public class QuestionController {
 		dialog.setTitle("Kategorie anlegen");
     	dialog.setContentText("Name:");
     	DialogPane dialogPane = dialog.getDialogPane();
-		dialogPane.getStylesheets().add(
-		   getClass().getClassLoader().getResource("../application/application.css").toExternalForm());
+		dialogPane.getStylesheets().add(getURL("style/application.css").toExternalForm());
 		
     	Optional<String> result = dialog.showAndWait();
     	result.ifPresent(name -> {
@@ -515,7 +521,7 @@ public class QuestionController {
 		ReactController.fragebogen = fragebogen;
 		
 		try {
-			ScreenController.addScreen(model.Scene.REACT, FXMLLoader.load(getClass().getClassLoader().getResource("view/ReactView.fxml")));
+			ScreenController.addScreen(model.Scene.REACT, FXMLLoader.load(getURL("view/ReactView.fxml")));
 			ScreenController.activate(model.Scene.REACT);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -543,13 +549,9 @@ public class QuestionController {
 		} else {
 			btnSave.setDisable(true);
 		}
-		
 
-		if(!btnSave.isDisabled()) {
-			return true;
-		} else {
-			return false;
-		}		
+
+		return !btnSave.isDisabled();
 	}
 
 	public class Antwort {

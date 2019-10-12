@@ -1,20 +1,19 @@
 package model;
 
-import java.util.Comparator;
-import java.util.Vector;
-
 import application.GlobalVars;
 import flag.FlagList;
 import flag.SymbolType;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.Pane;
+
+import java.util.ArrayList;
+import java.util.Comparator;
 
 public class Frage implements Comparable<Frage>, Comparator<Frage> {
 	private String frage;
@@ -25,14 +24,14 @@ public class Frage implements Comparable<Frage>, Comparator<Frage> {
 	private FlagList flags;
 	private int position;
 	private String ueberschrift = "";
-	private Vector<String> antwort_moeglichkeit = new Vector<String>();
-	private Vector<String> antwort = new Vector<String>();
+	private ArrayList<String> antwort_moeglichkeit = new ArrayList<String>();
+	private ArrayList<String> antwort = new ArrayList<String>();
 	private Label frageLabel;
 	private Pane scene;
-	private Vector<CheckBox> antwortenMC = new Vector<>();
-	private Vector<TextField> antwortenFF = new Vector<>();
-	private Vector<ListView<String>> antwortenLIST = new Vector<>();
-	private Vector<TextArea> antwortenTEXT = new Vector<>();
+	private ArrayList<CheckBox> antwortenMC = new ArrayList<>();
+	private ArrayList<TextField> antwortenFF = new ArrayList<>();
+	private ArrayList<ListView<String>> antwortenLIST = new ArrayList<>();
+	private ArrayList<TextArea> antwortenTEXT = new ArrayList<>();
 	private Frage target;
 	private int fragebogenID;
 	
@@ -153,13 +152,13 @@ public class Frage implements Comparable<Frage>, Comparator<Frage> {
 	/**
 	 * @return the antwort_moeglichkeit
 	 */
-	public Vector<String> getAntwort_moeglichkeit() {
+	public ArrayList<String> getAntwort_moeglichkeit() {
 		return antwort_moeglichkeit;
 	}
 	/**
 	 * @param antwort_moeglichkeit the antwort_moeglichkeit to set
 	 */
-	public void setAntwort_moeglichkeit(Vector<String> antwort_moeglichkeit) {
+	public void setAntwort_moeglichkeit(ArrayList<String> antwort_moeglichkeit) {
 		this.antwort_moeglichkeit = antwort_moeglichkeit;
 	}
 	
@@ -169,61 +168,61 @@ public class Frage implements Comparable<Frage>, Comparator<Frage> {
 	/**
 	 * @return the antwort
 	 */
-	public Vector<String> getAntwort() {
+	public ArrayList<String> getAntwort() {
 		return antwort;
 	}
 	/**
 	 * @param antwort the antwort to set
 	 */
-	public void setAntwort(Vector<String> antwort) {
+	public void setAntwort(ArrayList<String> antwort) {
 		this.antwort = antwort;
 	}
 	/**
 	 * @return the antwortenMC
 	 */
-	public Vector<CheckBox> getAntwortenMC() {
+	public ArrayList<CheckBox> getAntwortenMC() {
 		return antwortenMC;
 	}
 	/**
 	 * @param antwortenMC the antwortenMC to set
 	 */
-	public void setAntwortenMC(Vector<CheckBox> antwortenMC) {
+	public void setAntwortenMC(ArrayList<CheckBox> antwortenMC) {
 		this.antwortenMC = antwortenMC;
 	}
 	/**
 	 * @return the antwortenFF
 	 */
-	public Vector<TextField> getAntwortenFF() {
+	public ArrayList<TextField> getAntwortenFF() {
 		return antwortenFF;
 	}
 	/**
 	 * @param antwortenFF the antwortenFF to set
 	 */
-	public void setAntwortenFF(Vector<TextField> antwortenFF) {
+	public void setAntwortenFF(ArrayList<TextField> antwortenFF) {
 		this.antwortenFF = antwortenFF;
 	}
 	/**
 	 * @return the antwortenLIST
 	 */
-	public Vector<ListView<String>> getAntwortenLIST() {
+	public ArrayList<ListView<String>> getAntwortenLIST() {
 		return antwortenLIST;
 	}
 	/**
 	 * @param antwortenLIST the antwortenLIST to set
 	 */
-	public void setAntwortenLIST(Vector<ListView<String>> antwortenLIST) {
+	public void setAntwortenLIST(ArrayList<ListView<String>> antwortenLIST) {
 		this.antwortenLIST = antwortenLIST;
 	}
 	/**
 	 * @return the antwortenTEXT
 	 */
-	public Vector<TextArea> getAntwortenTEXT() {
+	public ArrayList<TextArea> getAntwortenTEXT() {
 		return antwortenTEXT;
 	}
 	/**
 	 * @param antwortenTEXT the antwortenTEXT to set
 	 */
-	public void setAntwortenTEXT(Vector<TextArea> antwortenTEXT) {
+	public void setAntwortenTEXT(ArrayList<TextArea> antwortenTEXT) {
 		this.antwortenTEXT = antwortenTEXT;
 	}
 	/**
@@ -431,7 +430,7 @@ public class Frage implements Comparable<Frage>, Comparator<Frage> {
 	
 	/**
 	 * Setzt dynamisch ChangeListener
-	 * @param index int: Position im Vector
+	 * @param index int: Position im ArrayList
 	 * @param s String: Fragenart
 	 */
 	public void setListener(int index, String s) {
