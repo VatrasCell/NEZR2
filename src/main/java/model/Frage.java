@@ -115,7 +115,7 @@ public class Frage implements Comparable<Frage>, Comparator<Frage> {
 	 * @return the flags
 	 */
 	public FlagList getFlags() {
-		return flags;
+		return flags == null ? new FlagList() : flags;
 	}
 
 	/**

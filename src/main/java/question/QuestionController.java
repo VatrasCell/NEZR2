@@ -24,6 +24,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.ImageView;
 import javafx.util.Callback;
 import model.Frage;
+import model.FrageEditParam;
 import model.Fragebogen;
 import org.controlsfx.control.Notifications;
 import react.ReactController;
@@ -86,6 +87,9 @@ public class QuestionController {
 	
 	@FXML
 	private Button btnSave;
+
+	@FXML
+	private Button btnNewAnswer;
 
 	@FXML
 	private TableView<Antwort> tbl_antworten;
@@ -221,6 +225,11 @@ public class QuestionController {
 		ObservableList<String> listArt = FXCollections.observableArrayList("Bewertungsfrage", "Multiple Choice",
 				"Freie Frage");
 		artChoice.setItems(listArt);
+		artChoice.getSelectionModel().select("Freie Frage");
+		artChoice.getSelectionModel().selectedIndexProperty().addListener((observable, oldValue, newValue) -> {
+			artChoice.getSelectionModel().select(newValue.intValue());
+			updateCheckboxes();
+		});
 
 		ObservableList<String> listZahl = FXCollections.observableArrayList("Genau wie die Zahl", "Kleiner gleich Zahl",
 				"Größer gleich Zahl");
@@ -322,6 +331,8 @@ public class QuestionController {
 		} else {
 			chckbxZahl.setSelected(false);
 		}
+
+		updateCheckboxes();
 	}
 	
 	@FXML
@@ -338,13 +349,7 @@ public class QuestionController {
 			
 			String oldFrage = frage.getFrage();
 			
-			FlagList flags;
-			
-			if(frage.getFlags().size() > 0) {
-				flags = frage.getFlags();
-			} else {
-				flags = new FlagList();
-			}
+			FlagList flags = frage.getFlags();
 			
 			Pattern MY_PATTERNs = Pattern.compile("#\\[[0-9]+]");
 			Matcher ms = MY_PATTERNs.matcher(oldFrage);
@@ -364,44 +369,30 @@ public class QuestionController {
 			if(frage != null) {
 				neueFrage.setFrageID(frage.getFrageID());
 			}
+
+			FrageEditParam param = new FrageEditParam(artChoice, zahlChoice, textFieldZahl, chckbxPflichtfrage, chckbxMultipleChoice,
+					chckbxListe, chckbxTextArea, chckbxJaNein, chckbxUeberschrift, chckbxX, chckbxZahl);
+
+			neueFrage.setArt(param.getType());
 			
-			if(artChoice.getSelectionModel().getSelectedItem().equals("Multiple Choice") || artChoice.getSelectionModel().getSelectedItem().equals("Bewertungsfrage")) {
-				neueFrage.setArt("MC");
-			} else if (artChoice.getSelectionModel().getSelectedItem().equals("Freie Frage")) {
-				neueFrage.setArt("FF");
-			}
-			
-			String selectedKat = katChoice.getSelectionModel().getSelectedItem().toString();
+			String selectedKat = katChoice.getSelectionModel().getSelectedItem();
 			if (selectedKat.equals("")) {
-				selectedKat = katChoice.getItems().get(0).toString();
+				selectedKat = katChoice.getItems().get(0);
 			}						
 			neueFrage.setKategorie(selectedKat);
-			
-			
-			boolean pflichtfrage = chckbxPflichtfrage.isSelected();                 // +
-	        boolean liste = chckbxListe.isSelected();                               // LIST
-	        boolean multipleChoice = chckbxMultipleChoice.isSelected();             // *
-	        boolean textarea = chckbxTextArea.isSelected();                         // TEXT
-	        boolean ja_nein = chckbxJaNein.isSelected();   							// JN
-	        boolean x = chckbxX.isSelected();
-	        //floNeu
-	        boolean isZahl = chckbxZahl.isSelected();									
-	        String zahlArt = (String) zahlChoice.getSelectionModel().getSelectedItem();			// INT<= | INT>= | INT==
-	        int anzahlZeichen = textFieldZahl.getText().equals("") ? 0 : Integer.parseInt(textFieldZahl.getText());
-	        //	
 	        
 	        List<React> mcList = flags.getAll(React.class);
 	        for (React react : mcList) {
-	        	if(pflichtfrage) {
+	        	if(param.isRequired()) {
 					QuestionService.updateFlags(fragebogen, react.getQuestionType().toString(), react.getQuestionId());
 				}
 		        if (QuestionService.isPflichtfrage(fragebogen, react.getQuestionType().toString(), react.getQuestionId())) {
-		        	pflichtfrage = true;
+		        	param.setRequired(true);
 		        }
 			}
 	        
 			if (artChoice.getSelectionModel().getSelectedItem().equals("Freie Frage")) {
-				QuestionService.getMoeglicheFlags(flags, pflichtfrage, liste, multipleChoice, textarea, ja_nein, isZahl, false, zahlArt, anzahlZeichen, "ff");//floNeu
+				QuestionService.getMoeglicheFlags(flags, param);//floNeu
 				neueFrage.setFlags(flags);
 				QuestionService.saveFreieFrage(fragebogen, neueFrage);					
 			}
@@ -409,7 +400,7 @@ public class QuestionController {
 				ArrayList<Integer> antIds = new ArrayList<>();
 				ArrayList<Integer> antIdsRaus = new ArrayList<>();
 				ArrayList<String> ants = new ArrayList<>();
-				if (ja_nein) {
+				if (param.isYesNoQuestion()) {
 					ants.add("Ja");
 					ants.add("Nein");
 				} else {
@@ -445,12 +436,12 @@ public class QuestionController {
 					int antId = QuestionService.getAntwortID(ant);
 					antIds.add(antId);
 				}
-				QuestionService.getMoeglicheFlags(flags, pflichtfrage, liste, multipleChoice, textarea, ja_nein, isZahl, x, zahlArt, anzahlZeichen, "mc");//floNeu
+				QuestionService.getMoeglicheFlags(flags, param);//floNeu
 				neueFrage.setFlags(flags);
 				QuestionService.saveMC(fragebogen, neueFrage, antIds);
 			}
 			if (artChoice.getSelectionModel().getSelectedItem().equals("Bewertungsfrage")) {
-				QuestionService.getMoeglicheFlags(flags, pflichtfrage, liste, multipleChoice, textarea, ja_nein, isZahl, false, zahlArt, anzahlZeichen, "bf");//floNeu
+				QuestionService.getMoeglicheFlags(flags, param);//floNeu
 				neueFrage.setFlags(flags);
 				QuestionService.saveBewertungsfrage(fragebogen, neueFrage);
 			}
@@ -552,6 +543,65 @@ public class QuestionController {
 
 
 		return !btnSave.isDisabled();
+	}
+
+	@FXML
+	private void updateCheckboxes() {
+		FrageEditParam param = new FrageEditParam(artChoice, zahlChoice, textFieldZahl, chckbxPflichtfrage, chckbxMultipleChoice,
+				chckbxListe, chckbxTextArea, chckbxJaNein, chckbxUeberschrift, chckbxX, chckbxZahl);
+
+		artChoice.setDisable(!param.isTypeActivatable());
+		if(artChoice.isDisabled()) {
+			artChoice.getSelectionModel().select(1);
+		}
+
+		zahlChoice.setDisable(!param.isNumberTypeActivatable());
+		if(zahlChoice.isDisabled()) {
+			zahlChoice.getSelectionModel().clearSelection();
+		}
+
+		textFieldZahl.setDisable(!param.isCountCharsActivatable());
+		if(textFieldZahl.isDisabled()) {
+			textFieldZahl.clear();
+		}
+
+		chckbxPflichtfrage.setDisable(!param.isRequiredActivatable());
+		if(chckbxPflichtfrage.isDisabled()) {
+			chckbxPflichtfrage.setSelected(false);
+		}
+
+		chckbxMultipleChoice.setDisable(!param.isMultipleChoiceActivatable());
+		if(chckbxMultipleChoice.isDisabled()) {
+			chckbxMultipleChoice.setSelected(false);
+		}
+
+		chckbxListe.setDisable(!param.isListActivatable());
+		if(chckbxListe.isDisabled()) {
+			chckbxListe.setSelected(false);
+		}
+
+		chckbxTextArea.setDisable(!param.isTextareaActivatable());
+		if(chckbxTextArea.isDisabled()) {
+			chckbxTextArea.setSelected(false);
+		}
+
+		chckbxJaNein.setDisable(!param.isYesNoQuestionActivatable());
+		if(chckbxJaNein.isDisabled()) {
+			chckbxJaNein.setSelected(false);
+		}
+
+		chckbxX.setDisable(!param.isSingleLineActivatable());
+		if(chckbxX.isDisabled()) {
+			chckbxX.setSelected(false);
+		}
+
+		chckbxZahl.setDisable(!param.isNumericActivatable());
+		if(chckbxZahl.isDisabled()) {
+			chckbxZahl.setSelected(false);
+		}
+
+		tbl_antworten.setDisable(!param.isAnswersListActivatable());
+		btnNewAnswer.setDisable(!param.isAnswersListActivatable());
 	}
 
 	public class Antwort {

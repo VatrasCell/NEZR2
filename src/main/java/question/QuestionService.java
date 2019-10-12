@@ -7,6 +7,7 @@ import flag.NumberOperator;
 import flag.Symbol;
 import flag.SymbolType;
 import model.Frage;
+import model.FrageEditParam;
 import model.Fragebogen;
 import org.controlsfx.control.Notifications;
 
@@ -136,70 +137,47 @@ public class QuestionService extends Datenbank {
 	
 	/**
 	 * Erstellt String mit den angegebenen Flags.
-	 * 
-	 * @param pflichtfrage
-	 *            boolean: ist es eine Pflichtfrage?
-	 * @param liste
-	 *            boolean: ist es eine Liste?
-	 * @param multipleChoice
-	 *            boolean: sind mehrere Antworten moeglich?
-	 * @param textarea
-	 *            boolean: ist es ein Textarea?
-	 * @param ja_nein
-	 *            boolean: ist es eine Ja- Nein- Frage?
-	 * @param isZahl
-	 *            boolean: verlangt das Textfeld eine Zahl?
-	 * @param zahlArt
-	 *            String: <=; ==; >=?
-	 * @param anzahlZeichen
-	 *            int: Anzahl der Stellen der Zahl?
-	 * @param art
-	 *            String: ist es eine Bewertungsfrage?
-	 * @return String flag
 	 * @author Florian
 	 */
-	public static FlagList getMoeglicheFlags(FlagList flags, boolean pflichtfrage, boolean liste, boolean multipleChoice,
-			boolean textarea, boolean ja_nein, boolean isZahl, boolean isX, String zahlArt, int anzahlZeichen,
-			String art) {
-		if (pflichtfrage) {
+	public static void getMoeglicheFlags(FlagList flags, FrageEditParam param) {
+		if (param.isRequired()) {
 			flags.add(new Symbol(SymbolType.REQUIRED));
 		}
-		if (liste) {
+		if (param.isList()) {
 			flags.add(new Symbol(SymbolType.LIST));
 		}
-		if (multipleChoice) {
+		if (param.isMultipleChoice()) {
 			flags.add(new Symbol(SymbolType.MC));
 		}
-		if (textarea) {
+		if (param.isTextarea()) {
 			flags.add(new Symbol(SymbolType.TEXT));
 		}
-		if (ja_nein) {
+		if (param.isYesNoQuestion()) {
 			flags.add(new Symbol(SymbolType.JN));
-			if (isX) {
+			if (param.isSingleLine()) {
 				flags.add(new Symbol(SymbolType.JNExcel));
 			}
 		}
 
-		if (isZahl) {
-			if (zahlArt.equals("Größer gleich Zahl")) {
-				flags.add(new Number(NumberOperator.GTE, anzahlZeichen));
+		if (param.isNumeric()) {
+			if (param.getNumberType().equals("Größer gleich Zahl")) {
+				flags.add(new Number(NumberOperator.GTE, param.getCountChars()));
 			}
 
-			if (zahlArt.equals("Kleiner gleich Zahl")) {
-				flags.add(new Number(NumberOperator.LTE, anzahlZeichen));
+			if (param.getNumberType().equals("Kleiner gleich Zahl")) {
+				flags.add(new Number(NumberOperator.LTE, param.getCountChars()));
 			}
 
-			if (zahlArt.equals("Genau wie die Zahl")) {
-				flags.add(new Number(NumberOperator.EQ, anzahlZeichen));
+			if (param.getNumberType().equals("Genau wie die Zahl")) {
+				flags.add(new Number(NumberOperator.EQ, param.getCountChars()));
 			}
 		}
 
 		//
 
-		if (art.equals("bf")) {
+		if (param.isValuationAsk()) {
 			flags.add(new Symbol(SymbolType.B));
 		}
-		return flags;
 	}
 	
 	/**
@@ -357,7 +335,7 @@ public class QuestionService extends Datenbank {
 				ResultSet myRS = mySQL.executeQuery(statement);
 
 				if (myRS.next()) {
-					if (myRS.getString("Flags").indexOf("+") >= 0) {
+					if (myRS.getString("Flags").contains("+")) {
 						return true;
 					} else {
 						String flags = myRS.getString("Flags") + " +";
