@@ -11,7 +11,7 @@ import static application.GlobalFuncs.getInputStream;
 
 public class GlobalVars {
 	public static final boolean DEVMODE = true;
-	public static final boolean IGNORE_CHECK = true;
+	public static final boolean IGNORE_CHECK = false;
 	public static int fragen = 3;
 	public static final int proZeile = 3;
 	public static String standort;

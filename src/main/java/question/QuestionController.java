@@ -99,9 +99,6 @@ public class QuestionController {
 	private TableColumn<Antwort, String> antCol;
 	@FXML
 	private TableColumn<Antwort, String> actionCol = new TableColumn<>("Bearbeiten");
-	// @FXML
-	// private TableColumn<Fragebogen, String> copCol = new
-	// TableColumn<>("Kopieren");
 	@FXML
 	private TableColumn<Antwort, String> delCol = new TableColumn<>("Löschen");
 
@@ -447,14 +444,11 @@ public class QuestionController {
 			}
 		
 			ScreenController.activate(model.Scene.QUESTIONLIST);
-			//pnlFrageErstellenLeeren();
-			//makeFragenTabelle(QuestionService.getFragen(fragebogen));
-			//cardLayout.show(frame.getContentPane(), "pnlFragenUebersicht");		
 		} else {
-			/*BalloonTip fehler = new BalloonTip(btnSpeichernFE, "Die Frage ist fehlerhaft und kann deswegen nicht gespeichert werden!");
-			fehler.setCloseButton(null);
-			TimingUtils.showTimedBalloon(fehler, 3000);
-			fehler.setVisible(true);*/
+			Notifications
+					.create()
+					.title("Antwort anlegen").text("\"Die Frage ist fehlerhaft und kann deswegen nicht gespeichert werden!")
+					.showError();
 		}
 	}
 	

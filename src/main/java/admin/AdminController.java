@@ -38,13 +38,14 @@ import start.StartController;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Objects;
 import java.util.Optional;
 
 import static application.GlobalFuncs.getURL;
 import static application.ScreenController.styleSheet;
 
 public class AdminController {
-	
+
 	private ArrayList<Fragebogen> fragebogen;
 	private ObservableList<Fragebogen> data = FXCollections.observableArrayList();
 	
@@ -86,9 +87,7 @@ public class AdminController {
 		data.clear();
 		fragebogen = AdminService.getFragebogen(GlobalVars.standort);
 		//System.out.println(fragebogen.toString());
-		for(Fragebogen f : fragebogen) {
-			data.add(f);
-		}
+		data.addAll(Objects.requireNonNull(fragebogen));
 	}
 	
 	/**
@@ -156,31 +155,30 @@ public class AdminController {
         		imgView.setFitWidth(30);
         		Button btn = new Button("", imgView);
                 btn.setPadding(Insets.EMPTY);
-                final TableCell<Fragebogen, String> cell = new TableCell<Fragebogen, String>() {
+				return new TableCell<Fragebogen, String>() {
 
-                    @Override
-                    public void updateItem(String item, boolean empty) {
-                        super.updateItem(item, empty);
-                        if (empty) {
-                            setGraphic(null);
-                            setText(null);
-                        } else {
-                            btn.setOnAction(event -> {
-                            	try {
-                            		QuestionListController.fragebogen = getTableView().getItems().get(getIndex());
-									ScreenController.addScreen(model.Scene.QUESTIONLIST, 
-											FXMLLoader.load(getClass().getClassLoader().getResource("view/QuestionListView.fxml")));
+					@Override
+					public void updateItem(String item, boolean empty) {
+						super.updateItem(item, empty);
+						if (empty) {
+							setGraphic(null);
+							setText(null);
+						} else {
+							btn.setOnAction(event -> {
+								try {
+									QuestionListController.fragebogen = getTableView().getItems().get(getIndex());
+									ScreenController.addScreen(model.Scene.QUESTIONLIST,
+											FXMLLoader.load(getURL("view/QuestionListView.fxml")));
 									ScreenController.activate(model.Scene.QUESTIONLIST);
 								} catch (IOException e) {
 									e.printStackTrace();
 								}
-                            });
-                            setGraphic(btn);
-                            setText(null);
-                        }
-                    }
-                };
-                return cell;
+							});
+							setGraphic(btn);
+							setText(null);
+						}
+					}
+				};
             }
         };
 
@@ -196,46 +194,45 @@ public class AdminController {
             	ImageView imgView = new ImageView(GlobalVars.IMG_COP);
             	imgView.setFitHeight(30);
         		imgView.setFitWidth(30);
-                final TableCell<Fragebogen, String> cell = new TableCell<Fragebogen, String>() {
+				return new TableCell<Fragebogen, String>() {
 
-                    final Button btn = new Button("", imgView);
+					final Button btn = new Button("", imgView);
 
-                    @Override
-                    public void updateItem(String item, boolean empty) {
-                        super.updateItem(item, empty);
-                        if (empty) {
-                            setGraphic(null);
-                            setText(null);
-                        } else {
-                            btn.setOnAction(event -> {
-                            	Fragebogen fragebogen = getTableView().getItems().get(getIndex());
-                            	
-                            	ChoiceDialog<String> dialog = new ChoiceDialog<>(GlobalVars.standort, GlobalVars.standorte);
-                            	dialog.setTitle("Fragebogen kopieren");
-                            	dialog.setHeaderText("Fragebogen kopieren");
-                            	dialog.setContentText("Standort wählen:");
-                            	DialogPane dialogPane = dialog.getDialogPane();
-                            	dialogPane.getStylesheets().add(getURL(styleSheet).toExternalForm());
+					@Override
+					public void updateItem(String item, boolean empty) {
+						super.updateItem(item, empty);
+						if (empty) {
+							setGraphic(null);
+							setText(null);
+						} else {
+							btn.setOnAction(event -> {
+								Fragebogen fragebogen1 = getTableView().getItems().get(getIndex());
 
-                            	Optional<String> result = dialog.showAndWait();
-                            	result.ifPresent(ort -> {
-		                            	if(AdminService.copyFragebogen(fragebogen, ort)) {
-		                            		getData();
-		                            		tbl_fragebogen.refresh();
-		                            		Notifications.create().title("Fragebogen kopieren").text("Der Fragebogen \"" + fragebogen.getName() + "\" wurde erfolgreich\nnach \"" + ort  + "\" kopiert.").show();
-	                            		} else {
-	                            			Notifications.create().title("Excel Export").text("Ein Fehler ist aufgetreten.").showError();
-	                            		}
-                            		}
-                            	);
-                            	
-                            });
-                            setGraphic(btn);
-                            setText(null);
-                        }
-                    }
-                };
-                return cell;
+								ChoiceDialog<String> dialog = new ChoiceDialog<>(GlobalVars.standort, GlobalVars.standorte);
+								dialog.setTitle("Fragebogen kopieren");
+								dialog.setHeaderText("Fragebogen kopieren");
+								dialog.setContentText("Standort wählen:");
+								DialogPane dialogPane = dialog.getDialogPane();
+								dialogPane.getStylesheets().add(getURL(styleSheet).toExternalForm());
+
+								Optional<String> result = dialog.showAndWait();
+								result.ifPresent(ort -> {
+										if(AdminService.copyFragebogen(fragebogen1, ort)) {
+											getData();
+											tbl_fragebogen.refresh();
+											Notifications.create().title("Fragebogen kopieren").text("Der Fragebogen \"" + fragebogen1.getName() + "\" wurde erfolgreich\nnach \"" + ort  + "\" kopiert.").show();
+										} else {
+											Notifications.create().title("Excel Export").text("Ein Fehler ist aufgetreten.").showError();
+										}
+									}
+								);
+
+							});
+							setGraphic(btn);
+							setText(null);
+						}
+					}
+				};
             }
         };
 
@@ -251,39 +248,38 @@ public class AdminController {
             	ImageView imgView = new ImageView(GlobalVars.IMG_REN);
             	imgView.setFitHeight(30);
         		imgView.setFitWidth(30);
-                final TableCell<Fragebogen, String> cell = new TableCell<Fragebogen, String>() {
-                    final Button btn = new Button("", imgView);
+				return new TableCell<Fragebogen, String>() {
+					final Button btn = new Button("", imgView);
 
-                    @Override
-                    public void updateItem(String item, boolean empty) {
-                        super.updateItem(item, empty);
-                        if (empty) {
-                            setGraphic(null);
-                            setText(null);
-                        } else {
-                            btn.setOnAction(event -> {
-                            	Fragebogen fragebogen = getTableView().getItems().get(getIndex());
-                            	TextInputDialog dialog = new TextInputDialog("");
-                            	dialog.setTitle("Fragebogen umbenennen");
-                            	dialog.setContentText("neuer Name:");
-                            	DialogPane dialogPane = dialog.getDialogPane();
-                        		dialogPane.getStylesheets().add(
-                        		   getClass().getClassLoader().getResource("../application/application.css").toExternalForm());
-                        		
-                            	Optional<String> result = dialog.showAndWait();
-                            	result.ifPresent(name -> fragebogen.setName(name));
-                            	
-                            	if(AdminService.renameFragebogen(fragebogen)) {
-                            		getData();
-                            		tbl_fragebogen.refresh();
-                            	}
-                            });
-                            setGraphic(btn);
-                            setText(null);
-                        }
-                    }
-                };
-                return cell;
+					@Override
+					public void updateItem(String item, boolean empty) {
+						super.updateItem(item, empty);
+						if (empty) {
+							setGraphic(null);
+							setText(null);
+						} else {
+							btn.setOnAction(event -> {
+								Fragebogen fragebogen1 = getTableView().getItems().get(getIndex());
+								TextInputDialog dialog = new TextInputDialog("");
+								dialog.setTitle("Fragebogen umbenennen");
+								dialog.setContentText("neuer Name:");
+								DialogPane dialogPane = dialog.getDialogPane();
+								dialogPane.getStylesheets().add(
+								   getURL("style/application.css").toExternalForm());
+
+								Optional<String> result = dialog.showAndWait();
+								result.ifPresent(fragebogen1::setName);
+
+								if(AdminService.renameFragebogen(fragebogen1)) {
+									getData();
+									tbl_fragebogen.refresh();
+								}
+							});
+							setGraphic(btn);
+							setText(null);
+						}
+					}
+				};
             }
         };
 
@@ -299,26 +295,25 @@ public class AdminController {
             	ImageView imgView = new ImageView(GlobalVars.IMG_SQL);
             	imgView.setFitHeight(30);
         		imgView.setFitWidth(30);
-                final TableCell<Fragebogen, String> cell = new TableCell<Fragebogen, String>() {
-                    final Button btn = new Button("", imgView);
+				return new TableCell<Fragebogen, String>() {
+					final Button btn = new Button("", imgView);
 
-                    @Override
-                    public void updateItem(String item, boolean empty) {
-                        super.updateItem(item, empty);
-                        if (empty) {
-                            setGraphic(null);
-                            setText(null);
-                        } else {
-                            btn.setOnAction(event -> {
-                            	Fragebogen fragebogen = getTableView().getItems().get(getIndex());
-                            	
-                            });
-                            setGraphic(btn);
-                            setText(null);
-                        }
-                    }
-                };
-                return cell;
+					@Override
+					public void updateItem(String item, boolean empty) {
+						super.updateItem(item, empty);
+						if (empty) {
+							setGraphic(null);
+							setText(null);
+						} else {
+							btn.setOnAction(event -> {
+								Fragebogen fragebogen1 = getTableView().getItems().get(getIndex());
+
+							});
+							setGraphic(btn);
+							setText(null);
+						}
+					}
+				};
             }
         };
 
@@ -334,36 +329,35 @@ public class AdminController {
             	ImageView imgView = new ImageView(GlobalVars.IMG_XLS);
             	imgView.setFitHeight(30);
         		imgView.setFitWidth(30);
-                final TableCell<Fragebogen, String> cell = new TableCell<Fragebogen, String>() {
-                    final Button btn = new Button("", imgView);
+				return new TableCell<Fragebogen, String>() {
+					final Button btn = new Button("", imgView);
 
-                    @Override
-                    public void updateItem(String item, boolean empty) {
-                        super.updateItem(item, empty);
-                        if (empty) {
-                            setGraphic(null);
-                            setText(null);
-                        } else {
-                            btn.setOnAction(event -> {
-                            	Fragebogen fragebogen = getTableView().getItems().get(getIndex());
-                            	ExportController exportController = new ExportController();
-                            	Optional<Pair<String, String>> result = getDatePickerDialog();
-                            	result.ifPresent(dates -> {
-                        		    //System.out.println("Von=" + usernamePassword.getKey() + ", Bis=" + usernamePassword.getValue());
-                            		if( exportController.excelNeu(fragebogen.getId() + "_" + fragebogen.getOrt() + "_" + fragebogen.getName() + ".xlsx", fragebogen, 
-                            		dates.getKey(), dates.getValue())) {
-                            			Notifications.create().title("Excel Export").text("Export erfolgreich abgeschlossen.").show();
-                            		} else {
-                            			Notifications.create().title("Excel Export").text("Ein Fehler ist aufgetreten.").showError();
-                            		}
-                        		});
-                            });
-                            setGraphic(btn);
-                            setText(null);
-                        }
-                    }
-                };
-                return cell;
+					@Override
+					public void updateItem(String item, boolean empty) {
+						super.updateItem(item, empty);
+						if (empty) {
+							setGraphic(null);
+							setText(null);
+						} else {
+							btn.setOnAction(event -> {
+								Fragebogen fragebogen1 = getTableView().getItems().get(getIndex());
+								ExportController exportController = new ExportController();
+								Optional<Pair<String, String>> result = getDatePickerDialog();
+								result.ifPresent(dates -> {
+									//System.out.println("Von=" + usernamePassword.getKey() + ", Bis=" + usernamePassword.getValue());
+									if( exportController.excelNeu(fragebogen1.getId() + "_" + fragebogen1.getOrt() + "_" + fragebogen1.getName() + ".xlsx", fragebogen1,
+									dates.getKey(), dates.getValue())) {
+										Notifications.create().title("Excel Export").text("Export erfolgreich abgeschlossen.").show();
+									} else {
+										Notifications.create().title("Excel Export").text("Ein Fehler ist aufgetreten.").showError();
+									}
+								});
+							});
+							setGraphic(btn);
+							setText(null);
+						}
+					}
+				};
             }
         };
 
@@ -379,46 +373,42 @@ public class AdminController {
             	ImageView imgView = new ImageView(GlobalVars.IMG_DEL);
             	imgView.setFitHeight(30);
         		imgView.setFitWidth(30);
-                final TableCell<Fragebogen, String> cell = new TableCell<Fragebogen, String>() {
-                    final Button btn = new Button("", imgView);
+				return new TableCell<Fragebogen, String>() {
+					final Button btn = new Button("", imgView);
 
-                    @Override
-                    public void updateItem(String item, boolean empty) {
-                        super.updateItem(item, empty);
-                        if (empty) {
-                            setGraphic(null);
-                            setText(null);
-                        } else {
-                            btn.setOnAction(event -> {
-                            	Fragebogen fragebogen = getTableView().getItems().get(getIndex());
-                            	Alert alert = new Alert(AlertType.CONFIRMATION);
-                        		alert.setTitle("Fragebogen löschen");
-                        		alert.setHeaderText("Wollen Sie den Fragebogen wirklich löschen?");
-                        		alert.setContentText("Fortfahren?");
-                        		
-                        		DialogPane dialogPane = alert.getDialogPane();
-                        		dialogPane.getStylesheets().add(
-                        		   getClass().getClassLoader().getResource("../application/application.css").toExternalForm());
+					@Override
+					public void updateItem(String item, boolean empty) {
+						super.updateItem(item, empty);
+						if (empty) {
+							setGraphic(null);
+							setText(null);
+						} else {
+							btn.setOnAction(event -> {
+								Fragebogen fragebogen1 = getTableView().getItems().get(getIndex());
+								Alert alert = new Alert(AlertType.CONFIRMATION);
+								alert.setTitle("Fragebogen löschen");
+								alert.setHeaderText("Wollen Sie den Fragebogen wirklich löschen?");
+								alert.setContentText("Fortfahren?");
 
-                        		Optional<ButtonType> result = alert.showAndWait();
-                        		if (result.get() == ButtonType.OK){
-                        			if(AdminService.deleteFragebogen(fragebogen)) {
-                                		getData();
-                                		tbl_fragebogen.refresh();
-                                		Notifications.create().title("Fragebogen löschen").text("Fragebogen \"" + fragebogen.getName() + "\" wurde erfolgreich abgeschlossen.").show();
-                            		} else {
-                            			Notifications.create().title("Fragebogen löschen").text("Ein Fehler ist aufgetreten.").showError();
-                            		}
-                        		} else {
-                        		    // ... user chose CANCEL or closed the dialog
-                        		}
-                            });
-                            setGraphic(btn);
-                            setText(null);
-                        }
-                    }
-                };
-                return cell;
+								DialogPane dialogPane = alert.getDialogPane();
+								dialogPane.getStylesheets().add(getURL("style/application.css").toExternalForm());
+
+								Optional<ButtonType> result = alert.showAndWait();
+								if (result.isPresent() && result.get() == ButtonType.OK){
+									if(AdminService.deleteFragebogen(fragebogen1)) {
+										getData();
+										tbl_fragebogen.refresh();
+										Notifications.create().title("Fragebogen löschen").text("Fragebogen \"" + fragebogen1.getName() + "\" wurde erfolgreich abgeschlossen.").show();
+									} else {
+										Notifications.create().title("Fragebogen löschen").text("Ein Fehler ist aufgetreten.").showError();
+									}
+								}
+							});
+							setGraphic(btn);
+							setText(null);
+						}
+					}
+				};
             }
         };
 
@@ -433,8 +423,7 @@ public class AdminController {
 		dialog.setTitle("Excel Export");
 		
 		DialogPane dialogPane = dialog.getDialogPane();
-    	dialogPane.getStylesheets().add(
-     		   getClass().getClassLoader().getResource("../application/application.css").toExternalForm());
+    	dialogPane.getStylesheets().add(getURL("style/application.css").toExternalForm());
 
 		ButtonType okButtonType = new ButtonType("Export", ButtonData.OK_DONE);
 		dialog.getDialogPane().getButtonTypes().addAll(okButtonType, ButtonType.CANCEL);
@@ -456,7 +445,7 @@ public class AdminController {
 
 		dialog.getDialogPane().setContent(grid);
 
-		Platform.runLater(() -> von.requestFocus());
+		Platform.runLater(von::requestFocus);
 
 		dialog.setResultConverter(dialogButton -> {
 		    if (dialogButton == okButtonType) {
@@ -465,8 +454,7 @@ public class AdminController {
 		    return null;
 		});
 
-		Optional<Pair<String, String>> result = dialog.showAndWait();
-		return result;
+		return dialog.showAndWait();
 	}
 	
 	@FXML
@@ -475,8 +463,7 @@ public class AdminController {
     	dialog.setTitle("Fragebogen erstellen");
     	dialog.setContentText("Name:");
     	DialogPane dialogPane = dialog.getDialogPane();
-		dialogPane.getStylesheets().add(
-		   getClass().getClassLoader().getResource("../application/application.css").toExternalForm());
+		dialogPane.getStylesheets().add(getURL("style/application.css").toExternalForm());
 		
     	Optional<String> result = dialog.showAndWait();
     	result.ifPresent(name -> {

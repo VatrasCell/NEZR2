@@ -63,7 +63,7 @@ public class SurveyController {
 			break;
 		}
 		
-		String image = this.getClass().getClassLoader().getResource(value).toExternalForm();
+		String image = getURL(value).toExternalForm();
 		pane.setStyle("-fx-background-image: url('" + image + "');" +
 				"-fx-background-repeat: no-repeat;" +
 	  			"-fx-background-attachment: fixed;" +
@@ -81,7 +81,7 @@ public class SurveyController {
 				if(!isPreview) {
 					SurveyService.saveUmfrage(GlobalVars.fragenJePanel);
 					ScreenController.addScreen(model.Scene.GRATITUDE, 
-							FXMLLoader.load(getClass().getClassLoader().getResource("view/GratitudeView.fxml")));
+							FXMLLoader.load(getURL("view/GratitudeView.fxml")));
 					ScreenController.activate(model.Scene.GRATITUDE);
 				} else {
 					System.out.println("still page " + GlobalVars.page);
@@ -117,10 +117,8 @@ public class SurveyController {
 			dialogPane.getStylesheets().add(getURL(styleSheet).toExternalForm());
 
 			Optional<ButtonType> result = alert.showAndWait();
-			if (result.get() == ButtonType.OK){
+			if (result.isPresent() && result.get() == ButtonType.OK){
 				ScreenController.activate(model.Scene.START);
-			} else {
-			    // ... user chose CANCEL or closed the dialog
 			}
 		}			
 	}
@@ -133,14 +131,11 @@ public class SurveyController {
 		alert.setContentText("Fortfahren?");
 		
 		DialogPane dialogPane = alert.getDialogPane();
-		dialogPane.getStylesheets().add(
-		   getClass().getClassLoader().getResource("../application/application.css").toExternalForm());
+		dialogPane.getStylesheets().add(getURL("style/application.css").toExternalForm());
 
 		Optional<ButtonType> result = alert.showAndWait();
-		if (result.get() == ButtonType.OK){
+		if (result.isPresent() && result.get() == ButtonType.OK){
 			ScreenController.activate(model.Scene.QUESTION);
-		} else {
-		    // ... user chose CANCEL or closed the dialog
 		}
 		
 	}
@@ -158,19 +153,17 @@ public class SurveyController {
 		
 		if(GlobalVars.everythingIsAwesome) {
 			for(Frage frage : GlobalVars.fragenJePanel.get(GlobalVars.page)) {
-				if(frage.getArt() == "MC") {
+				if(frage.getArt().equals("MC")) {
 					if(frage.getFlags().is(SymbolType.LIST)) {
-						ArrayList<String> antwort = new ArrayList<String>();
+						ArrayList<String> antwort = new ArrayList<>();
 						for(ListView<String> listView : frage.getAntwortenLIST()) {
 							if(listView.isVisible()) {
-								for(String value : listView.getSelectionModel().getSelectedItems()) {
-									antwort.add(value);
-								}
+								antwort.addAll(listView.getSelectionModel().getSelectedItems());
 							}
 						}
 						frage.setAntwort(antwort);
 					} else {
-						ArrayList<String> antwort = new ArrayList<String>();
+						ArrayList<String> antwort = new ArrayList<>();
 						for(CheckBox checkbox : frage.getAntwortenMC()) {
 							if(checkbox.isSelected() && checkbox.isVisible()) {
 								antwort.add(checkbox.getText());
@@ -180,7 +173,7 @@ public class SurveyController {
 					}
 				} else {
 					if(frage.getFlags().is(SymbolType.TEXT)) {
-						ArrayList<String> antwort = new ArrayList<String>();
+						ArrayList<String> antwort = new ArrayList<>();
 						for(TextArea textArea : frage.getAntwortenTEXT()) {
 							if(!textArea.getText().equals("") && textArea.isVisible()) {
 								String string = textArea.getText();
@@ -189,7 +182,7 @@ public class SurveyController {
 						}
 						frage.setAntwort(antwort);
 					} else {
-						ArrayList<String> antwort = new ArrayList<String>();
+						ArrayList<String> antwort = new ArrayList<>();
 						for(TextField textField : frage.getAntwortenFF()) {
 							if(!textField.getText().equals("") && textField.isVisible()) {
 								String string = textField.getText();
@@ -343,7 +336,6 @@ public class SurveyController {
 				try {
 					Integer.parseInt(frage.getAntwortenFF().get(0).getText());
 					if(textField.getText().length() >= number.getDigits()) {
-						continue;
 					} else {
 						//BalloonTip fehler = new BalloonTip(textField, "die Zahl ist nicht gr\u00f6\u00dfer oder gleich " + i + " Zeichen lang");
 						//fehler.setCloseButton(null);
@@ -370,7 +362,7 @@ public class SurveyController {
 	 */
 	private boolean checkPflichtfrage(Frage frage) {
 		if(frage.getFlags().is(SymbolType.REQUIRED) && frage.getFrageLabel().isVisible()) {
-			if (frage.getArt() == "MC") {
+			if (frage.getArt().equals("MC")) {
 				boolean selected = false;
 				for (CheckBox checkbox : frage.getAntwortenMC()) {
 					if (checkbox.isSelected()) {
