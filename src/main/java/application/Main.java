@@ -16,7 +16,7 @@ public class Main extends Application {
 		} else {
 			primaryStage.setTitle("NEZR FX");
 		}
-		primaryStage.setFullScreen(false);
+		primaryStage.setFullScreen(true);
 		
 		ScreenController.setRootScene(primaryStage);
 		

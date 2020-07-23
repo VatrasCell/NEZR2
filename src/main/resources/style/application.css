@@ -1,29 +1,4 @@
 /*
- * The MIT License (MIT)
- * 
- * Copyright (c) 2015 - AGIX | Innovative Engineering
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT 	SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- *                                                                              
- */
-
-/*
  *   This is a Material Design CSS for JavaFX
  */
 
@@ -33,39 +8,47 @@
  *                                                                             *
  ******************************************************************************/
 .root {
-	/* Swatch Colors - Blue*/
+	/*Colors*/
 	-swatch-100: #BBDEFB;
 	-swatch-200: #90CAF9;
-	-swatch-300: #64BEF6;
 	-swatch-400: #42A5F5;
-	-swatch-500: #5f372b;
+	
+	-COLOR-BROWN: #5F372B; /*rgb(95, 55, 43)*/
+	-COLOR-LIGHT-YELLOW: #FCF5D9; /*rgb(252, 245, 217)*/
+	-COLOR-LIGHT-GREEN: #9ABC2A; /*rgb(154, 188, 42)*/
+	-COLOR-GREEN: #00843D; /*rgb(0, 132, 61)*/
+	-COLOR-ORANGE: #F6660D; /*rgb(246, 102, 13)*/
+
+	-COLOR-WHITE: #FFFFFF; /*rgb(255.0, 255.0, 255.0)*/
+	-COLOR-GRAY-245: #F5F5F5;  /*rgb(245.0, 245.0, 245.0)*/
+	-COLOR-GRAY-200: #C8C8C8;  /*rgb(200.0, 200.0, 200.0)*/
+	-COLOR-GRAY-130: #828282;  /*rgb(130.0, 130.0, 130.0)*/
+	-COLOR-GRAY-100: #646464;  /*rgb(100.0, 100.0, 100.0)*/
+	-COLOR-GRAY-65: #414141; /*rgb(65.0, 65.0, 65.0)*/
+	-COLOR-GRAY-45: #2D2D2D; /*rgb(45.0, 45.0, 45.0)*/
+
 	/*default text */
-	-fx-text-base-color: rgb(95, 55, 43);
-	-fx-text-button-normal: -swatch-500;
-	-fx-text-button-colored: rgb(255.0, 255.0, 255.0);
-	-fx-text-button-text: rgb(100.0, 100.0, 100.0);
-	-fx-text-title-color: rgb(45.0, 45.0, 45.0);
-	-fx-text-subtitle-color: rgb(65.0, 65.0, 65.0);
-	-fx-text-control-title-color: rgb(130.0, 130.0, 130.0);
-	-fx-text-fill: -fx-text-base-color;
-	-dark: rgb(252, 245, 217);
-	-fx-background-color: -dark;
+	-fx-text-base-color: -COLOR-BROWN;
+	-fx-text-button-normal: -COLOR-BROWN;
+	-fx-text-button-colored: -COLOR-WHITE;
+	-fx-text-button-text: -COLOR-GRAY-100;
+	-fx-text-title-color: -COLOR-GRAY-45;
+	-fx-text-subtitle-color: -COLOR-GRAY-65;
+	-fx-text-control-title-color: -COLOR-GRAY-130;
+	-fx-text-fill: -COLOR-BROWN;
+	-fx-background-color: -COLOR-LIGHT-YELLOW;
+
 	/*default font */
 	-fx-font-family: 'Roboto Medium';
 	-fx-font-size: 14.0px;
 	-fx-disabled-opacity: 0.6;
-	/*default colors */
-	-swatch-grey: rgb(200, 200, 200);
-	-swatch-dark-grey: white;
-	-swatch-light-grey: white;
-	-swatch-toolbar: rgb(245.0, 245.0, 245.0);
-	-swatch-toolbar-selected: rgb(215.0, 215.0, 215.0);
-	/* 
+
+	/*
      Modena colors
      */
 	-fx-dark-text-color: white; /* Text color when selected*/
 	-fx-mid-text-color: -fx-text-base-color;
-	-fx-light-text-color: -swatch-light-grey;
+	-fx-light-text-color: -COLOR-WHITE;
 	-fx-body-color: white;
 	/* A bright blue for the focus indicator of objects. Typically used as the
      * first color in -fx-background-color for the "focused" pseudo-class. Also
@@ -139,6 +122,13 @@
 	-fx-background-color: transparent;
 }
 
+.button.cancel {
+    /*-fx-font-size: 32.0px;
+    -fx-pref-width: 100px;
+    -fx-pref-height: 100px;*/
+    -fx-background-color: #2980b9;
+}
+
 .toggle-button, .button {
 	-fx-text-fill: -fx-text-button-normal;
 	-fx-font-family: 'Roboto';
@@ -148,7 +138,7 @@
 	-fx-padding: 0.7em;
 	-fx-alignment: CENTER;
 	-fx-border-width: 3;
-	-fx-border-color: -swatch-500;
+	-fx-border-color: -COLOR-BROWN;
 }
 
 .button-raised .button .text, .button-flat .button .text {
@@ -156,24 +146,24 @@
 }
 
 .button:default {
-/* -fx-background-color: -swatch-500; */
+/* -fx-background-color: -COLOR-BROWN; */
 /* -fx-text-fill: -fx-text-button-colored;*/
 }
 
 .toggle-button:focused, .button:focused, .button:default:focused {
-	-fx-background-color: -swatch-light-grey;
+	-fx-background-color: -COLOR-WHITE;
 }
 
 .toggle-button:focused:selected {
-	-fx-background-color: derive(-swatch-500, 50.0%),
-		derive(-swatch-500, -20.0%);
+	-fx-background-color: derive(-COLOR-BROWN, 50.0%),
+		derive(-COLOR-BROWN, -20.0%);
 	-fx-background-insets: 0.0, 0.2em;
  -fx-text-fill: -fx-text-button-colored;
 }
 
 .toggle-button:armed, .toggle-button:selected, .button:armed, .button:default:armed
 	{
-	-fx-background-color: -swatch-grey;
+	-fx-background-color: -COLOR-GRAY-200;
  -fx-text-fill: -fx-text-button-colored;
 }
 
@@ -198,14 +188,14 @@
  ******************************************************************************/
 .combo-box-base, .choice-box {
 	-fx-background-color: transparent;
-	-fx-border-color: -swatch-grey;
+	-fx-border-color: -COLOR-GRAY-200;
 	-fx-border-width: 0 0 2 0;
 	-fx-background-radius: 0;
 	-fx-border-radius: 0;
 }
 
 .combo-box:focused, .choice-box:focused {
-	-fx-border-color: -swatch-500;
+	-fx-border-color: -COLOR-BROWN;
 }
 
 .combo-box-base>.label, .choice-box>.label {
@@ -218,16 +208,16 @@
 }
 
 .combo-box-base>.arrow-button>.arrow, .choice-box>.open-button>.arrow {
-	-fx-background-color: -swatch-grey;
+	-fx-background-color: -COLOR-GRAY-200;
 }
 
 .combo-box-base .arrow-button:hover .arrow, .spinner .increment-arrow-button:hover .increment-arrow,
 	.spinner .decrement-arrow-button:hover .decrement-arrow {
-	-fx-background-color: -swatch-dark-grey;
+	-fx-background-color: -COLOR-WHITE;
 }
 
 .menu-item:focused {
-	-fx-background-color: -swatch-light-grey;
+	-fx-background-color: -COLOR-WHITE;
 }
 
 /*******************************************************************************
@@ -246,7 +236,7 @@
 .check-box>.box, .check-box>.box.unfocused, .check-box:disabled>.box,
 	.check-box:indeterminate>.box {
 	-fx-border-radius: 4.0;
-	-fx-border-color: -swatch-grey;
+	-fx-border-color: -COLOR-GRAY-200;
 	-fx-border-width: 2;
 	-fx-background-radius: 4;
 	-fx-background-color: transparent;
@@ -254,8 +244,8 @@
 }
 
 .check-box:selected>.box {
-	-fx-border-color: -swatch-500;
-	-fx-background-color: -swatch-500;
+	-fx-border-color: -COLOR-BROWN;
+	-fx-background-color: -COLOR-BROWN;
 }
 
 .check-box:focused>.box {
@@ -268,7 +258,7 @@
 }
 
 .check-box:indeterminate>.box>.mark {
-	-fx-background-color: -swatch-grey;
+	-fx-background-color: -COLOR-GRAY-200;
 	-fx-padding: 0.45em;
 }
 
@@ -287,12 +277,12 @@
 }
 
 .radio-menu-item:checked .label, .check-menu-item:checked .label {
-	-fx-text-fill: -swatch-500;
+	-fx-text-fill: -COLOR-BROWN;
 }
 
 .radio-menu-item:checked>.left-container>.radio, .check-menu-item:checked>.left-container>.check
 	{
-	-fx-background-color: -swatch-dark-grey;
+	-fx-background-color: -COLOR-WHITE;
 	-fx-padding: 0.68em 0.5em 0.0em 0.0em;
 	-fx-effect: dropshadow(gaussian, rgb(0.0, 0.0, 0.0, 0.2), 0.0, 0.0, 0.0,
 		1.0);
@@ -315,7 +305,7 @@
 
 .popup-overlay {
 	-fx-background-color: white;
-	-fx-border-color: -swatch-grey;
+	-fx-border-color: -COLOR-GRAY-200;
 	-fx-border-width: 0 0 2 0;
 	-fx-background-radius: 0;
 	-fx-border-radius: 0;
@@ -339,7 +329,7 @@
 }
 
 .content-area {
-	-fx-background-color: -dark;
+	-fx-background-color: -COLOR-LIGHT-YELLOW;
 }
 
 .content-background {
@@ -354,11 +344,11 @@
  *                                                                             *
  ******************************************************************************/
 .date-picker-popup .button {
-	-fx-background-color: -swatch-500;
+	-fx-background-color: -COLOR-BROWN;
 }
 
 .date-picker-popup>.month-year-pane {
-	-fx-background-color: -swatch-500;
+	-fx-background-color: -COLOR-BROWN;
 }
 
 .date-picker-popup>*>.spinner>.button>.left-arrow, .date-picker-popup>*>.spinner>.button>.right-arrow
@@ -378,7 +368,7 @@
 .date-picker-popup>*>.day-name-cell, .date-picker-popup>*>.week-number-cell
 	{
 	-fx-font-weight: normal;
-	-fx-text-fill: -swatch-dark-grey;
+	-fx-text-fill: -COLOR-WHITE;
 	-fx-font-size: 1em;
 }
 
@@ -407,7 +397,7 @@
 .html-editor {
 	-fx-background-color: white;
 	-fx-border-width: 2 0 2 0;
-	-fx-border-color: -swatch-grey;
+	-fx-border-color: -COLOR-GRAY-200;
 }
 
 .html-editor .web-view {
@@ -443,11 +433,11 @@
  ******************************************************************************/
 .list-view:focused .list-cell:filled:focused:selected {
 	-fx-background-color: rgb(245.0, 245.0, 245.0);
-	-fx-text-fill: -swatch-500;
+	-fx-text-fill: -COLOR-BROWN;
 }
 
 .list-view:hover .list-cell:hover {
-	-fx-background-color: -swatch-light-grey;
+	-fx-background-color: -COLOR-WHITE;
 	-fx-text-fill: -fx-text-base-color;
 }
 
@@ -461,13 +451,13 @@
  *                                                                             *
  ******************************************************************************/
 .progress-bar>.track {
-	-fx-background-color: derive(-swatch-grey, 50.0%);
+	-fx-background-color: derive(-COLOR-GRAY-200, 50.0%);
 	-fx-background-radius: 2.0;
 	-fx-padding: 0.0;
 }
 
 .progress-bar>.bar {
-	-fx-background-color: -swatch-500;
+	-fx-background-color: -COLOR-BROWN;
 	-fx-background-radius: 2.0;
 	-fx-background-insets: 0.0;
 	-fx-border-width: 0.0;
@@ -475,7 +465,7 @@
 }
 
 .progress-bar:indeterminate>.bar {
-	-fx-background-color: derive(-swatch-500, 50.0%);
+	-fx-background-color: derive(-COLOR-BROWN, 50.0%);
 	-fx-background-radius: 2.0;
 	-fx-background-insets: 0.0;
 	-fx-border-width: 0.0;
@@ -497,7 +487,7 @@
 }
 
 .progress-indicator>.determinate-indicator>.progress {
-	-fx-background-color: -swatch-500;
+	-fx-background-color: -COLOR-BROWN;
 }
 
 .progress-indicator>.determinate-indicator>.percentage {
@@ -523,7 +513,7 @@
 .radio-button>.radio, .radio-button>.radio.unfocused, .radio-button:disabled>.radio,
 	.radio-button:selected>.radio {
 	-fx-border-radius: 100.0;
-	-fx-border-color: -swatch-grey;
+	-fx-border-color: -COLOR-GRAY-200;
 	-fx-border-width: 2;
 	-fx-background-radius: 100;
 	-fx-background-color: transparent;
@@ -539,7 +529,7 @@
 }
 
 .radio-button:selected>.radio>.dot {
-	-fx-background-color: -swatch-500;
+	-fx-background-color: -COLOR-BROWN;
 	-fx-background-insets: 0;
 }
 
@@ -559,12 +549,12 @@
  ******************************************************************************/
 .scroll-bar:vertical>.track-background, .scroll-bar:horizontal>.track-background
 	{
-	-fx-background-color: -swatch-light-grey;
+	-fx-background-color: -COLOR-WHITE;
 	-fx-background-insets: 0.0;
 }
 
 .scroll-bar:vertical>.thumb, .scroll-bar:horizontal>.thumb {
-	-fx-background-color: -swatch-grey;
+	-fx-background-color: -COLOR-GRAY-200;
 	-fx-background-insets: 0.0;
 	-fx-background-radius: 4.0;
 }
@@ -577,7 +567,7 @@
 
 .scroll-bar>.increment-button>.increment-arrow, .scroll-bar>.decrement-button>.decrement-arrow
 	{
-	-fx-background-color: -swatch-dark-grey;
+	-fx-background-color: -COLOR-WHITE;
 }
 
 .scroll-bar>.track-background {
@@ -598,12 +588,12 @@
 }
 
 .slider>.track {
-	-fx-background-color: -swatch-grey;
+	-fx-background-color: -COLOR-GRAY-200;
 	-fx-background-insets: 1.5;
 }
 
 .slider>.thumb {
-	-fx-background-color: -swatch-500;
+	-fx-background-color: -COLOR-BROWN;
 }
 
 /*******************************************************************************
@@ -614,11 +604,11 @@
 .spinner {
 	-fx-background-color: transparent;
 	-fx-border-width: 0 0 2 0;
-	-fx-border-color: -swatch-grey;
+	-fx-border-color: -COLOR-GRAY-200;
 }
 
 .spinner:focused {
-	-fx-border-color: -swatch-500;
+	-fx-border-color: -COLOR-BROWN;
 }
 
 .spinner .text-field {
@@ -626,23 +616,23 @@
 	-fx-background-radius: 0;
 	-fx-border-width: 0;
 	-fx-padding: 0.5em 0.5em 0.5em 0.1em;
-	-fx-prompt-text-fill: derive(-dark, 50.0%);
+	-fx-prompt-text-fill: derive(-COLOR-LIGHT-YELLOW, 50.0%);
 	-fx-highlight-fill: rgb(94.0, 203.0, 234.0);
 }
 
 .spinner .increment-arrow-button, .spinner .decrement-arrow-button {
 	-fx-background-color: transparent;
-	-fx-fill: swatch-500;
+	-fx-fill: COLOR-BROWN;
 }
 
 .spinner .increment-arrow-button .increment-arrow, .spinner .decrement-arrow-button .decrement-arrow
 	{
-	-fx-background-color: -swatch-grey;
+	-fx-background-color: -COLOR-GRAY-200;
 }
 
 .spinner .increment-arrow-button, .spinner .decrement-arrow-button {
 	-fx-background-color: transparent;
-	-fx-fill: swatch-500;
+	-fx-fill: COLOR-BROWN;
 }
 
 /*******************************************************************************
@@ -664,7 +654,7 @@
 	.tree-table-view .column-header {
 	-fx-size: 65;
 	-fx-border-style: null;
-	-fx-border-color: -swatch-grey;
+	-fx-border-color: -COLOR-GRAY-200;
 	-fx-border-width: 0 0 2 0;
 	-fx-background-color: transparent;
 }
@@ -708,15 +698,15 @@
 	-fx-background-color: transparent;
 	-fx-background-radius: 2.0;
 	-fx-padding: 0.5em 0.5em 0.5em 0.1em;
-	-fx-border-color: -swatch-grey;
+	-fx-border-color: -COLOR-GRAY-200;
 	-fx-border-width: 0 0 2 0;
-	-fx-prompt-text-fill: derive(-dark, 50.0%);
+	-fx-prompt-text-fill: derive(-COLOR-LIGHT-YELLOW, 50.0%);
 	-fx-highlight-fill: rgb(94.0, 203.0, 234.0);
 }
 
 .text-area .text, .text-field>*>.text {
 	-fx-effect: null;
-	-fx-fill: -dark;
+	-fx-fill: -COLOR-LIGHT-YELLOW;
 }
 
 .text-area {
@@ -734,7 +724,7 @@
 }
 
 .text-area:focused, .text-field:focused {
-	-fx-border-color: -swatch-500;
+	-fx-border-color: -COLOR-BROWN;
 }
 
 /*******************************************************************************
@@ -743,9 +733,9 @@
  *                                                                             *
  ******************************************************************************/
 .tool-bar, .menu-bar { /* top */
-	-fx-background-color: -swatch-toolbar;
+	-fx-background-color: -COLOR-GRAY-245;
 	-fx-border-width: 0 0 2 0;
-	-fx-border-color: -swatch-grey;
+	-fx-border-color: -COLOR-GRAY-200;
 	-fx-min-height: 48;
 	-fx-alignment: CENTER_LEFT;
 }
@@ -759,7 +749,7 @@
 }
 
 .tool-bar .button, .tool-bar .toggle-button {
-	-fx-background-color: -swatch-toolbar;
+	-fx-background-color: -COLOR-GRAY-245;
 	-fx-text-fill: -fx-text-base-color;
 	-fx-pref-height: 42;
 	-fx-pref-width: 42;
@@ -771,11 +761,11 @@
 
 .tool-bar .button:pressed, .tool-bar .toggle-button:pressed, .tool-bar .toggle-button:selected
 	{
-	-fx-background-color: -swatch-grey;
+	-fx-background-color: -COLOR-GRAY-200;
 }
 
 .tool-bar .toggle-button {
-	-fx-background-color: -swatch-toolbar;
+	-fx-background-color: -COLOR-GRAY-245;
 }
 
 .tool-bar .separator {
@@ -783,13 +773,13 @@
 }
 
 .toolbar-colored {
-	-fx-background-color: -swatch-500;
+	-fx-background-color: -COLOR-BROWN;
 	-fx-border-width: 0 0 2 0;
-	-fx-border-color: -swatch-grey;
+	-fx-border-color: -COLOR-GRAY-200;
 }
 
 .toolbar-colored .button, .toolbar-colored .toggle-button {
-	-fx-background-color: -swatch-500;
+	-fx-background-color: -COLOR-BROWN;
 	-fx-text-fill: white;
 }
 
