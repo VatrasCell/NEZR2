@@ -15,37 +15,37 @@ import javafx.scene.layout.Pane;
 import java.util.ArrayList;
 import java.util.Comparator;
 
-public class Frage implements Comparable<Frage>, Comparator<Frage> {
-	private String frage;
-	private int frageID;
-	private String art;
-	private String kategorie;
-	private String datum;
+public class Question implements Comparable<Question>, Comparator<Question> {
+	private String question;
+	private int questionId;
+	private String questionType; //art
+	private String category;
+	private String date;
 	private FlagList flags;
 	private int position;
-	private String ueberschrift = "";
-	private ArrayList<String> antwort_moeglichkeit = new ArrayList<String>();
-	private ArrayList<String> antwort = new ArrayList<String>();
-	private Label frageLabel;
+	private String headline = "";
+	private ArrayList<String> answerOptions = new ArrayList<>();
+	private ArrayList<String> answer = new ArrayList<>();
+	private Label questionLabel;
 	private Pane scene;
-	private ArrayList<CheckBox> antwortenMC = new ArrayList<>();
-	private ArrayList<TextField> antwortenFF = new ArrayList<>();
-	private ArrayList<ListView<String>> antwortenLIST = new ArrayList<>();
-	private ArrayList<TextArea> antwortenTEXT = new ArrayList<>();
-	private Frage target;
-	private int fragebogenID;
+	private ArrayList<CheckBox> answersMC = new ArrayList<>();
+	private ArrayList<TextField> answersFF = new ArrayList<>();
+	private ArrayList<ListView<String>> answersLIST = new ArrayList<>();
+	private ArrayList<TextArea> answersTEXT = new ArrayList<>();
+	private Question target;
+	private int questionnaireId;
 	
 	
 	/**
 	 * 
 	 */
-	public Frage() {
+	public Question() {
 		super();
 	}
 	
-	public Frage(int size) {
-		this.frage = "";
-		this.art = "MC";
+	public Question(int size) {
+		this.question = "";
+		this.questionType = "MC";
 		this.position = ++size;
 		this.flags = new FlagList();
 	}
@@ -53,62 +53,62 @@ public class Frage implements Comparable<Frage>, Comparator<Frage> {
 	/**
 	 * @return the frage
 	 */
-	public String getFrage() {
-		return frage;
+	public String getQuestion() {
+		return question;
 	}
 	/**
-	 * @param frage the frage to set
+	 * @param question the frage to set
 	 */
-	public void setFrage(String frage) {
-		this.frage = frage;
+	public void setQuestion(String question) {
+		this.question = question;
 	}
 	/**
 	 * @return the frageID
 	 */
-	public int getFrageID() {
-		return frageID;
+	public int getQuestionId() {
+		return questionId;
 	}
 	/**
-	 * @param frageID the frageID to set
+	 * @param questionId the frageID to set
 	 */
-	public void setFrageID(int frageID) {
-		this.frageID = frageID;
+	public void setQuestionId(int questionId) {
+		this.questionId = questionId;
 	}
 	/**
 	 * @return the art
 	 */
-	public String getArt() {
-		return art;
+	public String getQuestionType() {
+		return questionType;
 	}
 	/**
-	 * @param art the art to set
+	 * @param questionType the art to set
 	 */
-	public void setArt(String art) {
-		this.art = art;
+	public void setQuestionType(String questionType) {
+		this.questionType = questionType;
 	}
 	/**
 	 * @return the kategorie
 	 */
-	public String getKategorie() {
-		return kategorie;
+	public String getCategory() {
+		return category;
 	}
 	/**
-	 * @param kategorie the kategorie to set
+	 * @param category the kategorie to set
 	 */
-	public void setKategorie(String kategorie) {
-		this.kategorie = kategorie;
+	public void setCategory(String category) {
+		this.category = category;
 	}
 	/**
 	 * @return the datum
 	 */
-	public String getDatum() {
-		return datum;
+	public String getDate() {
+		return date;
 	}
 	/**
-	 * @param datum the datum to set
+	 * @param date the datum to set
 	 */
-	public void setDatum(String datum) {
-		this.datum = datum;
+	public void setDate(String date) {
+		this.date = date;
 	}
 
 	/**
@@ -140,114 +140,114 @@ public class Frage implements Comparable<Frage>, Comparator<Frage> {
 	/**
 	 * @return the ueberschrift
 	 */
-	public String getUeberschrift() {
-		return ueberschrift;
+	public String getHeadline() {
+		return headline;
 	}
 	/**
-	 * @param ueberschrift the ueberschrift to set
+	 * @param headline the ueberschrift to set
 	 */
-	public void setUeberschrift(String ueberschrift) {
-		this.ueberschrift = ueberschrift;
+	public void setHeadline(String headline) {
+		this.headline = headline;
 	}
 	/**
 	 * @return the antwort_moeglichkeit
 	 */
-	public ArrayList<String> getAntwort_moeglichkeit() {
-		return antwort_moeglichkeit;
+	public ArrayList<String> getAnswerOptions() {
+		return answerOptions;
 	}
 	/**
-	 * @param antwort_moeglichkeit the antwort_moeglichkeit to set
+	 * @param answerOptions the antwort_moeglichkeit to set
 	 */
-	public void setAntwort_moeglichkeit(ArrayList<String> antwort_moeglichkeit) {
-		this.antwort_moeglichkeit = antwort_moeglichkeit;
+	public void setAnswerOptions(ArrayList<String> answerOptions) {
+		this.answerOptions = answerOptions;
 	}
 	
 	public void addAntwort_moeglichkeit(String antwort_moeglichkeit) {
-		this.antwort_moeglichkeit.add(antwort_moeglichkeit);
+		this.answerOptions.add(antwort_moeglichkeit);
 	}
 	/**
 	 * @return the antwort
 	 */
-	public ArrayList<String> getAntwort() {
-		return antwort;
+	public ArrayList<String> getAnswer() {
+		return answer;
 	}
 	/**
-	 * @param antwort the antwort to set
+	 * @param answer the antwort to set
 	 */
-	public void setAntwort(ArrayList<String> antwort) {
-		this.antwort = antwort;
+	public void setAnswer(ArrayList<String> answer) {
+		this.answer = answer;
 	}
 	/**
 	 * @return the antwortenMC
 	 */
-	public ArrayList<CheckBox> getAntwortenMC() {
-		return antwortenMC;
+	public ArrayList<CheckBox> getAnswersMC() {
+		return answersMC;
 	}
 	/**
-	 * @param antwortenMC the antwortenMC to set
+	 * @param answersMC the antwortenMC to set
 	 */
-	public void setAntwortenMC(ArrayList<CheckBox> antwortenMC) {
-		this.antwortenMC = antwortenMC;
+	public void setAnswersMC(ArrayList<CheckBox> answersMC) {
+		this.answersMC = answersMC;
 	}
 	/**
 	 * @return the antwortenFF
 	 */
-	public ArrayList<TextField> getAntwortenFF() {
-		return antwortenFF;
+	public ArrayList<TextField> getAnswersFF() {
+		return answersFF;
 	}
 	/**
-	 * @param antwortenFF the antwortenFF to set
+	 * @param answersFF the antwortenFF to set
 	 */
-	public void setAntwortenFF(ArrayList<TextField> antwortenFF) {
-		this.antwortenFF = antwortenFF;
+	public void setAnswersFF(ArrayList<TextField> answersFF) {
+		this.answersFF = answersFF;
 	}
 	/**
 	 * @return the antwortenLIST
 	 */
-	public ArrayList<ListView<String>> getAntwortenLIST() {
-		return antwortenLIST;
+	public ArrayList<ListView<String>> getAnswersLIST() {
+		return answersLIST;
 	}
 	/**
-	 * @param antwortenLIST the antwortenLIST to set
+	 * @param answersLIST the antwortenLIST to set
 	 */
-	public void setAntwortenLIST(ArrayList<ListView<String>> antwortenLIST) {
-		this.antwortenLIST = antwortenLIST;
+	public void setAnswersLIST(ArrayList<ListView<String>> answersLIST) {
+		this.answersLIST = answersLIST;
 	}
 	/**
 	 * @return the antwortenTEXT
 	 */
-	public ArrayList<TextArea> getAntwortenTEXT() {
-		return antwortenTEXT;
+	public ArrayList<TextArea> getAnswersTEXT() {
+		return answersTEXT;
 	}
 	/**
-	 * @param antwortenTEXT the antwortenTEXT to set
+	 * @param answersTEXT the antwortenTEXT to set
 	 */
-	public void setAntwortenTEXT(ArrayList<TextArea> antwortenTEXT) {
-		this.antwortenTEXT = antwortenTEXT;
+	public void setAnswersTEXT(ArrayList<TextArea> answersTEXT) {
+		this.answersTEXT = answersTEXT;
 	}
 	/**
 	 * @return the target
 	 */
-	public Frage getTarget() {
+	public Question getTarget() {
 		return target;
 	}
 	/**
 	 * @param target the target to set
 	 */
-	public void setTarget(Frage target) {
+	public void setTarget(Question target) {
 		this.target = target;
 	}
 	/**
 	 * @return the fragebogenID
 	 */
-	public int getFragebogenID() {
-		return fragebogenID;
+	public int getQuestionnaireId() {
+		return questionnaireId;
 	}
 	/**
-	 * @param fragebogenID the fragebogenID to set
+	 * @param questionnaireId the fragebogenID to set
 	 */
-	public void setFragebogenID(int fragebogenID) {
-		this.fragebogenID = fragebogenID;
+	public void setQuestionnaireId(int questionnaireId) {
+		this.questionnaireId = questionnaireId;
 	}
 	/**
 	 * @return the scene
@@ -264,17 +264,17 @@ public class Frage implements Comparable<Frage>, Comparator<Frage> {
 	/**
 	 * @return the frageLabel
 	 */
-	public Label getFrageLabel() {
-		return frageLabel;
+	public Label getQuestionLabel() {
+		return questionLabel;
 	}
 	/**
-	 * @param frageLabel the frageLabel to set
+	 * @param questionLabel the frageLabel to set
 	 */
-	public void setFrageLabel(Label frageLabel) {
-		this.frageLabel = frageLabel;
+	public void setQuestionLabel(Label questionLabel) {
+		this.questionLabel = questionLabel;
 	}
 	@Override
-	public int compareTo(Frage o) {
+	public int compareTo(Question o) {
 
 		if(this.getPosition() < o.getPosition()) {
 			return -1;
@@ -286,7 +286,7 @@ public class Frage implements Comparable<Frage>, Comparator<Frage> {
 	}
 	
 	@Override
-	public int compare(Frage o1, Frage o2) {
+	public int compare(Question o1, Question o2) {
 		return o1.compareTo(o2);
 	}
 	
@@ -295,7 +295,7 @@ public class Frage implements Comparable<Frage>, Comparator<Frage> {
 	 */
 	@Override
 	public String toString() {
-		return frage;
+		return question;
 	}	
 	
 	/* (non-Javadoc)
@@ -305,24 +305,24 @@ public class Frage implements Comparable<Frage>, Comparator<Frage> {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((antwort == null) ? 0 : antwort.hashCode());
-		result = prime * result + ((antwort_moeglichkeit == null) ? 0 : antwort_moeglichkeit.hashCode());
-		result = prime * result + ((antwortenFF == null) ? 0 : antwortenFF.hashCode());
-		result = prime * result + ((antwortenLIST == null) ? 0 : antwortenLIST.hashCode());
-		result = prime * result + ((antwortenMC == null) ? 0 : antwortenMC.hashCode());
-		result = prime * result + ((antwortenTEXT == null) ? 0 : antwortenTEXT.hashCode());
-		result = prime * result + ((art == null) ? 0 : art.hashCode());
-		result = prime * result + ((datum == null) ? 0 : datum.hashCode());
+		result = prime * result + ((answer == null) ? 0 : answer.hashCode());
+		result = prime * result + ((answerOptions == null) ? 0 : answerOptions.hashCode());
+		result = prime * result + ((answersFF == null) ? 0 : answersFF.hashCode());
+		result = prime * result + ((answersLIST == null) ? 0 : answersLIST.hashCode());
+		result = prime * result + ((answersMC == null) ? 0 : answersMC.hashCode());
+		result = prime * result + ((answersTEXT == null) ? 0 : answersTEXT.hashCode());
+		result = prime * result + ((questionType == null) ? 0 : questionType.hashCode());
+		result = prime * result + ((date == null) ? 0 : date.hashCode());
 		result = prime * result + ((flags == null) ? 0 : flags.hashCode());
-		result = prime * result + ((frage == null) ? 0 : frage.hashCode());
-		result = prime * result + frageID;
-		result = prime * result + ((frageLabel == null) ? 0 : frageLabel.hashCode());
-		result = prime * result + fragebogenID;
-		result = prime * result + ((kategorie == null) ? 0 : kategorie.hashCode());
+		result = prime * result + ((question == null) ? 0 : question.hashCode());
+		result = prime * result + questionId;
+		result = prime * result + ((questionLabel == null) ? 0 : questionLabel.hashCode());
+		result = prime * result + questionnaireId;
+		result = prime * result + ((category == null) ? 0 : category.hashCode());
 		result = prime * result + position;
 		result = prime * result + ((scene == null) ? 0 : scene.hashCode());
 		result = prime * result + ((target == null) ? 0 : target.hashCode());
-		result = prime * result + ((ueberschrift == null) ? 0 : ueberschrift.hashCode());
+		result = prime * result + ((headline == null) ? 0 : headline.hashCode());
 		return result;
 	}
 
@@ -337,70 +337,70 @@ public class Frage implements Comparable<Frage>, Comparator<Frage> {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		Frage other = (Frage) obj;
-		if (antwort == null) {
-			if (other.antwort != null)
+		Question other = (Question) obj;
+		if (answer == null) {
+			if (other.answer != null)
 				return false;
-		} else if (!antwort.equals(other.antwort))
+		} else if (!answer.equals(other.answer))
 			return false;
-		if (antwort_moeglichkeit == null) {
-			if (other.antwort_moeglichkeit != null)
+		if (answerOptions == null) {
+			if (other.answerOptions != null)
 				return false;
-		} else if (!antwort_moeglichkeit.equals(other.antwort_moeglichkeit))
+		} else if (!answerOptions.equals(other.answerOptions))
 			return false;
-		if (antwortenFF == null) {
-			if (other.antwortenFF != null)
+		if (answersFF == null) {
+			if (other.answersFF != null)
 				return false;
-		} else if (!antwortenFF.equals(other.antwortenFF))
+		} else if (!answersFF.equals(other.answersFF))
 			return false;
-		if (antwortenLIST == null) {
-			if (other.antwortenLIST != null)
+		if (answersLIST == null) {
+			if (other.answersLIST != null)
 				return false;
-		} else if (!antwortenLIST.equals(other.antwortenLIST))
+		} else if (!answersLIST.equals(other.answersLIST))
 			return false;
-		if (antwortenMC == null) {
-			if (other.antwortenMC != null)
+		if (answersMC == null) {
+			if (other.answersMC != null)
 				return false;
-		} else if (!antwortenMC.equals(other.antwortenMC))
+		} else if (!answersMC.equals(other.answersMC))
 			return false;
-		if (antwortenTEXT == null) {
-			if (other.antwortenTEXT != null)
+		if (answersTEXT == null) {
+			if (other.answersTEXT != null)
 				return false;
-		} else if (!antwortenTEXT.equals(other.antwortenTEXT))
+		} else if (!answersTEXT.equals(other.answersTEXT))
 			return false;
-		if (art == null) {
-			if (other.art != null)
+		if (questionType == null) {
+			if (other.questionType != null)
 				return false;
-		} else if (!art.equals(other.art))
+		} else if (!questionType.equals(other.questionType))
 			return false;
-		if (datum == null) {
-			if (other.datum != null)
+		if (date == null) {
+			if (other.date != null)
 				return false;
-		} else if (!datum.equals(other.datum))
+		} else if (!date.equals(other.date))
 			return false;
 		if (flags == null) {
 			if (other.flags != null)
 				return false;
 		} else if (!flags.equals(other.flags))
 			return false;
-		if (frage == null) {
-			if (other.frage != null)
+		if (question == null) {
+			if (other.question != null)
 				return false;
-		} else if (!frage.equals(other.frage))
+		} else if (!question.equals(other.question))
 			return false;
-		if (frageID != other.frageID)
+		if (questionId != other.questionId)
 			return false;
-		if (frageLabel == null) {
-			if (other.frageLabel != null)
+		if (questionLabel == null) {
+			if (other.questionLabel != null)
 				return false;
-		} else if (!frageLabel.equals(other.frageLabel))
+		} else if (!questionLabel.equals(other.questionLabel))
 			return false;
-		if (fragebogenID != other.fragebogenID)
+		if (questionnaireId != other.questionnaireId)
 			return false;
-		if (kategorie == null) {
-			if (other.kategorie != null)
+		if (category == null) {
+			if (other.category != null)
 				return false;
-		} else if (!kategorie.equals(other.kategorie))
+		} else if (!category.equals(other.category))
 			return false;
 		if (position != other.position)
 			return false;
@@ -414,18 +414,18 @@ public class Frage implements Comparable<Frage>, Comparator<Frage> {
 				return false;
 		} else if (!target.equals(other.target))
 			return false;
-		if (ueberschrift == null) {
-			if (other.ueberschrift != null)
+		if (headline == null) {
+			if (other.headline != null)
 				return false;
-		} else if (!ueberschrift.equals(other.ueberschrift))
+		} else if (!headline.equals(other.headline))
 			return false;
 		return true;
 	}
 
 	public String toDebugString() {
-		return "Frage [frage=" + frage + ", art=" + art + ", kategorie=" + kategorie + ", flags=" + flags
-				+ ", Position=" + position + ", ueberschrift=" + ueberschrift + ", antwort_moeglichkeit="
-				+ antwort_moeglichkeit + "]";
+		return "Frage [frage=" + question + ", art=" + questionType + ", kategorie=" + category + ", flags=" + flags
+				+ ", Position=" + position + ", ueberschrift=" + headline + ", antwort_moeglichkeit="
+				+ answerOptions + "]";
 	}	
 	
 	/**
@@ -435,21 +435,21 @@ public class Frage implements Comparable<Frage>, Comparator<Frage> {
 	 */
 	public void setListener(int index, String s) {
 		if(s == "MC") {
-			CheckBox checkbox = target.antwortenMC.get(index);
+			CheckBox checkbox = target.answersMC.get(index);
 			checkbox.selectedProperty().addListener(new ChangeListener<Boolean>() {
 		        public void changed(ObservableValue<? extends Boolean> ov,
 		                Boolean old_val, Boolean new_val) {
 		        	if(checkbox.isSelected()) {
-						scene.lookup("#lblFrage_" + getFrageID()).setVisible(true);
+						scene.lookup("#lblFrage_" + getQuestionId()).setVisible(true);
 						
-						for(int i = 0; i < antwortenFF.size(); i++) {
-							antwortenFF.get(i).setVisible(true);
+						for(int i = 0; i < answersFF.size(); i++) {
+							answersFF.get(i).setVisible(true);
 						}
-						for(int i = 0; i < antwortenMC.size(); i++) {
-							antwortenMC.get(i).setVisible(true);
+						for(int i = 0; i < answersMC.size(); i++) {
+							answersMC.get(i).setVisible(true);
 						}
-						for(int i = 0; i < antwortenLIST.size(); i++) {
-							antwortenLIST.get(i).setVisible(true);
+						for(int i = 0; i < answersLIST.size(); i++) {
+							answersLIST.get(i).setVisible(true);
 						}
 						if(getFlags().is(SymbolType.B)) {
 							scene.lookup("#lblNull").setVisible(true);
@@ -457,16 +457,16 @@ public class Frage implements Comparable<Frage>, Comparator<Frage> {
 							scene.lookup("#lblZehn").setVisible(true);
 						}
 					} else {
-						scene.lookup("#lblFrage_" + getFrageID()).setVisible(false);
+						scene.lookup("#lblFrage_" + getQuestionId()).setVisible(false);
 						
-						for(int i = 0; i < antwortenFF.size(); i++) {
-							antwortenFF.get(i).setVisible(false);
+						for(int i = 0; i < answersFF.size(); i++) {
+							answersFF.get(i).setVisible(false);
 						}
-						for(int i = 0; i < antwortenMC.size(); i++) {
-							antwortenMC.get(i).setVisible(false);
+						for(int i = 0; i < answersMC.size(); i++) {
+							answersMC.get(i).setVisible(false);
 						}
-						for(int i = 0; i < antwortenLIST.size(); i++) {
-							antwortenLIST.get(i).setVisible(false);
+						for(int i = 0; i < answersLIST.size(); i++) {
+							answersLIST.get(i).setVisible(false);
 						}
 						if(getFlags().is(SymbolType.B)) {
 							scene.lookup("#lblNull").setVisible(false);
@@ -478,33 +478,33 @@ public class Frage implements Comparable<Frage>, Comparator<Frage> {
 		        });
 		} else if (s == "FF") {
 			
-			TextField textField = target.antwortenFF.get(index);
+			TextField textField = target.answersFF.get(index);
 			textField.textProperty().addListener((observable, oldValue, newValue) -> {
 			    // System.out.println("textfield changed from " + oldValue + " to " + newValue);
 			    if(textField.getText().equals("")) {
-			    	scene.lookup("#lblFrage_" + getFrageID()).setVisible(true);
+			    	scene.lookup("#lblFrage_" + getQuestionId()).setVisible(true);
 					
-					for(int i = 0; i < antwortenFF.size(); i++) {
-						antwortenFF.get(i).setVisible(true);
+					for(int i = 0; i < answersFF.size(); i++) {
+						answersFF.get(i).setVisible(true);
 					}
-					for(int i = 0; i < antwortenMC.size(); i++) {
-						antwortenMC.get(i).setVisible(true);
+					for(int i = 0; i < answersMC.size(); i++) {
+						answersMC.get(i).setVisible(true);
 					}
-					for(int i = 0; i < antwortenLIST.size(); i++) {
-						antwortenLIST.get(i).setVisible(true);
+					for(int i = 0; i < answersLIST.size(); i++) {
+						answersLIST.get(i).setVisible(true);
 					}
 				} else {
 					// System.out.println(getFrageID() + " " + target.getFrageID());
-					scene.lookup("#lblFrage_" + getFrageID()).setVisible(false);
+					scene.lookup("#lblFrage_" + getQuestionId()).setVisible(false);
 					
-					for(int i = 0; i < antwortenFF.size(); i++) {
-						antwortenFF.get(i).setVisible(false);
+					for(int i = 0; i < answersFF.size(); i++) {
+						answersFF.get(i).setVisible(false);
 					}
-					for(int i = 0; i < antwortenMC.size(); i++) {
-						antwortenMC.get(i).setVisible(false);
+					for(int i = 0; i < answersMC.size(); i++) {
+						answersMC.get(i).setVisible(false);
 					}
-					for(int i = 0; i < antwortenLIST.size(); i++) {
-						antwortenLIST.get(i).setVisible(false);
+					for(int i = 0; i < answersLIST.size(); i++) {
+						answersLIST.get(i).setVisible(false);
 					}
 				}
 			});
@@ -556,7 +556,7 @@ public class Frage implements Comparable<Frage>, Comparator<Frage> {
 			});
 			*/
 		} else if (s.indexOf("INT") >= 0) {
-			TextField textField = antwortenFF.get(0);
+			TextField textField = answersFF.get(0);
 			textField.textProperty().addListener((observable, oldValue, newValue) -> {
 			    System.out.println("textfield changed from " + oldValue + " to " + newValue);
 			    if(textField.getText().equals("")) {

@@ -1,14 +1,14 @@
 package question;
 
-import application.Datenbank;
+import application.Database;
 import flag.FlagList;
 import flag.Number;
 import flag.NumberOperator;
 import flag.Symbol;
 import flag.SymbolType;
-import model.Frage;
+import model.Question;
 import model.FrageEditParam;
-import model.Fragebogen;
+import model.Questionnaire;
 import org.controlsfx.control.Notifications;
 
 import java.sql.Connection;
@@ -21,19 +21,19 @@ import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class QuestionService extends Datenbank {
+public class QuestionService extends Database {
 	/**
 	 * Gibt alle Antworten einer Frage zurueck.
 	 * 
-	 * @param frage
+	 * @param question
 	 *            FrageErstellen: die Frage
 	 * @return ArrayList String aller Antworten
 	 */
-	public static ArrayList<String> getAnswers(Frage frage) {
+	public static ArrayList<String> getAnswers(Question question) {
 		try {
 			Connection myCon = DriverManager.getConnection(url, user, pwd);
 			Statement mySQL = myCon.createStatement();
-			String text = slashUnicode(frage.getFrage()).replaceAll("\\\\", "\\\\\\\\");
+			String text = slashUnicode(question.getQuestion()).replaceAll("\\\\", "\\\\\\\\");
 			String statement = "SELECT Antwort FROM fragebogen JOIN "
 					+ "fb_has_mc ON fragebogen.idFragebogen=fb_has_mc.idFragebogen JOIN "
 					+ "multiplechoice mc1 ON fb_has_mc.idMultipleChoice=mc1.idMultipleChoice JOIN "
@@ -70,7 +70,7 @@ public class QuestionService extends Datenbank {
 	 *            FragebogenDialog: der Fragebogen
 	 * @return int
 	 */
-	public static int getCountPosition(Fragebogen fb) {
+	public static int getCountPosition(Questionnaire fb) {
 		int positionCount = 0;
 		int maxPosMc = 0;
 		int maxPosFf = 0;
@@ -184,12 +184,12 @@ public class QuestionService extends Datenbank {
 	 * Updated die Flags, beim LÃ¶schen einer Antwort, auf die reagiert wird.
 	 * Gibt bei Erfolg TRUE zurueck.
 	 * 
-	 * @param frage
+	 * @param question
 	 *            FrageErstellen: die Frage
 	 * @return boolean
 	 */
 	// anneSehrNeu
-	public static boolean updateFlags(Frage frage) {
+	public static boolean updateFlags(Question question) {
 		String statement;
 		String flag = "";
 		int start = -1;
@@ -197,9 +197,9 @@ public class QuestionService extends Datenbank {
 
 		try {
 			Connection myCon = DriverManager.getConnection(url, user, pwd);
-			if (frage.getArt().equals("MC")) {
+			if (question.getQuestionType().equals("MC")) {
 				Statement mySQL = myCon.createStatement();
-				statement = "SELECT flags, idMultipleChoice FROM FB_has_mc where flags LIKE '%__" + frage.getFrageID()
+				statement = "SELECT flags, idMultipleChoice FROM FB_has_mc where flags LIKE '%__" + question.getQuestionId()
 						+ "A%'";
 				ResultSet myRS = mySQL.executeQuery(statement);
 
@@ -226,7 +226,7 @@ public class QuestionService extends Datenbank {
 				}
 
 				mySQL = myCon.createStatement();
-				statement = "SELECT flags, idFreieFragen FROM FB_has_ff where flags LIKE '%__" + frage.getFrageID()
+				statement = "SELECT flags, idFreieFragen FROM FB_has_ff where flags LIKE '%__" + question.getQuestionId()
 						+ "A%'";
 				myRS = mySQL.executeQuery(statement);
 
@@ -253,7 +253,7 @@ public class QuestionService extends Datenbank {
 				}
 			} else {
 				Statement mySQL = myCon.createStatement();
-				statement = "SELECT flags, idFreieFragen FROM FB_has_ff where flags LIKE '%__" + frage.getFrageID()
+				statement = "SELECT flags, idFreieFragen FROM FB_has_ff where flags LIKE '%__" + question.getQuestionId()
 						+ "A%'";
 				ResultSet myRS = mySQL.executeQuery(statement);
 
@@ -280,7 +280,7 @@ public class QuestionService extends Datenbank {
 				}
 
 				mySQL = myCon.createStatement();
-				statement = "SELECT flags, idmultiplechoice FROM FB_has_mc where flags LIKE '%__" + frage.getFrageID()
+				statement = "SELECT flags, idmultiplechoice FROM FB_has_mc where flags LIKE '%__" + question.getQuestionId()
 						+ "A%'";
 				myRS = mySQL.executeQuery(statement);
 
@@ -325,7 +325,7 @@ public class QuestionService extends Datenbank {
 	 *            int: ID der Frage
 	 * @return boolean
 	 */
-	public static boolean updateFlags(Fragebogen fb, String art, int id) {
+	public static boolean updateFlags(Questionnaire fb, String art, int id) {
 		if (art.equals("FF")) {
 			try {
 				Connection myCon = DriverManager.getConnection(url, user, pwd);
@@ -402,7 +402,7 @@ public class QuestionService extends Datenbank {
 	 *            int: ID der Frage
 	 * @return boolean
 	 */
-	public static boolean isPflichtfrage(Fragebogen fb, String art, int id) {
+	public static boolean isPflichtfrage(Questionnaire fb, String art, int id) {
 		if (art.equals("FF")) {
 			try {
 				Connection myCon = DriverManager.getConnection(url, user, pwd);
@@ -533,12 +533,12 @@ public class QuestionService extends Datenbank {
 	 * 
 	 * @param selectedFB
 	 *            FragebogenDialog
-	 * @param frage
+	 * @param question
 	 *            FrageErstellen
 	 * @return boolean
 	 * @author Anne
 	 */
-	public static boolean saveFreieFrage(Fragebogen selectedFB, Frage frage) {
+	public static boolean saveFreieFrage(Questionnaire selectedFB, Question question) {
 
 		try {
 			Connection myCon = DriverManager.getConnection(url, user, pwd);
@@ -547,10 +547,10 @@ public class QuestionService extends Datenbank {
 			int idFreieFrage = -1;
 			int idFragebogen = selectedFB.getId();
 
-			if (frage.getFrageID() == 0) {
+			if (question.getQuestionId() == 0) {
 				statement = "SELECT idFreieFragen FROM FreieFragen WHERE FrageFF=?";
 				PreparedStatement psSql = myCon.prepareStatement(statement);
-				psSql.setString(1, slashUnicode(frage.getFrage()));
+				psSql.setString(1, slashUnicode(question.getQuestion()));
 				ResultSet myRS = psSql.executeQuery();
 
 				if (myRS.next()) {
@@ -559,13 +559,13 @@ public class QuestionService extends Datenbank {
 				psSql = null;
 				myRS = null;
 			} else {
-				idFreieFrage = frage.getFrageID();
+				idFreieFrage = question.getQuestionId();
 			}
 
 			Statement mySQL = myCon.createStatement();
 			statement = "SELECT idKategorie FROM kategorie WHERE Kategorie=?";
 			PreparedStatement psSql = myCon.prepareStatement(statement);
-			psSql.setString(1, slashUnicode(frage.getKategorie()));
+			psSql.setString(1, slashUnicode(question.getCategory()));
 			ResultSet myRS = psSql.executeQuery();
 
 			if (myRS.next()) {
@@ -577,7 +577,7 @@ public class QuestionService extends Datenbank {
 				mySQL = myCon.createStatement();
 				statement = "INSERT INTO Kategorie VALUES(NULL, ?)";
 				psSql = myCon.prepareStatement(statement);
-				psSql.setString(1, slashUnicode(frage.getKategorie()));
+				psSql.setString(1, slashUnicode(question.getCategory()));
 				psSql.executeUpdate();
 
 				psSql = null;
@@ -587,7 +587,7 @@ public class QuestionService extends Datenbank {
 				mySQL = myCon.createStatement();
 				statement = "SELECT idKategorie FROM kategorie WHERE Kategorie=?";
 				psSql = myCon.prepareStatement(statement);
-				psSql.setString(1, slashUnicode(frage.getKategorie()));
+				psSql.setString(1, slashUnicode(question.getCategory()));
 				myRS = psSql.executeQuery();
 
 				if (myRS.next()) {
@@ -614,7 +614,7 @@ public class QuestionService extends Datenbank {
 				mySQL = myCon.createStatement();
 				statement = "UPDATE FreieFragen SET FrageFF=? WHERE idFreieFragen=" + idFreieFrage;
 				psSql = myCon.prepareStatement(statement);
-				psSql.setString(1, slashUnicode(frage.getFrage()));
+				psSql.setString(1, slashUnicode(question.getQuestion()));
 				psSql.executeUpdate();
 
 			} else {
@@ -625,7 +625,7 @@ public class QuestionService extends Datenbank {
 				mySQL = myCon.createStatement();
 				statement = "INSERT INTO FreieFragen VALUES(NULL, ? ," + idKategorie + ")";
 				psSql = myCon.prepareStatement(statement);
-				psSql.setString(1, slashUnicode(frage.getFrage()));
+				psSql.setString(1, slashUnicode(question.getQuestion()));
 				psSql.executeUpdate();
 
 				mySQL = null;
@@ -635,7 +635,7 @@ public class QuestionService extends Datenbank {
 				mySQL = myCon.createStatement();
 				statement = "SELECT idFreieFragen FROM FreieFragen WHERE FrageFF=?";
 				psSql = myCon.prepareStatement(statement);
-				psSql.setString(1, slashUnicode(frage.getFrage()));
+				psSql.setString(1, slashUnicode(question.getQuestion()));
 				myRS = psSql.executeQuery();
 
 				if (myRS.next()) {
@@ -657,19 +657,19 @@ public class QuestionService extends Datenbank {
 				mySQL = null;
 				myRS = null;
 				mySQL = myCon.createStatement();
-				statement = "UPDATE FB_HAS_FF SET Flags='" + frage.getFlags().createFlagString() + "' WHERE idRelFBFF=" + idRelFBFF;
+				statement = "UPDATE FB_HAS_FF SET Flags='" + question.getFlags().createFlagString() + "' WHERE idRelFBFF=" + idRelFBFF;
 				mySQL.executeUpdate(statement);
 
 				mySQL = null;
 				myRS = null;
 				mySQL = myCon.createStatement();
-				statement = "UPDATE FB_HAS_FF SET Position=" + frage.getPosition() + " WHERE idRelFBFF=" + idRelFBFF;
+				statement = "UPDATE FB_HAS_FF SET Position=" + question.getPosition() + " WHERE idRelFBFF=" + idRelFBFF;
 				mySQL.executeUpdate(statement);
 			} else {
 				mySQL.close();
 				mySQL = myCon.createStatement();
 				statement = "INSERT INTO Fb_has_FF VALUES (NULL," + idFragebogen + "," + idFreieFrage + ","
-						+ frage.getPosition() + ",'" + frage.getFlags().createFlagString() + "')";
+						+ question.getPosition() + ",'" + question.getFlags().createFlagString() + "')";
 				mySQL.executeUpdate(statement);
 				mySQL = null;
 				myRS = null;
@@ -743,12 +743,12 @@ public class QuestionService extends Datenbank {
 	 * 
 	 * @param antids
 	 *            ArrayList<Integer>: ids der zu-lÃ¶schendenen Antworten
-	 * @param frage
+	 * @param question
 	 *            FrageErstellen: die zugehÃ¶rige Frage
 	 * @return boolean
 	 */
 	// anneSehrNeu
-	public static boolean deleteAntworten(ArrayList<Integer> antids, Frage frage) {
+	public static boolean deleteAntworten(ArrayList<Integer> antids, Question question) {
 		String statement;
 
 		try {
@@ -757,7 +757,7 @@ public class QuestionService extends Datenbank {
 			for (Integer antid : antids) {
 				Statement mySQL = myCon.createStatement();
 				statement = "DELETE FROM MC_has_A WHERE AntwortNr=" + antid + " AND idMultipleChoice="
-						+ frage.getFrageID();
+						+ question.getQuestionId();
 				mySQL.execute(statement);
 				mySQL = null;
 			}
@@ -785,19 +785,19 @@ public class QuestionService extends Datenbank {
 	 * Speichert eine neue Multipe Choice Frage. Gibt bei Erfolg TRUE zurÃ¼ck.
 	 * @author Eric
 	 */
-	public static boolean saveMC(Fragebogen selectedFB, Frage frage, ArrayList<Integer> antIds) {
+	public static boolean saveMC(Questionnaire selectedFB, Question question, ArrayList<Integer> antIds) {
 
 		try {
 			Connection myCon = DriverManager.getConnection(url, user, pwd);
-			int idMultipleChoice = frage.getFrageID();
+			int idMultipleChoice = question.getQuestionId();
 			int idFragebogen = selectedFB.getId();
 			int idKategorie = -1;
 			String statement;
 
-			if (frage.getFrageID() == 0) {
+			if (question.getQuestionId() == 0) {
 				statement = "SELECT idMultipleChoice FROM MultipleChoice WHERE FrageMC=?";
 				PreparedStatement psSql = myCon.prepareStatement(statement);
-				psSql.setString(1, slashUnicode(frage.getFrage()));
+				psSql.setString(1, slashUnicode(question.getQuestion()));
 				ResultSet myRS = psSql.executeQuery();
 
 				if (myRS.next()) {
@@ -806,13 +806,13 @@ public class QuestionService extends Datenbank {
 				psSql = null;
 				myRS = null;
 			} else {
-				idMultipleChoice = frage.getFrageID();
+				idMultipleChoice = question.getQuestionId();
 			}
 
 			// Kategorie
 			statement = "SELECT idKategorie FROM kategorie WHERE Kategorie=?";
 			PreparedStatement psSql = myCon.prepareStatement(statement);
-			psSql.setString(1, slashUnicode(frage.getKategorie()));
+			psSql.setString(1, slashUnicode(question.getCategory()));
 			ResultSet myRS = psSql.executeQuery();
 
 			if (myRS.next()) {
@@ -822,7 +822,7 @@ public class QuestionService extends Datenbank {
 
 				statement = "INSERT INTO Kategorie VALUES(NULL, ?)";
 				psSql = myCon.prepareStatement(statement);
-				psSql.setString(1, slashUnicode(frage.getKategorie()));
+				psSql.setString(1, slashUnicode(question.getCategory()));
 				psSql.executeUpdate();
 
 				psSql = null;
@@ -830,7 +830,7 @@ public class QuestionService extends Datenbank {
 
 				statement = "SELECT idKategorie FROM kategorie WHERE Kategorie=?";
 				psSql = myCon.prepareStatement(statement);
-				psSql.setString(1, slashUnicode(frage.getKategorie()));
+				psSql.setString(1, slashUnicode(question.getCategory()));
 				myRS = psSql.executeQuery();
 
 				if (myRS.next()) {
@@ -856,7 +856,7 @@ public class QuestionService extends Datenbank {
 				}
 				statement = "UPDATE MultipleChoice SET FrageMC=? WHERE idMultipleChoice=" + idMultipleChoice;
 				psSql = myCon.prepareStatement(statement);
-				psSql.setString(1, slashUnicode(frage.getFrage()));
+				psSql.setString(1, slashUnicode(question.getQuestion()));
 				psSql.executeUpdate();
 			} else {
 				myRS = null;
@@ -864,13 +864,13 @@ public class QuestionService extends Datenbank {
 
 				statement = "INSERT INTO MultipleChoice VALUES(NULL, ?, " + idKategorie + ")";
 				psSql = myCon.prepareStatement(statement);
-				psSql.setString(1, slashUnicode(frage.getFrage()));
+				psSql.setString(1, slashUnicode(question.getQuestion()));
 				psSql.executeUpdate();
 				psSql = null;
 
 				statement = "SELECT idMultipleChoice FROM MultipleChoice WHERE FrageMC=?";
 				psSql = myCon.prepareStatement(statement);
-				psSql.setString(1, slashUnicode(frage.getFrage()));
+				psSql.setString(1, slashUnicode(question.getQuestion()));
 				myRS = psSql.executeQuery();
 
 				if (myRS.next()) {
@@ -935,19 +935,19 @@ public class QuestionService extends Datenbank {
 				mySQL = null;
 				myRS = null;
 				mySQL = myCon.createStatement();
-				statement = "UPDATE FB_HAS_MC SET Flags='" + frage.getFlags().createFlagString() + "' WHERE idRelFBMC=" + idRelFBMC;
+				statement = "UPDATE FB_HAS_MC SET Flags='" + question.getFlags().createFlagString() + "' WHERE idRelFBMC=" + idRelFBMC;
 				mySQL.executeUpdate(statement);
 
 				mySQL = null;
 				myRS = null;
 				mySQL = myCon.createStatement();
-				statement = "UPDATE FB_HAS_MC SET Position=" + frage.getPosition() + " WHERE idRelFBMC=" + idRelFBMC;
+				statement = "UPDATE FB_HAS_MC SET Position=" + question.getPosition() + " WHERE idRelFBMC=" + idRelFBMC;
 				mySQL.executeUpdate(statement);
 			} else {
 				mySQL.close();
 				mySQL = myCon.createStatement();
 				statement = "INSERT INTO Fb_has_MC VALUES (NULL," + idFragebogen + "," + idMultipleChoice + ","
-						+ frage.getPosition() + ",'" + frage.getFlags().createFlagString() + "')";
+						+ question.getPosition() + ",'" + question.getFlags().createFlagString() + "')";
 				mySQL.executeUpdate(statement);
 				mySQL = null;
 				myRS = null;
@@ -968,7 +968,7 @@ public class QuestionService extends Datenbank {
 	 * Speichert eine neue Bewertungsfrage. Gibt bei Erfolg TRUE zurÃ¼ck.
 	 * @author Anne
 	 */
-	public static boolean saveBewertungsfrage(Fragebogen selectedFB, Frage frage) {
+	public static boolean saveBewertungsfrage(Questionnaire selectedFB, Question question) {
 
 		try {
 			Connection myCon = DriverManager.getConnection(url, user, pwd);
@@ -978,10 +978,10 @@ public class QuestionService extends Datenbank {
 			int countAntwort = 0;
 			String statement;
 
-			if (frage.getFrageID() == 0) {
+			if (question.getQuestionId() == 0) {
 				statement = "SELECT idMultipleChoice FROM MultipleChoice WHERE FrageMC=?";
 				PreparedStatement psSql = myCon.prepareStatement(statement);
-				psSql.setString(1, slashUnicode(frage.getFrage()));
+				psSql.setString(1, slashUnicode(question.getQuestion()));
 				ResultSet myRS = psSql.executeQuery();
 
 				if (myRS.next()) {
@@ -990,12 +990,12 @@ public class QuestionService extends Datenbank {
 				psSql = null;
 				myRS = null;
 			} else {
-				idBewertungsFrage = frage.getFrageID();
+				idBewertungsFrage = question.getQuestionId();
 			}
 
 			statement = "SELECT idKategorie FROM kategorie WHERE Kategorie=?";
 			PreparedStatement psSql = myCon.prepareStatement(statement);
-			psSql.setString(1, slashUnicode(frage.getKategorie()));
+			psSql.setString(1, slashUnicode(question.getCategory()));
 			ResultSet myRS = psSql.executeQuery();
 
 			if (myRS.next()) {
@@ -1005,7 +1005,7 @@ public class QuestionService extends Datenbank {
 
 				statement = "INSERT INTO Kategorie VALUES(NULL, ?)";
 				psSql = myCon.prepareStatement(statement);
-				psSql.setString(1, slashUnicode(frage.getKategorie()));
+				psSql.setString(1, slashUnicode(question.getCategory()));
 				psSql.executeUpdate();
 
 				psSql = null;
@@ -1013,7 +1013,7 @@ public class QuestionService extends Datenbank {
 
 				statement = "SELECT idKategorie FROM kategorie WHERE Kategorie=?";
 				psSql = myCon.prepareStatement(statement);
-				psSql.setString(1, slashUnicode(frage.getKategorie()));
+				psSql.setString(1, slashUnicode(question.getCategory()));
 				myRS = psSql.executeQuery();
 
 				if (myRS.next()) {
@@ -1038,7 +1038,7 @@ public class QuestionService extends Datenbank {
 				}
 				statement = "UPDATE MultipleChoice SET FrageMC=? WHERE idMultipleChoice=" + idBewertungsFrage;
 				psSql = myCon.prepareStatement(statement);
-				psSql.setString(1, slashUnicode(frage.getFrage()));
+				psSql.setString(1, slashUnicode(question.getQuestion()));
 				psSql.executeUpdate();
 
 			} else {
@@ -1046,7 +1046,7 @@ public class QuestionService extends Datenbank {
 
 				statement = "INSERT INTO MultipleChoice VALUES(NULL, ? ," + idKategorie + ")";
 				psSql = myCon.prepareStatement(statement);
-				psSql.setString(1, slashUnicode(frage.getFrage()));
+				psSql.setString(1, slashUnicode(question.getQuestion()));
 				psSql.executeUpdate();
 			}
 
@@ -1057,7 +1057,7 @@ public class QuestionService extends Datenbank {
 			mySQL = myCon.createStatement();
 			statement = "SELECT idMultipleChoice FROM MultipleChoice WHERE FrageMC=?";
 			psSql = myCon.prepareStatement(statement);
-			psSql.setString(1, slashUnicode(frage.getFrage()));
+			psSql.setString(1, slashUnicode(question.getQuestion()));
 			myRS = psSql.executeQuery();
 
 			if (myRS.next()) {
@@ -1077,19 +1077,19 @@ public class QuestionService extends Datenbank {
 				mySQL = null;
 				myRS = null;
 				mySQL = myCon.createStatement();
-				statement = "UPDATE FB_HAS_MC SET Flags='" + frage.getFlags().createFlagString() + "' WHERE idRelFBMC=" + idRelFBMC;
+				statement = "UPDATE FB_HAS_MC SET Flags='" + question.getFlags().createFlagString() + "' WHERE idRelFBMC=" + idRelFBMC;
 				mySQL.executeUpdate(statement);
 
 				mySQL = null;
 				myRS = null;
 				mySQL = myCon.createStatement();
-				statement = "UPDATE FB_HAS_MC SET Position=" + frage.getPosition() + " WHERE idRelFBMC=" + idRelFBMC;
+				statement = "UPDATE FB_HAS_MC SET Position=" + question.getPosition() + " WHERE idRelFBMC=" + idRelFBMC;
 				mySQL.executeUpdate(statement);
 			} else {
 				mySQL.close();
 				mySQL = myCon.createStatement();
 				statement = "INSERT INTO Fb_has_MC VALUES (NULL," + idFragebogen + "," + idBewertungsFrage + ","
-						+ frage.getPosition() + ",'" + frage.getFlags().createFlagString() + "')";
+						+ question.getPosition() + ",'" + question.getFlags().createFlagString() + "')";
 				mySQL.executeUpdate(statement);
 				mySQL = null;
 				myRS = null;

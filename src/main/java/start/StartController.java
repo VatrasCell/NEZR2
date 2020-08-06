@@ -28,8 +28,9 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.TextAlignment;
-import model.Frage;
 import model.PanelInfo;
+import model.Question;
+import model.SceneName;
 import survey.SurveyController;
 import survey.SurveyService;
 
@@ -40,6 +41,8 @@ import java.util.Deque;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static application.GlobalFuncs.getURL;
 
 public class StartController {
 
@@ -55,14 +58,14 @@ public class StartController {
 	@FXML
 	Button btn_start;
 
-	private static StringProperty fragebogenText = new SimpleStringProperty();
-	private static StringProperty fragebogenWarn = new SimpleStringProperty();
+	private static StringProperty questionnaireText = new SimpleStringProperty();
+	private static StringProperty questionnaireWarn = new SimpleStringProperty();
 
 	/**
 	 * The constructor (is called before the initialize()-method).
 	 */
 	public StartController() {
-		GlobalVars.activFragebogen = StartService.getActivFragebogen();
+		GlobalVars.activQuestionnaire = StartService.getActivFragebogen();
 	}
 
 	/**
@@ -102,39 +105,39 @@ public class StartController {
 	  			"-fx-background-position: 98% 5%;");
 		
 		setStartText();
-		lbl_fragebogen.textProperty().bind(fragebogenText);
-		lbl_warning.textProperty().bind(fragebogenWarn);
+		lbl_fragebogen.textProperty().bind(questionnaireText);
+		lbl_warning.textProperty().bind(questionnaireWarn);
 		lbl_warning.setStyle("-fx-text-fill: #c90000;");
 	}
 
 	public static void setStartText() {
-		fragebogenText
-				.set(GlobalVars.activFragebogen == null ? "" : "Fragebogen: " + GlobalVars.activFragebogen.getName());
-		fragebogenWarn.set(GlobalVars.activFragebogen == null ? "kein Fragebogen ausgewählt"
-				: !GlobalVars.activFragebogen.getOrt().equals(GlobalVars.standort)
+		questionnaireText
+				.set(GlobalVars.activQuestionnaire == null ? "" : "Fragebogen: " + GlobalVars.activQuestionnaire.getName());
+		questionnaireWarn.set(GlobalVars.activQuestionnaire == null ? "kein Fragebogen ausgewählt"
+				: !GlobalVars.activQuestionnaire.getOrt().equals(GlobalVars.standort)
 						? "Fragebogen ist nicht für diesen Standort optimiert"
 						: "");
 	}
 
-	public static void makeFragebogen(ArrayList<Frage> fragen, boolean isPreview) {
+	public static void makeQuestionnaire(List<Question> questions, boolean isPreview) {
 		
 		SurveyController.setPreview(isPreview);
 		
-		Deque<Frage> stack = new ArrayDeque<Frage>();
+		Deque<Question> stack = new ArrayDeque<>();
 
-		for (int v = fragen.size() - 1; v >= 0; v--) {
-			stack.push(fragen.get(v));
+		for (int v = questions.size() - 1; v >= 0; v--) {
+			stack.push(questions.get(v));
 		}
 
-		List<ArrayList<Frage>> fragenJePanel = new ArrayList<ArrayList<Frage>>();
-		List<Pane> allePanel = new ArrayList<Pane>();
+		List<ArrayList<Question>> fragenJePanel = new ArrayList<>();
+		List<Pane> allePanel = new ArrayList<>();
 		do {
 			int questionsOnPanel = 0;
 			String lastKat = "";
 			// create panel
 			Pane scene = null;
 			try {
-				scene = FXMLLoader.load(StartController.class.getClassLoader().getResource("view/SurveyView2.fxml"));
+				scene = FXMLLoader.load(getURL(SceneName.SURVEY_PATH));
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -143,12 +146,12 @@ public class StartController {
 			PanelInfo info = new PanelInfo();
 			fragenJePanel.add(new ArrayList<>());
 			do {
-				Frage frage = stack.peek();
-				if(lastKat.equals("") || lastKat.equals(frage.getKategorie())) {
-					frage = stack.pop();
-					info = addQuestionToPanel(frage, scene, info);
-					fragenJePanel.get(allePanel.size()).add(info.getFrage());
-					lastKat = frage.getKategorie();
+				Question question = stack.peek();
+				if(lastKat.equals("") || lastKat.equals(question.getCategory())) {
+					question = stack.pop();
+					addQuestionToPanel(question, scene, info);
+					fragenJePanel.get(allePanel.size()).add(info.getQuestion());
+					lastKat = question.getCategory();
 					if (stack.isEmpty())
 						break;
 					
@@ -170,17 +173,17 @@ public class StartController {
 		}
 		
 		//add reaction listener
-		for (int y = 0; y < fragen.size(); y++) {
+		for (int y = 0; y < questions.size(); y++) {
 
-			List<React> reacts = fragen.get(y).getFlags().getAll(React.class);
-			List<Number> numbers = fragen.get(y).getFlags().getAll(Number.class);
+			List<React> reacts = questions.get(y).getFlags().getAll(React.class);
+			List<Number> numbers = questions.get(y).getFlags().getAll(Number.class);
 			for (React react : reacts) {
-				fragen.get(y).setTarget(
-						fragen.get(getY(react.getQuestionId(), react.getQuestionType().toString(), fragen)));
-				fragen.get(y).setListener(react.getAnswerPos(), react.getQuestionType().toString());
+				questions.get(y).setTarget(
+						questions.get(getY(react.getQuestionId(), react.getQuestionType().toString(), questions)));
+				questions.get(y).setListener(react.getAnswerPos(), react.getQuestionType().toString());
 			}
 			for (Number number : numbers) {
-				fragen.get(y).setListener(0, number.toString());
+				questions.get(y).setListener(0, number.toString());
 			}
 		}
 
@@ -188,67 +191,66 @@ public class StartController {
 		GlobalVars.countPanel = allePanel.size();
 	}
 
-	private static PanelInfo addQuestionToPanel(Frage frage, Pane screen, PanelInfo info) {
+	private static void addQuestionToPanel(Question question, Pane screen, PanelInfo info) {
 		VBox vBox = (VBox) screen.lookup("#vbox");
 
 		// set headline
-		if (!frage.getUeberschrift().equals("") && !info.hasHeadline()) {
+		if (!question.getHeadline().equals("") && !info.hasHeadline()) {
 			Label lbl_headline = (Label) screen.lookup("#lbl_headline");
-			lbl_headline.setText(removeMark(frage.getUeberschrift()));
+			lbl_headline.setText(removeMark(question.getHeadline()));
 			info.setHeadline(true);
 		}
 
 		//add question
-		vBox.getChildren().add(createQuestionLabel(screen, frage));
+		vBox.getChildren().add(createQuestionLabel(screen, question));
 
-		if (frage.getArt() == "FF") {
-			vBox.getChildren().add(createFFNode(frage));
-		} else if (frage.getArt() == "MC") {
-			if (frage.getFlags().is(SymbolType.LIST)) {
-				vBox.getChildren().add(createMCListView(frage));
+		if (question.getQuestionType().equals("FF")) {
+			vBox.getChildren().add(createFFNode(question));
+		} else if (question.getQuestionType().equals("MC")) {
+			if (question.getFlags().is(SymbolType.LIST)) {
+				vBox.getChildren().add(createMCListView(question));
 			} else {
-				vBox.getChildren().add(createMCCheckboxen(frage, info));
+				vBox.getChildren().add(createMCCheckboxen(question, info));
 			}
 
 		}
-		info.setFrage(frage);
-		return info;
+		info.setQuestion(question);
 	}
 
-	private static Label createQuestionLabel(Pane screen, Frage frage) {
-		String questionTest = removeMark(frage.getFrage());
+	private static Label createQuestionLabel(Pane screen, Question question) {
+		String questionTest = removeMark(question.getQuestion());
 
-		questionTest = addRequiredTag(questionTest, frage.getFlags().is(SymbolType.REQUIRED));
+		questionTest = addRequiredTag(questionTest, question.getFlags().is(SymbolType.REQUIRED));
 
 		Label lblFrage = new Label(questionTest);
 		// System.out.println("frageObj.get(y).frageid = " +
 		// frageObj.get(y).getFrageID());
-		lblFrage.setId("lblFrage_" + frage.getFrageID());
+		lblFrage.setId("lblFrage_" + question.getQuestionId());
 
-		if (frage.getFlags().hasMCReact()) {
+		if (question.getFlags().hasMCReact()) {
 			//lblFrage.setVisible(false);
 		}
 
 		// allePanel.get(z).add(lblFrage, "align center, span, wrap");
-		frage.setScene(screen);
-		frage.setFrageLabel(lblFrage);
+		question.setScene(screen);
+		question.setQuestionLabel(lblFrage);
 
 		return lblFrage;
 	}
 
 	@SuppressWarnings("unchecked")
-	private static <T extends Control> T createFFNode(Frage frage) {
-		if (frage.getFlags().is(SymbolType.TEXT)) {
+	private static <T extends Control> T createFFNode(Question question) {
+		if (question.getFlags().is(SymbolType.TEXT)) {
 			// F�gt eine Textarea ein
 			TextArea textArea = new TextArea(); // anneSuperNeu
 			// textArea.setPreferredSize(new Dimension(200, 50));
 			// allePanel.get(z).add(textArea, "span, center");
-			ArrayList<TextArea> textAreas = new ArrayList<TextArea>();
+			ArrayList<TextArea> textAreas = new ArrayList<>();
 			textAreas.add(textArea);
-			frage.setAntwortenTEXT(textAreas);
+			question.setAnswersTEXT(textAreas);
 			return (T) textArea;
 		} else {
-			if (frage.getFlags().is(SymbolType.LIST)) {
+			if (question.getFlags().is(SymbolType.LIST)) {
 				// ErrorLog.fehlerBerichtB("ERROR",
 				// Datenbank.class + ": " +
 				// Thread.currentThread().getStackTrace()[1].getLineNumber(), "Fehler");
@@ -257,14 +259,14 @@ public class StartController {
 				TextField textField = new TextField();
 				// textField.setPreferredSize(new Dimension(200, 50));
 
-				if (frage.getFlags().hasFFReact()) {
+				if (question.getFlags().hasFFReact()) {
 					textField.setVisible(false);
 				}
 
 				// allePanel.get(z).add(textField, "wrap, span, center");
-				ArrayList<TextField> textFields = new ArrayList<TextField>();
+				ArrayList<TextField> textFields = new ArrayList<>();
 				textFields.add(textField);
-				frage.setAntwortenFF(textFields);
+				question.setAnswersFF(textFields);
 				return (T) textField;
 			}
 		}
@@ -272,12 +274,12 @@ public class StartController {
 		return null;
 	}
 
-	private static ListView<String> createMCListView(Frage frage) {
+	private static ListView<String> createMCListView(Question question) {
 		// Erstellt eine Liste
 		ArrayList<ListView<String>> antwortenLIST = new ArrayList<>();
 		// scrollPane.getVerticalScrollBar().setUI(new MyScrollBarUI());
 		// allePanel.get(z).add(scrollPane, "span, center");
-		ListView<String> liste = new ListView<String>();
+		ListView<String> liste = new ListView<>();
 		liste.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
 		liste.setCellFactory(lv -> {
@@ -309,21 +311,21 @@ public class StartController {
 			return cell;
 		});
 
-		liste.setItems(FXCollections.observableArrayList(frage.getAntwort_moeglichkeit()));
+		liste.setItems(FXCollections.observableArrayList(question.getAnswerOptions()));
 
-		if (frage.getFlags().hasMCReact()) {
+		if (question.getFlags().hasMCReact()) {
 			//liste.setVisible(false);
 		}
 
 		antwortenLIST.add(liste);
-		frage.setAntwortenLIST(antwortenLIST);
+		question.setAnswersLIST(antwortenLIST);
 		return liste;	
 	}
 	
-	private static HBox createMCCheckboxen(Frage frage, PanelInfo info) {
+	private static HBox createMCCheckboxen(Question question, PanelInfo info) {
 		List<CheckBox> checkBoxen = new ArrayList<>();
-		List<Integer> anzahlZeile = new ArrayList<Integer>();
-		int intAntworten = frage.getAntwort_moeglichkeit().size();
+		List<Integer> anzahlZeile = new ArrayList<>();
+		int intAntworten = question.getAnswerOptions().size();
 		do {
 			if (intAntworten > GlobalVars.proZeile) {
 				anzahlZeile.add(GlobalVars.proZeile);
@@ -339,10 +341,10 @@ public class StartController {
 		// antwortmoeglichkeiten
 		ArrayList<CheckBox> checkboxs = new ArrayList<>();
 		
-		for (int count3 = 0; count3 < frage.getAntwort_moeglichkeit().size(); count3++) {
+		for (int count3 = 0; count3 < question.getAnswerOptions().size(); count3++) {
 
 			// Erstellt eine Checkbox
-			String antwort = frage.getAntwort_moeglichkeit().get(count3);
+			String antwort = question.getAnswerOptions().get(count3);
 
 			String antwortAnzeige = "";
 			if (antwort.length() >= 25) {
@@ -361,11 +363,11 @@ public class StartController {
 			// chckbxSda.setFont(new Font("Tahoma", Font.PLAIN, 28));
 			// chckbxSda.setForeground(new Color(94, 56, 41));
 
-			if (frage.getFlags().hasMCReact()) {
+			if (question.getFlags().hasMCReact()) {
 				chckbxSda.setVisible(false);
 			}
 			checkBoxen.add(chckbxSda);
-			if (!frage.getFlags().is(SymbolType.MC)) {
+			if (!question.getFlags().is(SymbolType.MC)) {
 				chckbxSda.selectedProperty().addListener(new ChangeListener<Boolean>() {
 					public void changed(ObservableValue<? extends Boolean> ov, Boolean old_val,
 							Boolean new_val) {
@@ -399,7 +401,7 @@ public class StartController {
 			}
 
 			// set headlines for choice lists
-			if (frage.getFlags().is(SymbolType.B)) {
+			if (question.getFlags().is(SymbolType.B)) {
 
 				if(!info.hasBHeadlines()) {
 					Label label = new Label();
@@ -455,7 +457,7 @@ public class StartController {
 		}
 		
 		info.setbHeadlines(true);
-		frage.setAntwortenMC(checkboxs);
+		question.setAnswersMC(checkboxs);
 		return hBox;
 	}
 
@@ -482,7 +484,7 @@ public class StartController {
 	}
 
 	/**
-	 * Gibt die Position des "FrageErstellen" Objektes in dem ArrayList "fragen" zurück
+	 * Gibt die Position des "FrageErstellen" Objektes in dem ArrayList "questions" zurück
 	 * welche die entsprechende Fragen- ID und Fragenart hat. F�r die Vorschau!
 	 * <p>
 	 * 
@@ -490,17 +492,17 @@ public class StartController {
 	 *            int: Fragen- ID
 	 * @param s
 	 *            String: Fragenart
-	 * @param fragen
+	 * @param questions
 	 *            ArrayList FrageErstellen: alle Fragen
-	 * @return Postition im ArrayList "fragen" als int.
+	 * @return Postition im ArrayList "questions" als int.
 	 */
-	private static int getY(int x, String s, ArrayList<Frage> fragen) {
+	private static int getY(int x, String s, List<Question> questions) {
 		// TODO
 
-		for (int i = 0; i < fragen.size(); i++) {
-			// System.out.println(fragen.get(i).getFrageID()+ " == " + x + " && " +
-			// fragen.get(i).getArt() + " == " + s);
-			if (x == fragen.get(i).getFrageID() && s.equals(fragen.get(i).getArt())) {
+		for (int i = 0; i < questions.size(); i++) {
+			// System.out.println(questions.get(i).getFrageID()+ " == " + x + " && " +
+			// questions.get(i).getArt() + " == " + s);
+			if (x == questions.get(i).getQuestionId() && s.equals(questions.get(i).getQuestionType())) {
 				return i;
 			}
 		}
@@ -509,15 +511,15 @@ public class StartController {
 
 	@FXML
 	private void adminLogin() {
-		ScreenController.activate(model.Scene.LOGIN, "toAdmin", true);
+		ScreenController.activate(SceneName.LOGIN, "toAdmin", true);
 	}
 
 	@FXML
 	private void next() {
-		ArrayList<Frage> fragen = SurveyService.getFragen(GlobalVars.activFragebogen);
-		makeFragebogen(fragen, false);
+		List<Question> questions = SurveyService.getFragen(GlobalVars.activQuestionnaire);
+		makeQuestionnaire(questions, false);
 		GlobalVars.page = 0;
 		ScreenController.activate("survey_0");
-		// fragen.forEach((Frage frage) -> System.out.println(frage));
+		// questions.forEach((Frage frage) -> System.out.println(frage));
 	}
 }

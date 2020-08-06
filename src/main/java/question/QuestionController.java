@@ -23,9 +23,10 @@ import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.ImageView;
 import javafx.util.Callback;
-import model.Frage;
+import model.Question;
 import model.FrageEditParam;
-import model.Fragebogen;
+import model.Questionnaire;
+import model.SceneName;
 import org.controlsfx.control.Notifications;
 import react.ReactController;
 import start.StartController;
@@ -43,8 +44,8 @@ import java.util.stream.IntStream;
 import static application.GlobalFuncs.getURL;
 
 public class QuestionController {
-	public static Fragebogen fragebogen;
-	public static Frage frage;
+	public static Questionnaire questionnaire;
+	public static Question question;
 	private ArrayList<String> answers;
 	private ObservableList<Antwort> data = FXCollections.observableArrayList();
 	
@@ -107,7 +108,7 @@ public class QuestionController {
 	 */
 	public QuestionController() {
 		// fuer die Generierung der Antwortentabelle
-		answers = QuestionService.getAnswers(frage);
+		answers = QuestionService.getAnswers(question);
 		for (int i = 0; i < Objects.requireNonNull(answers).size(); ++i) {
 			Antwort antwort = new Antwort();
 			antwort.setNr(i + 1);
@@ -202,22 +203,22 @@ public class QuestionController {
 	private void fillScene() {
 		String string;
 		Pattern MY_PATTERN = Pattern.compile("#\\[[0-9]+]");
-		Matcher m = MY_PATTERN.matcher(frage.getFrage());
+		Matcher m = MY_PATTERN.matcher(question.getQuestion());
 		if (m.find()) {
-			string = frage.getFrage().substring(0, m.start());
+			string = question.getQuestion().substring(0, m.start());
 		} else {
-			string = frage.getFrage();
+			string = question.getQuestion();
 		}
 		textFieldFE.setText(string);
-		List<Integer> range = IntStream.range(1, QuestionService.getCountPosition(fragebogen) + 2).boxed()
+		List<Integer> range = IntStream.range(1, QuestionService.getCountPosition(questionnaire) + 2).boxed()
 				.collect(Collectors.toList());
 		ObservableList<Integer> list = FXCollections.observableArrayList(range);
 		posChoice.setItems(list);
-		posChoice.getSelectionModel().select(frage.getPosition() - 1);
+		posChoice.getSelectionModel().select(question.getPosition() - 1);
 
 		ObservableList<String> listKat = FXCollections.observableArrayList(QuestionService.getKategorie());
 		katChoice.setItems(listKat);
-		katChoice.getSelectionModel().select(frage.getKategorie());
+		katChoice.getSelectionModel().select(question.getCategory());
 
 		ObservableList<String> listArt = FXCollections.observableArrayList("Bewertungsfrage", "Multiple Choice",
 				"Freie Frage");
@@ -232,8 +233,8 @@ public class QuestionController {
 				"Größer gleich Zahl");
 		zahlChoice.setItems(listZahl);
 
-		if (frage.getArt().equals("MC")) {
-			if (frage.getFlags().is(SymbolType.B)) {
+		if (question.getQuestionType().equals("MC")) {
+			if (question.getFlags().is(SymbolType.B)) {
 				artChoice.getSelectionModel().select("Bewertungsfrage");
 			} else {
 				artChoice.getSelectionModel().select("Multiple Choice");
@@ -242,34 +243,34 @@ public class QuestionController {
 			artChoice.getSelectionModel().select("Freie Frage");
 		}
 
-		if (frage.getFlags().is(SymbolType.MC)) {
+		if (question.getFlags().is(SymbolType.MC)) {
 			chckbxMultipleChoice.setSelected(true);
 		} else {
 			chckbxMultipleChoice.setSelected(false);
 		}
 
-		if (frage.getFlags().is(SymbolType.LIST)) {
+		if (question.getFlags().is(SymbolType.LIST)) {
 			chckbxListe.setSelected(true);
 		} else {
 			chckbxListe.setSelected(false);
 		}
 
-		if (frage.getFlags().is(SymbolType.TEXT)) {
+		if (question.getFlags().is(SymbolType.TEXT)) {
 			chckbxTextArea.setSelected(true);
 		} else {
 			chckbxTextArea.setSelected(false);
 		}
 
-		if (frage.getFlags().is(SymbolType.REQUIRED)) {
+		if (question.getFlags().is(SymbolType.REQUIRED)) {
 			chckbxPflichtfrage.setSelected(true);
 		} else {
 			chckbxPflichtfrage.setSelected(false);
 		}
 
-		if (frage.getFlags().is(SymbolType.JN)) {
+		if (question.getFlags().is(SymbolType.JN)) {
 			chckbxJaNein.setSelected(true);
 			//imageView.setVisible(true);
-			if (frage.getFlags().is(SymbolType.JNExcel)) {
+			if (question.getFlags().is(SymbolType.JNExcel)) {
 				chckbxX.setSelected(true);
 				// image.showQRImage();
 			} else {
@@ -289,9 +290,9 @@ public class QuestionController {
 
 			}
 		}*/
-		if (frage.getArt().equals("MC")) {
-			if(frage.getAntwort_moeglichkeit().size() > 0) {
-				if (frage.getAntwort_moeglichkeit().get(0).equals("#####")) {
+		if (question.getQuestionType().equals("MC")) {
+			if(question.getAnswerOptions().size() > 0) {
+				if (question.getAnswerOptions().get(0).equals("#####")) {
 					chckbxUeberschrift.setSelected(true);
 				} else {
 					chckbxUeberschrift.setSelected(false);
@@ -308,7 +309,7 @@ public class QuestionController {
 		 * 1).toString()); }
 		 */
 
-		List<Number> numbers = frage.getFlags().getAll(Number.class);
+		List<Number> numbers = question.getFlags().getAll(Number.class);
 
 		if (numbers.size() > 0) {
 			Number number = numbers.get(0);
@@ -334,19 +335,19 @@ public class QuestionController {
 	
 	@FXML
 	private void exit() {
-		ScreenController.activate(model.Scene.QUESTIONLIST);
+		ScreenController.activate(SceneName.QUESTION_LIST);
 	}
 	
 	@FXML
 	private void save() {
 		if (checkFrageDaten()) {
-			Frage neueFrage = new Frage();
+			Question neueQuestion = new Question();
 			
 			String string;
 			
-			String oldFrage = frage.getFrage();
+			String oldFrage = question.getQuestion();
 			
-			FlagList flags = frage.getFlags();
+			FlagList flags = question.getFlags();
 			
 			Pattern MY_PATTERNs = Pattern.compile("#\\[[0-9]+]");
 			Matcher ms = MY_PATTERNs.matcher(oldFrage);
@@ -357,41 +358,41 @@ public class QuestionController {
 			}
 			
 			if(!string.equals(textFieldFE.getText())) {
-				neueFrage.setFrage(QuestionService.duplicateFrage(textFieldFE.getText()));
+				neueQuestion.setQuestion(QuestionService.duplicateFrage(textFieldFE.getText()));
 			} else {
-				neueFrage.setFrage(oldFrage);
+				neueQuestion.setQuestion(oldFrage);
 			}
 			oldFrage = "";
-			neueFrage.setPosition((int)posChoice.getValue());
-			if(frage != null) {
-				neueFrage.setFrageID(frage.getFrageID());
+			neueQuestion.setPosition((int)posChoice.getValue());
+			if(question != null) {
+				neueQuestion.setQuestionId(question.getQuestionId());
 			}
 
 			FrageEditParam param = new FrageEditParam(artChoice, zahlChoice, textFieldZahl, chckbxPflichtfrage, chckbxMultipleChoice,
 					chckbxListe, chckbxTextArea, chckbxJaNein, chckbxUeberschrift, chckbxX, chckbxZahl);
 
-			neueFrage.setArt(param.getType());
+			neueQuestion.setQuestionType(param.getType());
 			
 			String selectedKat = katChoice.getSelectionModel().getSelectedItem();
 			if (selectedKat.equals("")) {
 				selectedKat = katChoice.getItems().get(0);
 			}						
-			neueFrage.setKategorie(selectedKat);
+			neueQuestion.setCategory(selectedKat);
 	        
 	        List<React> mcList = flags.getAll(React.class);
 	        for (React react : mcList) {
 	        	if(param.isRequired()) {
-					QuestionService.updateFlags(fragebogen, react.getQuestionType().toString(), react.getQuestionId());
+					QuestionService.updateFlags(questionnaire, react.getQuestionType().toString(), react.getQuestionId());
 				}
-		        if (QuestionService.isPflichtfrage(fragebogen, react.getQuestionType().toString(), react.getQuestionId())) {
+		        if (QuestionService.isPflichtfrage(questionnaire, react.getQuestionType().toString(), react.getQuestionId())) {
 		        	param.setRequired(true);
 		        }
 			}
 	        
 			if (artChoice.getSelectionModel().getSelectedItem().equals("Freie Frage")) {
 				QuestionService.getMoeglicheFlags(flags, param);//floNeu
-				neueFrage.setFlags(flags);
-				QuestionService.saveFreieFrage(fragebogen, neueFrage);					
+				neueQuestion.setFlags(flags);
+				QuestionService.saveFreieFrage(questionnaire, neueQuestion);
 			}
 			if (artChoice.getSelectionModel().getSelectedItem().equals("Multiple Choice")) {
 				ArrayList<Integer> antIds = new ArrayList<>();
@@ -425,8 +426,8 @@ public class QuestionController {
 				}
 				
 				if(!antIdsRaus.isEmpty()) {
-					QuestionService.updateFlags(neueFrage);
-					QuestionService.deleteAntworten(antIdsRaus, neueFrage);
+					QuestionService.updateFlags(neueQuestion);
+					QuestionService.deleteAntworten(antIdsRaus, neueQuestion);
 				}
 				//
 				for (String ant : ants) {
@@ -434,16 +435,16 @@ public class QuestionController {
 					antIds.add(antId);
 				}
 				QuestionService.getMoeglicheFlags(flags, param);//floNeu
-				neueFrage.setFlags(flags);
-				QuestionService.saveMC(fragebogen, neueFrage, antIds);
+				neueQuestion.setFlags(flags);
+				QuestionService.saveMC(questionnaire, neueQuestion, antIds);
 			}
 			if (artChoice.getSelectionModel().getSelectedItem().equals("Bewertungsfrage")) {
 				QuestionService.getMoeglicheFlags(flags, param);//floNeu
-				neueFrage.setFlags(flags);
-				QuestionService.saveBewertungsfrage(fragebogen, neueFrage);
+				neueQuestion.setFlags(flags);
+				QuestionService.saveBewertungsfrage(questionnaire, neueQuestion);
 			}
 		
-			ScreenController.activate(model.Scene.QUESTIONLIST);
+			ScreenController.activate(SceneName.QUESTION_LIST);
 		} else {
 			Notifications
 					.create()
@@ -454,9 +455,9 @@ public class QuestionController {
 	
 	@FXML
 	private void setPreview() {
-		ArrayList<Frage> fragen = new ArrayList<>();
-		fragen.add(frage);
-		StartController.makeFragebogen(fragen, true);
+		List<Question> fragen = new ArrayList<>();
+		fragen.add(question);
+		StartController.makeQuestionnaire(fragen, true);
 		ScreenController.activate("survey_0");
 	}
 	
@@ -502,12 +503,12 @@ public class QuestionController {
 	
 	@FXML
 	private void react() {
-		ReactController.frage = frage;
-		ReactController.fragebogen = fragebogen;
+		ReactController.question = question;
+		ReactController.questionnaire = questionnaire;
 		
 		try {
-			ScreenController.addScreen(model.Scene.REACT, FXMLLoader.load(getURL("view/ReactView.fxml")));
-			ScreenController.activate(model.Scene.REACT);
+			ScreenController.addScreen(SceneName.REACT, FXMLLoader.load(getURL(SceneName.REACT_PATH)));
+			ScreenController.activate(SceneName.REACT);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

@@ -1,14 +1,14 @@
 package survey;
 
-import application.Datenbank;
+import application.Database;
 import application.GlobalVars;
 import flag.FlagList;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
-import model.Frage;
-import model.Fragebogen;
-import model.Ueberschrift;
+import model.Question;
+import model.Questionnaire;
+import model.Headline;
 import question.QuestionService;
 
 import java.sql.Connection;
@@ -20,7 +20,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SurveyService extends Datenbank {
+public class SurveyService extends Database {
 	/**
 	 * Erstellt einen ArrayList aus allen Fragen, welche im ausgewählten Fragebogen
 	 * sind.
@@ -28,7 +28,7 @@ public class SurveyService extends Datenbank {
 	 * @return ArrayList FrageErstellen
 	 * @author Julian und Eric
 	 */
-	public static ArrayList<Frage> getFragen(Fragebogen fb) {
+	public static List<Question> getFragen(Questionnaire fb) {
 		try {
 			System.out.println("FragebogenID: " + fb.getId());
 			Connection myCon = DriverManager.getConnection(url, user, pwd);
@@ -40,10 +40,10 @@ public class SurveyService extends Datenbank {
 			ArrayList<String> antworten = new ArrayList<>();
 			ArrayList<Integer> pos = new ArrayList<>();
 			ArrayList<String> alleFragen = new ArrayList<>();
-			ArrayList<Ueberschrift> ueberschriften = new ArrayList<>();
+			ArrayList<Headline> ueberschriften = new ArrayList<>();
 
-			ArrayList<Frage> ffFragen = new ArrayList<>();
-			ArrayList<Frage> mcFragen = new ArrayList<>();
+			ArrayList<Question> ffFragen = new ArrayList<>();
+			ArrayList<Question> mcFragen = new ArrayList<>();
 
 			// �berschrift MUSS MC sein...
 			while (myRS.next()) {
@@ -55,41 +55,41 @@ public class SurveyService extends Datenbank {
 					alleFragen.add(frage);
 				}
 
-				if ((mcFragen.isEmpty() || !mcFragen.get(mcFragen.size() - 1).getFrage().equals(frage))
+				if ((mcFragen.isEmpty() || !mcFragen.get(mcFragen.size() - 1).getQuestion().equals(frage))
 						&& !myRS.getString("Antwort").equals("#####")) {
-					Frage fragenObj = new Frage();
-					fragenObj.setFrage(frage);
-					fragenObj.setFrageID(myRS.getInt("idMultipleChoice"));
-					fragenObj.setKategorie(unslashUnicode(myRS.getString("Kategorie")));
-					fragenObj.setDatum(myRS.getString("Datum"));
+					Question fragenObj = new Question();
+					fragenObj.setQuestion(frage);
+					fragenObj.setQuestionId(myRS.getInt("idMultipleChoice"));
+					fragenObj.setCategory(unslashUnicode(myRS.getString("Kategorie")));
+					fragenObj.setDate(myRS.getString("Datum"));
 					fragenObj.setFlags(new FlagList(myRS.getString("Flags")));
 					fragenObj.setPosition(Integer.parseInt(myRS.getString("Position")));
-					fragenObj.setArt("MC");
-					fragenObj.setFragebogenID(fb.getId());
+					fragenObj.setQuestionType("MC");
+					fragenObj.setQuestionnaireId(fb.getId());
 
 					int iii;
 					for (iii = 0; iii < ueberschriften.size(); iii++) {
 
-						if (fragenObj.getPosition() == ueberschriften.get(iii).getPostition()) {
+						if (fragenObj.getPosition() == ueberschriften.get(iii).getPosition()) {
 							isUeberschrift = true;
 							break;
 						}
 					}
 
 					if (isUeberschrift) {
-						fragenObj.setUeberschrift(ueberschriften.get(iii).getUeberschrift());
+						fragenObj.setHeadline(ueberschriften.get(iii).getHeadline());
 					}
 
 					mcFragen.add(fragenObj);
 				} else {
 					if (myRS.getString("Antwort").equals("#####")) {
 						skip = true;
-						ueberschriften.add(new Ueberschrift(Integer.parseInt(myRS.getString("Position")),
+						ueberschriften.add(new Headline(Integer.parseInt(myRS.getString("Position")),
 								unslashUnicode(myRS.getString("FrageMC"))));
 					}
 				}
 
-				if ((mcFragen.isEmpty() || mcFragen.get(mcFragen.size() - 1).getFrage().equals(frage)) && !skip) {
+				if ((mcFragen.isEmpty() || mcFragen.get(mcFragen.size() - 1).getQuestion().equals(frage)) && !skip) {
 					antworten.add(unslashUnicode(myRS.getString("Antwort")));
 				}
 			}
@@ -107,45 +107,45 @@ public class SurveyService extends Datenbank {
 				String frage = unslashUnicode(myRS.getString("FrageFF"));
 				alleFragen.add(frage);
 				if ((ffFragen.isEmpty() || 
-						!ffFragen.get(ffFragen.size() - 1).getFrage().equals(frage))/* && !myRS.getString("Antwort").equals("#####")*/) {
-					Frage fragenObj = new Frage();
-					fragenObj.setFrage(frage);
-					fragenObj.setFrageID(myRS.getInt("idFreieFragen"));
-					fragenObj.setKategorie(unslashUnicode(myRS.getString("Kategorie")));
-					fragenObj.setDatum(myRS.getString("Datum"));
+						!ffFragen.get(ffFragen.size() - 1).getQuestion().equals(frage))/* && !myRS.getString("Antwort").equals("#####")*/) {
+					Question fragenObj = new Question();
+					fragenObj.setQuestion(frage);
+					fragenObj.setQuestionId(myRS.getInt("idFreieFragen"));
+					fragenObj.setCategory(unslashUnicode(myRS.getString("Kategorie")));
+					fragenObj.setDate(myRS.getString("Datum"));
 					fragenObj.setFlags(new FlagList(myRS.getString("Flags")));
 					fragenObj.setPosition(Integer.parseInt(myRS.getString("Position")));
-					fragenObj.setArt("FF");
-					fragenObj.setFragebogenID(fb.getId());
+					fragenObj.setQuestionType("FF");
+					fragenObj.setQuestionnaireId(fb.getId());
 
 					int iii;
 					for (iii = 0; iii < ueberschriften.size(); iii++) {
 
-						if (fragenObj.getPosition() == ueberschriften.get(iii).getPostition()) {
+						if (fragenObj.getPosition() == ueberschriften.get(iii).getPosition()) {
 							isUeberschrift = true;
 							break;
 						}
 					}
 
 					if (isUeberschrift) {
-						fragenObj.setUeberschrift(ueberschriften.get(iii).getUeberschrift());
+						fragenObj.setHeadline(ueberschriften.get(iii).getHeadline());
 					}
 
 					ffFragen.add(fragenObj);
 				} else {
 					if (myRS.getString("Antwort").equals("#####")) {
 						skip = true;
-						ueberschriften.add(new Ueberschrift(Integer.parseInt(myRS.getString("Position")),
+						ueberschriften.add(new Headline(Integer.parseInt(myRS.getString("Position")),
 								unslashUnicode(myRS.getString("FrageMC"))));
 					}
 				}
 
-				if ((ffFragen.isEmpty() || ffFragen.get(ffFragen.size() - 1).getFrage().equals(frage)) && !skip) {
+				if ((ffFragen.isEmpty() || ffFragen.get(ffFragen.size() - 1).getQuestion().equals(frage)) && !skip) {
 					antworten.add("");
 				}
 			}
 
-			ArrayList<Frage> fragen = new ArrayList<Frage>();
+			ArrayList<Question> fragen = new ArrayList<Question>();
 
 			for (int z = 0; z < mcFragen.size(); z++) {
 				fragen.add(mcFragen.get(z));
@@ -202,13 +202,13 @@ public class SurveyService extends Datenbank {
 	 *            ArrayList ArrayList FrageErstellen: alle Fragen des Fragebogens
 	 * @author Julian und Eric
 	 */
-	public static void saveUmfrage(List<ArrayList<Frage>> fragen) {
+	public static void saveUmfrage(List<ArrayList<Question>> fragen) {
 		try {
 			Connection myCon = DriverManager.getConnection(url, user, pwd);
 
 			String statement = "INSERT INTO Befragung VALUES(NULL, CURDATE(), ?)";
 			PreparedStatement psSql = myCon.prepareStatement(statement);
-			psSql.setInt(1, fragen.get(0).get(0).getFragebogenID());
+			psSql.setInt(1, fragen.get(0).get(0).getQuestionnaireId());
 			psSql.executeUpdate();
 
 			int b_id = 0;
@@ -220,17 +220,17 @@ public class SurveyService extends Datenbank {
 				b_id = myRS.getInt("MAX(idBefragung)");
 
 				for (int i = 0; i < fragen.size(); i++) {
-					ArrayList<Frage> panel = fragen.get(i);
-					for (Frage frage : panel) {
-						if (frage.getArt() == "MC") {
-							if (frage.getAntwort().size() > 0) {
-								for (String antwort : frage.getAntwort()) {
+					ArrayList<Question> panel = fragen.get(i);
+					for (Question question : panel) {
+						if (question.getQuestionType() == "MC") {
+							if (question.getAnswer().size() > 0) {
+								for (String antwort : question.getAnswer()) {
 									antwort = antwort.replaceAll("<.*>", "");
 									myRS = null;
 									mySQL = null;
 									mySQL = myCon.createStatement();
 									statement = "SELECT B_has_MCid FROM B_has_MC WHERE idBefragung=" + b_id
-											+ " AND idMultipleChoice=" + frage.getFrageID() + " AND AntwortNr="
+											+ " AND idMultipleChoice=" + question.getQuestionId() + " AND AntwortNr="
 											+ QuestionService.getAntwortID(antwort);
 									myRS = mySQL.executeQuery(statement);
 									if (!myRS.next()) {
@@ -238,26 +238,26 @@ public class SurveyService extends Datenbank {
 										mySQL = null;
 										mySQL = myCon.createStatement();
 										statement = "INSERT INTO B_has_MC VALUES(NULL," + b_id + ", "
-												+ frage.getFrageID() + ", " + QuestionService.getAntwortID(antwort) + ")";
+												+ question.getQuestionId() + ", " + QuestionService.getAntwortID(antwort) + ")";
 										mySQL.executeUpdate(statement);
 									}
 								}
 							}
-						} else if (frage.getAntwort().size() > 0) {
-							for (String antwort : frage.getAntwort()) {
+						} else if (question.getAnswer().size() > 0) {
+							for (String antwort : question.getAnswer()) {
 								antwort = antwort.replaceAll("<.*>", "");
 								myRS = null;
 								mySQL = null;
 								mySQL = myCon.createStatement();
 								statement = "SELECT B_has_FFid FROM B_has_FF WHERE idBefragung=" + b_id
-										+ " AND idFreieFragen=" + frage.getFrageID() + " AND AntwortNr="
+										+ " AND idFreieFragen=" + question.getQuestionId() + " AND AntwortNr="
 										+ QuestionService.getAntwortID(antwort);
 								myRS = mySQL.executeQuery(statement);
 								if (!myRS.next()) {
 									myRS = null;
 									mySQL = null;
 									mySQL = myCon.createStatement();
-									statement = "INSERT INTO B_has_FF VALUES(NULL," + b_id + ", " + frage.getFrageID()
+									statement = "INSERT INTO B_has_FF VALUES(NULL," + b_id + ", " + question.getQuestionId()
 											+ ", " + QuestionService.getAntwortID(antwort) + ")";
 									mySQL.executeUpdate(statement);
 								}
@@ -280,16 +280,16 @@ public class SurveyService extends Datenbank {
 	 */
 	public static void resetFragebogen() {
 		
-		for(ArrayList<Frage> fragen : GlobalVars.fragenJePanel) {
-			for(Frage frage : fragen) {
-				frage.setAntwort(null);
-				for(CheckBox checkbox : frage.getAntwortenMC()) {
+		for(ArrayList<Question> fragen : GlobalVars.fragenJePanel) {
+			for(Question question : fragen) {
+				question.setAnswer(null);
+				for(CheckBox checkbox : question.getAnswersMC()) {
 					checkbox.setSelected(false);
 				}
-				for(TextField textField : frage.getAntwortenFF()) {
+				for(TextField textField : question.getAnswersFF()) {
 					textField.setText("");
 				}
-				for(ListView<String> list : frage.getAntwortenLIST()) {
+				for(ListView<String> list : question.getAnswersLIST()) {
 					list.getItems().clear();
 				}
 			}

@@ -1,7 +1,7 @@
 package start;
 
-import application.Datenbank;
-import model.Fragebogen;
+import application.Database;
+import model.Questionnaire;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -9,29 +9,29 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-public class StartService extends Datenbank {
+public class StartService extends Database {
 	/**
 	 * Gibt den aktivierten Fragebogen zurück.
 	 * 
 	 * @return FragebogenDialog
 	 * @author Eric
 	 */
-	public static Fragebogen getActivFragebogen() {
-		Fragebogen fragebogen;
+	public static Questionnaire getActivFragebogen() {
+		Questionnaire questionnaire;
 		try {
 			Connection myCon = DriverManager.getConnection(url, user, pwd);
 			Statement mySQL = myCon.createStatement();
 			ResultSet myRS = mySQL.executeQuery(
 					"SELECT idFragebogen, Datum, Name, Ort.ort FROM fragebogen JOIN Ort ON Ort.idort = Fragebogen.idort WHERE aktiviert = TRUE");
 			if (myRS.next()) {
-				fragebogen = new Fragebogen();
-				fragebogen.setName(unslashUnicode(myRS.getString("Name")));
-				fragebogen.setDate(myRS.getString("Datum"));
-				fragebogen.setId(myRS.getInt("idFragebogen"));
-				fragebogen.setOrt(unslashUnicode(myRS.getString("ort")));
-				fragebogen.setActiv(true);
+				questionnaire = new Questionnaire();
+				questionnaire.setName(unslashUnicode(myRS.getString("Name")));
+				questionnaire.setDate(myRS.getString("Datum"));
+				questionnaire.setId(myRS.getInt("idFragebogen"));
+				questionnaire.setOrt(unslashUnicode(myRS.getString("ort")));
+				questionnaire.setActive(true);
 				myCon.close();
-				return fragebogen;
+				return questionnaire;
 			} else {
 				myCon.close();
 				return null;

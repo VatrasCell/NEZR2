@@ -13,37 +13,39 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.ImageView;
 import javafx.util.Callback;
-import model.Frage;
-import model.Fragebogen;
+import model.Question;
+import model.Questionnaire;
+import model.SceneName;
 import question.QuestionController;
 import survey.SurveyService;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 import static application.GlobalFuncs.getURL;
 
 public class QuestionListController {
-	public static Fragebogen fragebogen;
-	private ArrayList<Frage> fragen;
-	private ObservableList<Frage> data = FXCollections.observableArrayList();
+	public static Questionnaire questionnaire;
+	private List<Question> fragen;
+	private ObservableList<Question> data = FXCollections.observableArrayList();
 	
 	@FXML
-	private TableView<Frage> tbl_fragen;
+	private TableView<Question> tbl_fragen;
 	@FXML
-	private TableColumn<Frage, String> nameCol;
+	private TableColumn<Question, String> nameCol;
 	@FXML
-	private TableColumn<Frage, String> katCol;
+	private TableColumn<Question, String> katCol;
 	@FXML
-	private TableColumn<Frage, Integer> posCol;
+	private TableColumn<Question, Integer> posCol;
 	@FXML
-	private TableColumn<Frage, String> artCol;
+	private TableColumn<Question, String> artCol;
 	@FXML
-	private TableColumn<Frage, String> actionCol = new TableColumn<>("Bearbeiten");
+	private TableColumn<Question, String> actionCol = new TableColumn<>("Bearbeiten");
 	//@FXML
 	//private TableColumn<Fragebogen, String> copCol = new TableColumn<>("Kopieren");
 	@FXML
-	private TableColumn<Frage, String> delCol = new TableColumn<>("Löschen");
+	private TableColumn<Question, String> delCol = new TableColumn<>("Löschen");
 	
 	/**
 	 * The constructor (is called before the initialize()-method).
@@ -54,13 +56,13 @@ public class QuestionListController {
 	
 	private void getData() {
 		data.clear();
-		fragen = SurveyService.getFragen(fragebogen);
-		ArrayList<Frage> ueberschriften = QuestionListService.getUeberschriften(fragebogen);
-		for (Frage frage : ueberschriften) {
-			int pos = frage.getPosition();
+		fragen = SurveyService.getFragen(questionnaire);
+		ArrayList<Question> ueberschriften = QuestionListService.getUeberschriften(questionnaire);
+		for (Question question : ueberschriften) {
+			int pos = question.getPosition();
 			for (int j = 0; j < fragen.size(); j++) {
 				if (fragen.get(j).getPosition() == pos) {
-					fragen.add(j, frage);
+					fragen.add(j, question);
 					break;
 				}
 			}
@@ -84,15 +86,15 @@ public class QuestionListController {
 		
 		actionCol.setCellValueFactory(new PropertyValueFactory<>("DUMMY"));
 
-        Callback<TableColumn<Frage, String>, TableCell<Frage, String>> cellFactory
+        Callback<TableColumn<Question, String>, TableCell<Question, String>> cellFactory
                 = //
-                new Callback<TableColumn<Frage, String>, TableCell<Frage, String>>() {
+                new Callback<TableColumn<Question, String>, TableCell<Question, String>>() {
             @Override
-            public TableCell<Frage, String> call(final TableColumn<Frage, String> param) {
+            public TableCell<Question, String> call(final TableColumn<Question, String> param) {
             	ImageView imgView = new ImageView(GlobalVars.IMG_EDT);
             	imgView.setFitHeight(30);
         		imgView.setFitWidth(30);
-				return new TableCell<Frage, String>() {
+				return new TableCell<Question, String>() {
 
 					Button btn = new Button("", imgView);
 					//final Button btn = new Button("EDIT");
@@ -105,12 +107,12 @@ public class QuestionListController {
 							setText(null);
 						} else {
 							btn.setOnAction(event -> {
-								QuestionController.fragebogen = fragebogen;
-								QuestionController.frage = getTableView().getItems().get(getIndex());
+								QuestionController.questionnaire = questionnaire;
+								QuestionController.question = getTableView().getItems().get(getIndex());
 								try {
-									ScreenController.addScreen(model.Scene.QUESTION,
-											FXMLLoader.load(getURL("view/QuestionView.fxml")));
-											ScreenController.activate(model.Scene.QUESTION);
+									ScreenController.addScreen(SceneName.QUESTION,
+											FXMLLoader.load(getURL(SceneName.QUESTION_PATH)));
+											ScreenController.activate(SceneName.QUESTION);
 								} catch (IOException e) {
 									// TODO Auto-generated catch block
 									e.printStackTrace();
@@ -129,16 +131,16 @@ public class QuestionListController {
         
         
         delCol.setCellValueFactory(new PropertyValueFactory<>("DUMMY"));
-        Callback<TableColumn<Frage, String>, TableCell<Frage, String>> cellFactoryDel
+        Callback<TableColumn<Question, String>, TableCell<Question, String>> cellFactoryDel
                 = //
-                new Callback<TableColumn<Frage, String>, TableCell<Frage, String>>() {
+                new Callback<TableColumn<Question, String>, TableCell<Question, String>>() {
             @Override
-            public TableCell<Frage, String> call(final TableColumn<Frage, String> param) {
+            public TableCell<Question, String> call(final TableColumn<Question, String> param) {
             	ImageView imgView = new ImageView(GlobalVars.IMG_DEL);
             	imgView.setFitHeight(30);
         		imgView.setFitWidth(30);
 
-				return new TableCell<Frage, String>() {
+				return new TableCell<Question, String>() {
 					Button btn = new Button("", imgView);
 					//final Button btn = new Button("DEL");
 
@@ -150,8 +152,8 @@ public class QuestionListController {
 							setText(null);
 						} else {
 							btn.setOnAction(event -> {
-								Frage frage = getTableView().getItems().get(getIndex());
-								if(QuestionListService.deleteFrage(frage)) {
+								Question question = getTableView().getItems().get(getIndex());
+								if(QuestionListService.deleteFrage(question)) {
 									getData();
 									tbl_fragen.refresh();
 								}
@@ -171,20 +173,20 @@ public class QuestionListController {
 	
 	@FXML
 	private void save() {
-		ScreenController.activate(model.Scene.ADMIN);
+		ScreenController.activate(SceneName.ADMIN);
 	}
 	
 	@FXML
 	private void newQuestion() {
-		QuestionController.fragebogen = fragebogen;
+		QuestionController.questionnaire = questionnaire;
 		System.out.println(fragen);
 		System.out.println(fragen.size());
 		
-    	QuestionController.frage = new Frage(fragen.size());
+    	QuestionController.question = new Question(fragen.size());
     	try {
-			ScreenController.addScreen(model.Scene.QUESTION, 
-					FXMLLoader.load(getURL("view/QuestionView.fxml")));
-					ScreenController.activate(model.Scene.QUESTION);
+			ScreenController.addScreen(SceneName.QUESTION,
+					FXMLLoader.load(getURL(SceneName.QUESTION_PATH)));
+					ScreenController.activate(SceneName.QUESTION);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

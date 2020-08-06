@@ -9,7 +9,7 @@ public enum QuestionType {
 	
 private final String type;
 	
-	private QuestionType(String type) {
+QuestionType(String type) {
 		this.type = type;
 	}
 	

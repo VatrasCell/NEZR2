@@ -1,8 +1,8 @@
 package export;
 
-import application.Datenbank;
+import application.Database;
 import flag.SymbolType;
-import model.Frage;
+import model.Question;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -12,7 +12,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 
-public class ExportService extends Datenbank {
+public class ExportService extends Database {
 	/**
 	 * Gibt die Anzahl an gespeicherten Befragungen zurÃ¼ck.
 	 * 
@@ -40,7 +40,7 @@ public class ExportService extends Datenbank {
 	 * Erstellt einen ArrayList aus Excel Zellen anhand des FrageErstellen
 	 * Objektes.
 	 * 
-	 * @param frage
+	 * @param question
 	 *            FrageErstellen
 	 * @param von
 	 *            String: Datum
@@ -48,16 +48,16 @@ public class ExportService extends Datenbank {
 	 *            Srring: Datum
 	 * @return ArrayList
 	 */
-	public static ArrayList<ExcelCell> getAntwortenPosition(Frage frage, String von, String bis) {
+	public static ArrayList<ExcelCell> getAntwortenPosition(Question question, String von, String bis) {
 		ArrayList<ExcelCell> re = new ArrayList<ExcelCell>();
-		if (((frage.getArt().equals("MC")) && (frage.getFlags().is(SymbolType.B)))
-				|| (frage.getFlags().is(SymbolType.LIST)) || (frage.getFlags().is(SymbolType.JN))) {
+		if (((question.getQuestionType().equals("MC")) && (question.getFlags().is(SymbolType.B)))
+				|| (question.getFlags().is(SymbolType.LIST)) || (question.getFlags().is(SymbolType.JN))) {
 			try {
 				Connection myCon = DriverManager.getConnection(url, user, pwd);
 				Statement mySQL = myCon.createStatement();
 				ResultSet myRS = mySQL.executeQuery(
 						"SELECT b2.idBefragung, antwort FROM Antworten a JOIN B_has_MC b ON a.AntwortNr = b.AntwortNr JOIN Befragung b2 ON b.idBefragung = b2.idBefragung WHERE idFragebogen="
-								+ frage.getFragebogenID() + " AND idMultipleChoice=" + frage.getFrageID()
+								+ question.getQuestionnaireId() + " AND idMultipleChoice=" + question.getQuestionId()
 								+ " AND (b2.Datum BETWEEN '" + von + "' AND '" + bis + "')");
 
 				int old = -1;
@@ -78,13 +78,13 @@ public class ExportService extends Datenbank {
 				//		Datenbank.class + ": " + Thread.currentThread().getStackTrace()[1].getLineNumber(),
 				//		e.getMessage());
 			}
-		} else if (frage.getArt().equals("FF")) {
+		} else if (question.getQuestionType().equals("FF")) {
 			try {
 				Connection myCon = DriverManager.getConnection(url, user, pwd);
 				Statement mySQL = myCon.createStatement();
 				ResultSet myRS = mySQL.executeQuery(
 						"SELECT b2.idBefragung, antwort FROM Antworten a JOIN B_has_FF b ON a.AntwortNr = b.AntwortNr JOIN Befragung b2 ON b.idBefragung = b2.idBefragung WHERE idFragebogen="
-								+ frage.getFragebogenID() + " AND idFreieFragen=" + frage.getFrageID()
+								+ question.getQuestionnaireId() + " AND idFreieFragen=" + question.getQuestionId()
 								+ " AND (b2.Datum BETWEEN '" + von + "' AND '" + bis + "')");
 
 				int old = -1;
@@ -113,7 +113,7 @@ public class ExportService extends Datenbank {
 	 * Erstellt einen ArrayList aus Excel Zellen anhand des FrageErstellen Objektes
 	 * und der Antwort.
 	 * 
-	 * @param frage
+	 * @param question
 	 *            FrageErstellen
 	 * @param antwort
 	 *            String
@@ -123,14 +123,14 @@ public class ExportService extends Datenbank {
 	 *            Srring: Datum
 	 * @return ArrayList
 	 */
-	public static ArrayList<ExcelCell> getAntwortenPosition(Frage frage, String antwort, String von, String bis) {
+	public static ArrayList<ExcelCell> getAntwortenPosition(Question question, String antwort, String von, String bis) {
 		ArrayList<ExcelCell> re = new ArrayList<ExcelCell>();
 		try {
 			Connection myCon = DriverManager.getConnection(url, user, pwd);
 			String statement = "SELECT b2.idBefragung FROM Antworten a JOIN B_has_MC b ON a.AntwortNr = b.AntwortNr JOIN Befragung b2 ON b.idBefragung = b2.idBefragung WHERE idFragebogen=? AND idMultipleChoice=? AND antwort=? AND (b2.Datum BETWEEN ? AND ?)";
 			PreparedStatement psSql = myCon.prepareStatement(statement);
-			psSql.setInt(1, frage.getFragebogenID());
-			psSql.setInt(2, frage.getFrageID());
+			psSql.setInt(1, question.getQuestionnaireId());
+			psSql.setInt(2, question.getQuestionId());
 			psSql.setString(3, slashUnicode(antwort));
 			psSql.setString(4, von);
 			psSql.setString(5, bis);

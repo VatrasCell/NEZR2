@@ -3,7 +3,7 @@ package model;
 public class PanelInfo {
 	private boolean headline;
 	private boolean bHeadlines;
-	private Frage frage;
+	private Question question;
 	
 	/**
 	 * 
@@ -11,7 +11,7 @@ public class PanelInfo {
 	public PanelInfo() {
 		headline = false;
 		bHeadlines = false;
-		frage = null;
+		question = null;
 	}
 
 	/**
@@ -44,15 +44,15 @@ public class PanelInfo {
 	/**
 	 * @return the frage
 	 */
-	public Frage getFrage() {
-		return frage;
+	public Question getQuestion() {
+		return question;
 	}
 
 	/**
-	 * @param frage the frage to set
+	 * @param question the frage to set
 	 */
-	public void setFrage(Frage frage) {
-		this.frage = frage;
+	public void setQuestion(Question question) {
+		this.question = question;
 	}
 	
 }

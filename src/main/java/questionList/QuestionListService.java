@@ -1,9 +1,9 @@
 package questionList;
 
-import application.Datenbank;
+import application.Database;
 import flag.FlagList;
-import model.Frage;
-import model.Fragebogen;
+import model.Question;
+import model.Questionnaire;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class QuestionListService extends Datenbank {
+public class QuestionListService extends Database {
 	/**
 	 * Gibt alle Ueberschriften des gegebenen Fragebogen zurueck.
 	 * 
@@ -23,8 +23,8 @@ public class QuestionListService extends Datenbank {
 	 * @return ArrayList FrageErstellen
 	 * @author Eric
 	 */
-	public static ArrayList<Frage> getUeberschriften(Fragebogen fb) {
-		ArrayList<Frage> ueberschriften = new ArrayList<>();
+	public static ArrayList<Question> getUeberschriften(Questionnaire fb) {
+		ArrayList<Question> ueberschriften = new ArrayList<>();
 		try {
 			Connection myCon = DriverManager.getConnection(url, user, pwd);
 			Statement mySQL = myCon.createStatement();
@@ -32,17 +32,17 @@ public class QuestionListService extends Datenbank {
 					+ fb.getId() + " AND antwort='#####'";
 			ResultSet myRS = mySQL.executeQuery(statment);
 			while (myRS.next()) {
-				Frage frage = new Frage();
-				frage.setFrage(unslashUnicode(myRS.getString("FrageMC")));
-				frage.setFrageID(myRS.getInt("idMultipleChoice"));
-				frage.setKategorie(unslashUnicode(myRS.getString("Kategorie")));
-				frage.setDatum(myRS.getString("Datum"));
-				frage.setFlags(new FlagList());
-				frage.setPosition(Integer.parseInt(myRS.getString("Position")));
-				frage.setArt("MC");
-				frage.setFragebogenID(fb.getId());
-				frage.addAntwort_moeglichkeit(myRS.getString("Antwort"));
-				ueberschriften.add(frage);
+				Question question = new Question();
+				question.setQuestion(unslashUnicode(myRS.getString("FrageMC")));
+				question.setQuestionId(myRS.getInt("idMultipleChoice"));
+				question.setCategory(unslashUnicode(myRS.getString("Kategorie")));
+				question.setDate(myRS.getString("Datum"));
+				question.setFlags(new FlagList());
+				question.setPosition(Integer.parseInt(myRS.getString("Position")));
+				question.setQuestionType("MC");
+				question.setQuestionnaireId(fb.getId());
+				question.addAntwort_moeglichkeit(myRS.getString("Antwort"));
+				ueberschriften.add(question);
 			}
 			myCon.close();
 		} catch (SQLException e) {
@@ -56,12 +56,12 @@ public class QuestionListService extends Datenbank {
 	/**
 	 * Loescht die gegebene Frage. Gibt bei Erfolg TRUE zurueck.
 	 * 
-	 * @param frage
+	 * @param question
 	 *            FrageErstellen: die Frage
 	 * @return boolean
 	 */
 	// anneSehrNeu
-	public static boolean deleteFrage(Frage frage) {
+	public static boolean deleteFrage(Question question) {
 		ArrayList<Integer> antmcnr = new ArrayList<Integer>(); // IDs der Antworten
 															// aus MC Fragen
 		ArrayList<String> antwortenmc = new ArrayList<String>(); // Antworten zu MC
@@ -72,9 +72,9 @@ public class QuestionListService extends Datenbank {
 
 		try {
 			Connection myCon = DriverManager.getConnection(url, user, pwd);
-			if (frage.getArt().equals("MC")) {
+			if (question.getQuestionType().equals("MC")) {
 				Statement mySQL = myCon.createStatement();
-				statement = "SELECT flags, idMultipleChoice FROM FB_has_mc where flags LIKE '%__" + frage.getFrageID()
+				statement = "SELECT flags, idMultipleChoice FROM FB_has_mc where flags LIKE '%__" + question.getQuestionId()
 						+ "A%'";
 				ResultSet myRS = mySQL.executeQuery(statement);
 
@@ -101,7 +101,7 @@ public class QuestionListService extends Datenbank {
 				}
 
 				mySQL = myCon.createStatement();
-				statement = "SELECT flags, idFreieFragen FROM FB_has_ff WHERE flags LIKE '%__" + frage.getFrageID()
+				statement = "SELECT flags, idFreieFragen FROM FB_has_ff WHERE flags LIKE '%__" + question.getQuestionId()
 						+ "A%'";
 				myRS = mySQL.executeQuery(statement);
 
@@ -129,7 +129,7 @@ public class QuestionListService extends Datenbank {
 
 				mySQL = myCon.createStatement();
 				statement = "SELECT Antworten.AntwortNr, Antworten.Antwort FROM multiplechoice mc JOIN mc_has_a ON mc.idMultipleChoice=mc_has_a.idMultipleChoice JOIN antworten "
-						+ "ON mc_has_a.AntwortNr=antworten.AntwortNr WHERE mc.idmultiplechoice=" + frage.getFrageID();
+						+ "ON mc_has_a.AntwortNr=antworten.AntwortNr WHERE mc.idmultiplechoice=" + question.getQuestionId();
 				myRS = mySQL.executeQuery(statement);
 
 				while (myRS.next()) {
@@ -162,12 +162,12 @@ public class QuestionListService extends Datenbank {
 
 				// LÃ¶schen der Relationen von Fragebogen zu MultipleChoice
 				mySQL = myCon.createStatement();
-				statement = "DELETE FROM Fb_has_Mc WHERE idMultipleChoice=" + frage.getFrageID();
+				statement = "DELETE FROM Fb_has_Mc WHERE idMultipleChoice=" + question.getQuestionId();
 				mySQL.execute(statement);
 				mySQL = null;
-			} else if (frage.getArt().equals("FF")) {
+			} else if (question.getQuestionType().equals("FF")) {
 				Statement mySQL = myCon.createStatement();
-				statement = "SELECT flags, idFreieFragen FROM FB_has_ff where flags LIKE '%__" + frage.getFrageID()
+				statement = "SELECT flags, idFreieFragen FROM FB_has_ff where flags LIKE '%__" + question.getQuestionId()
 						+ "A%'";
 				ResultSet myRS = mySQL.executeQuery(statement);
 
@@ -194,7 +194,7 @@ public class QuestionListService extends Datenbank {
 				}
 
 				mySQL = myCon.createStatement();
-				statement = "SELECT flags, idmultiplechoice FROM FB_has_mc where flags LIKE '%__" + frage.getFrageID()
+				statement = "SELECT flags, idmultiplechoice FROM FB_has_mc where flags LIKE '%__" + question.getQuestionId()
 						+ "A%'";
 				myRS = mySQL.executeQuery(statement);
 
@@ -222,14 +222,14 @@ public class QuestionListService extends Datenbank {
 
 				// LÃ¶schen der Relationen von Fragebogen zu FreieFragen
 				mySQL = myCon.createStatement();
-				statement = "DELETE FROM Fb_has_Ff WHERE idFreieFragen=" + frage.getFrageID();
+				statement = "DELETE FROM Fb_has_Ff WHERE idFreieFragen=" + question.getQuestionId();
 				mySQL.execute(statement);
 				mySQL = null;
 			}
 
-			if (frage.getArt().equals("MC")) {
+			if (question.getQuestionType().equals("MC")) {
 				Statement mySQL = myCon.createStatement();
-				statement = "SELECT idMultipleChoice FROM FB_has_MC WHERE idMultipleChoice=" + frage.getFrageID();
+				statement = "SELECT idMultipleChoice FROM FB_has_MC WHERE idMultipleChoice=" + question.getQuestionId();
 				ResultSet myRS = mySQL.executeQuery(statement);
 
 				// steht ID der MC Frage nach dem LÃ¶schen der Relation zum
@@ -238,18 +238,18 @@ public class QuestionListService extends Datenbank {
 				// in keinem anderen Fragebogen vor
 				if (!myRS.next()) {
 					mySQL = myCon.createStatement();
-					statement = "DELETE FROM MC_has_A WHERE idMultipleChoice=" + frage.getFrageID();
+					statement = "DELETE FROM MC_has_A WHERE idMultipleChoice=" + question.getQuestionId();
 					mySQL.execute(statement);
 					mySQL = null;
 
 					mySQL = myCon.createStatement();
-					statement = "DELETE FROM MultipleChoice WHERE idMultipleChoice=" + frage.getFrageID();
+					statement = "DELETE FROM MultipleChoice WHERE idMultipleChoice=" + question.getQuestionId();
 					mySQL.execute(statement);
 					mySQL = null;
 				}
-			} else if (frage.getArt().equals("FF")) {
+			} else if (question.getQuestionType().equals("FF")) {
 				Statement mySQL = myCon.createStatement();
-				statement = "SELECT idFreieFragen FROM Fb_has_ff WHERE idFreieFragen=" + frage.getFrageID();
+				statement = "SELECT idFreieFragen FROM Fb_has_ff WHERE idFreieFragen=" + question.getQuestionId();
 				ResultSet myRS = mySQL.executeQuery(statement);
 
 				// steht ID der FF Frage nach dem LÃ¶schen der Relation zum
@@ -258,7 +258,7 @@ public class QuestionListService extends Datenbank {
 				// in keinem anderen Fragebogen vor
 				if (!myRS.next()) {
 					mySQL = myCon.createStatement();
-					statement = "DELETE FROM FreieFragen WHERE idFreieFragen=" + frage.getFrageID();
+					statement = "DELETE FROM FreieFragen WHERE idFreieFragen=" + question.getQuestionId();
 					mySQL.execute(statement);
 					mySQL = null;
 				}

@@ -8,7 +8,7 @@ import java.util.regex.Pattern;
 public class FlagList {
 	
 	private List<Flag> list = new ArrayList<>();
-	private List<Symbol> possibleFlags = new ArrayList<>();
+	private List<Symbol> possibleFlags;
 
 	public FlagList() {
 		super();
@@ -54,13 +54,12 @@ public class FlagList {
 			react = getReactMCFromFlagList(flag);
 			if(react != null) {
 				this.add(react);
-				continue;
 			}
 		}
 	}
 	
 	public boolean is(SymbolType expectation) {
-		return getSymbol(expectation) != null ? true : false;
+		return getSymbol(expectation) != null;
 	}
 	
 	public Symbol getSymbol(SymbolType expectation) {

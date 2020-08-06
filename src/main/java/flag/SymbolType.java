@@ -16,7 +16,7 @@ public enum SymbolType {
 	
 	private final String flag;
 	
-	private SymbolType(String flag) {
+	SymbolType(String flag) {
 		this.flag = flag;
 	}
 	

@@ -9,7 +9,7 @@ public class React extends Flag {
 	/**
 	 * @param questionType
 	 * @param questionId
-	 * @param answerId
+	 * @param answerPos
 	 */
 	public React(QuestionType questionType, int questionId, int answerPos) {
 		super();
@@ -54,7 +54,7 @@ public class React extends Flag {
 	}
 	
 	/**
-	 * @param answerId the answerId to set
+	 * @param answerPos the answerId to set
 	 */
 	public void setAnswerPos(int answerPos) {
 		this.answerPos = answerPos;

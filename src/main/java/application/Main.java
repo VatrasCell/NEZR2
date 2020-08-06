@@ -3,6 +3,7 @@ package application;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.stage.Stage;
+import model.SceneName;
 
 import java.io.IOException;
 
@@ -16,14 +17,14 @@ public class Main extends Application {
 		} else {
 			primaryStage.setTitle("NEZR FX");
 		}
-		primaryStage.setFullScreen(true);
+		primaryStage.setFullScreen(false);
 		
-		ScreenController.setRootScene(primaryStage);
+		ScreenController.setPrimaryStage(primaryStage);
 		
-		ScreenController.addScreen("login", FXMLLoader.load(getURL("view/LoginView.fxml")));
+		ScreenController.addScreen(SceneName.LOGIN, FXMLLoader.load(getURL(SceneName.LOGIN_PATH)));
 		
 		if(!GlobalVars.DEVMODE) {
-			ScreenController.activate("login");
+			ScreenController.activate(SceneName.LOGIN);
 		}
 	}
 	

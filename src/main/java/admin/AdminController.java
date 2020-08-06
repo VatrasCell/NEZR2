@@ -3,6 +3,7 @@ package admin;
 import application.GlobalVars;
 import application.ScreenController;
 import export.ExportController;
+import export.impl.ExportControllerImpl;
 import javafx.application.Platform;
 import javafx.beans.value.ObservableBooleanValue;
 import javafx.collections.FXCollections;
@@ -30,7 +31,8 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.util.Callback;
 import javafx.util.Pair;
-import model.Fragebogen;
+import model.Questionnaire;
+import model.SceneName;
 import org.controlsfx.control.Notifications;
 import questionList.QuestionListController;
 import start.StartController;
@@ -46,34 +48,34 @@ import static application.ScreenController.styleSheet;
 
 public class AdminController {
 
-	private ArrayList<Fragebogen> fragebogen;
-	private ObservableList<Fragebogen> data = FXCollections.observableArrayList();
+	private ArrayList<Questionnaire> questionnaire;
+	private ObservableList<Questionnaire> data = FXCollections.observableArrayList();
 	
 	
 	@FXML
 	private Button btn_loc;
 	@FXML
-	private TableView<Fragebogen> tbl_fragebogen;
+	private TableView<Questionnaire> tbl_fragebogen;
 	@FXML
-	private TableColumn<Fragebogen, String> nameCol;
+	private TableColumn<Questionnaire, String> nameCol;
 	@FXML
-	private TableColumn<Fragebogen, String> dateCol;
+	private TableColumn<Questionnaire, String> dateCol;
 	@FXML
-	private TableColumn<Fragebogen, Boolean> activCol = new TableColumn<>("Aktiv");
+	private TableColumn<Questionnaire, Boolean> activCol = new TableColumn<>("Aktiv");
 	@FXML
-	private TableColumn<Fragebogen, Boolean> finalCol = new TableColumn<>("Final");
+	private TableColumn<Questionnaire, Boolean> finalCol = new TableColumn<>("Final");
 	@FXML
-	private TableColumn<Fragebogen, String> actionCol = new TableColumn<>("Bearbeiten");
+	private TableColumn<Questionnaire, String> actionCol = new TableColumn<>("Bearbeiten");
 	@FXML
-	private TableColumn<Fragebogen, String> copCol = new TableColumn<>("Kopieren");
+	private TableColumn<Questionnaire, String> copCol = new TableColumn<>("Kopieren");
 	@FXML
-	private TableColumn<Fragebogen, String> renCol = new TableColumn<>("Umbenennen");
+	private TableColumn<Questionnaire, String> renCol = new TableColumn<>("Umbenennen");
 	@FXML
-	private TableColumn<Fragebogen, String> sqlCol = new TableColumn<>("SQL Export");
+	private TableColumn<Questionnaire, String> sqlCol = new TableColumn<>("SQL Export");
 	@FXML
-	private TableColumn<Fragebogen, String> xlsCol = new TableColumn<>("XLS Export");
+	private TableColumn<Questionnaire, String> xlsCol = new TableColumn<>("XLS Export");
 	@FXML
-	private TableColumn<Fragebogen, String> delCol = new TableColumn<>("Löschen");
+	private TableColumn<Questionnaire, String> delCol = new TableColumn<>("Löschen");
 	
 	/**
 	 * The constructor (is called before the initialize()-method).
@@ -85,9 +87,9 @@ public class AdminController {
 	
 	private void getData() {
 		data.clear();
-		fragebogen = AdminService.getFragebogen(GlobalVars.standort);
+		questionnaire = AdminService.getFragebogen(GlobalVars.standort);
 		//System.out.println(fragebogen.toString());
-		data.addAll(Objects.requireNonNull(fragebogen));
+		data.addAll(Objects.requireNonNull(questionnaire));
 	}
 	
 	/**
@@ -98,22 +100,22 @@ public class AdminController {
 	private void initialize() {
 		tbl_fragebogen.setItems(data);
 		
-		nameCol.setCellValueFactory(new PropertyValueFactory<Fragebogen, String>("name"));
-		dateCol.setCellValueFactory(new PropertyValueFactory<Fragebogen, String>("date"));
+		nameCol.setCellValueFactory(new PropertyValueFactory<Questionnaire, String>("name"));
+		dateCol.setCellValueFactory(new PropertyValueFactory<Questionnaire, String>("date"));
 		//activCol.setCellValueFactory(new PropertyValueFactory<Fragebogen, Boolean>("activ"));
 		activCol.setCellValueFactory(cellData -> {
-            Fragebogen cellValue = cellData.getValue();
-            ObservableBooleanValue property = cellValue.isActiv();
+            Questionnaire cellValue = cellData.getValue();
+            ObservableBooleanValue property = cellValue.isActive();
 
             // Add listener to handler change
             property.addListener((observable, oldValue, newValue) -> {
-            	cellValue.setActiv(newValue);
+            	cellValue.setActive(newValue);
             	if(newValue) {
             		AdminService.activateFragebogen(cellValue);
-            		GlobalVars.activFragebogen = cellValue;
+            		GlobalVars.activQuestionnaire = cellValue;
             	} else {
             		AdminService.disableFragebogen(cellValue);
-            		GlobalVars.activFragebogen = null;
+            		GlobalVars.activQuestionnaire = null;
             	}
             	StartController.setStartText();
         		getData();
@@ -126,7 +128,7 @@ public class AdminController {
 		//finalCol.setCellValueFactory(new PropertyValueFactory<Fragebogen, Boolean>("final"));
 		finalCol.setCellValueFactory(cellData -> {
 
-            Fragebogen cellValue = cellData.getValue();
+            Questionnaire cellValue = cellData.getValue();
             ObservableBooleanValue property = cellValue.isFinal();
 
             // Add listener to handler change
@@ -145,17 +147,17 @@ public class AdminController {
 		
 		actionCol.setCellValueFactory(new PropertyValueFactory<>("DUMMY"));
 
-        Callback<TableColumn<Fragebogen, String>, TableCell<Fragebogen, String>> cellFactory
+        Callback<TableColumn<Questionnaire, String>, TableCell<Questionnaire, String>> cellFactory
                 = //
-                new Callback<TableColumn<Fragebogen, String>, TableCell<Fragebogen, String>>() {
+                new Callback<TableColumn<Questionnaire, String>, TableCell<Questionnaire, String>>() {
             @Override
-            public TableCell<Fragebogen, String> call(final TableColumn<Fragebogen, String> param) {
+            public TableCell<Questionnaire, String> call(final TableColumn<Questionnaire, String> param) {
             	ImageView imgView = new ImageView(GlobalVars.IMG_EDT);
             	imgView.setFitHeight(30);
         		imgView.setFitWidth(30);
         		Button btn = new Button("", imgView);
                 btn.setPadding(Insets.EMPTY);
-				return new TableCell<Fragebogen, String>() {
+				return new TableCell<Questionnaire, String>() {
 
 					@Override
 					public void updateItem(String item, boolean empty) {
@@ -166,10 +168,10 @@ public class AdminController {
 						} else {
 							btn.setOnAction(event -> {
 								try {
-									QuestionListController.fragebogen = getTableView().getItems().get(getIndex());
-									ScreenController.addScreen(model.Scene.QUESTIONLIST,
-											FXMLLoader.load(getURL("view/QuestionListView.fxml")));
-									ScreenController.activate(model.Scene.QUESTIONLIST);
+									QuestionListController.questionnaire = getTableView().getItems().get(getIndex());
+									ScreenController.addScreen(SceneName.QUESTION_LIST,
+											FXMLLoader.load(getURL(SceneName.QUESTION_LIST_PATH)));
+									ScreenController.activate(SceneName.QUESTION_LIST);
 								} catch (IOException e) {
 									e.printStackTrace();
 								}
@@ -186,15 +188,15 @@ public class AdminController {
         tbl_fragebogen.getColumns().add(actionCol);
         
         copCol.setCellValueFactory(new PropertyValueFactory<>("DUMMY"));
-        Callback<TableColumn<Fragebogen, String>, TableCell<Fragebogen, String>> cellFactoryCop
+        Callback<TableColumn<Questionnaire, String>, TableCell<Questionnaire, String>> cellFactoryCop
                 = //
-                new Callback<TableColumn<Fragebogen, String>, TableCell<Fragebogen, String>>() {
+                new Callback<TableColumn<Questionnaire, String>, TableCell<Questionnaire, String>>() {
             @Override
-            public TableCell<Fragebogen, String> call(final TableColumn<Fragebogen, String> param) {
+            public TableCell<Questionnaire, String> call(final TableColumn<Questionnaire, String> param) {
             	ImageView imgView = new ImageView(GlobalVars.IMG_COP);
             	imgView.setFitHeight(30);
         		imgView.setFitWidth(30);
-				return new TableCell<Fragebogen, String>() {
+				return new TableCell<Questionnaire, String>() {
 
 					final Button btn = new Button("", imgView);
 
@@ -206,7 +208,7 @@ public class AdminController {
 							setText(null);
 						} else {
 							btn.setOnAction(event -> {
-								Fragebogen fragebogen1 = getTableView().getItems().get(getIndex());
+								Questionnaire questionnaire1 = getTableView().getItems().get(getIndex());
 
 								ChoiceDialog<String> dialog = new ChoiceDialog<>(GlobalVars.standort, GlobalVars.standorte);
 								dialog.setTitle("Fragebogen kopieren");
@@ -217,10 +219,10 @@ public class AdminController {
 
 								Optional<String> result = dialog.showAndWait();
 								result.ifPresent(ort -> {
-										if(AdminService.copyFragebogen(fragebogen1, ort)) {
+										if(AdminService.copyFragebogen(questionnaire1, ort)) {
 											getData();
 											tbl_fragebogen.refresh();
-											Notifications.create().title("Fragebogen kopieren").text("Der Fragebogen \"" + fragebogen1.getName() + "\" wurde erfolgreich\nnach \"" + ort  + "\" kopiert.").show();
+											Notifications.create().title("Fragebogen kopieren").text("Der Fragebogen \"" + questionnaire1.getName() + "\" wurde erfolgreich\nnach \"" + ort  + "\" kopiert.").show();
 										} else {
 											Notifications.create().title("Excel Export").text("Ein Fehler ist aufgetreten.").showError();
 										}
@@ -240,15 +242,15 @@ public class AdminController {
         tbl_fragebogen.getColumns().add(copCol);
         
         renCol.setCellValueFactory(new PropertyValueFactory<>("DUMMY"));
-        Callback<TableColumn<Fragebogen, String>, TableCell<Fragebogen, String>> cellFactoryRen
+        Callback<TableColumn<Questionnaire, String>, TableCell<Questionnaire, String>> cellFactoryRen
                 = //
-                new Callback<TableColumn<Fragebogen, String>, TableCell<Fragebogen, String>>() {
+                new Callback<TableColumn<Questionnaire, String>, TableCell<Questionnaire, String>>() {
             @Override
-            public TableCell<Fragebogen, String> call(final TableColumn<Fragebogen, String> param) {
+            public TableCell<Questionnaire, String> call(final TableColumn<Questionnaire, String> param) {
             	ImageView imgView = new ImageView(GlobalVars.IMG_REN);
             	imgView.setFitHeight(30);
         		imgView.setFitWidth(30);
-				return new TableCell<Fragebogen, String>() {
+				return new TableCell<Questionnaire, String>() {
 					final Button btn = new Button("", imgView);
 
 					@Override
@@ -259,7 +261,7 @@ public class AdminController {
 							setText(null);
 						} else {
 							btn.setOnAction(event -> {
-								Fragebogen fragebogen1 = getTableView().getItems().get(getIndex());
+								Questionnaire questionnaire1 = getTableView().getItems().get(getIndex());
 								TextInputDialog dialog = new TextInputDialog("");
 								dialog.setTitle("Fragebogen umbenennen");
 								dialog.setContentText("neuer Name:");
@@ -268,9 +270,9 @@ public class AdminController {
 								   getURL("style/application.css").toExternalForm());
 
 								Optional<String> result = dialog.showAndWait();
-								result.ifPresent(fragebogen1::setName);
+								result.ifPresent(questionnaire1::setName);
 
-								if(AdminService.renameFragebogen(fragebogen1)) {
+								if(AdminService.renameFragebogen(questionnaire1)) {
 									getData();
 									tbl_fragebogen.refresh();
 								}
@@ -287,15 +289,15 @@ public class AdminController {
         tbl_fragebogen.getColumns().add(renCol);
         
         sqlCol.setCellValueFactory(new PropertyValueFactory<>("DUMMY"));
-        Callback<TableColumn<Fragebogen, String>, TableCell<Fragebogen, String>> cellFactorySql
+        Callback<TableColumn<Questionnaire, String>, TableCell<Questionnaire, String>> cellFactorySql
                 = //
-                new Callback<TableColumn<Fragebogen, String>, TableCell<Fragebogen, String>>() {
+                new Callback<TableColumn<Questionnaire, String>, TableCell<Questionnaire, String>>() {
             @Override
-            public TableCell<Fragebogen, String> call(final TableColumn<Fragebogen, String> param) {
+            public TableCell<Questionnaire, String> call(final TableColumn<Questionnaire, String> param) {
             	ImageView imgView = new ImageView(GlobalVars.IMG_SQL);
             	imgView.setFitHeight(30);
         		imgView.setFitWidth(30);
-				return new TableCell<Fragebogen, String>() {
+				return new TableCell<Questionnaire, String>() {
 					final Button btn = new Button("", imgView);
 
 					@Override
@@ -306,7 +308,7 @@ public class AdminController {
 							setText(null);
 						} else {
 							btn.setOnAction(event -> {
-								Fragebogen fragebogen1 = getTableView().getItems().get(getIndex());
+								Questionnaire questionnaire1 = getTableView().getItems().get(getIndex());
 
 							});
 							setGraphic(btn);
@@ -321,15 +323,15 @@ public class AdminController {
         tbl_fragebogen.getColumns().add(sqlCol);
         
         xlsCol.setCellValueFactory(new PropertyValueFactory<>("DUMMY"));
-        Callback<TableColumn<Fragebogen, String>, TableCell<Fragebogen, String>> cellFactoryXls
+        Callback<TableColumn<Questionnaire, String>, TableCell<Questionnaire, String>> cellFactoryXls
                 = //
-                new Callback<TableColumn<Fragebogen, String>, TableCell<Fragebogen, String>>() {
+                new Callback<TableColumn<Questionnaire, String>, TableCell<Questionnaire, String>>() {
             @Override
-            public TableCell<Fragebogen, String> call(final TableColumn<Fragebogen, String> param) {
+            public TableCell<Questionnaire, String> call(final TableColumn<Questionnaire, String> param) {
             	ImageView imgView = new ImageView(GlobalVars.IMG_XLS);
             	imgView.setFitHeight(30);
         		imgView.setFitWidth(30);
-				return new TableCell<Fragebogen, String>() {
+				return new TableCell<Questionnaire, String>() {
 					final Button btn = new Button("", imgView);
 
 					@Override
@@ -340,12 +342,12 @@ public class AdminController {
 							setText(null);
 						} else {
 							btn.setOnAction(event -> {
-								Fragebogen fragebogen1 = getTableView().getItems().get(getIndex());
-								ExportController exportController = new ExportController();
+								Questionnaire questionnaire1 = getTableView().getItems().get(getIndex());
+								ExportController exportController = new ExportControllerImpl();
 								Optional<Pair<String, String>> result = getDatePickerDialog();
 								result.ifPresent(dates -> {
 									//System.out.println("Von=" + usernamePassword.getKey() + ", Bis=" + usernamePassword.getValue());
-									if( exportController.excelNeu(fragebogen1.getId() + "_" + fragebogen1.getOrt() + "_" + fragebogen1.getName() + ".xlsx", fragebogen1,
+									if( exportController.excelNeu(questionnaire1.getId() + "_" + questionnaire1.getOrt() + "_" + questionnaire1.getName() + ".xlsx", questionnaire1,
 									dates.getKey(), dates.getValue())) {
 										Notifications.create().title("Excel Export").text("Export erfolgreich abgeschlossen.").show();
 									} else {
@@ -365,15 +367,15 @@ public class AdminController {
         tbl_fragebogen.getColumns().add(xlsCol);
         
         delCol.setCellValueFactory(new PropertyValueFactory<>("DUMMY"));
-        Callback<TableColumn<Fragebogen, String>, TableCell<Fragebogen, String>> cellFactoryDel
+        Callback<TableColumn<Questionnaire, String>, TableCell<Questionnaire, String>> cellFactoryDel
                 = //
-                new Callback<TableColumn<Fragebogen, String>, TableCell<Fragebogen, String>>() {
+                new Callback<TableColumn<Questionnaire, String>, TableCell<Questionnaire, String>>() {
             @Override
-            public TableCell<Fragebogen, String> call(final TableColumn<Fragebogen, String> param) {
+            public TableCell<Questionnaire, String> call(final TableColumn<Questionnaire, String> param) {
             	ImageView imgView = new ImageView(GlobalVars.IMG_DEL);
             	imgView.setFitHeight(30);
         		imgView.setFitWidth(30);
-				return new TableCell<Fragebogen, String>() {
+				return new TableCell<Questionnaire, String>() {
 					final Button btn = new Button("", imgView);
 
 					@Override
@@ -384,7 +386,7 @@ public class AdminController {
 							setText(null);
 						} else {
 							btn.setOnAction(event -> {
-								Fragebogen fragebogen1 = getTableView().getItems().get(getIndex());
+								Questionnaire questionnaire1 = getTableView().getItems().get(getIndex());
 								Alert alert = new Alert(AlertType.CONFIRMATION);
 								alert.setTitle("Fragebogen löschen");
 								alert.setHeaderText("Wollen Sie den Fragebogen wirklich löschen?");
@@ -395,10 +397,10 @@ public class AdminController {
 
 								Optional<ButtonType> result = alert.showAndWait();
 								if (result.isPresent() && result.get() == ButtonType.OK){
-									if(AdminService.deleteFragebogen(fragebogen1)) {
+									if(AdminService.deleteFragebogen(questionnaire1)) {
 										getData();
 										tbl_fragebogen.refresh();
-										Notifications.create().title("Fragebogen löschen").text("Fragebogen \"" + fragebogen1.getName() + "\" wurde erfolgreich abgeschlossen.").show();
+										Notifications.create().title("Fragebogen löschen").text("Fragebogen \"" + questionnaire1.getName() + "\" wurde erfolgreich abgeschlossen.").show();
 									} else {
 										Notifications.create().title("Fragebogen löschen").text("Ein Fehler ist aufgetreten.").showError();
 									}
@@ -476,12 +478,12 @@ public class AdminController {
 	
 	@FXML
 	private void logout() {
-		ScreenController.activate(model.Scene.START);
+		ScreenController.activate(SceneName.START);
 	}
 	
 	@FXML
 	private void changeLocation() {
-		ScreenController.activate(model.Scene.LOCATION);
+		ScreenController.activate(SceneName.LOCATION);
 	}
 	
 	@FXML

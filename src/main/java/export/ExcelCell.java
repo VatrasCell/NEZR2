@@ -7,30 +7,30 @@ import java.util.ArrayList;
  * @version 1.0.0
  */
 public class ExcelCell {
-	private int idBefragung;
-	private ArrayList<String> antworten;
+	private int surveyId;
+	private ArrayList<String> answers;
 
 	public ExcelCell() {
 	}
 
-	public ExcelCell(int idBefragung, ArrayList<String> antworten) {
-		this.idBefragung = idBefragung;
-		this.antworten = antworten;
+	public ExcelCell(int surveyId, ArrayList<String> answers) {
+		this.surveyId = surveyId;
+		this.answers = answers;
 	}
 
-	public int getIdBefragung() {
-		return this.idBefragung;
+	public int getSurveyId() {
+		return this.surveyId;
 	}
 
-	public void setIdBefragung(int idBefragung) {
-		this.idBefragung = idBefragung;
+	public void setSurveyId(int surveyId) {
+		this.surveyId = surveyId;
 	}
 
-	public ArrayList<String> getAntworten() {
-		return this.antworten;
+	public ArrayList<String> getAnswers() {
+		return this.answers;
 	}
 
-	public void setAntworten(ArrayList<String> antworten) {
-		this.antworten = antworten;
+	public void setAnswers(ArrayList<String> answers) {
+		this.answers = answers;
 	}
 }

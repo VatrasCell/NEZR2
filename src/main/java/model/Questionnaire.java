@@ -4,12 +4,12 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ObservableBooleanValue;
 
-public class Fragebogen {
+public class Questionnaire {
 	private int id;
 	private String date;
 	private String name;
 	private String ort;
-	private BooleanProperty activ = new SimpleBooleanProperty();
+	private BooleanProperty isActive = new SimpleBooleanProperty();
 	private BooleanProperty isFinal = new SimpleBooleanProperty();
 	
 	/**
@@ -61,26 +61,29 @@ public class Fragebogen {
 		this.ort = ort;
 	}
 	/**
-	 * @return the activ
+	 * @return the active
 	 */
-	public ObservableBooleanValue isActiv() {
-		return activ;
+	public ObservableBooleanValue isActive() {
+		return isActive;
 	}
 	/**
-	 * @param activ the activ to set
+	 * @param isActive the active to set
 	 */
-	public void setActiv(boolean activ) {
-		this.activ.set(activ);
+	public void setActive(boolean isActive) {
+		this.isActive.set(isActive);
 	}
+
 	public ObservableBooleanValue isFinal() {
 		return isFinal;
 	}
+
 	public void setFinal(boolean isFinal) {
 		this.isFinal.set(isFinal);
 	}
+
 	@Override
 	public String toString() {
-		return "Fragebogen [id=" + id + ", date=" + date + ", name=" + name + ", ort=" + ort + ", activ=" + activ
+		return "Fragebogen [id=" + id + ", date=" + date + ", name=" + name + ", ort=" + ort + ", activ=" + isActive
 				+ ", isFinal=" + isFinal + "]";
 	}
 	

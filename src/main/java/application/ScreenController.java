@@ -4,7 +4,7 @@ import javafx.scene.Scene;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import login.LoginController;
-import model.Fragebogen;
+import model.Questionnaire;
 import questionList.QuestionListController;
 
 import java.util.HashMap;
@@ -13,12 +13,12 @@ import static application.GlobalFuncs.getURL;
 
 public class ScreenController {
 	private static HashMap<String, Pane> screenMap = new HashMap<>();
-	private static Stage main;
+	private static Stage primaryStage;
 
 	public static final String styleSheet = "style/application.css";
 
-	public static void setRootScene(Stage main) {
-		ScreenController.main = main;
+	public static void setPrimaryStage(Stage primaryStage) {
+		ScreenController.primaryStage = primaryStage;
 	}
 
 	public static void addScreen(String name, Pane pane) {
@@ -27,13 +27,13 @@ public class ScreenController {
 	}
 
 	public static void activate(String name) {
-		if (main.getScene() == null) {
-			main.setScene(new Scene(screenMap.get(name)));
+		if (primaryStage.getScene() == null) {
+			primaryStage.setScene(new Scene(screenMap.get(name)));
 		}
 
-		Pane scene = screenMap.get(name);
-		main.getScene().setRoot(scene);
-		main.show();
+		Pane root = screenMap.get(name);
+		primaryStage.getScene().setRoot(root);
+		primaryStage.show();
 		System.out.println("activate " + name);
 	}
 
@@ -48,7 +48,7 @@ public class ScreenController {
 			LoginController.toAdmin = (Boolean) value;
 			break;
 		case "questionList.fragebogen":
-			QuestionListController.fragebogen = (Fragebogen) value;
+			QuestionListController.questionnaire = (Questionnaire) value;
 
 		default:
 			break;

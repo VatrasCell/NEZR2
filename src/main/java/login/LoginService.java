@@ -1,13 +1,13 @@
 package login;
 
-import application.Datenbank;
+import application.Database;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 
 import static application.GlobalFuncs.getURL;
 
-public class LoginService extends Datenbank {
+public class LoginService extends Database {
 
 	/**
 	 * Testet, ob ein Verbindung zum Datenbankserver möglich ist.
@@ -32,9 +32,9 @@ public class LoginService extends Datenbank {
 					pwd);
 
 			connection.close();
-			Datenbank.user = user;
-			Datenbank.pwd = pwd;
-			Datenbank.url = url;
+			Database.user = user;
+			Database.pwd = pwd;
+			Database.url = url;
 			System.out.println("db success");
 			return true;
 		} catch (Exception e) {

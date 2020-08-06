@@ -1,11 +1,11 @@
 package admin;
 
-import application.Datenbank;
+import application.Database;
 import application.GlobalFuncs;
 import application.GlobalVars;
 import flag.SymbolType;
-import model.Frage;
-import model.Fragebogen;
+import model.Question;
+import model.Questionnaire;
 import question.QuestionService;
 import survey.SurveyService;
 
@@ -16,9 +16,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
-public class AdminService extends Datenbank {
+public class AdminService extends Database {
 	
 	/**
 	 * Gibt alle Frageboegen eines Standortes zurueck
@@ -28,9 +29,9 @@ public class AdminService extends Datenbank {
 	 * @return ArrayList FragebogenDialog aller Frageboegen des Standortes
 	 * @author Eric
 	 */
-	public static ArrayList<Fragebogen> getFragebogen(String standort) {
+	public static ArrayList<Questionnaire> getFragebogen(String standort) {
 		try {
-			ArrayList<Fragebogen> fragebogen = new ArrayList<>();
+			ArrayList<Questionnaire> questionnaire = new ArrayList<>();
 			Connection myCon = DriverManager.getConnection(url, user, pwd);
 			int idstandort = getStandortId(standort);
 
@@ -40,17 +41,17 @@ public class AdminService extends Datenbank {
 			//System.out.println(idstandort);
 			//System.out.println(myRS.toString());
 			while (myRS.next()) {
-				Fragebogen fb = new Fragebogen();
+				Questionnaire fb = new Questionnaire();
 				fb.setName(unslashUnicode(myRS.getString("name")));
 				fb.setDate(myRS.getString("datum"));
 				fb.setOrt(standort);
-				fb.setActiv(myRS.getBoolean("aktiviert")); // anneNeu
+				fb.setActive(myRS.getBoolean("aktiviert")); // anneNeu
 				fb.setId(myRS.getInt("idFragebogen")); // anneNeuFlorian
 				fb.setFinal(myRS.getBoolean("final"));
-				fragebogen.add(fb);
+				questionnaire.add(fb);
 			}
 			myCon.close();
-			return fragebogen;
+			return questionnaire;
 		} catch (SQLException e) {
 			e.printStackTrace();
 			//ErrorLog.fehlerBerichtB("ERROR",
@@ -68,7 +69,7 @@ public class AdminService extends Datenbank {
 	 * @return boolean
 	 * @author Anne
 	 */
-	public static boolean activateFragebogen(Fragebogen fb) {
+	public static boolean activateFragebogen(Questionnaire fb) {
 		try {
 			Connection myCon = DriverManager.getConnection(url, user, pwd);
 			Statement mySQL = myCon.createStatement();
@@ -98,7 +99,7 @@ public class AdminService extends Datenbank {
 	 * @return boolean
 	 * @author Eric
 	 */
-	public static boolean disableFragebogen(Fragebogen fb) {
+	public static boolean disableFragebogen(Questionnaire fb) {
 		try {
 			// anneSuperNeu
 			Connection myCon = DriverManager.getConnection(url, user, pwd);
@@ -449,21 +450,21 @@ public class AdminService extends Datenbank {
 		return false;
 	}
 	*/
-	public static boolean copyFragebogen(Fragebogen fb, String ort) {
+	public static boolean copyFragebogen(Questionnaire fb, String ort) {
 		fb.setId(createFragebogen(fb.getName(), ort));
-		ArrayList<Frage> fragen = SurveyService.getFragen(fb);
-		for (Frage frage : Objects.requireNonNull(fragen)) {
-			if(frage.getArt().equals("FF")) {
-				QuestionService.saveFreieFrage(fb, frage);
+		List<Question> fragen = SurveyService.getFragen(fb);
+		for (Question question : Objects.requireNonNull(fragen)) {
+			if(question.getQuestionType().equals("FF")) {
+				QuestionService.saveFreieFrage(fb, question);
 			} else {
-				if(frage.getFlags().is(SymbolType.B)) {
-					QuestionService.saveBewertungsfrage(fb, frage);
+				if(question.getFlags().is(SymbolType.B)) {
+					QuestionService.saveBewertungsfrage(fb, question);
 				} else {
 					ArrayList<Integer> antIds = new ArrayList<>();
-					for (String answer : frage.getAntwort_moeglichkeit()) {
+					for (String answer : question.getAnswerOptions()) {
 						antIds.add(QuestionService.getAntwortID(answer));
 					} 
-					QuestionService.saveMC(fb, frage, antIds);
+					QuestionService.saveMC(fb, question, antIds);
 				}
 			}
 		}
@@ -479,7 +480,7 @@ public class AdminService extends Datenbank {
 	 * @return boolean
 	 * @author Anne
 	 */
-	public static boolean deleteFragebogen(Fragebogen fb) {
+	public static boolean deleteFragebogen(Questionnaire fb) {
 		ArrayList<Integer> idsmc = new ArrayList<Integer>(); // IDs der MC Fragen
 		ArrayList<Integer> idsff = new ArrayList<Integer>(); // IDs der Freien Fragen
 		ArrayList<Integer> antmcnr = new ArrayList<Integer>(); // IDs der Antworten
@@ -643,7 +644,7 @@ public class AdminService extends Datenbank {
 	 * @return boolean
 	 * @author Eric
 	 */
-	public static boolean renameFragebogen(Fragebogen fb) {
+	public static boolean renameFragebogen(Questionnaire fb) {
 		try {
 			Connection myCon = DriverManager.getConnection(url, user, pwd);
 			Statement mySQL = myCon.createStatement();
@@ -670,7 +671,7 @@ public class AdminService extends Datenbank {
 	 * @return boolean
 	 * @author Eric
 	 */
-	public static boolean setFinal(Fragebogen fb) {
+	public static boolean setFinal(Questionnaire fb) {
 		try {
 			// anneSuperNeu
 			Connection myCon = DriverManager.getConnection(url, user, pwd);
@@ -696,7 +697,7 @@ public class AdminService extends Datenbank {
 	 * @return boolean
 	 * @author Eric
 	 */
-	public static boolean setUnFinal(Fragebogen fb) {
+	public static boolean setUnFinal(Questionnaire fb) {
 		try {
 			// anneSuperNeu
 			Connection myCon = DriverManager.getConnection(url, user, pwd);
@@ -724,7 +725,7 @@ public class AdminService extends Datenbank {
 	 * @return boolean
 	 * @author Eric
 	 */
-	public static boolean isFinal(Fragebogen fb) {
+	public static boolean isFinal(Questionnaire fb) {
 		try {
 			// anneSuperNeu
 			Connection myCon = DriverManager.getConnection(url, user, pwd);
@@ -760,7 +761,7 @@ public class AdminService extends Datenbank {
 		try {
 			Connection myCon = DriverManager.getConnection(url, user, pwd);
 			Statement mySQL = myCon.createStatement();
-			String statement = "INSERT INTO fragebogen VALUES(NULL, '" + GlobalFuncs.getcurDate() + "', '" + name + "', FALSE, "
+			String statement = "INSERT INTO fragebogen VALUES(NULL, '" + GlobalFuncs.getCurrentDate() + "', '" + name + "', FALSE, "
 					+ getStandortId(ort) + ", FALSE)";
 			mySQL.execute(statement);
 			mySQL = null;

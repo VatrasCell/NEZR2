@@ -27,27 +27,27 @@ import javafx.scene.layout.HBox;
 import javafx.scene.text.Text;
 import javafx.util.Callback;
 import javafx.util.Pair;
-import model.Frage;
-import model.Fragebogen;
+import model.Question;
+import model.Questionnaire;
+import model.SceneName;
 import question.QuestionController;
 import survey.SurveyService;
 
 import java.text.MessageFormat;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 public class ReactController {
 
-	public static Frage frage;
-	public static ArrayList<Frage> fragen;
-	public static Fragebogen fragebogen;
+	public static Question question;
+	public static List<Question> fragen;
+	public static Questionnaire questionnaire;
 	
 	private final int MAX_COUNT_REACTIONS = 1;
 	private final String REACT_DESCRIPTION = "...die Antwortmöglichkeit \"{1}\" der Frage \"{0}\" ausgewählt wurde.";
 
 	private ObservableList<ReactTableElement> data = FXCollections.observableArrayList();
-	private ObservableList<Frage> fragenData = FXCollections.observableArrayList();
+	private ObservableList<Question> fragenData = FXCollections.observableArrayList();
 	private ObservableList<String> antwortData = FXCollections.observableArrayList();
 	
 	private boolean hasQuestion = false;
@@ -71,17 +71,17 @@ public class ReactController {
 	 * The constructor (is called before the initialize()-method).
 	 */
 	public ReactController() {
-		FlagList flags = frage.getFlags();
-		fragen = SurveyService.getFragen(fragebogen);
+		FlagList flags = question.getFlags();
+		fragen = SurveyService.getFragen(questionnaire);
 
 		for (React react : flags.getAll(React.class)) {
-			Frage frage = fragen.get(getY(react.getQuestionId(), react.getQuestionType().toString(), fragen));
-			data.add(new ReactTableElement(frage, react.getAnswerPos()));
+			Question question = fragen.get(getY(react.getQuestionId(), react.getQuestionType().toString(), fragen));
+			data.add(new ReactTableElement(question, react.getAnswerPos()));
 		}
 
 		fragenData.addAll(fragen);
 		for (int i = 0; i < fragen.size(); ++i) {
-			if(fragen.get(i).getArt().equals(frage.getArt()) && fragen.get(i).getFrageID() == frage.getFrageID()) {	
+			if(fragen.get(i).getQuestionType().equals(question.getQuestionType()) && fragen.get(i).getQuestionId() == question.getQuestionId()) {
 				fragenData.remove(i);
 			}
 		}
@@ -135,12 +135,12 @@ public class ReactController {
 									btn.setOnAction(event -> {
 										ReactTableElement reactTableElement = getTableView().getItems().get(getIndex());
 										
-										for(int i = 0; i < frage.getFlags().getAll(React.class).size(); ++i) {
-											System.out.println(frage.getFlags().getAll(React.class).get(i).toString() + " - " + reactTableElement.getFlag().toString());
-											if(frage.getFlags().getAll(React.class).get(i).toString().equals(reactTableElement.getFlag().toString())) {
-												List<React> reacts = frage.getFlags().getAll(React.class);
+										for(int i = 0; i < question.getFlags().getAll(React.class).size(); ++i) {
+											System.out.println(question.getFlags().getAll(React.class).get(i).toString() + " - " + reactTableElement.getFlag().toString());
+											if(question.getFlags().getAll(React.class).get(i).toString().equals(reactTableElement.getFlag().toString())) {
+												List<React> reacts = question.getFlags().getAll(React.class);
 												reacts.remove(i);
-												frage.getFlags().replaceAll(React.class, reacts);
+												question.getFlags().replaceAll(React.class, reacts);
 											}
 										}
 									
@@ -159,7 +159,7 @@ public class ReactController {
 		tbl_react.getColumns().add(delCol);
 		
 		ObservableList<Flag> flagData = FXCollections.observableArrayList();
-		flagData.setAll(frage.getFlags().getAll(React.class));
+		flagData.setAll(question.getFlags().getAll(React.class));
 		BooleanBinding invalid = Bindings.size(flagData).greaterThanOrEqualTo(MAX_COUNT_REACTIONS);
 		
 		btn_new.disableProperty().bind(invalid);
@@ -179,15 +179,15 @@ public class ReactController {
 
 		HBox hBox = new HBox(8);
 
-		ComboBox<Frage> question = new ComboBox<Frage>();
-		question.valueProperty().addListener(new ChangeListener<Frage>() {
+		ComboBox<Question> question = new ComboBox<Question>();
+		question.valueProperty().addListener(new ChangeListener<Question>() {
 			@Override
-			public void changed(ObservableValue ov, Frage oldFrage, Frage newFrage) {
-				if(newFrage != null) {
+			public void changed(ObservableValue ov, Question oldQuestion, Question newQuestion) {
+				if(newQuestion != null) {
 					hasQuestion = true;
 					okButton.setDisable(!(hasQuestion && hasAnswer));
 					antwortData.clear();
-					for (String antwort : newFrage.getAntwort_moeglichkeit()) {
+					for (String antwort : newQuestion.getAnswerOptions()) {
 						if(antwort.equals("")) {
 							antwort = "<Textfeld>";
 						}
@@ -222,9 +222,9 @@ public class ReactController {
 		
 		dialog.setResultConverter(dialogButton -> {
 			if (dialogButton == okButtonType) {
-				Frage frage = question.getSelectionModel().getSelectedItem();
+				Question frage = question.getSelectionModel().getSelectedItem();
 				int answerPos = answer.getSelectionModel().getSelectedIndex();
-				React react = new React(QuestionType.valueOf(frage.getArt()), frage.getFrageID(), answerPos);
+				React react = new React(QuestionType.valueOf(frage.getQuestionType()), frage.getQuestionId(), answerPos);
 				ReactTableElement tableElement = new ReactTableElement(frage, answerPos, react);
 				Pair<React, ReactTableElement> result = new Pair<React, ReactTableElement>(react, tableElement);
 				return result;
@@ -234,20 +234,20 @@ public class ReactController {
 
 		Optional<Pair<React, ReactTableElement>> result = dialog.showAndWait();
 		result.ifPresent(pair -> {
-			frage.getFlags().add(pair.getKey());
+			ReactController.question.getFlags().add(pair.getKey());
 			data.add(pair.getValue());
 		});
 	}
 	
 	@FXML
 	private void save() {
-		QuestionController.frage = frage;
-		ScreenController.activate(model.Scene.QUESTION);
+		QuestionController.question = question;
+		ScreenController.activate(SceneName.QUESTION);
 	}
 
 	@FXML
 	private void exit() {
-		ScreenController.activate(model.Scene.QUESTION);
+		ScreenController.activate(SceneName.QUESTION);
 	}
 
 	/**
@@ -263,11 +263,11 @@ public class ReactController {
 	 *            ArrayList FrageErstellen: alle Fragen
 	 * @return Postition im ArrayList "fragen" als int.
 	 */
-	private static int getY(int x, String s, ArrayList<Frage> fragen) {
+	private static int getY(int x, String s, List<Question> fragen) {
 		// TODO
 
 		for (int i = 0; i < fragen.size(); i++) {
-			if (x == fragen.get(i).getFrageID() && s.equals(fragen.get(i).getArt())) {
+			if (x == fragen.get(i).getQuestionId() && s.equals(fragen.get(i).getQuestionType())) {
 				return i;
 			}
 		}
@@ -280,19 +280,19 @@ public class ReactController {
 		private String comment;
 		private React flag;
 		
-		public ReactTableElement(Frage frage, int answerPos) {
+		public ReactTableElement(Question question, int answerPos) {
 			super();
-			this.question = frage.getFrage();
-			this.answer = frage.getAntwort_moeglichkeit().get(answerPos);
-			this.comment = MessageFormat.format(REACT_DESCRIPTION, question, answer);
-			this.flag = getFlagFromFlagList(frage, answerPos);
+			this.question = question.getQuestion();
+			this.answer = question.getAnswerOptions().get(answerPos);
+			this.comment = MessageFormat.format(REACT_DESCRIPTION, this.question, answer);
+			this.flag = getFlagFromFlagList(question, answerPos);
 		}
 		
-		public ReactTableElement(Frage frage, int answerPos, React flag) {
+		public ReactTableElement(Question question, int answerPos, React flag) {
 			super();
-			this.question = frage.getFrage();
-			this.answer = frage.getAntwort_moeglichkeit().get(answerPos);
-			this.comment = MessageFormat.format(REACT_DESCRIPTION, question, answer);
+			this.question = question.getQuestion();
+			this.answer = question.getAnswerOptions().get(answerPos);
+			this.comment = MessageFormat.format(REACT_DESCRIPTION, this.question, answer);
 			this.flag = flag;
 		}
 
@@ -355,10 +355,10 @@ public class ReactController {
 			this.flag = flag;
 		}
 
-		private React getFlagFromFlagList(Frage frage, int answerPos) {
-			for (React react : frage.getFlags().getAll(React.class)) {
-				if(react.getQuestionType().equals(QuestionType.valueOf(frage.getArt())) && 
-						react.getQuestionId() == frage.getFrageID() && 
+		private React getFlagFromFlagList(Question question, int answerPos) {
+			for (React react : question.getFlags().getAll(React.class)) {
+				if(react.getQuestionType().equals(QuestionType.valueOf(question.getQuestionType())) &&
+						react.getQuestionId() == question.getQuestionId() &&
 						react.getAnswerPos() == answerPos) {
 							return react;
 						}

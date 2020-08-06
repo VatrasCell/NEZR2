@@ -4,7 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
-public class Datenbank {
+public class Database {
 
 	protected final static String DB_NAME = "nezr_v5"; // Datenbankname
 	protected final static String DB_PATH = "db/"; // Datenbank Datei Pfad

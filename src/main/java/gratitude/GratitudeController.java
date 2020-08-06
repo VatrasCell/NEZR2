@@ -2,12 +2,13 @@ package gratitude;
 
 import application.ScreenController;
 import javafx.fxml.FXML;
+import model.SceneName;
 
 public class GratitudeController {
 	
 	@FXML
 	private void exit() {
-		ScreenController.activate(model.Scene.START);
+		ScreenController.activate(SceneName.START);
 	}
 
 }

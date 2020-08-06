@@ -1,8 +1,8 @@
 package application;
 
 import javafx.scene.image.Image;
-import model.Frage;
-import model.Fragebogen;
+import model.Question;
+import model.Questionnaire;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,10 +15,10 @@ public class GlobalVars {
 	public static int fragen = 3;
 	public static final int proZeile = 3;
 	public static String standort;
-	public static Fragebogen activFragebogen = null;
+	public static Questionnaire activQuestionnaire = null;
 	public static int page = 0;
 	public static int countPanel;
-	public static List<ArrayList<Frage>> fragenJePanel = new ArrayList<>();
+	public static List<ArrayList<Question>> fragenJePanel = new ArrayList<>();
 	public static boolean everythingIsAwesome = true;
 	public static ArrayList<String> standorte;
 	

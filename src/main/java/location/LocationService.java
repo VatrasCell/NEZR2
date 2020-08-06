@@ -1,6 +1,6 @@
 package location;
 
-import application.Datenbank;
+import application.Database;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -9,7 +9,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 
-public class LocationService extends Datenbank {
+public class LocationService extends Database {
 	/**
 	 * Gibt alle Standorte zurueck
 	 * 

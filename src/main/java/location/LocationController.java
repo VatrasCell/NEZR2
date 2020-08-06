@@ -7,6 +7,7 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.ChoiceBox;
+import model.SceneName;
 
 import java.io.IOException;
 
@@ -42,10 +43,10 @@ public class LocationController {
 	private void next() {
 		GlobalVars.standort = choiceBox.getValue();
 		try {
-			ScreenController.addScreen("start", FXMLLoader.load(getURL("view/StartView.fxml")));
+			ScreenController.addScreen(SceneName.START, FXMLLoader.load(getURL(SceneName.START_PATH)));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		ScreenController.activate("start");
+		ScreenController.activate(SceneName.START);
 	}
 }

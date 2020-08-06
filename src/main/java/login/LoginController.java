@@ -9,6 +9,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import location.LocationService;
+import model.SceneName;
 
 import java.io.IOException;
 
@@ -46,12 +47,12 @@ public class LoginController {
 			if(LoginService.testDB(username.getText(), password.getText())) {
 				//System.out.println("logged in");
 				if(toAdmin) {
-					ScreenController.addScreen("admin", FXMLLoader.load(getURL("view/AdminView.fxml")));
-					ScreenController.activate("admin");
+					ScreenController.addScreen(SceneName.ADMIN, FXMLLoader.load(getURL(SceneName.ADMIN_PATH)));
+					ScreenController.activate(SceneName.ADMIN);
 				} else {
 					GlobalVars.standorte = LocationService.getStandort();
-					ScreenController.addScreen("location", FXMLLoader.load(getURL("view/LocationView.fxml")));
-					ScreenController.activate("location");
+					ScreenController.addScreen(SceneName.LOCATION, FXMLLoader.load(getURL(SceneName.LOCATION_PATH)));
+					ScreenController.activate(SceneName.LOCATION);
 				}	
 			} else {
 				//System.out.println("login wrong values");

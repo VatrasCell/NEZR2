@@ -10,7 +10,7 @@ public enum NumberOperator {
 	
 	private final String operator;
 	
-	private NumberOperator(String operator) {
+	NumberOperator(String operator) {
 		this.operator = operator;
 	}
 	

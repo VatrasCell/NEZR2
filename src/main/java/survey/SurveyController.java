@@ -1,6 +1,6 @@
 package survey;
 
-import application.Datenbank;
+import application.Database;
 import application.GlobalVars;
 import application.ScreenController;
 import flag.Number;
@@ -16,7 +16,8 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.Pane;
-import model.Frage;
+import model.Question;
+import model.SceneName;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -80,9 +81,9 @@ public class SurveyController {
 			} else {
 				if(!isPreview) {
 					SurveyService.saveUmfrage(GlobalVars.fragenJePanel);
-					ScreenController.addScreen(model.Scene.GRATITUDE, 
-							FXMLLoader.load(getURL("view/GratitudeView.fxml")));
-					ScreenController.activate(model.Scene.GRATITUDE);
+					ScreenController.addScreen(SceneName.GRATITUDE,
+							FXMLLoader.load(getURL(SceneName.GRATITUDE_PATH)));
+					ScreenController.activate(SceneName.GRATITUDE);
 				} else {
 					System.out.println("still page " + GlobalVars.page);
 				}
@@ -105,7 +106,7 @@ public class SurveyController {
 	@FXML
 	private void exit() {
 		if(isPreview) {
-			ScreenController.activate(model.Scene.QUESTION);
+			ScreenController.activate(SceneName.QUESTION);
 		} else {
 			Alert alert = new Alert(AlertType.CONFIRMATION);
 			alert.setTitle("Befragung abbrechen");
@@ -118,7 +119,7 @@ public class SurveyController {
 
 			Optional<ButtonType> result = alert.showAndWait();
 			if (result.isPresent() && result.get() == ButtonType.OK){
-				ScreenController.activate(model.Scene.START);
+				ScreenController.activate(SceneName.START);
 			}
 		}			
 	}
@@ -135,7 +136,7 @@ public class SurveyController {
 
 		Optional<ButtonType> result = alert.showAndWait();
 		if (result.isPresent() && result.get() == ButtonType.OK){
-			ScreenController.activate(model.Scene.QUESTION);
+			ScreenController.activate(SceneName.QUESTION);
 		}
 		
 	}
@@ -143,8 +144,8 @@ public class SurveyController {
 	private boolean check() {
 		GlobalVars.everythingIsAwesome = true;
 		if(GlobalVars.IGNORE_CHECK && GlobalVars.DEVMODE) return true;
-		for(Frage frage : GlobalVars.fragenJePanel.get(GlobalVars.page)) {
-            if(!checkInt(frage) || !checkPflichtfrage(frage)) {
+		for(Question question : GlobalVars.fragenJePanel.get(GlobalVars.page)) {
+            if(!checkInt(question) || !checkPflichtfrage(question)) {
             	GlobalVars.everythingIsAwesome = false;
             	break;
             }
@@ -152,44 +153,44 @@ public class SurveyController {
 		
 		
 		if(GlobalVars.everythingIsAwesome) {
-			for(Frage frage : GlobalVars.fragenJePanel.get(GlobalVars.page)) {
-				if(frage.getArt().equals("MC")) {
-					if(frage.getFlags().is(SymbolType.LIST)) {
+			for(Question question : GlobalVars.fragenJePanel.get(GlobalVars.page)) {
+				if(question.getQuestionType().equals("MC")) {
+					if(question.getFlags().is(SymbolType.LIST)) {
 						ArrayList<String> antwort = new ArrayList<>();
-						for(ListView<String> listView : frage.getAntwortenLIST()) {
+						for(ListView<String> listView : question.getAnswersLIST()) {
 							if(listView.isVisible()) {
 								antwort.addAll(listView.getSelectionModel().getSelectedItems());
 							}
 						}
-						frage.setAntwort(antwort);
+						question.setAnswer(antwort);
 					} else {
 						ArrayList<String> antwort = new ArrayList<>();
-						for(CheckBox checkbox : frage.getAntwortenMC()) {
+						for(CheckBox checkbox : question.getAnswersMC()) {
 							if(checkbox.isSelected() && checkbox.isVisible()) {
 								antwort.add(checkbox.getText());
 							}
 						}
-						frage.setAntwort(antwort);
+						question.setAnswer(antwort);
 					}
 				} else {
-					if(frage.getFlags().is(SymbolType.TEXT)) {
+					if(question.getFlags().is(SymbolType.TEXT)) {
 						ArrayList<String> antwort = new ArrayList<>();
-						for(TextArea textArea : frage.getAntwortenTEXT()) {
+						for(TextArea textArea : question.getAnswersTEXT()) {
 							if(!textArea.getText().equals("") && textArea.isVisible()) {
 								String string = textArea.getText();
-								antwort.add(Datenbank.slashUnicode(string));
+								antwort.add(Database.slashUnicode(string));
 							}
 						}
-						frage.setAntwort(antwort);
+						question.setAnswer(antwort);
 					} else {
 						ArrayList<String> antwort = new ArrayList<>();
-						for(TextField textField : frage.getAntwortenFF()) {
+						for(TextField textField : question.getAnswersFF()) {
 							if(!textField.getText().equals("") && textField.isVisible()) {
 								String string = textField.getText();
-								antwort.add(Datenbank.slashUnicode(string));
+								antwort.add(Database.slashUnicode(string));
 							}
 						}
-						frage.setAntwort(antwort);
+						question.setAnswer(antwort);
 					}
 				}
 			}
@@ -201,7 +202,7 @@ public class SurveyController {
 	
 	/**
 	 * Prueft, ob die gegebene Frage dem flag INT genuegt.
-	 * @param frage FrageErstellen: die Frage
+	 * @param question FrageErstellen: die Frage
 	 * @return boolean
 	 */
 	/*
@@ -285,17 +286,17 @@ public class SurveyController {
 		}
 	}*/
 	
-	private boolean checkInt(Frage frage) {		
-		List<Number> numbers = frage.getFlags().getAll(Number.class);
+	private boolean checkInt(Question question) {
+		List<Number> numbers = question.getFlags().getAll(Number.class);
 		for (Number number : numbers) {
-			TextField textField = frage.getAntwortenFF().get(0);
+			TextField textField = question.getAnswersFF().get(0);
 			if(textField.getText().equals("")) {
 				return true;
 			}
 			switch (number.getOperator()) {
 			case EQ:
 				try {
-					Integer.parseInt(frage.getAntwortenFF().get(0).getText());
+					Integer.parseInt(question.getAnswersFF().get(0).getText());
 					if(textField.getText().length() == number.getDigits()) {
 						continue;
 					} else {
@@ -315,7 +316,7 @@ public class SurveyController {
 				}
 			case LTE:
 				try {
-					Integer.parseInt(frage.getAntwortenFF().get(0).getText());
+					Integer.parseInt(question.getAnswersFF().get(0).getText());
 					if(textField.getText().length() <= number.getDigits()) {
 						continue;
 					} else {
@@ -334,7 +335,7 @@ public class SurveyController {
 				}
 			case GTE:
 				try {
-					Integer.parseInt(frage.getAntwortenFF().get(0).getText());
+					Integer.parseInt(question.getAnswersFF().get(0).getText());
 					if(textField.getText().length() >= number.getDigits()) {
 					} else {
 						//BalloonTip fehler = new BalloonTip(textField, "die Zahl ist nicht gr\u00f6\u00dfer oder gleich " + i + " Zeichen lang");
@@ -357,14 +358,14 @@ public class SurveyController {
 	
 	/**
 	 * Prueft, ob die gegebene Frage der Pfichtfrage genuegt.
-	 * @param frage FrageErstellen: die Frage
+	 * @param question FrageErstellen: die Frage
 	 * @return boolean
 	 */
-	private boolean checkPflichtfrage(Frage frage) {
-		if(frage.getFlags().is(SymbolType.REQUIRED) && frage.getFrageLabel().isVisible()) {
-			if (frage.getArt().equals("MC")) {
+	private boolean checkPflichtfrage(Question question) {
+		if(question.getFlags().is(SymbolType.REQUIRED) && question.getQuestionLabel().isVisible()) {
+			if (question.getQuestionType().equals("MC")) {
 				boolean selected = false;
-				for (CheckBox checkbox : frage.getAntwortenMC()) {
+				for (CheckBox checkbox : question.getAnswersMC()) {
 					if (checkbox.isSelected()) {
 						selected = true;
 						break;
@@ -380,8 +381,8 @@ public class SurveyController {
 					return false;
 				}
 			} else {
-				if (frage.getFlags().is(SymbolType.LIST)) {
-					for (ListView<String> listView : frage.getAntwortenLIST()) {
+				if (question.getFlags().is(SymbolType.LIST)) {
+					for (ListView<String> listView : question.getAnswersLIST()) {
 						if (listView.getSelectionModel().isEmpty()) {
 //							BalloonTip fehler = new BalloonTip(button, "Das ist eine Pflichtfrage!");
 //							fehler.setCloseButton(null);
@@ -393,8 +394,8 @@ public class SurveyController {
 						}
 					}
 
-				} else if (frage.getFlags().is(SymbolType.TEXT)) {
-					for (TextArea myText : frage.getAntwortenTEXT()) {
+				} else if (question.getFlags().is(SymbolType.TEXT)) {
+					for (TextArea myText : question.getAnswersTEXT()) {
 						if (myText.getText().isEmpty()) {
 //							BalloonTip fehler = new BalloonTip(button, "Das ist eine Pflichtfrage!");
 //							fehler.setCloseButton(null);
@@ -407,7 +408,7 @@ public class SurveyController {
 					}
 				} else {
 					boolean selected = false;
-					for (TextField textField : frage.getAntwortenFF()) {
+					for (TextField textField : question.getAnswersFF()) {
 						if (!textField.getText().equals("")) {
 							selected = true;
 							break;
