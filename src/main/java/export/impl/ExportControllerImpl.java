@@ -26,6 +26,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 public class ExportControllerImpl implements ExportController {
@@ -44,7 +45,7 @@ public class ExportControllerImpl implements ExportController {
 	  * @return boolean
 	 */
 	public boolean excelNeu(String Path, Questionnaire fb, String von, String bis) {
-		 ArrayList<Question> questions = SurveyService.getFragen(fb);
+		 List<Question> questions = SurveyService.getFragen(fb);
 		 
 		 Row infoRow = this.sheet.createRow(0);
 		 Row katRow = this.sheet.createRow(2);
@@ -196,10 +197,10 @@ public class ExportControllerImpl implements ExportController {
 
 			for (CellRangeAddress categoryCell : categoryCellList) {
 				if (categoryCell.getFirstColumn() == po) {
-					RegionUtil.setBorderTop(1, categoryCell, this.sheet);
-					RegionUtil.setBorderLeft(1, categoryCell, this.sheet);
-					RegionUtil.setBorderRight(1, categoryCell, this.sheet);
-					RegionUtil.setBorderBottom(1, categoryCell, this.sheet);
+					RegionUtil.setBorderTop(BorderStyle.THIN, categoryCell, this.sheet);
+					RegionUtil.setBorderLeft(BorderStyle.THIN, categoryCell, this.sheet);
+					RegionUtil.setBorderRight(BorderStyle.THIN, categoryCell, this.sheet);
+					RegionUtil.setBorderBottom(BorderStyle.THIN, categoryCell, this.sheet);
 				}
 			}
 

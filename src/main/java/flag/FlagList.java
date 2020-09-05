@@ -21,7 +21,7 @@ public class FlagList {
 		convertStringToFlagList(flags);
 	}
 	
-	private List<Symbol> getPossibleFlags() {
+	public List<Symbol> getPossibleFlags() {
 		List<Symbol> results = new ArrayList<>();
 		for (SymbolType symbolType : SymbolType.values()) {
 			if(!this.is(symbolType))
@@ -222,5 +222,7 @@ public class FlagList {
 		}
 		return results;
 	}
+
+
 	
 }
