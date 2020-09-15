@@ -42,7 +42,7 @@ public class SurveyController {
 	@FXML
 	private void initialize() {
 		String value;
-		switch (GlobalVars.standort) {
+		switch (GlobalVars.location) {
 		case "Rügen":
 			value = "images/img/logo_nezr.png";
 			break;
@@ -80,7 +80,7 @@ public class SurveyController {
 				ScreenController.activate("survey_" + GlobalVars.page);
 			} else {
 				if(!isPreview) {
-					SurveyService.saveUmfrage(GlobalVars.fragenJePanel);
+					SurveyService.saveUmfrage(GlobalVars.questionsPerPanel);
 					ScreenController.addScreen(SceneName.GRATITUDE,
 							FXMLLoader.load(getURL(SceneName.GRATITUDE_PATH)));
 					ScreenController.activate(SceneName.GRATITUDE);
@@ -143,8 +143,8 @@ public class SurveyController {
 	
 	private boolean check() {
 		GlobalVars.everythingIsAwesome = true;
-		if(GlobalVars.IGNORE_CHECK && GlobalVars.DEVMODE) return true;
-		for(Question question : GlobalVars.fragenJePanel.get(GlobalVars.page)) {
+		if(GlobalVars.IGNORE_CHECK && GlobalVars.DEV_MODE) return true;
+		for(Question question : GlobalVars.questionsPerPanel.get(GlobalVars.page)) {
             if(!checkInt(question) || !checkPflichtfrage(question)) {
             	GlobalVars.everythingIsAwesome = false;
             	break;
@@ -153,7 +153,7 @@ public class SurveyController {
 		
 		
 		if(GlobalVars.everythingIsAwesome) {
-			for(Question question : GlobalVars.fragenJePanel.get(GlobalVars.page)) {
+			for(Question question : GlobalVars.questionsPerPanel.get(GlobalVars.page)) {
 				if(question.getQuestionType().equals("MC")) {
 					if(question.getFlags().is(SymbolType.LIST)) {
 						ArrayList<String> antwort = new ArrayList<>();

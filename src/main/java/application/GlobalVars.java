@@ -10,17 +10,17 @@ import java.util.List;
 import static application.GlobalFuncs.getInputStream;
 
 public class GlobalVars {
-	public static final boolean DEVMODE = true;
+	public static final boolean DEV_MODE = true;
 	public static final boolean IGNORE_CHECK = false;
-	public static int fragen = 3;
-	public static final int proZeile = 3;
-	public static String standort;
-	public static Questionnaire activQuestionnaire = null;
+	public static int questions = 3;
+	public static final int perColumn = 3;
+	public static String location;
+	public static Questionnaire activeQuestionnaire = null;
 	public static int page = 0;
 	public static int countPanel;
-	public static List<ArrayList<Question>> fragenJePanel = new ArrayList<>();
+	public static List<ArrayList<Question>> questionsPerPanel = new ArrayList<>();
 	public static boolean everythingIsAwesome = true;
-	public static ArrayList<String> standorte;
+	public static ArrayList<String> locations;
 	
 	public static final Image IMG_DEL = new Image(getInputStream("images/icons/delete_2.png"));
 	public static final Image IMG_COP = new Image(getInputStream("images/icons/copy_2.png"));

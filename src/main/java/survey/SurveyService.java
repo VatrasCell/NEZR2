@@ -172,7 +172,7 @@ public class SurveyService extends Database {
 			for (int i = 0; i < pos.size(); i++) {
 				for (int j = 0; j < pos.get(i); j++) {
 					try {
-						fragen.get(i).addAntwort_moeglichkeit(antworten.get(i + j + c));
+						fragen.get(i).addAnswerOption(antworten.get(i + j + c));
 					} catch (Exception e) {
 						/*ErrorLog.fehlerBerichtB("ERROR",
 								Datenbank.class + ": " + Thread.currentThread().getStackTrace()[1].getLineNumber(),
@@ -280,7 +280,7 @@ public class SurveyService extends Database {
 	 */
 	public static void resetFragebogen() {
 		
-		for(ArrayList<Question> fragen : GlobalVars.fragenJePanel) {
+		for(ArrayList<Question> fragen : GlobalVars.questionsPerPanel) {
 			for(Question question : fragen) {
 				question.setAnswer(null);
 				for(CheckBox checkbox : question.getAnswersMC()) {

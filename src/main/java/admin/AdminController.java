@@ -87,7 +87,7 @@ public class AdminController {
 	
 	private void getData() {
 		data.clear();
-		questionnaire = AdminService.getFragebogen(GlobalVars.standort);
+		questionnaire = AdminService.getFragebogen(GlobalVars.location);
 		//System.out.println(fragebogen.toString());
 		data.addAll(Objects.requireNonNull(questionnaire));
 	}
@@ -112,10 +112,10 @@ public class AdminController {
             	cellValue.setActive(newValue);
             	if(newValue) {
             		AdminService.activateFragebogen(cellValue);
-            		GlobalVars.activQuestionnaire = cellValue;
+            		GlobalVars.activeQuestionnaire = cellValue;
             	} else {
             		AdminService.disableFragebogen(cellValue);
-            		GlobalVars.activQuestionnaire = null;
+            		GlobalVars.activeQuestionnaire = null;
             	}
             	StartController.setStartText();
         		getData();
@@ -210,7 +210,7 @@ public class AdminController {
 							btn.setOnAction(event -> {
 								Questionnaire questionnaire1 = getTableView().getItems().get(getIndex());
 
-								ChoiceDialog<String> dialog = new ChoiceDialog<>(GlobalVars.standort, GlobalVars.standorte);
+								ChoiceDialog<String> dialog = new ChoiceDialog<>(GlobalVars.location, GlobalVars.locations);
 								dialog.setTitle("Fragebogen kopieren");
 								dialog.setHeaderText("Fragebogen kopieren");
 								dialog.setContentText("Standort wählen:");
@@ -272,7 +272,7 @@ public class AdminController {
 								Optional<String> result = dialog.showAndWait();
 								result.ifPresent(questionnaire1::setName);
 
-								if(AdminService.renameFragebogen(questionnaire1)) {
+								if(AdminService.renameQuestionnaire(questionnaire1)) {
 									getData();
 									tbl_fragebogen.refresh();
 								}
@@ -397,7 +397,7 @@ public class AdminController {
 
 								Optional<ButtonType> result = alert.showAndWait();
 								if (result.isPresent() && result.get() == ButtonType.OK){
-									if(AdminService.deleteFragebogen(questionnaire1)) {
+									if(AdminService.deleteQuestionnaire(questionnaire1)) {
 										getData();
 										tbl_fragebogen.refresh();
 										Notifications.create().title("Fragebogen löschen").text("Fragebogen \"" + questionnaire1.getName() + "\" wurde erfolgreich abgeschlossen.").show();
@@ -469,7 +469,7 @@ public class AdminController {
 		
     	Optional<String> result = dialog.showAndWait();
     	result.ifPresent(name -> {
-    		if(AdminService.createFragebogen(name) != -1) {
+    		if(AdminService.createQuestionnaire(name) != -1) {
         		getData();
         		tbl_fragebogen.refresh();
         	}

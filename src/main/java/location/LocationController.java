@@ -24,7 +24,7 @@ public class LocationController {
 	 */
 	public LocationController() {
 		// Create some sample data for the ComboBox and ListView.
-        choiceBoxData.addAll(GlobalVars.standorte);
+        choiceBoxData.addAll(GlobalVars.locations);
 	}
 	
 	/**
@@ -41,7 +41,7 @@ public class LocationController {
 	
 	@FXML
 	private void next() {
-		GlobalVars.standort = choiceBox.getValue();
+		GlobalVars.location = choiceBox.getValue();
 		try {
 			ScreenController.addScreen(SceneName.START, FXMLLoader.load(getURL(SceneName.START_PATH)));
 		} catch (IOException e) {

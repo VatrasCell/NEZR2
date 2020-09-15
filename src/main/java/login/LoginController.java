@@ -33,7 +33,7 @@ public class LoginController {
 	
 	@FXML
 	private void initialize() throws IOException {
-		if(GlobalVars.DEVMODE) {
+		if(GlobalVars.DEV_MODE) {
 			username.setText("root");
 			password.setText("1234");
 			login(new ActionEvent());
@@ -50,7 +50,7 @@ public class LoginController {
 					ScreenController.addScreen(SceneName.ADMIN, FXMLLoader.load(getURL(SceneName.ADMIN_PATH)));
 					ScreenController.activate(SceneName.ADMIN);
 				} else {
-					GlobalVars.standorte = LocationService.getStandort();
+					GlobalVars.locations = LocationService.getStandort();
 					ScreenController.addScreen(SceneName.LOCATION, FXMLLoader.load(getURL(SceneName.LOCATION_PATH)));
 					ScreenController.activate(SceneName.LOCATION);
 				}	

@@ -83,7 +83,7 @@ public class Questionnaire {
 
 	@Override
 	public String toString() {
-		return "Fragebogen [id=" + id + ", date=" + date + ", name=" + name + ", ort=" + ort + ", activ=" + isActive
+		return "Questionnaire [id=" + id + ", date=" + date + ", name=" + name + ", ort=" + ort + ", activ=" + isActive
 				+ ", isFinal=" + isFinal + "]";
 	}
 	

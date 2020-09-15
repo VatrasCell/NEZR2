@@ -111,7 +111,7 @@ public class FrageEditParam {
     }
 
     public boolean isAnswersListActivatable() {
-        return !headline&& !valuationAsk && type.equals("MC");
+        return !headline && !valuationAsk && type.equals("MC");
     }
 
     public String getType() {

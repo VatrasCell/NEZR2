@@ -12,7 +12,7 @@ import static application.GlobalFuncs.getURL;
 public class Main extends Application {
 	@Override
 	public void start(Stage primaryStage) throws IOException {
-		if(GlobalVars.DEVMODE) {
+		if(GlobalVars.DEV_MODE) {
 			primaryStage.setTitle("NEZR FX DEVMODE");
 		} else {
 			primaryStage.setTitle("NEZR FX");
@@ -23,7 +23,7 @@ public class Main extends Application {
 		
 		ScreenController.addScreen(SceneName.LOGIN, FXMLLoader.load(getURL(SceneName.LOGIN_PATH)));
 		
-		if(!GlobalVars.DEVMODE) {
+		if(!GlobalVars.DEV_MODE) {
 			ScreenController.activate(SceneName.LOGIN);
 		}
 	}

@@ -65,7 +65,7 @@ public class StartController {
 	 * The constructor (is called before the initialize()-method).
 	 */
 	public StartController() {
-		GlobalVars.activQuestionnaire = StartService.getActivFragebogen();
+		GlobalVars.activeQuestionnaire = StartService.getActivFragebogen();
 	}
 
 	/**
@@ -75,7 +75,7 @@ public class StartController {
 	@FXML
 	private void initialize() {
 		String value;
-		switch (GlobalVars.standort) {
+		switch (GlobalVars.location) {
 		case "Rügen":
 			value = "images/img/logo_nezr.png";
 			break;
@@ -112,9 +112,9 @@ public class StartController {
 
 	public static void setStartText() {
 		questionnaireText
-				.set(GlobalVars.activQuestionnaire == null ? "" : "Fragebogen: " + GlobalVars.activQuestionnaire.getName());
-		questionnaireWarn.set(GlobalVars.activQuestionnaire == null ? "kein Fragebogen ausgewählt"
-				: !GlobalVars.activQuestionnaire.getOrt().equals(GlobalVars.standort)
+				.set(GlobalVars.activeQuestionnaire == null ? "" : "Fragebogen: " + GlobalVars.activeQuestionnaire.getName());
+		questionnaireWarn.set(GlobalVars.activeQuestionnaire == null ? "kein Fragebogen ausgewählt"
+				: !GlobalVars.activeQuestionnaire.getOrt().equals(GlobalVars.location)
 						? "Fragebogen ist nicht für diesen Standort optimiert"
 						: "");
 	}
@@ -158,7 +158,7 @@ public class StartController {
 				} else {
 					break;
 				}
-			} while (++questionsOnPanel < GlobalVars.proZeile);
+			} while (++questionsOnPanel < GlobalVars.perColumn);
 			allePanel.add(scene);
 		} while (!stack.isEmpty());
 
@@ -187,7 +187,7 @@ public class StartController {
 			}
 		}
 
-		GlobalVars.fragenJePanel = fragenJePanel;
+		GlobalVars.questionsPerPanel = fragenJePanel;
 		GlobalVars.countPanel = allePanel.size();
 	}
 
@@ -327,11 +327,11 @@ public class StartController {
 		List<Integer> anzahlZeile = new ArrayList<>();
 		int intAntworten = question.getAnswerOptions().size();
 		do {
-			if (intAntworten > GlobalVars.proZeile) {
-				anzahlZeile.add(GlobalVars.proZeile);
-				intAntworten -= GlobalVars.proZeile;
+			if (intAntworten > GlobalVars.perColumn) {
+				anzahlZeile.add(GlobalVars.perColumn);
+				intAntworten -= GlobalVars.perColumn;
 			}
-		} while (intAntworten > GlobalVars.proZeile);
+		} while (intAntworten > GlobalVars.perColumn);
 		anzahlZeile.add(intAntworten);
 
 		HBox hBox = new HBox();
@@ -432,7 +432,7 @@ public class StartController {
 				}
 				
 			} else {
-				if ((count3 % (GlobalVars.proZeile)) == (GlobalVars.proZeile - 1)) {
+				if ((count3 % (GlobalVars.perColumn)) == (GlobalVars.perColumn - 1)) {
 					// allePanel.get(z).add(chckbxSda, "");
 					hBox.getChildren().add(chckbxSda);
 					/*
@@ -516,7 +516,7 @@ public class StartController {
 
 	@FXML
 	private void next() {
-		List<Question> questions = SurveyService.getFragen(GlobalVars.activQuestionnaire);
+		List<Question> questions = SurveyService.getFragen(GlobalVars.activeQuestionnaire);
 		makeQuestionnaire(questions, false);
 		GlobalVars.page = 0;
 		ScreenController.activate("survey_0");

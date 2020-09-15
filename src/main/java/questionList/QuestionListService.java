@@ -41,7 +41,7 @@ public class QuestionListService extends Database {
 				question.setPosition(Integer.parseInt(myRS.getString("Position")));
 				question.setQuestionType("MC");
 				question.setQuestionnaireId(fb.getId());
-				question.addAntwort_moeglichkeit(myRS.getString("Antwort"));
+				question.addAnswerOption(myRS.getString("Antwort"));
 				ueberschriften.add(question);
 			}
 			myCon.close();

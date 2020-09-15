@@ -19,6 +19,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import static application.SqlStatement.SQL_COLUMN_LABEL_MAX_QUESTIONNAIRE_ID;
+import static application.SqlStatement.SQL_CREATE_QUESTIONNAIRE;
+import static application.SqlStatement.SQL_GET_LAST_QUESTIONNAIRE_ID;
+import static application.SqlStatement.SQL_GET_LOCATION_ID;
+import static application.SqlStatement.SQL_IS_QUESTIONNAIRE_FINAL;
+import static application.SqlStatement.SQL_RENAME_QUESTIONNAIRE;
+import static application.SqlStatement.SQL_SET_QUESTIONNAIRE_FINAL_STATUS;
+
 public class AdminService extends Database {
 	
 	/**
@@ -33,7 +41,7 @@ public class AdminService extends Database {
 		try {
 			ArrayList<Questionnaire> questionnaire = new ArrayList<>();
 			Connection myCon = DriverManager.getConnection(url, user, pwd);
-			int idstandort = getStandortId(standort);
+			int idstandort = getLocationId(standort);
 
 			Statement mySQL = myCon.createStatement();
 			String statement = "SELECT * FROM Fragebogen WHERE idOrt='" + idstandort + "'";
@@ -451,7 +459,7 @@ public class AdminService extends Database {
 	}
 	*/
 	public static boolean copyFragebogen(Questionnaire fb, String ort) {
-		fb.setId(createFragebogen(fb.getName(), ort));
+		fb.setId(createQuestionnaire(fb.getName(), ort));
 		List<Question> fragen = SurveyService.getFragen(fb);
 		for (Question question : Objects.requireNonNull(fragen)) {
 			if(question.getQuestionType().equals("FF")) {
@@ -471,21 +479,13 @@ public class AdminService extends Database {
 		//TODO
 		return true;
 	}
-	
-	/**
-	 * Loescht den gegebenen Fragebogen. Gibt bei Erfolg TRUE zurueck.
-	 * 
-	 * @param fb
-	 *            FragebogenDialog: der Fragebogen
-	 * @return boolean
-	 * @author Anne
-	 */
-	public static boolean deleteFragebogen(Questionnaire fb) {
-		ArrayList<Integer> idsmc = new ArrayList<Integer>(); // IDs der MC Fragen
-		ArrayList<Integer> idsff = new ArrayList<Integer>(); // IDs der Freien Fragen
-		ArrayList<Integer> antmcnr = new ArrayList<Integer>(); // IDs der Antworten
+
+	public static boolean deleteQuestionnaire(Questionnaire fb) {
+		ArrayList<Integer> mcQuestionIds = new ArrayList<>(); // IDs der MC Fragen
+		ArrayList<Integer> ffQuestionIds = new ArrayList<>(); // IDs der Freien Fragen
+		ArrayList<Integer> mcQuestionAnswerIds = new ArrayList<>(); // IDs der Antworten
 															// aus MC Fragen
-		ArrayList<String> antwortenmc = new ArrayList<String>(); // Antworten zu MC
+		ArrayList<String> mcQuestionAnswers = new ArrayList<>(); // Antworten zu MC
 															// Fragen
 
 		try {
@@ -498,20 +498,20 @@ public class AdminService extends Database {
 			ResultSet myRS = mySQL.executeQuery(statement);
 
 			while (myRS.next()) {
-				if (!antmcnr.isEmpty()) {
-					for (int i = 0; i < antmcnr.size(); i++) {
-						if (myRS.getInt("AntwortNr") != antmcnr.get(i)
-								&& !myRS.getString("Antwort").equals(antwortenmc.get(i))) {
-							antmcnr.add(myRS.getInt("AntwortNr"));
-							antwortenmc.add(myRS.getString("Antwort"));
+				if (!mcQuestionAnswerIds.isEmpty()) {
+					for (int i = 0; i < mcQuestionAnswerIds.size(); i++) {
+						if (myRS.getInt("AntwortNr") != mcQuestionAnswerIds.get(i)
+								&& !myRS.getString("Antwort").equals(mcQuestionAnswers.get(i))) {
+							mcQuestionAnswerIds.add(myRS.getInt("AntwortNr"));
+							mcQuestionAnswers.add(myRS.getString("Antwort"));
 							break;
 						}
 					}
 				} else {
-					antmcnr.add(myRS.getInt("AntwortNr"));
-					antwortenmc.add(myRS.getString("Antwort"));
+					mcQuestionAnswerIds.add(myRS.getInt("AntwortNr"));
+					mcQuestionAnswers.add(myRS.getString("Antwort"));
 				}
-				idsmc.add(myRS.getInt("idMultipleChoice"));
+				mcQuestionIds.add(myRS.getInt("idMultipleChoice"));
 			}
 			myRS = null;
 			mySQL = null;
@@ -525,9 +525,9 @@ public class AdminService extends Database {
 			// Antworten, die noch in einem anderen Fragebogen vorkommen, aus
 			// dem ArrayList entfernen
 			while (myRS.next()) {
-				for (int i = 0; i < antmcnr.size(); i++) {
-					if (myRS.getInt("AntwortNr") == antmcnr.get(i)) {
-						antmcnr.remove(i);
+				for (int i = 0; i < mcQuestionAnswerIds.size(); i++) {
+					if (myRS.getInt("AntwortNr") == mcQuestionAnswerIds.get(i)) {
+						mcQuestionAnswerIds.remove(i);
 					}
 				}
 			}
@@ -540,32 +540,32 @@ public class AdminService extends Database {
 			myRS = mySQL.executeQuery(statement);
 
 			while (myRS.next()) {
-				idsff.add(myRS.getInt("idFreieFragen"));
+				ffQuestionIds.add(myRS.getInt("idFreieFragen"));
 			}
 			myRS = null;
 			mySQL = null;
 
 			// LÃ¶schen der Relationen von Fragebogen zu MultipleChoice
-			for (short i = 0; i < idsmc.size(); i++) {
+			for (short i = 0; i < mcQuestionIds.size(); i++) {
 				mySQL = myCon.createStatement();
-				statement = "DELETE FROM Fb_has_Mc WHERE idMultipleChoice=" + idsmc.get(i) + " AND idFragebogen="
+				statement = "DELETE FROM Fb_has_Mc WHERE idMultipleChoice=" + mcQuestionIds.get(i) + " AND idFragebogen="
 						+ fb.getId();
 				mySQL.execute(statement);
 				mySQL = null;
 			}
 
 			// LÃ¶schen der Relationen von Fragebogen zu FreieFragen
-			for (short i = 0; i < idsff.size(); i++) {
+			for (short i = 0; i < ffQuestionIds.size(); i++) {
 				mySQL = myCon.createStatement();
-				statement = "DELETE FROM Fb_has_Ff WHERE idFreieFragen=" + idsff.get(i) + " AND idFragebogen="
+				statement = "DELETE FROM Fb_has_Ff WHERE idFreieFragen=" + ffQuestionIds.get(i) + " AND idFragebogen="
 						+ fb.getId();
 				mySQL.execute(statement);
 				mySQL = null;
 			}
 
-			for (short i = 0; i < idsmc.size(); i++) {
+			for (short i = 0; i < mcQuestionIds.size(); i++) {
 				mySQL = myCon.createStatement();
-				statement = "SELECT idMultipleChoice FROM FB_has_MC WHERE idMultipleChoice=" + idsmc.get(i);
+				statement = "SELECT idMultipleChoice FROM FB_has_MC WHERE idMultipleChoice=" + mcQuestionIds.get(i);
 				myRS = mySQL.executeQuery(statement);
 
 				// steht ID der MC Frage nach dem LÃ¶schen der Relation zum
@@ -574,20 +574,20 @@ public class AdminService extends Database {
 				// in keinem anderen Fragebogen vor
 				if (!myRS.next()) {
 					mySQL = myCon.createStatement();
-					statement = "DELETE FROM MC_has_A WHERE idMultipleChoice=" + idsmc.get(i);
+					statement = "DELETE FROM MC_has_A WHERE idMultipleChoice=" + mcQuestionIds.get(i);
 					mySQL.execute(statement);
 					mySQL = null;
 
 					mySQL = myCon.createStatement();
-					statement = "DELETE FROM MultipleChoice WHERE idMultipleChoice=" + idsmc.get(i);
+					statement = "DELETE FROM MultipleChoice WHERE idMultipleChoice=" + mcQuestionIds.get(i);
 					mySQL.execute(statement);
 					mySQL = null;
 				}
 			}
 
-			for (short i = 0; i < idsff.size(); i++) {
+			for (short i = 0; i < ffQuestionIds.size(); i++) {
 				mySQL = myCon.createStatement();
-				statement = "SELECT idFreieFragen FROM Fb_has_ff WHERE idFreieFragen=" + idsff.get(i);
+				statement = "SELECT idFreieFragen FROM Fb_has_ff WHERE idFreieFragen=" + ffQuestionIds.get(i);
 				myRS = mySQL.executeQuery(statement);
 				// steht ID der FF Frage nach dem LÃ¶schen der Relation zum
 				// jeweiligen Fragebogen immernoch wo anders?
@@ -595,7 +595,7 @@ public class AdminService extends Database {
 				// in keinem anderen Fragebogen vor
 				if (!myRS.next()) {
 					mySQL = myCon.createStatement();
-					statement = "DELETE FROM FreieFragen WHERE idFreieFragen=" + idsff.get(i);
+					statement = "DELETE FROM FreieFragen WHERE idFreieFragen=" + ffQuestionIds.get(i);
 					mySQL.execute(statement);
 					mySQL = null;
 				}
@@ -603,16 +603,16 @@ public class AdminService extends Database {
 
 			// Antworten lÃ¶schen, wenn nicht 0-10 / ja / nein / ##### (Multiple
 			// Choice Edition)
-			for (short j = 0; j < antmcnr.size(); j++) {
-				if (!antwortenmc.get(j).equals("0") && !antwortenmc.get(j).equals("1")
-						&& !antwortenmc.get(j).equals("2") && !antwortenmc.get(j).equals("3")
-						&& !antwortenmc.get(j).equals("4") && !antwortenmc.get(j).equals("5")
-						&& !antwortenmc.get(j).equals("6") && !antwortenmc.get(j).equals("7")
-						&& !antwortenmc.get(j).equals("8") && !antwortenmc.get(j).equals("9")
-						&& !antwortenmc.get(j).equals("10") && !antwortenmc.get(j).equals("ja")
-						&& !antwortenmc.get(j).equals("nein") && !antwortenmc.get(j).equals("#####")) {
+			for (short j = 0; j < mcQuestionAnswerIds.size(); j++) {
+				if (!mcQuestionAnswers.get(j).equals("0") && !mcQuestionAnswers.get(j).equals("1")
+						&& !mcQuestionAnswers.get(j).equals("2") && !mcQuestionAnswers.get(j).equals("3")
+						&& !mcQuestionAnswers.get(j).equals("4") && !mcQuestionAnswers.get(j).equals("5")
+						&& !mcQuestionAnswers.get(j).equals("6") && !mcQuestionAnswers.get(j).equals("7")
+						&& !mcQuestionAnswers.get(j).equals("8") && !mcQuestionAnswers.get(j).equals("9")
+						&& !mcQuestionAnswers.get(j).equals("10") && !mcQuestionAnswers.get(j).equals("ja")
+						&& !mcQuestionAnswers.get(j).equals("nein") && !mcQuestionAnswers.get(j).equals("#####")) {
 					mySQL = myCon.createStatement();
-					statement = "DELETE FROM Antworten WHERE AntwortNr=" + antmcnr.get(j);
+					statement = "DELETE FROM Antworten WHERE AntwortNr=" + mcQuestionAnswerIds.get(j);
 					mySQL.execute(statement);
 					mySQL = null;
 				}
@@ -635,51 +635,31 @@ public class AdminService extends Database {
 		}
 		return false;
 	}
-	
-	/**
-	 * Benennt den gegebenen Fragebogen um. Gibt bei Erfolg TRUE zurueck.
-	 * 
-	 * @param fb
-	 *            FragebogenDialog: der Fragebogen
-	 * @return boolean
-	 * @author Eric
-	 */
-	public static boolean renameFragebogen(Questionnaire fb) {
+
+	public static boolean renameQuestionnaire(Questionnaire fb) {
 		try {
 			Connection myCon = DriverManager.getConnection(url, user, pwd);
-			Statement mySQL = myCon.createStatement();
-			String statement = "UPDATE fragebogen SET Name='" + slashUnicode(fb.getName())
-					+ "' WHERE idFragebogen=" + fb.getId();
-			mySQL.execute(statement);
+			PreparedStatement psSql = myCon.prepareStatement(SQL_RENAME_QUESTIONNAIRE);
+			psSql.setString(1, slashUnicode(fb.getName()));
+			psSql.setInt(2, fb.getId());
+			psSql.execute();
 
-			mySQL = null;
 			myCon.close();
 			return true;
 		} catch (SQLException e) {
 			e.printStackTrace();
-			//ErrorLog.fehlerBerichtB("ERROR",
-			//		Datenbank.class + ": " + Thread.currentThread().getStackTrace()[1].getLineNumber(), e.getMessage());
 		}
 		return false;
 	}
-	
-	/**
-	 * Setzt den gegebenen Fragebogen auf final. Gibt bei Erfolg TRUE zurueck.
-	 * 
-	 * @param fb
-	 *            FragebogenDialog: der Fragebogen
-	 * @return boolean
-	 * @author Eric
-	 */
+
 	public static boolean setFinal(Questionnaire fb) {
 		try {
-			// anneSuperNeu
 			Connection myCon = DriverManager.getConnection(url, user, pwd);
-			Statement mySQL = myCon.createStatement();
-			String statement = "UPDATE fragebogen SET final=TRUE WHERE idFragebogen=" + fb.getId();
-			mySQL.execute(statement);
+			PreparedStatement psSql = myCon.prepareStatement(SQL_SET_QUESTIONNAIRE_FINAL_STATUS);
+			psSql.setBoolean(1, true);
+			psSql.setInt(2, fb.getId());
+			psSql.execute();
 
-			mySQL = null;
 			myCon.close();
 			return true;
 		} catch (SQLException e) {
@@ -688,115 +668,81 @@ public class AdminService extends Database {
 		return false;
 	}
 
-	/**
-	 * Setzt den gegebenen Fragebogen auf nicht final. Gibt bei Erfolg TRUE
-	 * zurueck.
-	 * 
-	 * @param fb
-	 *            FragebogenDialog
-	 * @return boolean
-	 * @author Eric
-	 */
 	public static boolean setUnFinal(Questionnaire fb) {
 		try {
-			// anneSuperNeu
 			Connection myCon = DriverManager.getConnection(url, user, pwd);
-			Statement mySQL = myCon.createStatement();
-			String statement = "UPDATE fragebogen SET final=FALSE WHERE idFragebogen=" + fb.getId();
-			mySQL.execute(statement);
+			PreparedStatement psSql = myCon.prepareStatement(SQL_SET_QUESTIONNAIRE_FINAL_STATUS);
+			psSql.setBoolean(1, false);
+			psSql.setInt(2, fb.getId());
+			psSql.execute();
 
-			mySQL = null;
 			myCon.close();
 			return true;
 		} catch (SQLException e) {
 			e.printStackTrace();
-			//ErrorLog.fehlerBerichtB("ERROR",
-			//		Datenbank.class + ": " + Thread.currentThread().getStackTrace()[1].getLineNumber(), e.getMessage());
 		}
 		return false;
 	}
 
-	/**
-	 * Prueft, ob der gegebenen Fragebogen final ist. Gibt bei Erfolg TRUE
-	 * zurueck.
-	 * 
-	 * @param fb
-	 *            FragebogenDialog: der Fragebogen
-	 * @return boolean
-	 * @author Eric
-	 */
 	public static boolean isFinal(Questionnaire fb) {
 		try {
-			// anneSuperNeu
 			Connection myCon = DriverManager.getConnection(url, user, pwd);
-			Statement mySQL = myCon.createStatement();
-			String statement = "SELECT idFragebogen FROM fragebogen WHERE final=TRUE AND idFragebogen="
-					+ fb.getId();
-			ResultSet myRS = mySQL.executeQuery(statement);
+			PreparedStatement psSql = myCon.prepareStatement(SQL_IS_QUESTIONNAIRE_FINAL);
+			psSql.setInt(1, fb.getId());
+			ResultSet myRS = psSql.executeQuery();
 
 			if (myRS.next()) {
-				mySQL = null;
-				myRS = null;
 				myCon.close();
 				return true;
 			} else {
-				mySQL = null;
-				myRS = null;
 				myCon.close();
 				return false;
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
-			//ErrorLog.fehlerBerichtB("ERROR",
-			//		Datenbank.class + ": " + Thread.currentThread().getStackTrace()[1].getLineNumber(), e.getMessage());
 		}
 		return false;
 	}
 	
-	public static int createFragebogen(String name) {
-		return createFragebogen(name, GlobalVars.standort);
+	public static int createQuestionnaire(String name) {
+		return createQuestionnaire(name, GlobalVars.location);
 	}
 	
-	public static int createFragebogen(String name, String ort) {
+	public static int createQuestionnaire(String name, String location) {
 		try {
 			Connection myCon = DriverManager.getConnection(url, user, pwd);
-			Statement mySQL = myCon.createStatement();
-			String statement = "INSERT INTO fragebogen VALUES(NULL, '" + GlobalFuncs.getCurrentDate() + "', '" + name + "', FALSE, "
-					+ getStandortId(ort) + ", FALSE)";
-			mySQL.execute(statement);
-			mySQL = null;
-			
-			mySQL = myCon.createStatement();
-			statement = "SELECT MAX(idFragebogen) FROM fragebogen";
-			ResultSet myRS = mySQL.executeQuery(statement);
+			PreparedStatement psSql = myCon.prepareStatement(SQL_CREATE_QUESTIONNAIRE);
+			psSql.setString(1, GlobalFuncs.getCurrentDate());
+			psSql.setString(2, name);
+			psSql.setInt(3, getLocationId(location));
+			psSql.execute();
+
+			psSql = myCon.prepareStatement(SQL_GET_LAST_QUESTIONNAIRE_ID);
+			ResultSet myRS = psSql.executeQuery();
 			int id = -1;
 			if (myRS.next()) {
-				id = myRS.getInt("MAX(idFragebogen)");
+				id = myRS.getInt(SQL_COLUMN_LABEL_MAX_QUESTIONNAIRE_ID);
 			}
 			
 			myCon.close();
 			return id;
 		} catch (SQLException e) {
 			e.printStackTrace();
-			//ErrorLog.fehlerBerichtB("ERROR",
-			//		Datenbank.class + ": " + Thread.currentThread().getStackTrace()[1].getLineNumber(), e.getMessage());
 		}
 		return -1;
 	}	
 	
-	public static int getStandortId(String ort) {
+	public static int getLocationId(String location) {
 		Connection myCon;
 		int ortID = -1;
 		try {
-			myCon = DriverManager.getConnection(url, user, pwd);			
-			String statement = "SELECT idOrt FROM Ort WHERE ort=?";
-			PreparedStatement psSql = myCon.prepareStatement(statement);
-			psSql.setString(1, slashUnicode(ort));
+			myCon = DriverManager.getConnection(url, user, pwd);
+			PreparedStatement psSql = myCon.prepareStatement(SQL_GET_LOCATION_ID);
+			psSql.setString(1, slashUnicode(location));
 			ResultSet myRS = psSql.executeQuery();
 			if (myRS.next()) {
 				ortID = myRS.getInt("idOrt");
 			}
-			myRS = null;	
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
