@@ -5,7 +5,7 @@ import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.TextField;
 
 public class FrageEditParam {
-    private final String type;
+    private final QuestionType type;
     private final boolean list;
     private final boolean multipleChoice;
     private final boolean textarea;
@@ -19,7 +19,7 @@ public class FrageEditParam {
 
     private boolean required;
 
-    public FrageEditParam(String type, boolean required, boolean list, boolean multipleChoice, boolean textarea,
+    public FrageEditParam(QuestionType type, boolean required, boolean list, boolean multipleChoice, boolean textarea,
                           boolean yesNoQuestion, boolean singleLine, boolean numeric, boolean headline, boolean valuationAsk,
                           String numberType, int countChars) {
         this.type = type;
@@ -41,15 +41,15 @@ public class FrageEditParam {
                           CheckBox chckbxYesNoQuestion, CheckBox chckbxHeadline, CheckBox chckbxSingleLine, CheckBox chckbxNumeric) {
         switch (typeChoice.getSelectionModel().getSelectedItem()) {
             case "Multiple Choice":
-                type = "MC";
+                type = QuestionType.MULTIPLE_CHOICE;
                 valuationAsk = false;
                 break;
             case "Bewertungsfrage":
-                type = "MC";
+                type = QuestionType.MULTIPLE_CHOICE;
                 valuationAsk = true;
                 break;
             case "Freie Frage":
-                type = "FF";
+                type = QuestionType.SHORT_ANSWER;
                 valuationAsk = false;
                 break;
             default:
@@ -80,18 +80,18 @@ public class FrageEditParam {
     }
     
     public boolean isListActivatable() {
-        return !headline && type.equals("MC");
+        return !headline && type.equals(QuestionType.MULTIPLE_CHOICE);
     }
     public boolean isMultipleChoiceActivatable() {
-        return !headline && !yesNoQuestion && !valuationAsk && !textarea && !singleLine && !numeric  && type.equals("MC");
+        return !headline && !yesNoQuestion && !valuationAsk && !textarea && !singleLine && !numeric  && type.equals(QuestionType.MULTIPLE_CHOICE);
     }
     
     public boolean isTextareaActivatable() {
-        return !headline && !multipleChoice && !yesNoQuestion && !singleLine && !list && !numeric && type.equals("FF");
+        return !headline && !multipleChoice && !yesNoQuestion && !singleLine && !list && !numeric && type.equals(QuestionType.SHORT_ANSWER);
     }
 
     public boolean isYesNoQuestionActivatable() {
-        return !headline && !multipleChoice && !valuationAsk && !list && !numeric && !textarea && type.equals("MC");
+        return !headline && !multipleChoice && !valuationAsk && !list && !numeric && !textarea && type.equals(QuestionType.MULTIPLE_CHOICE);
     }
 
     public boolean isSingleLineActivatable() {
@@ -99,7 +99,7 @@ public class FrageEditParam {
     }
 
     public boolean isNumericActivatable() {
-        return !headline && !textarea && !multipleChoice && !list && !yesNoQuestion && !singleLine && type.equals("FF");
+        return !headline && !textarea && !multipleChoice && !list && !yesNoQuestion && !singleLine && type.equals(QuestionType.SHORT_ANSWER);
     }
 
     public boolean isNumberTypeActivatable() {
@@ -111,10 +111,10 @@ public class FrageEditParam {
     }
 
     public boolean isAnswersListActivatable() {
-        return !headline && !valuationAsk && type.equals("MC");
+        return !headline && !valuationAsk && type.equals(QuestionType.MULTIPLE_CHOICE);
     }
 
-    public String getType() {
+    public QuestionType getType() {
         return type;
     }
 

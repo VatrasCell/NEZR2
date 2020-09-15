@@ -5,6 +5,7 @@ import export.ExportController;
 import export.ExportService;
 import flag.SymbolType;
 import model.Question;
+import model.QuestionType;
 import model.Questionnaire;
 import org.apache.poi.ss.usermodel.BorderStyle;
 import org.apache.poi.ss.usermodel.Cell;
@@ -45,7 +46,7 @@ public class ExportControllerImpl implements ExportController {
 	  * @return boolean
 	 */
 	public boolean excelNeu(String Path, Questionnaire fb, String von, String bis) {
-		 List<Question> questions = SurveyService.getFragen(fb);
+		 List<Question> questions = SurveyService.getQuestions(fb);
 		 
 		 Row infoRow = this.sheet.createRow(0);
 		 Row katRow = this.sheet.createRow(2);
@@ -102,7 +103,7 @@ public class ExportControllerImpl implements ExportController {
 			 font.setFontHeightInPoints((short) 9);
 			formatTableHead.setFont(font);
 
-			if (question.getQuestionType().equals("FF")) {
+			if (question.getQuestionType().equals(QuestionType.SHORT_ANSWER)) {
 				faRow.createCell(over).setCellValue(this.crHelper.createRichTextString(question.getQuestion()));
 				faRow.getCell(over).setCellStyle(formatTableHead);
 				makeAnswersToExcel(question, "", over, von, bis);

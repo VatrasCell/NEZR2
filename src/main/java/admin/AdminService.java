@@ -5,6 +5,7 @@ import application.GlobalFuncs;
 import application.GlobalVars;
 import flag.SymbolType;
 import model.Question;
+import model.QuestionType;
 import model.Questionnaire;
 import question.QuestionService;
 import survey.SurveyService;
@@ -134,13 +135,13 @@ public class AdminService extends Database {
 	 * @author Eric
 	 */
 	/*
-	public static boolean copyFragebogen(Fragebogen fb, String ort) {
+	public static boolean copyFragebogen(Fragebogen fb, String location) {
 		int oldID = fb.getId();
 		System.out.println(fb.toString());
 		int newID = -1;
 		try {
 			Connection myCon = DriverManager.getConnection(url, user, pwd);
-			int ortID = getStandortId(ort);
+			int ortID = getStandortId(location);
 			Statement mySQL = myCon.createStatement();
 		 	String statement = "INSERT INTO fragebogen VALUES(NULL, '" + GlobalFuncs.getcurDate() + "', '"
 					+ slashUnicode(fb.getName()) + "', FALSE, " + ortID + ", FALSE)";
@@ -458,11 +459,11 @@ public class AdminService extends Database {
 		return false;
 	}
 	*/
-	public static boolean copyFragebogen(Questionnaire fb, String ort) {
-		fb.setId(createQuestionnaire(fb.getName(), ort));
-		List<Question> fragen = SurveyService.getFragen(fb);
-		for (Question question : Objects.requireNonNull(fragen)) {
-			if(question.getQuestionType().equals("FF")) {
+	public static boolean copyQuestionnaire(Questionnaire fb, String location) {
+		fb.setId(createQuestionnaire(fb.getName(), location));
+		List<Question> questions = SurveyService.getQuestions(fb);
+		for (Question question : Objects.requireNonNull(questions)) {
+			if(question.getQuestionType().equals(QuestionType.SHORT_ANSWER)) {
 				QuestionService.saveFreieFrage(fb, question);
 			} else {
 				if(question.getFlags().is(SymbolType.B)) {

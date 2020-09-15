@@ -43,7 +43,7 @@ public class ExportControllerTest {
         //arrange
         List<Question> questions = new ArrayList<>();
         PowerMockito.mockStatic(SurveyService.class);
-        when(SurveyService.getFragen(any())).thenReturn(questions);
+        when(SurveyService.getQuestions(any())).thenReturn(questions);
         //act
         boolean result = exportController.excelNeu(PATH, questionnaire, "2020-07-01", "2020-08-01");
         //assert

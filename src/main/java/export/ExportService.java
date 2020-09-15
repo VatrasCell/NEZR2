@@ -3,6 +3,7 @@ package export;
 import application.Database;
 import flag.SymbolType;
 import model.Question;
+import model.QuestionType;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -50,7 +51,7 @@ public class ExportService extends Database {
 	 */
 	public static ArrayList<ExcelCell> getAntwortenPosition(Question question, String von, String bis) {
 		ArrayList<ExcelCell> re = new ArrayList<ExcelCell>();
-		if (((question.getQuestionType().equals("MC")) && (question.getFlags().is(SymbolType.B)))
+		if (((question.getQuestionType().equals(QuestionType.MULTIPLE_CHOICE)) && (question.getFlags().is(SymbolType.B)))
 				|| (question.getFlags().is(SymbolType.LIST)) || (question.getFlags().is(SymbolType.JN))) {
 			try {
 				Connection myCon = DriverManager.getConnection(url, user, pwd);
@@ -78,7 +79,7 @@ public class ExportService extends Database {
 				//		Datenbank.class + ": " + Thread.currentThread().getStackTrace()[1].getLineNumber(),
 				//		e.getMessage());
 			}
-		} else if (question.getQuestionType().equals("FF")) {
+		} else if (question.getQuestionType().equals(QuestionType.SHORT_ANSWER)) {
 			try {
 				Connection myCon = DriverManager.getConnection(url, user, pwd);
 				Statement mySQL = myCon.createStatement();

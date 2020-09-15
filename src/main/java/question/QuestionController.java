@@ -25,6 +25,7 @@ import javafx.scene.image.ImageView;
 import javafx.util.Callback;
 import model.Question;
 import model.FrageEditParam;
+import model.QuestionType;
 import model.Questionnaire;
 import model.SceneName;
 import org.controlsfx.control.Notifications;
@@ -233,7 +234,7 @@ public class QuestionController {
 				"Größer gleich Zahl");
 		zahlChoice.setItems(listZahl);
 
-		if (question.getQuestionType().equals("MC")) {
+		if (question.getQuestionType().equals(QuestionType.MULTIPLE_CHOICE)) {
 			if (question.getFlags().is(SymbolType.B)) {
 				artChoice.getSelectionModel().select("Bewertungsfrage");
 			} else {
@@ -290,7 +291,7 @@ public class QuestionController {
 
 			}
 		}*/
-		if (question.getQuestionType().equals("MC")) {
+		if (question.getQuestionType().equals(QuestionType.MULTIPLE_CHOICE)) {
 			if(question.getAnswerOptions().size() > 0) {
 				if (question.getAnswerOptions().get(0).equals("#####")) {
 					chckbxUeberschrift.setSelected(true);
@@ -382,9 +383,9 @@ public class QuestionController {
 	        List<React> mcList = flags.getAll(React.class);
 	        for (React react : mcList) {
 	        	if(param.isRequired()) {
-					QuestionService.updateFlags(questionnaire, react.getQuestionType().toString(), react.getQuestionId());
+					QuestionService.updateFlags(questionnaire, react.getQuestionType(), react.getQuestionId());
 				}
-		        if (QuestionService.isPflichtfrage(questionnaire, react.getQuestionType().toString(), react.getQuestionId())) {
+		        if (QuestionService.isPflichtfrage(questionnaire, react.getQuestionType(), react.getQuestionId())) {
 		        	param.setRequired(true);
 		        }
 			}

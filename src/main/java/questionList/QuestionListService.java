@@ -3,6 +3,7 @@ package questionList;
 import application.Database;
 import flag.FlagList;
 import model.Question;
+import model.QuestionType;
 import model.Questionnaire;
 
 import java.sql.Connection;
@@ -39,7 +40,7 @@ public class QuestionListService extends Database {
 				question.setDate(myRS.getString("Datum"));
 				question.setFlags(new FlagList());
 				question.setPosition(Integer.parseInt(myRS.getString("Position")));
-				question.setQuestionType("MC");
+				question.setQuestionType(QuestionType.MULTIPLE_CHOICE);
 				question.setQuestionnaireId(fb.getId());
 				question.addAnswerOption(myRS.getString("Antwort"));
 				ueberschriften.add(question);
@@ -72,7 +73,7 @@ public class QuestionListService extends Database {
 
 		try {
 			Connection myCon = DriverManager.getConnection(url, user, pwd);
-			if (question.getQuestionType().equals("MC")) {
+			if (question.getQuestionType().equals(QuestionType.MULTIPLE_CHOICE)) {
 				Statement mySQL = myCon.createStatement();
 				statement = "SELECT flags, idMultipleChoice FROM FB_has_mc where flags LIKE '%__" + question.getQuestionId()
 						+ "A%'";
@@ -165,7 +166,7 @@ public class QuestionListService extends Database {
 				statement = "DELETE FROM Fb_has_Mc WHERE idMultipleChoice=" + question.getQuestionId();
 				mySQL.execute(statement);
 				mySQL = null;
-			} else if (question.getQuestionType().equals("FF")) {
+			} else if (question.getQuestionType().equals(QuestionType.SHORT_ANSWER)) {
 				Statement mySQL = myCon.createStatement();
 				statement = "SELECT flags, idFreieFragen FROM FB_has_ff where flags LIKE '%__" + question.getQuestionId()
 						+ "A%'";
@@ -227,7 +228,7 @@ public class QuestionListService extends Database {
 				mySQL = null;
 			}
 
-			if (question.getQuestionType().equals("MC")) {
+			if (question.getQuestionType().equals(QuestionType.MULTIPLE_CHOICE)) {
 				Statement mySQL = myCon.createStatement();
 				statement = "SELECT idMultipleChoice FROM FB_has_MC WHERE idMultipleChoice=" + question.getQuestionId();
 				ResultSet myRS = mySQL.executeQuery(statement);
@@ -247,7 +248,7 @@ public class QuestionListService extends Database {
 					mySQL.execute(statement);
 					mySQL = null;
 				}
-			} else if (question.getQuestionType().equals("FF")) {
+			} else if (question.getQuestionType().equals(QuestionType.SHORT_ANSWER)) {
 				Statement mySQL = myCon.createStatement();
 				statement = "SELECT idFreieFragen FROM Fb_has_ff WHERE idFreieFragen=" + question.getQuestionId();
 				ResultSet myRS = mySQL.executeQuery(statement);

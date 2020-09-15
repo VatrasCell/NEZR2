@@ -219,7 +219,7 @@ public class AdminController {
 
 								Optional<String> result = dialog.showAndWait();
 								result.ifPresent(ort -> {
-										if(AdminService.copyFragebogen(questionnaire1, ort)) {
+										if(AdminService.copyQuestionnaire(questionnaire1, ort)) {
 											getData();
 											tbl_fragebogen.refresh();
 											Notifications.create().title("Fragebogen kopieren").text("Der Fragebogen \"" + questionnaire1.getName() + "\" wurde erfolgreich\nnach \"" + ort  + "\" kopiert.").show();

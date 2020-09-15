@@ -56,7 +56,7 @@ public class QuestionListController {
 	
 	private void getData() {
 		data.clear();
-		fragen = SurveyService.getFragen(questionnaire);
+		fragen = SurveyService.getQuestions(questionnaire);
 		ArrayList<Question> ueberschriften = QuestionListService.getUeberschriften(questionnaire);
 		for (Question question : ueberschriften) {
 			int pos = question.getPosition();

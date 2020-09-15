@@ -7,6 +7,7 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import model.Question;
+import model.QuestionType;
 import model.Questionnaire;
 import model.Headline;
 import question.QuestionService;
@@ -28,7 +29,7 @@ public class SurveyService extends Database {
 	 * @return ArrayList FrageErstellen
 	 * @author Julian und Eric
 	 */
-	public static List<Question> getFragen(Questionnaire fb) {
+	public static List<Question> getQuestions(Questionnaire fb) {
 		try {
 			System.out.println("FragebogenID: " + fb.getId());
 			Connection myCon = DriverManager.getConnection(url, user, pwd);
@@ -64,7 +65,7 @@ public class SurveyService extends Database {
 					fragenObj.setDate(myRS.getString("Datum"));
 					fragenObj.setFlags(new FlagList(myRS.getString("Flags")));
 					fragenObj.setPosition(Integer.parseInt(myRS.getString("Position")));
-					fragenObj.setQuestionType("MC");
+					fragenObj.setQuestionType(QuestionType.MULTIPLE_CHOICE);
 					fragenObj.setQuestionnaireId(fb.getId());
 
 					int iii;
@@ -115,7 +116,7 @@ public class SurveyService extends Database {
 					fragenObj.setDate(myRS.getString("Datum"));
 					fragenObj.setFlags(new FlagList(myRS.getString("Flags")));
 					fragenObj.setPosition(Integer.parseInt(myRS.getString("Position")));
-					fragenObj.setQuestionType("FF");
+					fragenObj.setQuestionType(QuestionType.SHORT_ANSWER);
 					fragenObj.setQuestionnaireId(fb.getId());
 
 					int iii;
@@ -222,7 +223,7 @@ public class SurveyService extends Database {
 				for (int i = 0; i < fragen.size(); i++) {
 					ArrayList<Question> panel = fragen.get(i);
 					for (Question question : panel) {
-						if (question.getQuestionType() == "MC") {
+						if (question.getQuestionType().equals(QuestionType.MULTIPLE_CHOICE)) {
 							if (question.getAnswer().size() > 0) {
 								for (String antwort : question.getAnswer()) {
 									antwort = antwort.replaceAll("<.*>", "");

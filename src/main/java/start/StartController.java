@@ -30,6 +30,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.TextAlignment;
 import model.PanelInfo;
 import model.Question;
+import model.QuestionType;
 import model.SceneName;
 import survey.SurveyController;
 import survey.SurveyService;
@@ -179,11 +180,11 @@ public class StartController {
 			List<Number> numbers = questions.get(y).getFlags().getAll(Number.class);
 			for (React react : reacts) {
 				questions.get(y).setTarget(
-						questions.get(getY(react.getQuestionId(), react.getQuestionType().toString(), questions)));
-				questions.get(y).setListener(react.getAnswerPos(), react.getQuestionType().toString());
+						questions.get(getY(react.getQuestionId(), react.getQuestionType(), questions)));
+				questions.get(y).setListener(react.getAnswerPos(), react.getQuestionType());
 			}
 			for (Number number : numbers) {
-				questions.get(y).setListener(0, number.toString());
+				questions.get(y).setListener(number);
 			}
 		}
 
@@ -204,9 +205,9 @@ public class StartController {
 		//add question
 		vBox.getChildren().add(createQuestionLabel(screen, question));
 
-		if (question.getQuestionType().equals("FF")) {
+		if (question.getQuestionType().equals(QuestionType.SHORT_ANSWER)) {
 			vBox.getChildren().add(createFFNode(question));
-		} else if (question.getQuestionType().equals("MC")) {
+		} else if (question.getQuestionType().equals(QuestionType.MULTIPLE_CHOICE)) {
 			if (question.getFlags().is(SymbolType.LIST)) {
 				vBox.getChildren().add(createMCListView(question));
 			} else {
@@ -490,19 +491,19 @@ public class StartController {
 	 * 
 	 * @param x
 	 *            int: Fragen- ID
-	 * @param s
+	 * @param type
 	 *            String: Fragenart
 	 * @param questions
 	 *            ArrayList FrageErstellen: alle Fragen
 	 * @return Postition im ArrayList "questions" als int.
 	 */
-	private static int getY(int x, String s, List<Question> questions) {
+	private static int getY(int x, QuestionType type, List<Question> questions) {
 		// TODO
 
 		for (int i = 0; i < questions.size(); i++) {
 			// System.out.println(questions.get(i).getFrageID()+ " == " + x + " && " +
-			// questions.get(i).getArt() + " == " + s);
-			if (x == questions.get(i).getQuestionId() && s.equals(questions.get(i).getQuestionType())) {
+			// questions.get(i).getArt() + " == " + type);
+			if (x == questions.get(i).getQuestionId() && type.equals(questions.get(i).getQuestionType())) {
 				return i;
 			}
 		}
@@ -516,7 +517,7 @@ public class StartController {
 
 	@FXML
 	private void next() {
-		List<Question> questions = SurveyService.getFragen(GlobalVars.activeQuestionnaire);
+		List<Question> questions = SurveyService.getQuestions(GlobalVars.activeQuestionnaire);
 		makeQuestionnaire(questions, false);
 		GlobalVars.page = 0;
 		ScreenController.activate("survey_0");

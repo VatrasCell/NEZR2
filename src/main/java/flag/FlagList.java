@@ -1,5 +1,7 @@
 package flag;
 
+import model.QuestionType;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -102,7 +104,7 @@ public class FlagList {
 			Matcher m2 = MY_PATTERN2.matcher(mges.group(0));
 			if (m1.find() && m2.find()) {
 				return new React(
-						QuestionType.MC, 
+						QuestionType.MULTIPLE_CHOICE,
 						Integer.parseInt(m1.group(0).substring(2)), 
 						Integer.parseInt(m2.group(0).substring(1))
 					);
@@ -123,7 +125,7 @@ public class FlagList {
 			Matcher m2 = MY_PATTERN2.matcher(mges.group(0));
 			if (m1.find() && m2.find()) {
 				return new React(
-						QuestionType.FF, 
+						QuestionType.SHORT_ANSWER,
 						Integer.parseInt(m1.group(0).substring(2)), 
 						Integer.parseInt(m2.group(0).substring(1))
 					);
@@ -135,7 +137,7 @@ public class FlagList {
 	public boolean hasMCReact() {
 		for (Flag flag : list) {
 			if(flag.getClass() == React.class)
-				if(((React)flag).getQuestionType() == QuestionType.MC)
+				if(((React)flag).getQuestionType() == QuestionType.MULTIPLE_CHOICE)
 					return true;
 		}
 		return false;
@@ -144,7 +146,7 @@ public class FlagList {
 	public boolean hasFFReact() {
 		for (Flag flag : list) {
 			if(flag.getClass() == React.class)
-				if(((React)flag).getQuestionType() == QuestionType.FF)
+				if(((React)flag).getQuestionType() == QuestionType.SHORT_ANSWER)
 					return true;
 		}
 		return false;

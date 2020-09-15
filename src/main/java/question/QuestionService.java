@@ -8,6 +8,7 @@ import flag.Symbol;
 import flag.SymbolType;
 import model.Question;
 import model.FrageEditParam;
+import model.QuestionType;
 import model.Questionnaire;
 import org.controlsfx.control.Notifications;
 
@@ -197,7 +198,7 @@ public class QuestionService extends Database {
 
 		try {
 			Connection myCon = DriverManager.getConnection(url, user, pwd);
-			if (question.getQuestionType().equals("MC")) {
+			if (question.getQuestionType().equals(QuestionType.MULTIPLE_CHOICE)) {
 				Statement mySQL = myCon.createStatement();
 				statement = "SELECT flags, idMultipleChoice FROM FB_has_mc where flags LIKE '%__" + question.getQuestionId()
 						+ "A%'";
@@ -319,14 +320,14 @@ public class QuestionService extends Database {
 	 * 
 	 * @param fb
 	 *            FragebogenDialog: der Fragebogen
-	 * @param art
+	 * @param type
 	 *            String: Art der Frage
 	 * @param id
 	 *            int: ID der Frage
 	 * @return boolean
 	 */
-	public static boolean updateFlags(Questionnaire fb, String art, int id) {
-		if (art.equals("FF")) {
+	public static boolean updateFlags(Questionnaire fb, QuestionType type, int id) {
+		if (type.equals(QuestionType.SHORT_ANSWER)) {
 			try {
 				Connection myCon = DriverManager.getConnection(url, user, pwd);
 				Statement mySQL = myCon.createStatement();
@@ -367,7 +368,7 @@ public class QuestionService extends Database {
 				ResultSet myRS = mySQL.executeQuery(statement);
 
 				if (myRS.next()) {
-					if (myRS.getString("Flags").indexOf("+") >= 0) {
+					if (myRS.getString("Flags").contains("+")) {
 						return true;
 					} else {
 						String flags = myRS.getString("Flags") + " +";
@@ -396,14 +397,14 @@ public class QuestionService extends Database {
 	 * 
 	 * @param fb
 	 *            FragebogenDialog: der Fragebogen
-	 * @param art
+	 * @param type
 	 *            String: Art der Frage
 	 * @param id
 	 *            int: ID der Frage
 	 * @return boolean
 	 */
-	public static boolean isPflichtfrage(Questionnaire fb, String art, int id) {
-		if (art.equals("FF")) {
+	public static boolean isPflichtfrage(Questionnaire fb, QuestionType type, int id) {
+		if (type.equals(QuestionType.SHORT_ANSWER)) {
 			try {
 				Connection myCon = DriverManager.getConnection(url, user, pwd);
 				Statement mySQL = myCon.createStatement();
@@ -412,11 +413,7 @@ public class QuestionService extends Database {
 				ResultSet myRS = mySQL.executeQuery(statement);
 
 				if (myRS.next()) {
-					if (myRS.getString("Flags").indexOf("+") >= 0) {
-						return true;
-					} else {
-						return false;
-					}
+					return myRS.getString("Flags").contains("+");
 				} else {
 					return false;
 				}
@@ -437,11 +434,7 @@ public class QuestionService extends Database {
 				ResultSet myRS = mySQL.executeQuery(statement);
 
 				if (myRS.next()) {
-					if (myRS.getString("Flags").indexOf("+") >= 0) {
-						return true;
-					} else {
-						return false;
-					}
+					return myRS.getString("Flags").contains("+");
 				} else {
 					return false;
 				}

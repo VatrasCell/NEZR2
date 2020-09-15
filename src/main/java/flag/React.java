@@ -1,5 +1,7 @@
 package flag;
 
+import model.QuestionType;
+
 public class React extends Flag {
 	private final String ANSWER = "A";
 	private QuestionType questionType;

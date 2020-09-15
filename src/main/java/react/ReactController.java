@@ -3,7 +3,6 @@ package react;
 import application.ScreenController;
 import flag.Flag;
 import flag.FlagList;
-import flag.QuestionType;
 import flag.React;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
@@ -72,7 +71,7 @@ public class ReactController {
 	 */
 	public ReactController() {
 		FlagList flags = question.getFlags();
-		fragen = SurveyService.getFragen(questionnaire);
+		fragen = SurveyService.getQuestions(questionnaire);
 
 		for (React react : flags.getAll(React.class)) {
 			Question question = fragen.get(getY(react.getQuestionId(), react.getQuestionType().toString(), fragen));
@@ -224,7 +223,7 @@ public class ReactController {
 			if (dialogButton == okButtonType) {
 				Question frage = question.getSelectionModel().getSelectedItem();
 				int answerPos = answer.getSelectionModel().getSelectedIndex();
-				React react = new React(QuestionType.valueOf(frage.getQuestionType()), frage.getQuestionId(), answerPos);
+				React react = new React(frage.getQuestionType(), frage.getQuestionId(), answerPos);
 				ReactTableElement tableElement = new ReactTableElement(frage, answerPos, react);
 				Pair<React, ReactTableElement> result = new Pair<React, ReactTableElement>(react, tableElement);
 				return result;
@@ -357,7 +356,7 @@ public class ReactController {
 
 		private React getFlagFromFlagList(Question question, int answerPos) {
 			for (React react : question.getFlags().getAll(React.class)) {
-				if(react.getQuestionType().equals(QuestionType.valueOf(question.getQuestionType())) &&
+				if(react.getQuestionType().equals(question.getQuestionType()) &&
 						react.getQuestionId() == question.getQuestionId() &&
 						react.getAnswerPos() == answerPos) {
 							return react;

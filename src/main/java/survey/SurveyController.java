@@ -17,6 +17,7 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.Pane;
 import model.Question;
+import model.QuestionType;
 import model.SceneName;
 
 import java.io.IOException;
@@ -154,7 +155,7 @@ public class SurveyController {
 		
 		if(GlobalVars.everythingIsAwesome) {
 			for(Question question : GlobalVars.questionsPerPanel.get(GlobalVars.page)) {
-				if(question.getQuestionType().equals("MC")) {
+				if(question.getQuestionType().equals(QuestionType.MULTIPLE_CHOICE)) {
 					if(question.getFlags().is(SymbolType.LIST)) {
 						ArrayList<String> antwort = new ArrayList<>();
 						for(ListView<String> listView : question.getAnswersLIST()) {
@@ -363,7 +364,7 @@ public class SurveyController {
 	 */
 	private boolean checkPflichtfrage(Question question) {
 		if(question.getFlags().is(SymbolType.REQUIRED) && question.getQuestionLabel().isVisible()) {
-			if (question.getQuestionType().equals("MC")) {
+			if (question.getQuestionType().equals(QuestionType.MULTIPLE_CHOICE)) {
 				boolean selected = false;
 				for (CheckBox checkbox : question.getAnswersMC()) {
 					if (checkbox.isSelected()) {
