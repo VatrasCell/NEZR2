@@ -99,16 +99,8 @@ public class AdminService extends Database {
 		}
 		return false;
 	}
-
-	/**
-	 * Deaktiviert den gegebenen Fragebogen. Gibt bei Erfolg TRUE zurueck.
-	 * 
-	 * @param fb
-	 *            FragebogenDialog: der Fragebogen
-	 * @return boolean
-	 * @author Eric
-	 */
-	public static boolean disableFragebogen(Questionnaire fb) {
+	
+	public static boolean disableQuestionnaire (Questionnaire fb) {
 		try {
 			// anneSuperNeu
 			Connection myCon = DriverManager.getConnection(url, user, pwd);
@@ -464,16 +456,16 @@ public class AdminService extends Database {
 		List<Question> questions = SurveyService.getQuestions(fb);
 		for (Question question : Objects.requireNonNull(questions)) {
 			if(question.getQuestionType().equals(QuestionType.SHORT_ANSWER)) {
-				QuestionService.saveFreieFrage(fb, question);
+				QuestionService.saveShortAnswerQuestion(fb, question);
 			} else {
 				if(question.getFlags().is(SymbolType.B)) {
-					QuestionService.saveBewertungsfrage(fb, question);
+					QuestionService.saveEvaluationQuestion(fb.getId(), question);
 				} else {
 					ArrayList<Integer> antIds = new ArrayList<>();
 					for (String answer : question.getAnswerOptions()) {
-						antIds.add(QuestionService.getAntwortID(answer));
+						antIds.add(QuestionService.provideAnswerId(answer));
 					} 
-					QuestionService.saveMC(fb, question, antIds);
+					QuestionService.saveMultipleChoice(fb.getId(), question, antIds);
 				}
 			}
 		}

@@ -114,7 +114,7 @@ public class AdminController {
             		AdminService.activateFragebogen(cellValue);
             		GlobalVars.activeQuestionnaire = cellValue;
             	} else {
-            		AdminService.disableFragebogen(cellValue);
+            		AdminService.disableQuestionnaire(cellValue);
             		GlobalVars.activeQuestionnaire = null;
             	}
             	StartController.setStartText();

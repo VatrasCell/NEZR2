@@ -359,7 +359,7 @@ public class QuestionController {
 			}
 			
 			if(!string.equals(textFieldFE.getText())) {
-				neueQuestion.setQuestion(QuestionService.duplicateFrage(textFieldFE.getText()));
+				neueQuestion.setQuestion(QuestionService.duplicateQuestion(textFieldFE.getText()));
 			} else {
 				neueQuestion.setQuestion(oldFrage);
 			}
@@ -393,7 +393,7 @@ public class QuestionController {
 			if (artChoice.getSelectionModel().getSelectedItem().equals("Freie Frage")) {
 				QuestionService.getMoeglicheFlags(flags, param);//floNeu
 				neueQuestion.setFlags(flags);
-				QuestionService.saveFreieFrage(questionnaire, neueQuestion);
+				QuestionService.saveShortAnswerQuestion(questionnaire, neueQuestion);
 			}
 			if (artChoice.getSelectionModel().getSelectedItem().equals("Multiple Choice")) {
 				ArrayList<Integer> antIds = new ArrayList<>();
@@ -421,28 +421,28 @@ public class QuestionController {
 			
 				if(lblQuestion.getText().equals("Frage Bearbeiten")) {
 					for (String answer : answers) {
-						int antId = QuestionService.getAntwortID(answer);
+						int antId = QuestionService.provideAnswerId(answer);
 						antIdsRaus.add(antId);
 					}
 				}
 				
 				if(!antIdsRaus.isEmpty()) {
 					QuestionService.updateFlags(neueQuestion);
-					QuestionService.deleteAntworten(antIdsRaus, neueQuestion);
+					QuestionService.deleteAnswers(antIdsRaus, neueQuestion.getQuestionId());
 				}
 				//
 				for (String ant : ants) {
-					int antId = QuestionService.getAntwortID(ant);
+					int antId = QuestionService.provideAnswerId(ant);
 					antIds.add(antId);
 				}
 				QuestionService.getMoeglicheFlags(flags, param);//floNeu
 				neueQuestion.setFlags(flags);
-				QuestionService.saveMC(questionnaire, neueQuestion, antIds);
+				QuestionService.saveMultipleChoice(questionnaire.getId(), neueQuestion, antIds);
 			}
 			if (artChoice.getSelectionModel().getSelectedItem().equals("Bewertungsfrage")) {
 				QuestionService.getMoeglicheFlags(flags, param);//floNeu
 				neueQuestion.setFlags(flags);
-				QuestionService.saveBewertungsfrage(questionnaire, neueQuestion);
+				QuestionService.saveEvaluationQuestion(questionnaire.getId(), neueQuestion);
 			}
 		
 			ScreenController.activate(SceneName.QUESTION_LIST);
@@ -491,7 +491,7 @@ public class QuestionController {
 		
     	Optional<String> result = dialog.showAndWait();
     	result.ifPresent(name -> {
-    		if(QuestionService.createKategorie(name)) {
+    		if(QuestionService.createCategory(name)) {
     			ObservableList<String> listKat = FXCollections.observableArrayList(QuestionService.getKategorie());
     			katChoice.setItems(listKat);
     			katChoice.getSelectionModel().select(name);

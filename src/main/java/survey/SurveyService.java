@@ -232,14 +232,14 @@ public class SurveyService extends Database {
 									mySQL = myCon.createStatement();
 									statement = "SELECT B_has_MCid FROM B_has_MC WHERE idBefragung=" + b_id
 											+ " AND idMultipleChoice=" + question.getQuestionId() + " AND AntwortNr="
-											+ QuestionService.getAntwortID(antwort);
+											+ QuestionService.provideAnswerId(antwort);
 									myRS = mySQL.executeQuery(statement);
 									if (!myRS.next()) {
 										myRS = null;
 										mySQL = null;
 										mySQL = myCon.createStatement();
 										statement = "INSERT INTO B_has_MC VALUES(NULL," + b_id + ", "
-												+ question.getQuestionId() + ", " + QuestionService.getAntwortID(antwort) + ")";
+												+ question.getQuestionId() + ", " + QuestionService.provideAnswerId(antwort) + ")";
 										mySQL.executeUpdate(statement);
 									}
 								}
@@ -252,14 +252,14 @@ public class SurveyService extends Database {
 								mySQL = myCon.createStatement();
 								statement = "SELECT B_has_FFid FROM B_has_FF WHERE idBefragung=" + b_id
 										+ " AND idFreieFragen=" + question.getQuestionId() + " AND AntwortNr="
-										+ QuestionService.getAntwortID(antwort);
+										+ QuestionService.provideAnswerId(antwort);
 								myRS = mySQL.executeQuery(statement);
 								if (!myRS.next()) {
 									myRS = null;
 									mySQL = null;
 									mySQL = myCon.createStatement();
 									statement = "INSERT INTO B_has_FF VALUES(NULL," + b_id + ", " + question.getQuestionId()
-											+ ", " + QuestionService.getAntwortID(antwort) + ")";
+											+ ", " + QuestionService.provideAnswerId(antwort) + ")";
 									mySQL.executeUpdate(statement);
 								}
 							}
