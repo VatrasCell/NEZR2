@@ -11,7 +11,7 @@ import java.sql.Statement;
 
 public class StartService extends Database {
 	/**
-	 * Gibt den aktivierten Fragebogen zurück.
+	 * Gibt den aktivierten Fragebogen zurck.
 	 * 
 	 * @return FragebogenDialog
 	 * @author Eric

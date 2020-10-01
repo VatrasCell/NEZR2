@@ -23,8 +23,8 @@ import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.ImageView;
 import javafx.util.Callback;
-import model.Question;
 import model.FrageEditParam;
+import model.Question;
 import model.QuestionType;
 import model.Questionnaire;
 import model.SceneName;
@@ -34,6 +34,7 @@ import start.StartController;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -211,13 +212,13 @@ public class QuestionController {
 			string = question.getQuestion();
 		}
 		textFieldFE.setText(string);
-		List<Integer> range = IntStream.range(1, QuestionService.getCountPosition(questionnaire) + 2).boxed()
+		List<Integer> range = IntStream.range(1, QuestionService.getCountPosition(questionnaire.getId()) + 2).boxed()
 				.collect(Collectors.toList());
 		ObservableList<Integer> list = FXCollections.observableArrayList(range);
 		posChoice.setItems(list);
 		posChoice.getSelectionModel().select(question.getPosition() - 1);
 
-		ObservableList<String> listKat = FXCollections.observableArrayList(QuestionService.getKategorie());
+		ObservableList<String> listKat = FXCollections.observableArrayList(QuestionService.getCategories());
 		katChoice.setItems(listKat);
 		katChoice.getSelectionModel().select(question.getCategory());
 
@@ -383,17 +384,17 @@ public class QuestionController {
 	        List<React> mcList = flags.getAll(React.class);
 	        for (React react : mcList) {
 	        	if(param.isRequired()) {
-					QuestionService.updateFlags(questionnaire, react.getQuestionType(), react.getQuestionId());
+					QuestionService.provideQuestionRequired(questionnaire.getId(), react.getQuestionType(), react.getQuestionId());
 				}
-		        if (QuestionService.isPflichtfrage(questionnaire, react.getQuestionType(), react.getQuestionId())) {
+		        if (QuestionService.isQuestionRequired(questionnaire.getId(), react.getQuestionType(), react.getQuestionId())) {
 		        	param.setRequired(true);
 		        }
 			}
 	        
 			if (artChoice.getSelectionModel().getSelectedItem().equals("Freie Frage")) {
-				QuestionService.getMoeglicheFlags(flags, param);//floNeu
+				QuestionService.getPossibleFlags(flags, param);//floNeu
 				neueQuestion.setFlags(flags);
-				QuestionService.saveShortAnswerQuestion(questionnaire, neueQuestion);
+				QuestionService.saveShortAnswerQuestion(questionnaire.getId(), neueQuestion);
 			}
 			if (artChoice.getSelectionModel().getSelectedItem().equals("Multiple Choice")) {
 				ArrayList<Integer> antIds = new ArrayList<>();
@@ -435,12 +436,12 @@ public class QuestionController {
 					int antId = QuestionService.provideAnswerId(ant);
 					antIds.add(antId);
 				}
-				QuestionService.getMoeglicheFlags(flags, param);//floNeu
+				QuestionService.getPossibleFlags(flags, param);//floNeu
 				neueQuestion.setFlags(flags);
 				QuestionService.saveMultipleChoice(questionnaire.getId(), neueQuestion, antIds);
 			}
 			if (artChoice.getSelectionModel().getSelectedItem().equals("Bewertungsfrage")) {
-				QuestionService.getMoeglicheFlags(flags, param);//floNeu
+				QuestionService.getPossibleFlags(flags, param);//floNeu
 				neueQuestion.setFlags(flags);
 				QuestionService.saveEvaluationQuestion(questionnaire.getId(), neueQuestion);
 			}
@@ -456,10 +457,8 @@ public class QuestionController {
 	
 	@FXML
 	private void setPreview() {
-		List<Question> fragen = new ArrayList<>();
-		fragen.add(question);
-		StartController.makeQuestionnaire(fragen, true);
-		ScreenController.activate("survey_0");
+		StartController.makeQuestionnaire(Collections.singletonList(question), true);
+		ScreenController.activate(SceneName.SURVEY_0);
 	}
 	
 	@FXML
@@ -491,8 +490,8 @@ public class QuestionController {
 		
     	Optional<String> result = dialog.showAndWait();
     	result.ifPresent(name -> {
-    		if(QuestionService.createCategory(name)) {
-    			ObservableList<String> listKat = FXCollections.observableArrayList(QuestionService.getKategorie());
+    		if(QuestionService.provideCategory(name)) {
+    			ObservableList<String> listKat = FXCollections.observableArrayList(QuestionService.getCategories());
     			katChoice.setItems(listKat);
     			katChoice.getSelectionModel().select(name);
         		Notifications.create().title("Kategorie anlegen").text("Kategorie \"" + name + "\" wurde erfolgreich angelegt.").show();

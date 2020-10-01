@@ -2,6 +2,7 @@ package model;
 
 public class SceneName {
 	public static final String SURVEY = "survey_";
+	public static final String SURVEY_0 = SURVEY + "0";
 	public static final String LOCATION = "location";
 	public static final String LOGIN = "login";
 	public static final String START = "start";

@@ -456,7 +456,7 @@ public class AdminService extends Database {
 		List<Question> questions = SurveyService.getQuestions(fb);
 		for (Question question : Objects.requireNonNull(questions)) {
 			if(question.getQuestionType().equals(QuestionType.SHORT_ANSWER)) {
-				QuestionService.saveShortAnswerQuestion(fb, question);
+				QuestionService.saveShortAnswerQuestion(fb.getId(), question);
 			} else {
 				if(question.getFlags().is(SymbolType.B)) {
 					QuestionService.saveEvaluationQuestion(fb.getId(), question);

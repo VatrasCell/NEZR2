@@ -9,7 +9,6 @@ import flag.SymbolType;
 import model.FrageEditParam;
 import model.Question;
 import model.QuestionType;
-import model.Questionnaire;
 import org.controlsfx.control.Notifications;
 
 import java.sql.Connection;
@@ -29,18 +28,32 @@ import static application.SqlStatement.SQL_CREATE_CATEGORY;
 import static application.SqlStatement.SQL_CREATE_MULTIPLE_CHOICE;
 import static application.SqlStatement.SQL_CREATE_MULTIPLE_CHOICE_ANSWERS_RELATION;
 import static application.SqlStatement.SQL_CREATE_MULTIPLE_CHOICE_QUESTIONNAIRE_RELATION;
+import static application.SqlStatement.SQL_CREATE_SHORT_ANSWER;
+import static application.SqlStatement.SQL_CREATE_SHORT_ANSWER_QUESTIONNAIRE_RELATION;
 import static application.SqlStatement.SQL_DELETE_ANSWERS;
 import static application.SqlStatement.SQL_DELETE_MULTIPLE_CHOICE_ANSWERS_RELATION;
 import static application.SqlStatement.SQL_DELETE_MULTIPLE_CHOICE_ANSWERS_RELATION_BY_ID;
-import static application.SqlStatement.SQL_DELETE_MULTIPLE_CHOICE_QUESTIONNAIRE_RELATION;
+import static application.SqlStatement.SQL_GET_ANSWERS;
 import static application.SqlStatement.SQL_GET_ANSWER_ID;
+import static application.SqlStatement.SQL_GET_CATEGORIES;
 import static application.SqlStatement.SQL_GET_CATEGORY;
 import static application.SqlStatement.SQL_GET_CATEGORY_ID;
+import static application.SqlStatement.SQL_GET_MAX_MULTIPLE_CHOICE_POSITION;
+import static application.SqlStatement.SQL_GET_MAX_SHORT_ANSWER_POSITION;
 import static application.SqlStatement.SQL_GET_MULTIPLE_CHOICE_ANSWERS_RELATION_ID;
 import static application.SqlStatement.SQL_GET_MULTIPLE_CHOICE_ANSWERS_RELATION_IDS;
+import static application.SqlStatement.SQL_GET_MULTIPLE_CHOICE_FLAGS;
 import static application.SqlStatement.SQL_GET_MULTIPLE_CHOICE_ID;
+import static application.SqlStatement.SQL_GET_MULTIPLE_CHOICE_QUESTIONNAIRE_RELATION_ID;
+import static application.SqlStatement.SQL_GET_SHORT_ANSWERS_FLAGS;
+import static application.SqlStatement.SQL_GET_SHORT_ANSWER_ID;
+import static application.SqlStatement.SQL_GET_SHORT_ANSWER_QUESTIONNAIRE_RELATION_ID;
 import static application.SqlStatement.SQL_SET_FLAGS_ON_MULTIPLE_CHOICE_QUESTIONNAIRE_RELATION;
+import static application.SqlStatement.SQL_SET_FLAGS_ON_SHORT_ANSWER_QUESTIONNAIRE_RELATION;
 import static application.SqlStatement.SQL_SET_POSITION_ON_MULTIPLE_CHOICE_QUESTIONNAIRE_RELATION;
+import static application.SqlStatement.SQL_SET_POSITION_ON_SHORT_ANSWER_QUESTIONNAIRE_RELATION;
+import static application.SqlStatement.SQL_UPDATE_MULTIPLE_CHOICE_FLAGS;
+import static application.SqlStatement.SQL_UPDATE_SHORT_ANSWERS_FLAGS;
 
 public class QuestionService extends Database {
     /**
@@ -51,22 +64,13 @@ public class QuestionService extends Database {
      */
     public static ArrayList<String> getAnswers(Question question) {
         try {
-            Connection myCon = DriverManager.getConnection(url, user, pwd);
-            Statement mySQL = myCon.createStatement();
             String text = slashUnicode(question.getQuestion()).replaceAll("\\\\", "\\\\\\\\");
-            String statement = "SELECT Antwort FROM fragebogen JOIN "
-                    + "fb_has_mc ON fragebogen.idFragebogen=fb_has_mc.idFragebogen JOIN "
-                    + "multiplechoice mc1 ON fb_has_mc.idMultipleChoice=mc1.idMultipleChoice JOIN "
-                    + "kategorie ON mc1.idKategorie=kategorie.idKategorie JOIN "
-                    + "mc_has_a ON mc1.idMultipleChoice=mc_has_a.idMultipleChoice JOIN "
-                    + "antworten ON mc_has_a.AntwortNr=antworten.AntwortNr " + "WHERE mc1.FrageMC='" + text + "' "
-                    + "UNION  " + "SELECT Antwort FROM fragebogen JOIN "
-                    + "fb_has_ff ON fragebogen.idFragebogen=fb_has_ff.idFragebogen JOIN "
-                    + "freiefragen ff1 ON fb_has_ff.idFreieFragen=ff1.idFreieFragen JOIN "
-                    + "kategorie ON ff1.idKategorie=kategorie.idKategorie JOIN freiefragen "
-                    + "JOIN ff_has_a ON ff1.idFreieFragen=ff_has_a.idFreieFragen JOIN "
-                    + "antworten ON ff_has_a.AntwortNr=antworten.AntwortNr " + "WHERE ff1.FrageFF='" + text + "'";
-            ResultSet myRS = mySQL.executeQuery(statement);
+            Connection myCon = DriverManager.getConnection(url, user, pwd);
+            PreparedStatement psSql = myCon.prepareStatement(SQL_GET_ANSWERS);
+            psSql.setString(1, text);
+            psSql.setString(2, text);
+
+            ResultSet myRS = psSql.executeQuery();
             ArrayList<String> answers = new ArrayList<>();
 
             while (myRS.next()) {
@@ -77,8 +81,6 @@ public class QuestionService extends Database {
             return answers;
         } catch (SQLException e) {
             e.printStackTrace();
-            //ErrorLog.fehlerBerichtB("ERROR",
-            //		Datenbank.class + ": " + Thread.currentThread().getStackTrace()[1].getLineNumber(), e.getMessage());
         }
         return null;
     }
@@ -86,46 +88,46 @@ public class QuestionService extends Database {
     /**
      * Gibt das Maximum an moeglicher Position im Fragebogen zurueck.
      *
-     * @param fb FragebogenDialog: der Fragebogen
+     * @param questionnaireId FragebogenDialog: der Fragebogen
      * @return int
      */
-    public static int getCountPosition(Questionnaire fb) {
-        int positionCount = 0;
-        int maxPosMc = 0;
-        int maxPosFf = 0;
+    public static int getCountPosition(int questionnaireId) {
+        int maxPosMc = Objects.requireNonNull(getMaxMultipleChoicePosition(questionnaireId));
+        int maxPosFf = Objects.requireNonNull(getMaxShortAnswerPosition(questionnaireId));
+
+        return Math.max(maxPosFf, maxPosMc);
+    }
+
+    public static Integer getMaxMultipleChoicePosition(int questionnaireId) {
         try {
             Connection myCon = DriverManager.getConnection(url, user, pwd);
-            Statement mySQL = myCon.createStatement();
-            String statement = "SELECT MAX(fb_has_mc.Position) AS position FROM fragebogen JOIN fb_has_mc ON fragebogen.idFragebogen=fb_has_mc.idFragebogen WHERE fragebogen.idFragebogen="
-                    + fb.getId();
-            ResultSet myRS = mySQL.executeQuery(statement);
-            if (myRS.next()) {
-                maxPosMc = myRS.getInt("position");
-            }
-
-            myRS = null;
-            mySQL = null;
-            mySQL = myCon.createStatement();
-            statement = "SELECT MAX(fb_has_ff.Position) AS position FROM fragebogen JOIN fb_has_ff ON fragebogen.idFragebogen=fb_has_ff.idFragebogen WHERE fragebogen.idFragebogen="
-                    + fb.getId();
-            myRS = mySQL.executeQuery(statement);
+            PreparedStatement psSql = myCon.prepareStatement(SQL_GET_MAX_MULTIPLE_CHOICE_POSITION);
+            psSql.setInt(1, questionnaireId);
+            ResultSet myRS = psSql.executeQuery();
 
             if (myRS.next()) {
-                maxPosFf = myRS.getInt("position");
+                return myRS.getInt("position");
             }
-            if (maxPosFf > maxPosMc) {
-                positionCount = maxPosFf;
-            } else {
-                positionCount = maxPosMc;
-            }
-
-            myCon.close();
         } catch (SQLException e) {
             e.printStackTrace();
-            //ErrorLog.fehlerBerichtB("ERROR",
-            //		Datenbank.class + ": " + Thread.currentThread().getStackTrace()[1].getLineNumber(), e.getMessage());
         }
-        return positionCount;
+        return null;
+    }
+
+    public static Integer getMaxShortAnswerPosition(int questionnaireId) {
+        try {
+            Connection myCon = DriverManager.getConnection(url, user, pwd);
+            PreparedStatement psSql = myCon.prepareStatement(SQL_GET_MAX_SHORT_ANSWER_POSITION);
+            psSql.setInt(1, questionnaireId);
+            ResultSet myRS = psSql.executeQuery();
+
+            if (myRS.next()) {
+                return myRS.getInt("position");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     /**
@@ -133,23 +135,20 @@ public class QuestionService extends Database {
      *
      * @return ArrayList String aller Kategorien
      */
-    public static ArrayList<String> getKategorie() {
+    public static ArrayList<String> getCategories() {
         try {
             Connection myCon = DriverManager.getConnection(url, user, pwd);
             Statement mySQL = myCon.createStatement();
-            String statement = "SELECT * FROM kategorie";
-            ResultSet myRS = mySQL.executeQuery(statement);
-            ArrayList<String> kategorien = new ArrayList<String>();
+            ResultSet myRS = mySQL.executeQuery(SQL_GET_CATEGORIES);
+            ArrayList<String> categories = new ArrayList<>();
 
             while (myRS.next()) {
-                kategorien.add(unslashUnicode(myRS.getString("Kategorie")));
+                categories.add(unslashUnicode(myRS.getString("Kategorie")));
             }
             myCon.close();
-            return kategorien;
+            return categories;
         } catch (SQLException e) {
             e.printStackTrace();
-            //ErrorLog.fehlerBerichtB("ERROR",
-            //		Datenbank.class + ": " + Thread.currentThread().getStackTrace()[1].getLineNumber(), e.getMessage());
         }
         return null;
     }
@@ -159,7 +158,7 @@ public class QuestionService extends Database {
      *
      * @author Florian
      */
-    public static void getMoeglicheFlags(FlagList flags, FrageEditParam param) {
+    public static void getPossibleFlags(FlagList flags, FrageEditParam param) {
         if (param.isRequired()) {
             flags.add(new Symbol(SymbolType.REQUIRED));
         }
@@ -205,10 +204,9 @@ public class QuestionService extends Database {
      * Gibt bei Erfolg TRUE zurueck.
      *
      * @param question FrageErstellen: die Frage
-     * @return boolean
      */
     // anneSehrNeu
-    public static boolean updateFlags(Question question) {
+    public static void updateFlags(Question question) {
         String statement;
         String flag = "";
         int start = -1;
@@ -326,137 +324,63 @@ public class QuestionService extends Database {
                 }
             }
             myCon.close();
-            return true;
+            return;
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return false;
+        return;
     }
 
     /**
      * Updatet die Flags. Gibt bei Erfolg TRUE zurueck.
      *
-     * @param fb   FragebogenDialog: der Fragebogen
-     * @param type String: Art der Frage
-     * @param id   int: ID der Frage
-     * @return boolean
+     * @param questionnaireId FragebogenDialog: der Fragebogen
+     * @param type            String: Art der Frage
+     * @param questionId      int: ID der Frage
      */
-    public static boolean updateFlags(Questionnaire fb, QuestionType type, int id) {
-        if (type.equals(QuestionType.SHORT_ANSWER)) {
-            try {
-                Connection myCon = DriverManager.getConnection(url, user, pwd);
-                Statement mySQL = myCon.createStatement();
-                String statement = "SELECT Flags FROM Fb_has_FF WHERE idFragebogen=" + fb.getId()
-                        + " AND idFreieFragen=" + id;
-                ResultSet myRS = mySQL.executeQuery(statement);
+    public static void provideQuestionRequired(int questionnaireId, QuestionType type, int questionId) {
+        FlagList flagList = new FlagList(getFlags(questionnaireId, type, questionId));
+        if (!flagList.is(SymbolType.REQUIRED)) {
+            flagList.add(new Symbol(SymbolType.REQUIRED));
 
-                if (myRS.next()) {
-                    if (myRS.getString("Flags").contains("+")) {
-                        return true;
-                    } else {
-                        String flags = myRS.getString("Flags") + " +";
-
-                        mySQL = myCon.createStatement();
-                        statement = "UPDATE Fb_has_FF SET Flags='" + flags + "'  WHERE idFragebogen="
-                                + fb.getId() + " AND idFreieFragen=" + id;
-                        mySQL.executeUpdate(statement);
-                        return true;
-                    }
-
-                } else {
-                    return false;
-                }
-            } catch (SQLException e) {
-                e.printStackTrace();
-                //ErrorLog.fehlerBerichtB("ERROR",
-                //		Datenbank.class + ": " + Thread.currentThread().getStackTrace()[1].getLineNumber(),
-                //		e.getMessage());
-                return false;
-            }
-
-        } else {
-            try {
-                Connection myCon = DriverManager.getConnection(url, user, pwd);
-                Statement mySQL = myCon.createStatement();
-                String statement = "SELECT Flags FROM Fb_has_MC WHERE idFragebogen=" + fb.getId()
-                        + " AND idMultipleChoice=" + id;
-                ResultSet myRS = mySQL.executeQuery(statement);
-
-                if (myRS.next()) {
-                    if (myRS.getString("Flags").contains("+")) {
-                        return true;
-                    } else {
-                        String flags = myRS.getString("Flags") + " +";
-
-                        mySQL = myCon.createStatement();
-                        statement = "UPDATE Fb_has_MC SET Flags='" + flags + "'  WHERE idFragebogen="
-                                + fb.getId() + " AND idMultipleChoice=" + id;
-                        mySQL.executeUpdate(statement);
-                        return true;
-                    }
-                } else {
-                    return false;
-                }
-            } catch (SQLException e) {
-                e.printStackTrace();
-                //ErrorLog.fehlerBerichtB("ERROR",
-                //		Datenbank.class + ": " + Thread.currentThread().getStackTrace()[1].getLineNumber(),
-                //		e.getMessage());
-                return false;
-            }
+            updateFlags(type, flagList.createFlagString(), questionnaireId, questionId);
         }
     }
 
-    /**
-     * Prueft, ob eine Frage Pflichtfrage ist. Gibt bei Erfolg TRUE zurueck.
-     *
-     * @param fb   FragebogenDialog: der Fragebogen
-     * @param type String: Art der Frage
-     * @param id   int: ID der Frage
-     * @return boolean
-     */
-    public static boolean isPflichtfrage(Questionnaire fb, QuestionType type, int id) {
-        if (type.equals(QuestionType.SHORT_ANSWER)) {
-            try {
-                Connection myCon = DriverManager.getConnection(url, user, pwd);
-                Statement mySQL = myCon.createStatement();
-                String statement = "SELECT Flags FROM Fb_has_FF WHERE idFragebogen=" + fb.getId()
-                        + " AND idFreieFragen=" + id;
-                ResultSet myRS = mySQL.executeQuery(statement);
+    public static boolean isQuestionRequired(int questionnaireId, QuestionType type, int questionId) {
+        return Objects.requireNonNull(getFlags(questionnaireId, type, questionId))
+                .contains(SymbolType.REQUIRED.toString());
+    }
 
-                if (myRS.next()) {
-                    return myRS.getString("Flags").contains("+");
-                } else {
-                    return false;
-                }
-            } catch (SQLException e) {
-                e.printStackTrace();
-                //rrorLog.fehlerBerichtB("ERROR",
-                //		Datenbank.class + ": " + Thread.currentThread().getStackTrace()[1].getLineNumber(),
-                //		e.getMessage());
-                return false;
+    public static String getFlags(int questionnaireId, QuestionType type, int questionId) {
+        try {
+            Connection myCon = DriverManager.getConnection(url, user, pwd);
+            PreparedStatement psSql = myCon.prepareStatement(type.equals(QuestionType.SHORT_ANSWER) ?
+                    SQL_GET_SHORT_ANSWERS_FLAGS : SQL_GET_MULTIPLE_CHOICE_FLAGS);
+            psSql.setInt(1, questionnaireId);
+            psSql.setInt(2, questionId);
+            ResultSet myRS = psSql.executeQuery();
+
+            if (myRS.next()) {
+                return myRS.getString("Flags");
             }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 
-        } else {
-            try {
-                Connection myCon = DriverManager.getConnection(url, user, pwd);
-                Statement mySQL = myCon.createStatement();
-                String statement = "SELECT Flags FROM Fb_has_MC WHERE idMultipleChoice=" + fb.getId()
-                        + " AND idMultipleChoice=" + id;
-                ResultSet myRS = mySQL.executeQuery(statement);
-
-                if (myRS.next()) {
-                    return myRS.getString("Flags").contains("+");
-                } else {
-                    return false;
-                }
-            } catch (SQLException e) {
-                e.printStackTrace();
-                //ErrorLog.fehlerBerichtB("ERROR",
-                //		Datenbank.class + ": " + Thread.currentThread().getStackTrace()[1].getLineNumber(),
-                //		e.getMessage());
-                return false;
-            }
+    public static void updateFlags(QuestionType type, String flags, int questionnaireId, int questionId) {
+        try {
+            Connection myCon = DriverManager.getConnection(url, user, pwd);
+            PreparedStatement psSql = myCon.prepareStatement(type.equals(QuestionType.SHORT_ANSWER) ?
+                    SQL_UPDATE_SHORT_ANSWERS_FLAGS : SQL_UPDATE_MULTIPLE_CHOICE_FLAGS);
+            psSql.setString(1, flags);
+            psSql.setInt(2, questionnaireId);
+            psSql.setInt(3, questionId);
+            psSql.execute();
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
     }
 
@@ -468,6 +392,7 @@ public class QuestionService extends Database {
      * @return String: die Frage ggf. mit Suffix
      * @author Eric
      */
+    //TODO Duplicate Prozess und Mehrfachverwendung von Fragen überarbeiten
     public static String duplicateQuestion(String question) {
         try {
             Connection myCon = DriverManager.getConnection(url, user, pwd);
@@ -535,197 +460,27 @@ public class QuestionService extends Database {
     /**
      * Speichert eine neue Freie Frage. Gibt bei Erfolg TRUE zurÃ¼ck.
      *
-     * @param selectedFB FragebogenDialog
-     * @param question   FrageErstellen
-     * @return boolean
+     * @param
+     * @param question FrageErstellen
      * @author Anne
      */
-    public static boolean saveShortAnswerQuestion(Questionnaire selectedFB, Question question) {
+    public static void saveShortAnswerQuestion(int questionnaireId, Question question) {
 
-        try {
-            Connection myCon = DriverManager.getConnection(url, user, pwd);
-            String statement;
-            int idKategorie = -1;
-            int idFreieFrage = -1;
-            int idFragebogen = selectedFB.getId();
+        // category
+        Integer categoryId = provideCategoryId(question.getCategory());
 
-            if (question.getQuestionId() == 0) {
-                statement = "SELECT idFreieFragen FROM FreieFragen WHERE FrageFF=?";
-                PreparedStatement psSql = myCon.prepareStatement(statement);
-                psSql.setString(1, slashUnicode(question.getQuestion()));
-                ResultSet myRS = psSql.executeQuery();
+        // question
+        Integer shortAnswerId = provideShortAnswerQuestion(question.getQuestion(), categoryId);
 
-                if (myRS.next()) {
-                    idFreieFrage = myRS.getInt("idFreieFragen");
-                }
-                psSql = null;
-                myRS = null;
-            } else {
-                idFreieFrage = question.getQuestionId();
-            }
+        // questionnaire
+        Integer relationId = getShortAnswerQuestionnaireRelationId(questionnaireId, shortAnswerId);
 
-            Statement mySQL = myCon.createStatement();
-            statement = "SELECT idKategorie FROM kategorie WHERE Kategorie=?";
-            PreparedStatement psSql = myCon.prepareStatement(statement);
-            psSql.setString(1, slashUnicode(question.getCategory()));
-            ResultSet myRS = psSql.executeQuery();
-
-            if (myRS.next()) {
-                idKategorie = myRS.getInt("idKategorie");
-            } else {
-                psSql = null;
-                mySQL = null;
-
-                mySQL = myCon.createStatement();
-                statement = "INSERT INTO Kategorie VALUES(NULL, ?)";
-                psSql = myCon.prepareStatement(statement);
-                psSql.setString(1, slashUnicode(question.getCategory()));
-                psSql.executeUpdate();
-
-                psSql = null;
-                mySQL = null;
-                myRS = null;
-
-                mySQL = myCon.createStatement();
-                statement = "SELECT idKategorie FROM kategorie WHERE Kategorie=?";
-                psSql = myCon.prepareStatement(statement);
-                psSql.setString(1, slashUnicode(question.getCategory()));
-                myRS = psSql.executeQuery();
-
-                if (myRS.next()) {
-                    idKategorie = myRS.getInt("idKategorie");
-                }
-            }
-            mySQL = null;
-            myRS = null;
-            psSql = null;
-
-            mySQL = myCon.createStatement();
-            statement = "SELECT idKategorie, idFreieFragen FROM FreieFragen WHERE idFreieFragen=" + idFreieFrage;
-            myRS = mySQL.executeQuery(statement);
-
-            if (myRS.next()) {
-                mySQL = null;
-                if (myRS.getInt("idKategorie") != idKategorie) {
-                    mySQL = myCon.createStatement();
-                    statement = "UPDATE FreieFragen SET idKategorie=" + idKategorie + " WHERE idFreieFragen="
-                            + idFreieFrage;
-                    mySQL.execute(statement);
-                    mySQL = null;
-                }
-                mySQL = myCon.createStatement();
-                statement = "UPDATE FreieFragen SET FrageFF=? WHERE idFreieFragen=" + idFreieFrage;
-                psSql = myCon.prepareStatement(statement);
-                psSql.setString(1, slashUnicode(question.getQuestion()));
-                psSql.executeUpdate();
-
-            } else {
-                psSql = null;
-                mySQL.close();
-                mySQL = null;
-
-                mySQL = myCon.createStatement();
-                statement = "INSERT INTO FreieFragen VALUES(NULL, ? ," + idKategorie + ")";
-                psSql = myCon.prepareStatement(statement);
-                psSql.setString(1, slashUnicode(question.getQuestion()));
-                psSql.executeUpdate();
-
-                mySQL = null;
-                myRS = null;
-                psSql = null;
-
-                mySQL = myCon.createStatement();
-                statement = "SELECT idFreieFragen FROM FreieFragen WHERE FrageFF=?";
-                psSql = myCon.prepareStatement(statement);
-                psSql.setString(1, slashUnicode(question.getQuestion()));
-                myRS = psSql.executeQuery();
-
-                if (myRS.next()) {
-                    idFreieFrage = myRS.getInt("idFreieFragen");
-                }
-            }
-
-            mySQL = null;
-            myRS = null;
-            psSql = null;
-
-            mySQL = myCon.createStatement();
-            statement = "SELECT idRelFBFF FROM FB_HAS_FF WHERE idFragebogen=" + idFragebogen + " AND idFreieFragen="
-                    + idFreieFrage;
-            myRS = mySQL.executeQuery(statement);
-
-            if (myRS.next()) {
-                int idRelFBFF = myRS.getInt("idRelFBFF");
-                mySQL = null;
-                myRS = null;
-                mySQL = myCon.createStatement();
-                statement = "UPDATE FB_HAS_FF SET Flags='" + question.getFlags().createFlagString() + "' WHERE idRelFBFF=" + idRelFBFF;
-                mySQL.executeUpdate(statement);
-
-                mySQL = null;
-                myRS = null;
-                mySQL = myCon.createStatement();
-                statement = "UPDATE FB_HAS_FF SET Position=" + question.getPosition() + " WHERE idRelFBFF=" + idRelFBFF;
-                mySQL.executeUpdate(statement);
-            } else {
-                mySQL.close();
-                mySQL = myCon.createStatement();
-                statement = "INSERT INTO Fb_has_FF VALUES (NULL," + idFragebogen + "," + idFreieFrage + ","
-                        + question.getPosition() + ",'" + question.getFlags().createFlagString() + "')";
-                mySQL.executeUpdate(statement);
-                mySQL = null;
-                myRS = null;
-            }
-
-            psSql = null;
-            mySQL = null;
-            myRS = null;
-            myCon.close();
-            return true;
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-            //ErrorLog.fehlerBerichtB("ERROR",
-            //		Datenbank.class + ": " + Thread.currentThread().getStackTrace()[1].getLineNumber(), e.getMessage());
+        if (relationId != null) {
+            setFlagsOnShortAnswerQuestionnaireRelation(question.getFlags().createFlagString(), relationId);
+            setPositionOnShortAnswerQuestionnaireRelation(question.getPosition(), relationId);
+        } else {
+            createShortAnswerQuestionnaireRelation(questionnaireId, shortAnswerId, question.getPosition(), question.getFlags().createFlagString());
         }
-        return false;
-    }
-
-    /**
-     * Gibt die ID der Antwort zurÃ¼ck. Ist die Antwort noch nicht vorhanden,
-     * wird sie zuerst in der Datenbank gespeichert.
-     *
-     * @param answer String
-     * @return int
-     * @author Eric
-     */
-    public static int provideAnswerId(String answer) {
-        Integer id;
-
-        id = getAnswerId(Objects.requireNonNull(answer));
-
-        if (id == null) {
-            createAnswer(answer);
-            id = getAnswerId(answer);
-        }
-
-        return Objects.requireNonNull(id);
-    }
-
-    /**
-     * Loescht die gegebene Antwort. Gibt bei Erfolg TRUE zurueck.
-     *
-     * @param answerIds        ArrayList<Integer>: ids der zu-lÃ¶schendenen Antworten
-     * @param multipleChoiceId int: die zugehÃ¶rige Frage
-     */
-    // anneSehrNeu
-    public static void deleteAnswers(ArrayList<Integer> answerIds, int multipleChoiceId) {
-
-        for (Integer answerId : answerIds) {
-            deleteMultipleChoiceAnswersRelation(answerId, multipleChoiceId);
-        }
-
-        deleteAnswers();
     }
 
     /**
@@ -735,24 +490,11 @@ public class QuestionService extends Database {
      */
     public static void saveMultipleChoice(int questionnaireId, Question question, ArrayList<Integer> answersIds) {
 
-        Integer multipleChoiceId;
-        Integer categoryId;
-
-        multipleChoiceId = getMultipleChoiceId(question.getQuestion());
-
         // category
-        categoryId = getCategoryId(question.getCategory());
-
-        if (categoryId == null) {
-            createCategory(question.getCategory());
-            categoryId = getCategoryId(question.getCategory());
-        }
+        Integer categoryId = provideCategoryId(question.getCategory());
 
         // question
-        if (multipleChoiceId == null) {
-            createMultipleChoiceQuestion(question.getQuestion(), Objects.requireNonNull(categoryId));
-            multipleChoiceId = getMultipleChoiceId(question.getQuestion());
-        }
+        Integer multipleChoiceId = provideMultipleChoiceQuestion(question.getQuestion(), categoryId);
 
         // answers
         List<Integer> oldRelationIds = getMultipleChoiceAnswersRelationIds(Objects.requireNonNull(multipleChoiceId));
@@ -793,24 +535,11 @@ public class QuestionService extends Database {
      */
     public static void saveEvaluationQuestion(int questionnaireId, Question question) {
 
-        Integer categoryId;
-        Integer evaluationQuestionId;
-
-        evaluationQuestionId = getMultipleChoiceId(question.getQuestion());
-
         // category
-        categoryId = getCategoryId(question.getCategory());
-
-        if (categoryId == null) {
-            createCategory(question.getCategory());
-            categoryId = getCategoryId(question.getCategory());
-        }
+        Integer categoryId = provideCategoryId(question.getCategory());
 
         // question
-        if (evaluationQuestionId == null) {
-            createMultipleChoiceQuestion(question.getQuestion(), Objects.requireNonNull(categoryId));
-            evaluationQuestionId = getMultipleChoiceId(question.getQuestion());
-        }
+        Integer evaluationQuestionId = provideMultipleChoiceQuestion(question.getQuestion(), categoryId);
 
         // questionnaire
         Integer relationId = getMultipleChoiceQuestionnaireRelationId(questionnaireId, Objects.requireNonNull(evaluationQuestionId));
@@ -833,23 +562,63 @@ public class QuestionService extends Database {
         }
     }
 
-    public static boolean createCategory(String category) {
+    /**
+     * Gibt die ID der Antwort zurÃ¼ck. Ist die Antwort noch nicht vorhanden,
+     * wird sie zuerst in der Datenbank gespeichert.
+     *
+     * @param answer String
+     * @return int
+     * @author Eric
+     */
+    public static int provideAnswerId(String answer) {
+        Integer id;
+
+        id = getAnswerId(Objects.requireNonNull(answer));
+
+        if (id == null) {
+            createAnswer(answer);
+            id = getAnswerId(answer);
+        }
+
+        return Objects.requireNonNull(id);
+    }
+
+    /**
+     * Loescht die gegebene Antwort. Gibt bei Erfolg TRUE zurueck.
+     *
+     * @param answerIds        ArrayList<Integer>: ids der zu-lÃ¶schendenen Antworten
+     * @param multipleChoiceId int: die zugehÃ¶rige Frage
+     */
+    // anneSehrNeu
+    public static void deleteAnswers(ArrayList<Integer> answerIds, int multipleChoiceId) {
+
+        for (Integer answerId : answerIds) {
+            deleteMultipleChoiceAnswersRelation(answerId, multipleChoiceId);
+        }
+
+        deleteAnswers();
+    }
+
+    public static boolean provideCategory(String category) {
+        if (checkCategory(category)) {
+            Notifications.create().title("Kategorie anlegen").text("Die Kategorie existiert bereits!").showError();
+        } else {
+            createCategory(category);
+        }
+        //TODO Bool Wert entfernen
+        return true;
+    }
+
+    public static void createCategory(String category) {
         try {
-            if (checkCategory(category)) {
-                Notifications.create().title("Kategorie anlegen").text("Die Kategorie existiert bereits!").showError();
-            } else {
-                Connection myCon = DriverManager.getConnection(url, user, pwd);
-                PreparedStatement psSql = myCon.prepareStatement(SQL_CREATE_CATEGORY);
-                psSql.execute();
-                myCon.close();
-            }
-            return true;
+            Connection myCon = DriverManager.getConnection(url, user, pwd);
+            PreparedStatement psSql = myCon.prepareStatement(SQL_CREATE_CATEGORY);
+            psSql.setString(1, category);
+            psSql.execute();
+
         } catch (SQLException e) {
             e.printStackTrace();
-            //ErrorLog.fehlerBerichtB("ERROR",
-            //		Datenbank.class + ": " + Thread.currentThread().getStackTrace()[1].getLineNumber(), e.getMessage());
         }
-        return false;
     }
 
     public static boolean checkCategory(String category) {
@@ -886,6 +655,22 @@ public class QuestionService extends Database {
         return null;
     }
 
+    public static Integer getShortAnswerId(String question) {
+        try {
+            Connection myCon = DriverManager.getConnection(url, user, pwd);
+            PreparedStatement psSql = myCon.prepareStatement(SQL_GET_SHORT_ANSWER_ID);
+            psSql.setString(1, slashUnicode(question));
+            ResultSet myRS = psSql.executeQuery();
+
+            if (myRS.next()) {
+                return myRS.getInt("multipleChoiceId");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     public static Integer getCategoryId(String category) {
         try {
             Connection myCon = DriverManager.getConnection(url, user, pwd);
@@ -902,6 +687,17 @@ public class QuestionService extends Database {
         return null;
     }
 
+    public static Integer provideCategoryId(String category) {
+        Integer categoryId = getCategoryId(category);
+
+        if (categoryId == null) {
+            provideCategory(category);
+            categoryId = getCategoryId(category);
+        }
+
+        return categoryId;
+    }
+
     public static void createMultipleChoiceQuestion(String question, int categoryId) {
         try {
             Connection myCon = DriverManager.getConnection(url, user, pwd);
@@ -912,6 +708,40 @@ public class QuestionService extends Database {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    public static Integer provideMultipleChoiceQuestion(String question, int categoryId) {
+        Integer multipleChoiceId = getMultipleChoiceId(question);
+
+        if (multipleChoiceId == null) {
+            createMultipleChoiceQuestion(question, categoryId);
+            multipleChoiceId = getMultipleChoiceId(question);
+        }
+
+        return multipleChoiceId;
+    }
+
+    public static void createShortAnswerQuestion(String question, int categoryId) {
+        try {
+            Connection myCon = DriverManager.getConnection(url, user, pwd);
+            PreparedStatement psSql = myCon.prepareStatement(SQL_CREATE_SHORT_ANSWER);
+            psSql.setString(1, slashUnicode(question));
+            psSql.setInt(2, categoryId);
+            psSql.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static Integer provideShortAnswerQuestion(String question, int categoryId) {
+        Integer shortAnswerId = getShortAnswerId(question);
+
+        if (shortAnswerId == null) {
+            createShortAnswerQuestion(question, categoryId);
+            shortAnswerId = getShortAnswerId(question);
+        }
+
+        return shortAnswerId;
     }
 
     public static List<Integer> getMultipleChoiceAnswersRelationIds(int multipleChoiceId) {
@@ -987,7 +817,7 @@ public class QuestionService extends Database {
     public static Integer getMultipleChoiceQuestionnaireRelationId(int questionnaireId, int multipleChoiceId) {
         try {
             Connection myCon = DriverManager.getConnection(url, user, pwd);
-            PreparedStatement psSql = myCon.prepareStatement(SQL_DELETE_MULTIPLE_CHOICE_QUESTIONNAIRE_RELATION);
+            PreparedStatement psSql = myCon.prepareStatement(SQL_GET_MULTIPLE_CHOICE_QUESTIONNAIRE_RELATION_ID);
             psSql.setInt(1, questionnaireId);
             psSql.setInt(2, multipleChoiceId);
             ResultSet myRS = psSql.executeQuery();
@@ -1001,24 +831,65 @@ public class QuestionService extends Database {
         return null;
     }
 
-    public static void setFlagsOnMultipleChoiceQuestionnaireRelation(String flags, int multipleChoiceQuestionnaireRelationId) {
+    public static Integer getShortAnswerQuestionnaireRelationId(int questionnaireId, int shortAnswerId) {
+        try {
+            Connection myCon = DriverManager.getConnection(url, user, pwd);
+            PreparedStatement psSql = myCon.prepareStatement(SQL_GET_SHORT_ANSWER_QUESTIONNAIRE_RELATION_ID);
+            psSql.setInt(1, questionnaireId);
+            psSql.setInt(2, shortAnswerId);
+            ResultSet myRS = psSql.executeQuery();
+
+            if (myRS.next()) {
+                return myRS.getInt("idRelFBMC");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static void setFlagsOnMultipleChoiceQuestionnaireRelation(String flags, int relationId) {
         try {
             Connection myCon = DriverManager.getConnection(url, user, pwd);
             PreparedStatement psSql = myCon.prepareStatement(SQL_SET_FLAGS_ON_MULTIPLE_CHOICE_QUESTIONNAIRE_RELATION);
             psSql.setString(1, flags);
-            psSql.setInt(2, multipleChoiceQuestionnaireRelationId);
+            psSql.setInt(2, relationId);
             psSql.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
 
-    public static void setPositionOnMultipleChoiceQuestionnaireRelation(int position, int multipleChoiceQuestionnaireRelationId) {
+    public static void setFlagsOnShortAnswerQuestionnaireRelation(String flags, int relationId) {
+        try {
+            Connection myCon = DriverManager.getConnection(url, user, pwd);
+            PreparedStatement psSql = myCon.prepareStatement(SQL_SET_FLAGS_ON_SHORT_ANSWER_QUESTIONNAIRE_RELATION);
+            psSql.setString(1, flags);
+            psSql.setInt(2, relationId);
+            psSql.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void setPositionOnMultipleChoiceQuestionnaireRelation(int position, int relationId) {
         try {
             Connection myCon = DriverManager.getConnection(url, user, pwd);
             PreparedStatement psSql = myCon.prepareStatement(SQL_SET_POSITION_ON_MULTIPLE_CHOICE_QUESTIONNAIRE_RELATION);
             psSql.setInt(1, position);
-            psSql.setInt(2, multipleChoiceQuestionnaireRelationId);
+            psSql.setInt(2, relationId);
+            psSql.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void setPositionOnShortAnswerQuestionnaireRelation(int position, int relationId) {
+        try {
+            Connection myCon = DriverManager.getConnection(url, user, pwd);
+            PreparedStatement psSql = myCon.prepareStatement(SQL_SET_POSITION_ON_SHORT_ANSWER_QUESTIONNAIRE_RELATION);
+            psSql.setInt(1, position);
+            psSql.setInt(2, relationId);
             psSql.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -1031,6 +902,20 @@ public class QuestionService extends Database {
             PreparedStatement psSql = myCon.prepareStatement(SQL_CREATE_MULTIPLE_CHOICE_QUESTIONNAIRE_RELATION);
             psSql.setInt(1, questionnaireId);
             psSql.setInt(2, multipleChoiceId);
+            psSql.setInt(3, position);
+            psSql.setString(4, flags);
+            psSql.execute();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void createShortAnswerQuestionnaireRelation(int questionnaireId, int shortAnswerId, int position, String flags) {
+        try {
+            Connection myCon = DriverManager.getConnection(url, user, pwd);
+            PreparedStatement psSql = myCon.prepareStatement(SQL_CREATE_SHORT_ANSWER_QUESTIONNAIRE_RELATION);
+            psSql.setInt(1, questionnaireId);
+            psSql.setInt(2, shortAnswerId);
             psSql.setInt(3, position);
             psSql.setString(4, flags);
             psSql.execute();
