@@ -87,7 +87,7 @@ public class AdminController {
 	
 	private void getData() {
 		data.clear();
-		questionnaire = AdminService.getFragebogen(GlobalVars.location);
+		questionnaire = AdminService.getQuestionnaires(GlobalVars.location);
 		//System.out.println(fragebogen.toString());
 		data.addAll(Objects.requireNonNull(questionnaire));
 	}
@@ -104,17 +104,17 @@ public class AdminController {
 		dateCol.setCellValueFactory(new PropertyValueFactory<Questionnaire, String>("date"));
 		//activCol.setCellValueFactory(new PropertyValueFactory<Fragebogen, Boolean>("activ"));
 		activCol.setCellValueFactory(cellData -> {
-            Questionnaire cellValue = cellData.getValue();
-            ObservableBooleanValue property = cellValue.isActive();
+            Questionnaire questionnaire = cellData.getValue();
+            ObservableBooleanValue property = questionnaire.isActive();
 
             // Add listener to handler change
             property.addListener((observable, oldValue, newValue) -> {
-            	cellValue.setActive(newValue);
+            	questionnaire.setActive(newValue);
             	if(newValue) {
-            		AdminService.activateFragebogen(cellValue);
-            		GlobalVars.activeQuestionnaire = cellValue;
+            		AdminService.activateQuestionnaire(questionnaire.getId());
+            		GlobalVars.activeQuestionnaire = questionnaire;
             	} else {
-            		AdminService.disableQuestionnaire(cellValue);
+            		AdminService.disableQuestionnaire(questionnaire.getId());
             		GlobalVars.activeQuestionnaire = null;
             	}
             	StartController.setStartText();
@@ -224,7 +224,7 @@ public class AdminController {
 											tbl_fragebogen.refresh();
 											Notifications.create().title("Fragebogen kopieren").text("Der Fragebogen \"" + questionnaire1.getName() + "\" wurde erfolgreich\nnach \"" + ort  + "\" kopiert.").show();
 										} else {
-											Notifications.create().title("Excel Export").text("Ein Fehler ist aufgetreten.").showError();
+											Notifications.create().title("Fragebogen kopieren").text("Ein Fehler ist aufgetreten.").showError();
 										}
 									}
 								);
@@ -397,7 +397,7 @@ public class AdminController {
 
 								Optional<ButtonType> result = alert.showAndWait();
 								if (result.isPresent() && result.get() == ButtonType.OK){
-									if(AdminService.deleteQuestionnaire(questionnaire1)) {
+									if(AdminService.deleteQuestionnaire(questionnaire1.getId())) {
 										getData();
 										tbl_fragebogen.refresh();
 										Notifications.create().title("Fragebogen löschen").text("Fragebogen \"" + questionnaire1.getName() + "\" wurde erfolgreich abgeschlossen.").show();

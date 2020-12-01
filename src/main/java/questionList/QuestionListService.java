@@ -2,291 +2,321 @@ package questionList;
 
 import application.Database;
 import flag.FlagList;
+import flag.React;
+import model.Answer;
 import model.Question;
 import model.QuestionType;
-import model.Questionnaire;
+import question.QuestionService;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.List;
+
+import static application.SqlStatement.SQL_DELETE_MULTIPLE_CHOICE;
+import static application.SqlStatement.SQL_DELETE_MULTIPLE_CHOICE_ANSWERS_RELATION_BY_QUESTION_ID;
+import static application.SqlStatement.SQL_DELETE_MULTIPLE_CHOICE_QUESTIONNAIRE_RELATION;
+import static application.SqlStatement.SQL_DELETE_SHORT_ANSWER;
+import static application.SqlStatement.SQL_DELETE_SHORT_ANSWER_HAS_ANSWERS_RELATION_BY_QUESTION_ID;
+import static application.SqlStatement.SQL_DELETE_SHORT_ANSWER_QUESTIONNAIRE_RELATION;
+import static application.SqlStatement.SQL_GET_HEADLINES;
+import static application.SqlStatement.SQL_GET_MULTIPLE_CHOICE_IDS_BY_QUESTIONNAIRE_ID;
+import static application.SqlStatement.SQL_GET_MULTIPLE_CHOICE_QUESTION_ANSWERS;
+import static application.SqlStatement.SQL_GET_OTHER_MULTIPLE_CHOICE_QUESTIONNAIRE_RELATION_IDS;
+import static application.SqlStatement.SQL_GET_OTHER_SHORT_ANSWER_QUESTIONNAIRE_RELATION_IDS;
+import static application.SqlStatement.SQL_GET_SHORT_ANSWER_IDS_BY_QUESTIONNAIRE_ID;
+import static application.SqlStatement.SQL_GET_TARGET_QUESTION_FLAG_AND_ID_FOR_MULTIPLE_CHOICE;
+import static application.SqlStatement.SQL_GET_TARGET_QUESTION_FLAG_AND_ID_FOR_SHORT_ANSWER;
+import static application.SqlStatement.SQL_UPDATE_MULTIPLE_CHOICE_FLAGS;
+import static application.SqlStatement.SQL_UPDATE_SHORT_ANSWERS_FLAGS;
 
 public class QuestionListService extends Database {
-	/**
-	 * Gibt alle Ueberschriften des gegebenen Fragebogen zurueck.
-	 * 
-	 * @param fb
-	 *            FrageobgenDialog: der Fragebogen
-	 * @return ArrayList FrageErstellen
-	 * @author Eric
-	 */
-	public static ArrayList<Question> getUeberschriften(Questionnaire fb) {
-		ArrayList<Question> ueberschriften = new ArrayList<>();
-		try {
-			Connection myCon = DriverManager.getConnection(url, user, pwd);
-			Statement mySQL = myCon.createStatement();
-			String statment = "SELECT mc1.FrageMC, mc1.idMultipleChoice, Fragebogen.Datum, fb_has_mc.Position, fb_has_mc.Flags, Kategorie, Antwort FROM fragebogen JOIN fb_has_mc ON fragebogen.idFragebogen=fb_has_mc.idFragebogen JOIN multiplechoice mc1 ON fb_has_mc.idMultipleChoice=mc1.idMultipleChoice JOIN kategorie ON mc1.idKategorie=kategorie.idKategorie JOIN mc_has_a ON mc1.idMultipleChoice=mc_has_a.idMultipleChoice JOIN antworten ON mc_has_a.AntwortNr=antworten.AntwortNr WHERE Fragebogen.idFragebogen="
-					+ fb.getId() + " AND antwort='#####'";
-			ResultSet myRS = mySQL.executeQuery(statment);
-			while (myRS.next()) {
-				Question question = new Question();
-				question.setQuestion(unslashUnicode(myRS.getString("FrageMC")));
-				question.setQuestionId(myRS.getInt("idMultipleChoice"));
-				question.setCategory(unslashUnicode(myRS.getString("Kategorie")));
-				question.setDate(myRS.getString("Datum"));
-				question.setFlags(new FlagList());
-				question.setPosition(Integer.parseInt(myRS.getString("Position")));
-				question.setQuestionType(QuestionType.MULTIPLE_CHOICE);
-				question.setQuestionnaireId(fb.getId());
-				question.addAnswerOption(myRS.getString("Antwort"));
-				ueberschriften.add(question);
-			}
-			myCon.close();
-		} catch (SQLException e) {
-			//ErrorLog.fehlerBerichtB("ERROR",
-			//		Datenbank.class + ": " + Thread.currentThread().getStackTrace()[1].getLineNumber(), e.getMessage());
-			e.printStackTrace();
-		}
-		return ueberschriften;
-	}
-	
-	/**
-	 * Loescht die gegebene Frage. Gibt bei Erfolg TRUE zurueck.
-	 * 
-	 * @param question
-	 *            FrageErstellen: die Frage
-	 * @return boolean
-	 */
-	// anneSehrNeu
-	public static boolean deleteFrage(Question question) {
-		ArrayList<Integer> antmcnr = new ArrayList<Integer>(); // IDs der Antworten
-															// aus MC Fragen
-		ArrayList<String> antwortenmc = new ArrayList<String>(); // Antworten zu MC
-															// Fragen
-		String statement;
-		int start = -1;
-		int end = -1;
 
-		try {
-			Connection myCon = DriverManager.getConnection(url, user, pwd);
-			if (question.getQuestionType().equals(QuestionType.MULTIPLE_CHOICE)) {
-				Statement mySQL = myCon.createStatement();
-				statement = "SELECT flags, idMultipleChoice FROM FB_has_mc where flags LIKE '%__" + question.getQuestionId()
-						+ "A%'";
-				ResultSet myRS = mySQL.executeQuery(statement);
+    public static ArrayList<Question> getHeadlines(int questionnaireId) {
+        ArrayList<Question> headlines = new ArrayList<>();
+        try {
+            Connection myCon = DriverManager.getConnection(url, user, pwd);
+            PreparedStatement psSql = myCon.prepareStatement(SQL_GET_HEADLINES);
+            psSql.setInt(1, questionnaireId);
+            ResultSet myRS = psSql.executeQuery();
+            while (myRS.next()) {
+                Question question = new Question();
+                question.setQuestion(unslashUnicode(myRS.getString("FrageMC")));
+                question.setQuestionId(myRS.getInt("idMultipleChoice"));
+                question.setCategory(unslashUnicode(myRS.getString("Kategorie")));
+                question.setDate(myRS.getString("Datum"));
+                question.setFlags(new FlagList());
+                question.setPosition(Integer.parseInt(myRS.getString("Position")));
+                question.setQuestionType(QuestionType.MULTIPLE_CHOICE);
+                question.setQuestionnaireId(questionnaireId);
+                question.addAnswerOption(myRS.getString("Antwort"));
+                headlines.add(question);
+            }
+            myCon.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return headlines;
+    }
 
-				// Flags updaten, wenn eine Frage auf die zu lÃ¶schende Frage
-				// reagiert
-				while (myRS.next()) {
-					String flag = myRS.getString("flags");
-					Pattern MY_PATTERN = Pattern.compile("[MCFF][0-9]+A[0-9]+");
-					Matcher mges = MY_PATTERN.matcher(flag);
+    /**
+     * Loescht die gegebene Frage
+     *
+     * @param question FrageErstellen: die Frage
+     */
+    // anneSehrNeu
+    public static void deleteQuestion(int questionnaireId, Question question) {
+        deleteQuestion(questionnaireId, question.getQuestionId(), question.getQuestionType());
+    }
 
-					if (mges.find()) {
-						start = mges.start() - 1;
-						end = mges.end() + 1;
+    public static void deleteQuestion(int questionnaireId, int questionId, QuestionType questionType) {
+        deleteMultipleChoiceReactFlagsFromTargetQuestion(questionnaireId, questionId);
+        deleteShortAnswerReactFlagsFromTargetQuestion(questionnaireId, questionId);
 
-						StringBuilder sb = new StringBuilder(flag);
-						StringBuilder afterRemove = sb.delete(start, end);
-						flag = afterRemove.toString();
+        if (questionType.equals(QuestionType.MULTIPLE_CHOICE)) {
 
-						mySQL = myCon.createStatement();
-						statement = "UPDATE fb_has_mc SET flags='" + flag + "' WHERE idMultiplechoice="
-								+ myRS.getInt("idMultipleChoice");
-						mySQL.execute(statement);
-					}
-				}
+            deleteMultipleChoiceQuestionnaireRelation(questionnaireId, questionId);
 
-				mySQL = myCon.createStatement();
-				statement = "SELECT flags, idFreieFragen FROM FB_has_ff WHERE flags LIKE '%__" + question.getQuestionId()
-						+ "A%'";
-				myRS = mySQL.executeQuery(statement);
+            if (!doesMultipleChoiceQuestionExistsInOtherQuestionnaire(questionnaireId, questionId)) {
 
-				// Flags updaten, wenn eine Frage auf die zu lÃ¶schende Frage
-				// reagiert
-				while (myRS.next()) {
-					String flag = myRS.getString("flags");
-					Pattern MY_PATTERN = Pattern.compile("[MCFF][0-9]+A[0-9]+");
-					Matcher mges = MY_PATTERN.matcher(flag);
+                deleteMultipleChoiceHasAnswerRelation(questionId);
+                deleteMultipleChoiceQuestion(questionId);
+            }
+        } else if (questionType.equals(QuestionType.SHORT_ANSWER)) {
+            deleteShortAnswerQuestionnaireRelation(questionnaireId, questionId);
 
-					if (mges.find()) {
-						start = mges.start() - 1;
-						end = mges.end() + 1;
+            if (!doesShortAnswerQuestionExistsInOtherQuestionnaire(questionnaireId, questionId)) {
 
-						StringBuilder sb = new StringBuilder(flag);
-						StringBuilder afterRemove = sb.delete(start, end);
-						flag = afterRemove.toString();
+                deleteShortAnswerHasAnswerRelation(questionId);
+                deleteShortAnswerQuestion(questionId);
+            }
+        }
 
-						mySQL = myCon.createStatement();
-						statement = "UPDATE fb_has_ff SET flags='" + flag + "' WHERE idFreieFragen="
-								+ myRS.getInt("idFreieFragen");
-						mySQL.execute(statement);
-					}
-				}
+        QuestionService.deleteAnswers();
+    }
 
-				mySQL = myCon.createStatement();
-				statement = "SELECT Antworten.AntwortNr, Antworten.Antwort FROM multiplechoice mc JOIN mc_has_a ON mc.idMultipleChoice=mc_has_a.idMultipleChoice JOIN antworten "
-						+ "ON mc_has_a.AntwortNr=antworten.AntwortNr WHERE mc.idmultiplechoice=" + question.getQuestionId();
-				myRS = mySQL.executeQuery(statement);
+    public static void deleteShortAnswerQuestion(int questionId) {
+        try {
+            Connection myCon = DriverManager.getConnection(url, user, pwd);
+            PreparedStatement psSql = myCon.prepareStatement(SQL_DELETE_SHORT_ANSWER);
+            psSql.setInt(1, questionId);
 
-				while (myRS.next()) {
-					if (!antmcnr.isEmpty()) {
-						for (int i = 0; i < antmcnr.size(); i++) {
-							if (myRS.getInt("AntwortNr") != antmcnr.get(i)
-									&& !myRS.getString("Antwort").equals(antwortenmc.get(i))) {
-								antmcnr.add(myRS.getInt("AntwortNr"));
-								antwortenmc.add(myRS.getString("Antwort"));
-							}
-						}
-					} else {
-						antmcnr.add(myRS.getInt("AntwortNr"));
-						antwortenmc.add(myRS.getString("Antwort"));
-					}
-				}
+            psSql.execute();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 
-				// Antworten, die noch in einem anderen Fragebogen vorkommen,
-				// aus dem ArrayList entfernen
-				while (myRS.next()) {
-					for (int i = 0; i < antmcnr.size(); i++) {
-						if (myRS.getInt("AntwortNr") == antmcnr.get(i)) {
-							antmcnr.remove(i);
-						}
-					}
-				}
+    public static void deleteShortAnswerHasAnswerRelation(int questionId) {
+        try {
+            Connection myCon = DriverManager.getConnection(url, user, pwd);
+            PreparedStatement psSql = myCon.prepareStatement(SQL_DELETE_SHORT_ANSWER_HAS_ANSWERS_RELATION_BY_QUESTION_ID);
+            psSql.setInt(1, questionId);
 
-				myRS = null;
-				mySQL = null;
+            psSql.execute();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 
-				// LÃ¶schen der Relationen von Fragebogen zu MultipleChoice
-				mySQL = myCon.createStatement();
-				statement = "DELETE FROM Fb_has_Mc WHERE idMultipleChoice=" + question.getQuestionId();
-				mySQL.execute(statement);
-				mySQL = null;
-			} else if (question.getQuestionType().equals(QuestionType.SHORT_ANSWER)) {
-				Statement mySQL = myCon.createStatement();
-				statement = "SELECT flags, idFreieFragen FROM FB_has_ff where flags LIKE '%__" + question.getQuestionId()
-						+ "A%'";
-				ResultSet myRS = mySQL.executeQuery(statement);
+    public static void deleteMultipleChoiceQuestion(int questionId) {
+        try {
+            Connection myCon = DriverManager.getConnection(url, user, pwd);
+            PreparedStatement psSql = myCon.prepareStatement(SQL_DELETE_MULTIPLE_CHOICE);
+            psSql.setInt(1, questionId);
 
-				// Flags updaten, wenn eine Frage auf die zu lÃ¶schende Frage
-				// reagiert
-				while (myRS.next()) {
-					String flag = myRS.getString("flags");
-					Pattern MY_PATTERN = Pattern.compile("[MCFF][0-9]+A[0-9]+");
-					Matcher mges = MY_PATTERN.matcher(flag);
+            psSql.execute();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 
-					if (mges.find()) {
-						start = mges.start() - 1;
-						end = mges.end() + 1;
+    public static void deleteMultipleChoiceHasAnswerRelation(int questionId) {
+        try {
+            Connection myCon = DriverManager.getConnection(url, user, pwd);
+            PreparedStatement psSql = myCon.prepareStatement(SQL_DELETE_MULTIPLE_CHOICE_ANSWERS_RELATION_BY_QUESTION_ID);
+            psSql.setInt(1, questionId);
 
-						StringBuilder sb = new StringBuilder(flag);
-						StringBuilder afterRemove = sb.delete(start, end);
-						flag = afterRemove.toString();
+            psSql.execute();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 
-						mySQL = myCon.createStatement();
-						statement = "UPDATE fb_has_ff SET flags='" + flag + "' WHERE idFreieFragen="
-								+ myRS.getInt("idFreieFragen");
-						mySQL.execute(statement);
-					}
-				}
+    public static boolean doesMultipleChoiceQuestionExistsInOtherQuestionnaire(int questionnaireId, int questionId) {
+        try {
+            Connection myCon = DriverManager.getConnection(url, user, pwd);
+            PreparedStatement psSql = myCon.prepareStatement(SQL_GET_OTHER_MULTIPLE_CHOICE_QUESTIONNAIRE_RELATION_IDS);
+            psSql.setInt(1, questionnaireId);
+            psSql.setInt(2, questionId);
 
-				mySQL = myCon.createStatement();
-				statement = "SELECT flags, idmultiplechoice FROM FB_has_mc where flags LIKE '%__" + question.getQuestionId()
-						+ "A%'";
-				myRS = mySQL.executeQuery(statement);
+            return psSql.executeQuery().next();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
 
-				// Flags updaten, wenn eine Frage auf die zu lÃ¶schende Frage
-				// reagiert
-				while (myRS.next()) {
-					String flag = myRS.getString("flags");
-					Pattern MY_PATTERN = Pattern.compile("[MCFF][0-9]+A[0-9]+");
-					Matcher mges = MY_PATTERN.matcher(flag);
+        return true;
+    }
 
-					if (mges.find()) {
-						start = mges.start() - 1;
-						end = mges.end() + 1;
+    public static boolean doesShortAnswerQuestionExistsInOtherQuestionnaire(int questionnaireId, int questionId) {
+        try {
+            Connection myCon = DriverManager.getConnection(url, user, pwd);
+            PreparedStatement psSql = myCon.prepareStatement(SQL_GET_OTHER_SHORT_ANSWER_QUESTIONNAIRE_RELATION_IDS);
+            psSql.setInt(1, questionnaireId);
+            psSql.setInt(2, questionId);
 
-						StringBuilder sb = new StringBuilder(flag);
-						StringBuilder afterRemove = sb.delete(start, end);
-						flag = afterRemove.toString();
+            return psSql.executeQuery().next();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
 
-						mySQL = myCon.createStatement();
-						statement = "UPDATE fb_has_mc SET flags='" + flag + "' WHERE idmultiplechoice="
-								+ myRS.getInt("idmultiplechoice");
-						mySQL.execute(statement);
-					}
-				}
+        return true;
+    }
 
-				// LÃ¶schen der Relationen von Fragebogen zu FreieFragen
-				mySQL = myCon.createStatement();
-				statement = "DELETE FROM Fb_has_Ff WHERE idFreieFragen=" + question.getQuestionId();
-				mySQL.execute(statement);
-				mySQL = null;
-			}
+    public static void deleteShortAnswerQuestionnaireRelation(int questionnaireId, int questionId) {
+        try {
+            Connection myCon = DriverManager.getConnection(url, user, pwd);
+            PreparedStatement psSql = myCon.prepareStatement(SQL_DELETE_SHORT_ANSWER_QUESTIONNAIRE_RELATION);
+            psSql.setInt(1, questionId);
+            psSql.setInt(2, questionnaireId);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 
-			if (question.getQuestionType().equals(QuestionType.MULTIPLE_CHOICE)) {
-				Statement mySQL = myCon.createStatement();
-				statement = "SELECT idMultipleChoice FROM FB_has_MC WHERE idMultipleChoice=" + question.getQuestionId();
-				ResultSet myRS = mySQL.executeQuery(statement);
+    public static void deleteMultipleChoiceQuestionnaireRelation(int questionnaireId, int questionId) {
+        try {
+            Connection myCon = DriverManager.getConnection(url, user, pwd);
+            PreparedStatement psSql = myCon.prepareStatement(SQL_DELETE_MULTIPLE_CHOICE_QUESTIONNAIRE_RELATION);
+            psSql.setInt(1, questionId);
+            psSql.setInt(2, questionnaireId);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 
-				// steht ID der MC Frage nach dem LÃ¶schen der Relation zum
-				// jeweiligen Fragebogen immernoch wo anders?
-				// Wenn nicht, darf die MC Frage gelÃ¶scht werden, denn sie kommt
-				// in keinem anderen Fragebogen vor
-				if (!myRS.next()) {
-					mySQL = myCon.createStatement();
-					statement = "DELETE FROM MC_has_A WHERE idMultipleChoice=" + question.getQuestionId();
-					mySQL.execute(statement);
-					mySQL = null;
+    public static List<Answer> getMultipleChoiceQuestionAnswers(int questionnaireId, int questionId) {
+        List<Answer> answers = new ArrayList<>();
+        try {
+            Connection myCon = DriverManager.getConnection(url, user, pwd);
+            PreparedStatement psSql = myCon.prepareStatement(SQL_GET_MULTIPLE_CHOICE_QUESTION_ANSWERS);
+            psSql.setInt(1, questionId);
+            psSql.setInt(2, questionnaireId);
+            ResultSet myRS = psSql.executeQuery();
 
-					mySQL = myCon.createStatement();
-					statement = "DELETE FROM MultipleChoice WHERE idMultipleChoice=" + question.getQuestionId();
-					mySQL.execute(statement);
-					mySQL = null;
-				}
-			} else if (question.getQuestionType().equals(QuestionType.SHORT_ANSWER)) {
-				Statement mySQL = myCon.createStatement();
-				statement = "SELECT idFreieFragen FROM Fb_has_ff WHERE idFreieFragen=" + question.getQuestionId();
-				ResultSet myRS = mySQL.executeQuery(statement);
+            while (myRS.next()) {
+                Answer answer = new Answer();
+                answer.setId(myRS.getInt("AntwortNr"));
+                answer.setValue(myRS.getString("Antwort"));
 
-				// steht ID der FF Frage nach dem LÃ¶schen der Relation zum
-				// jeweiligen Fragebogen immernoch wo anders?
-				// Wenn nicht, darf die FF Frage gelÃ¶scht werden, denn sie kommt
-				// in keinem anderen Fragebogen vor
-				if (!myRS.next()) {
-					mySQL = myCon.createStatement();
-					statement = "DELETE FROM FreieFragen WHERE idFreieFragen=" + question.getQuestionId();
-					mySQL.execute(statement);
-					mySQL = null;
-				}
-			}
+                if (!answers.contains(answer)) {
+                    answers.add(answer);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
 
-			// Antworten lÃ¶schen, wenn nicht 0-10 / ja / nein / ##### (Multiple
-			// Choice Edition)
-			for (short j = 0; j < antmcnr.size(); j++) {
-				if (!antwortenmc.get(j).equals("0") && !antwortenmc.get(j).equals("1")
-						&& !antwortenmc.get(j).equals("2") && !antwortenmc.get(j).equals("3")
-						&& !antwortenmc.get(j).equals("4") && !antwortenmc.get(j).equals("5")
-						&& !antwortenmc.get(j).equals("6") && !antwortenmc.get(j).equals("7")
-						&& !antwortenmc.get(j).equals("8") && !antwortenmc.get(j).equals("9")
-						&& !antwortenmc.get(j).equals("10") && !antwortenmc.get(j).equals("ja")
-						&& !antwortenmc.get(j).equals("nein") && !antwortenmc.get(j).equals("#####")) {
-					Statement mySQL = myCon.createStatement();
-					statement = "DELETE FROM Antworten WHERE AntwortNr=" + antmcnr.get(j);
-					mySQL.execute(statement);
-					mySQL = null;
-				}
-			}
-			
-			myCon.close();
-			return true;
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		return false;
-	}
+        return answers;
+    }
+
+    public static void deleteShortAnswerReactFlagsFromTargetQuestion(int questionnaireId, int questionId) {
+
+        try {
+            Connection myCon = DriverManager.getConnection(url, user, pwd);
+            PreparedStatement psSql = myCon.prepareStatement(SQL_GET_TARGET_QUESTION_FLAG_AND_ID_FOR_SHORT_ANSWER);
+            psSql.setInt(1, questionId);
+            psSql.setInt(2, questionnaireId);
+            ResultSet myRS = psSql.executeQuery();
+
+            // Flags updaten, wenn eine Frage auf die zu loeschende Frage reagiert
+            while (myRS.next()) {
+                FlagList flags = new FlagList(myRS.getString("flags"));
+                int targetQuestionId = myRS.getInt("idFreieFrage");
+                List<React> flagsToDelete = flags.getAll(React.class);
+                if (!flagsToDelete.isEmpty()) {
+                    flags.removeAll(flagsToDelete);
+
+                    psSql = myCon.prepareStatement(SQL_UPDATE_SHORT_ANSWERS_FLAGS);
+                    psSql.setInt(1, questionnaireId);
+                    psSql.setInt(2, targetQuestionId);
+                    psSql.execute();
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void deleteMultipleChoiceReactFlagsFromTargetQuestion(int questionnaireId, int questionId) {
+        try {
+            Connection myCon = DriverManager.getConnection(url, user, pwd);
+
+            PreparedStatement psSql = myCon.prepareStatement(SQL_GET_TARGET_QUESTION_FLAG_AND_ID_FOR_MULTIPLE_CHOICE);
+            psSql.setInt(1, questionId);
+            psSql.setInt(2, questionnaireId);
+            ResultSet myRS = psSql.executeQuery();
+
+            // Flags updaten, wenn eine Frage auf die zu loeschende Frage reagiert
+            while (myRS.next()) {
+                FlagList flags = new FlagList(myRS.getString("flags"));
+                int targetQuestionId = myRS.getInt("idMultipleChoice");
+                List<React> flagsToDelete = flags.getAll(React.class);
+                if (!flagsToDelete.isEmpty()) {
+                    flags.removeAll(flagsToDelete);
+
+                    psSql = myCon.prepareStatement(SQL_UPDATE_MULTIPLE_CHOICE_FLAGS);
+                    psSql.setInt(1, questionnaireId);
+                    psSql.setInt(2, targetQuestionId);
+                    psSql.execute();
+                }
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static List<Integer> getMultipleChoiceQuestionsByQuestionnaireId(int questionnaireId) {
+        try {
+            List<Integer> results = new ArrayList<>();
+            Connection myCon = DriverManager.getConnection(url, user, pwd);
+            PreparedStatement psSql = myCon.prepareStatement(SQL_GET_MULTIPLE_CHOICE_IDS_BY_QUESTIONNAIRE_ID);
+            psSql.setInt(1, questionnaireId);
+            ResultSet myRS = psSql.executeQuery();
+
+            while (myRS.next()) {
+                results.add(myRS.getInt("idMultipleChoice"));
+            }
+
+            return results;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    public static List<Integer> getShortAnswerQuestionsByQuestionnaireId(int questionnaireId) {
+        try {
+            List<Integer> results = new ArrayList<>();
+            Connection myCon = DriverManager.getConnection(url, user, pwd);
+            PreparedStatement psSql = myCon.prepareStatement(SQL_GET_SHORT_ANSWER_IDS_BY_QUESTIONNAIRE_ID);
+            psSql.setInt(1, questionnaireId);
+            ResultSet myRS = psSql.executeQuery();
+
+            while (myRS.next()) {
+                results.add(myRS.getInt("idFreieFragen"));
+            }
+
+            return results;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
 }

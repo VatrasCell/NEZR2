@@ -6,6 +6,7 @@ import flag.Number;
 import flag.NumberOperator;
 import flag.Symbol;
 import flag.SymbolType;
+import model.Answer;
 import model.FrageEditParam;
 import model.Question;
 import model.QuestionType;
@@ -393,6 +394,7 @@ public class QuestionService extends Database {
      * @author Eric
      */
     //TODO Duplicate Prozess und Mehrfachverwendung von Fragen überarbeiten
+    @Deprecated
     public static String duplicateQuestion(String question) {
         try {
             Connection myCon = DriverManager.getConnection(url, user, pwd);
@@ -450,8 +452,6 @@ public class QuestionService extends Database {
             return question;
 
         } catch (SQLException e) {
-            //ErrorLog.fehlerBerichtB("ERROR",
-            //		Datenbank.class + ": " + Thread.currentThread().getStackTrace()[1].getLineNumber(), e.getMessage());
             e.printStackTrace();
             return null;
         }
@@ -460,7 +460,6 @@ public class QuestionService extends Database {
     /**
      * Speichert eine neue Freie Frage. Gibt bei Erfolg TRUE zurÃ¼ck.
      *
-     * @param
      * @param question FrageErstellen
      * @author Anne
      */
@@ -488,7 +487,7 @@ public class QuestionService extends Database {
      *
      * @author Eric
      */
-    public static void saveMultipleChoice(int questionnaireId, Question question, ArrayList<Integer> answersIds) {
+    public static void saveMultipleChoice(int questionnaireId, Question question, ArrayList<Answer> answers) {
 
         // category
         Integer categoryId = provideCategoryId(question.getCategory());
@@ -500,12 +499,12 @@ public class QuestionService extends Database {
         List<Integer> oldRelationIds = getMultipleChoiceAnswersRelationIds(Objects.requireNonNull(multipleChoiceId));
         List<Integer> newRelationIds = new ArrayList<>();
 
-        for (Integer answersId : answersIds) {
-            Integer relationId = getMultipleChoiceAnswersRelationId(multipleChoiceId, answersId);
+        for (Answer answer : answers) {
+            Integer relationId = getMultipleChoiceAnswersRelationId(multipleChoiceId, answer.getId());
             if (relationId != null) {
                 newRelationIds.add(relationId);
             } else {
-                createMultipleChoiceAnswersRelation(multipleChoiceId, answersId);
+                createMultipleChoiceAnswersRelation(multipleChoiceId, answer.getId());
             }
         }
 
@@ -663,7 +662,7 @@ public class QuestionService extends Database {
             ResultSet myRS = psSql.executeQuery();
 
             if (myRS.next()) {
-                return myRS.getInt("multipleChoiceId");
+                return myRS.getInt("idFreieFragen");
             }
         } catch (SQLException e) {
             e.printStackTrace();

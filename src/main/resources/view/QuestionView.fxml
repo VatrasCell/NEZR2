@@ -25,7 +25,7 @@
                <children>
                   <Button mnemonicParsing="false" onAction="#setPreview" text="Vorschau" />
                   <Button mnemonicParsing="false" onAction="#exit" text="Abbruch" />
-                  <Button fx:id="btnSave" mnemonicParsing="false" onAction="#save" text="Speichern" />
+                  <Button fx:id="saveButton" mnemonicParsing="false" onAction="#save" text="Speichern" />
                </children>
             </HBox>
          </children>
@@ -49,13 +49,13 @@
                     </rowConstraints>
                      <children>
                         <Label maxWidth="1.7976931348623157E308" text="Frage:" />
-                        <TextField fx:id="textFieldFE" maxWidth="1.7976931348623157E308" prefWidth="0.0" GridPane.columnIndex="1">
+                        <TextField fx:id="questionTextField" maxWidth="1.7976931348623157E308" prefWidth="0.0" GridPane.columnIndex="1">
                            <GridPane.margin>
                               <Insets left="8.0" />
                            </GridPane.margin>
                         </TextField>
                         <Label maxWidth="1.7976931348623157E308" text="Position:" GridPane.rowIndex="1" />
-                        <ChoiceBox fx:id="posChoice" prefHeight="25.0" prefWidth="51.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                        <ChoiceBox fx:id="positionChoiceBox" prefHeight="25.0" prefWidth="51.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
                            <GridPane.margin>
                               <Insets left="8.0" />
                            </GridPane.margin>
@@ -63,7 +63,7 @@
                         <Label maxWidth="1.7976931348623157E308" text="Kategorie:" GridPane.rowIndex="2" />
                         <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0" spacing="8.0" GridPane.columnIndex="1" GridPane.rowIndex="2">
                            <children>
-                              <ChoiceBox fx:id="katChoice" maxWidth="1.7976931348623157E308" prefHeight="25.0" prefWidth="188.0" HBox.hgrow="ALWAYS" />
+                              <ChoiceBox fx:id="categoryChoiceBox" maxWidth="1.7976931348623157E308" prefHeight="25.0" prefWidth="188.0" HBox.hgrow="ALWAYS" />
                               <Button mnemonicParsing="false" onAction="#createCategory" text="Neue Kategorie" />
                            </children>
                            <GridPane.margin>
@@ -73,12 +73,12 @@
                         <Label maxWidth="1.7976931348623157E308" text="Fragenart:" GridPane.rowIndex="3" />
                         <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0" spacing="8.0" GridPane.columnIndex="1" GridPane.rowIndex="3">
                            <children>
-                              <ChoiceBox fx:id="artChoice" maxWidth="1.7976931348623157E308" prefHeight="25.0" prefWidth="133.0" HBox.hgrow="ALWAYS">
+                              <ChoiceBox fx:id="questionTypeChoiceBox" maxWidth="1.7976931348623157E308" prefHeight="25.0" prefWidth="133.0" HBox.hgrow="ALWAYS">
                                  <HBox.margin>
                                     <Insets left="8.0" />
                                  </HBox.margin>
                               </ChoiceBox>
-                              <CheckBox fx:id="chckbxUeberschrift" mnemonicParsing="false" onAction="#updateCheckboxes" text="Überschrift" />
+                              <CheckBox fx:id="headlineCheckBox" mnemonicParsing="false" onAction="#updateCheckboxes" text="Überschrift" />
                            </children>
                         </HBox>
                      </children>
@@ -87,32 +87,32 @@
                      <children>
                         <FlowPane prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
                            <children>
-                              <CheckBox fx:id="chckbxTextArea" mnemonicParsing="false" onAction="#updateCheckboxes" text="Textarea">
+                              <CheckBox fx:id="textAreaCheckBox" mnemonicParsing="false" onAction="#updateCheckboxes" text="Textarea">
                                  <FlowPane.margin>
                                     <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
                                  </FlowPane.margin>
                               </CheckBox>
-                              <CheckBox fx:id="chckbxPflichtfrage" mnemonicParsing="false" onAction="#updateCheckboxes" text="Pflichtfrage">
+                              <CheckBox fx:id="requiredQuestionCheckBox" mnemonicParsing="false" onAction="#updateCheckboxes" text="Pflichtfrage">
                                  <FlowPane.margin>
                                     <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
                                  </FlowPane.margin>
                               </CheckBox>
-                              <CheckBox fx:id="chckbxMultipleChoice" mnemonicParsing="false" onAction="#updateCheckboxes" text="Multiple Choice">
+                              <CheckBox fx:id="multipleChoiceCheckBox" mnemonicParsing="false" onAction="#updateCheckboxes" text="Multiple Choice">
                                  <FlowPane.margin>
                                     <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
                                  </FlowPane.margin>
                               </CheckBox>
-                              <CheckBox fx:id="chckbxJaNein" mnemonicParsing="false" onAction="#updateCheckboxes" text="ja/nein Frage">
+                              <CheckBox fx:id="yesNoCheckBox" mnemonicParsing="false" onAction="#updateCheckboxes" text="ja/nein Frage">
                                  <FlowPane.margin>
                                     <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
                                  </FlowPane.margin>
                               </CheckBox>
-                              <CheckBox fx:id="chckbxX" mnemonicParsing="false" onAction="#updateCheckboxes" text="einzeilig">
+                              <CheckBox fx:id="excelFormatCheckBox" mnemonicParsing="false" onAction="#updateCheckboxes" text="einzeilig">
                                  <FlowPane.margin>
                                     <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
                                  </FlowPane.margin>
                               </CheckBox>
-                              <CheckBox fx:id="chckbxListe" mnemonicParsing="false" onAction="#updateCheckboxes" text="Liste">
+                              <CheckBox fx:id="listCheckBox" mnemonicParsing="false" onAction="#updateCheckboxes" text="Liste">
                                  <FlowPane.margin>
                                     <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
                                  </FlowPane.margin>
@@ -121,17 +121,17 @@
                         </FlowPane>
                         <FlowPane prefHeight="200.0" prefWidth="200.0">
                            <children>
-                              <CheckBox fx:id="chckbxZahl" mnemonicParsing="false" onAction="#updateCheckboxes" text="Zahl">
+                              <CheckBox fx:id="numberCheckBox" mnemonicParsing="false" onAction="#updateCheckboxes" text="Zahl">
                                  <FlowPane.margin>
                                     <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
                                  </FlowPane.margin>
                               </CheckBox>
-                              <ChoiceBox fx:id="zahlChoice" prefWidth="150.0">
+                              <ChoiceBox fx:id="numberChoiceBox" prefWidth="150.0">
                                  <FlowPane.margin>
                                     <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
                                  </FlowPane.margin>
                               </ChoiceBox>
-                              <TextField fx:id="textFieldZahl" onAction="#updateCheckboxes">
+                              <TextField fx:id="numberTextField" onAction="#updateCheckboxes">
                                  <FlowPane.margin>
                                     <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
                                  </FlowPane.margin>
@@ -153,16 +153,16 @@
             </VBox>
             <VBox prefHeight="512.0" prefWidth="187.0" spacing="8.0" HBox.hgrow="ALWAYS">
                <children>
-                  <TableView fx:id="tbl_antworten" prefHeight="200.0" prefWidth="263.0" VBox.vgrow="ALWAYS">
+                  <TableView fx:id="answerTable" prefHeight="200.0" prefWidth="263.0" VBox.vgrow="ALWAYS">
                     <columns>
-                      <TableColumn fx:id="nrCol" prefWidth="58.0" text="Nr" />
-                      <TableColumn fx:id="antCol" prefWidth="215.0" text="Antwort" />
+                      <TableColumn fx:id="answerIdTableColumn" prefWidth="58.0" text="Nr" />
+                      <TableColumn fx:id="answerValueTableColumn" prefWidth="215.0" text="Antwort" />
                     </columns>
                      <columnResizePolicy>
                         <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
                      </columnResizePolicy>
                   </TableView>
-                  <Button fx:id="btnNewAnswer" mnemonicParsing="false" onAction="#createAnswer" text="Neue Antwort">
+                  <Button fx:id="newAnswerButton" mnemonicParsing="false" onAction="#createAnswer" text="Neue Antwort">
                      <VBox.margin>
                         <Insets bottom="16.0" top="16.0" />
                      </VBox.margin>
@@ -176,7 +176,7 @@
       </HBox>
    </center>
    <top>
-      <Label fx:id="lblQuestion" alignment="CENTER" maxWidth="1.7976931348623157E308" prefHeight="17.0" prefWidth="109.0" text="Frage Bearbeiten" BorderPane.alignment="CENTER">
+      <Label fx:id="questionLabel" alignment="CENTER" maxWidth="1.7976931348623157E308" prefHeight="17.0" prefWidth="109.0" text="Frage Bearbeiten" BorderPane.alignment="CENTER">
          <BorderPane.margin>
             <Insets bottom="8.0" top="16.0" />
          </BorderPane.margin>

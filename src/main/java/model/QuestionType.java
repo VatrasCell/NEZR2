@@ -25,7 +25,7 @@ public enum QuestionType {
         return questionType;
     }
 
-    public static QuestionType get(String url) {
-        return lookup.get(url);
+    public static QuestionType get(String value) {
+        return lookup.get(value);
     }
 }

@@ -178,6 +178,11 @@ public class FlagList {
 		list.remove(getSymbol(type));
 		possibleFlags = getPossibleFlags();
 	}
+
+	public <T extends Flag> void removeAll(List<T> flagsToDelete) {
+		flagsToDelete.forEach(flagToDelete -> list.remove(flagToDelete));
+		possibleFlags = getPossibleFlags();
+	}
 	
 	private boolean isFlagPossible(Flag element) {
 		for (Flag flag : possibleFlags) {

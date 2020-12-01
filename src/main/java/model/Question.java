@@ -4,8 +4,6 @@ import application.GlobalVars;
 import flag.FlagList;
 import flag.Number;
 import flag.SymbolType;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
@@ -566,33 +564,30 @@ public class Question implements Comparable<Question>, Comparator<Question> {
     public void setListener(int index, QuestionType type) {
         if (type.equals(QuestionType.MULTIPLE_CHOICE)) {
             CheckBox checkbox = target.answersMC.get(index);
-            checkbox.selectedProperty().addListener(new ChangeListener<Boolean>() {
-                public void changed(ObservableValue<? extends Boolean> ov,
-                                    Boolean old_val, Boolean new_val) {
-                    if (checkbox.isSelected()) {
-                        scene.lookup("#lblFrage_" + getQuestionId()).setVisible(true);
+            checkbox.selectedProperty().addListener((ov, old_val, new_val) -> {
+                if (checkbox.isSelected()) {
+                    scene.lookup("#lblFrage_" + getQuestionId()).setVisible(true);
 
-                        answersFF.forEach(textField -> textField.setVisible(true));
-                        answersMC.forEach(checkBox -> checkBox.setVisible(true));
-                        answersLIST.forEach(stringListView -> stringListView.setVisible(true));
+                    answersFF.forEach(textField -> textField.setVisible(true));
+                    answersMC.forEach(checkBox -> checkBox.setVisible(true));
+                    answersLIST.forEach(stringListView -> stringListView.setVisible(true));
 
-                        if (getFlags().is(SymbolType.B)) {
-                            scene.lookup("#lblNull").setVisible(true);
-                            scene.lookup("#lblEins").setVisible(true);
-                            scene.lookup("#lblZehn").setVisible(true);
-                        }
-                    } else {
-                        scene.lookup("#lblFrage_" + getQuestionId()).setVisible(false);
+                    if (getFlags().is(SymbolType.B)) {
+                        scene.lookup("#lblNull").setVisible(true);
+                        scene.lookup("#lblEins").setVisible(true);
+                        scene.lookup("#lblZehn").setVisible(true);
+                    }
+                } else {
+                    scene.lookup("#lblFrage_" + getQuestionId()).setVisible(false);
 
-                        answersFF.forEach(textField -> textField.setVisible(false));
-                        answersMC.forEach(checkBox -> checkBox.setVisible(false));
-                        answersLIST.forEach(stringListView -> stringListView.setVisible(false));
+                    answersFF.forEach(textField -> textField.setVisible(false));
+                    answersMC.forEach(checkBox -> checkBox.setVisible(false));
+                    answersLIST.forEach(stringListView -> stringListView.setVisible(false));
 
-                        if (getFlags().is(SymbolType.B)) {
-                            scene.lookup("#lblNull").setVisible(false);
-                            scene.lookup("#lblEins").setVisible(false);
-                            scene.lookup("#lblZehn").setVisible(false);
-                        }
+                    if (getFlags().is(SymbolType.B)) {
+                        scene.lookup("#lblNull").setVisible(false);
+                        scene.lookup("#lblEins").setVisible(false);
+                        scene.lookup("#lblZehn").setVisible(false);
                     }
                 }
             });

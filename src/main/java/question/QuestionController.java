@@ -23,6 +23,7 @@ import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.ImageView;
 import javafx.util.Callback;
+import model.Answer;
 import model.FrageEditParam;
 import model.Question;
 import model.QuestionType;
@@ -46,243 +47,243 @@ import java.util.stream.IntStream;
 import static application.GlobalFuncs.getURL;
 
 public class QuestionController {
-	public static Questionnaire questionnaire;
-	public static Question question;
-	private ArrayList<String> answers;
-	private ObservableList<Antwort> data = FXCollections.observableArrayList();
-	
-	@FXML
-	private Label lblQuestion;
+    public static Questionnaire questionnaire;
+    public static Question question;
+    private ArrayList<String> answers;
+    private ObservableList<Answer> data = FXCollections.observableArrayList();
 
-	@FXML
-	private TextField textFieldFE;
-	@FXML
-	private TextField textFieldZahl;
+    @FXML
+    private Label questionLabel;
 
-	@FXML
-	private ChoiceBox<Integer> posChoice;
-	@FXML
-	private ChoiceBox<String> katChoice;
-	@FXML
-	private ChoiceBox<String> artChoice;
-	@FXML
-	private ChoiceBox<String> zahlChoice;
+    @FXML
+    private TextField questionTextField;
+    @FXML
+    private TextField numberTextField;
 
-	//@FXML
-	//private ImageView imageView;
+    @FXML
+    private ChoiceBox<Integer> positionChoiceBox;
+    @FXML
+    private ChoiceBox<String> categoryChoiceBox;
+    @FXML
+    private ChoiceBox<String> questionTypeChoiceBox;
+    @FXML
+    private ChoiceBox<String> numberChoiceBox;
 
-	@FXML
-	private CheckBox chckbxMultipleChoice;
-	@FXML
-	private CheckBox chckbxListe;
-	@FXML
-	private CheckBox chckbxTextArea;
-	@FXML
-	private CheckBox chckbxPflichtfrage;
-	@FXML
-	private CheckBox chckbxJaNein;
-	@FXML
-	private CheckBox chckbxUeberschrift;
-	@FXML
-	private CheckBox chckbxX;
-	@FXML
-	private CheckBox chckbxZahl;
-	
-	@FXML
-	private Button btnSave;
+    //@FXML
+    //private ImageView imageView;
 
-	@FXML
-	private Button btnNewAnswer;
+    @FXML
+    private CheckBox multipleChoiceCheckBox;
+    @FXML
+    private CheckBox listCheckBox;
+    @FXML
+    private CheckBox textAreaCheckBox;
+    @FXML
+    private CheckBox requiredQuestionCheckBox;
+    @FXML
+    private CheckBox yesNoCheckBox;
+    @FXML
+    private CheckBox headlineCheckBox;
+    @FXML
+    private CheckBox excelFormatCheckBox;
+    @FXML
+    private CheckBox numberCheckBox;
 
-	@FXML
-	private TableView<Antwort> tbl_antworten;
-	@FXML
-	private TableColumn<Antwort, String> nrCol;
-	@FXML
-	private TableColumn<Antwort, String> antCol;
-	@FXML
-	private TableColumn<Antwort, String> actionCol = new TableColumn<>("Bearbeiten");
-	@FXML
-	private TableColumn<Antwort, String> delCol = new TableColumn<>("Löschen");
+    @FXML
+    private Button saveButton;
 
-	/**
-	 * The constructor (is called before the initialize()-method).
-	 */
-	public QuestionController() {
-		// fuer die Generierung der Antwortentabelle
-		answers = QuestionService.getAnswers(question);
-		for (int i = 0; i < Objects.requireNonNull(answers).size(); ++i) {
-			Antwort antwort = new Antwort();
-			antwort.setNr(i + 1);
-			antwort.setAntwort(answers.get(i));
-			data.add(antwort);
-		}
-	}
+    @FXML
+    private Button newAnswerButton;
 
-	/**
-	 * Initializes the controller class. This method is automatically called after
-	 * the fxml file has been loaded.
-	 */
-	@FXML
-	private void initialize() {
-		tbl_antworten.setItems(data);
+    @FXML
+    private TableView<Answer> answerTable;
+    @FXML
+    private TableColumn<Answer, String> answerIdTableColumn;
+    @FXML
+    private TableColumn<Answer, String> answerValueTableColumn;
+    @FXML
+    private TableColumn<Answer, String> actionCol = new TableColumn<>("Bearbeiten");
+    @FXML
+    private TableColumn<Answer, String> delCol = new TableColumn<>("Löschen");
 
-		nrCol.setCellValueFactory(new PropertyValueFactory<>("nr"));
-		antCol.setCellValueFactory(new PropertyValueFactory<>("antwort"));
+    /**
+     * The constructor (is called before the initialize()-method).
+     */
+    public QuestionController() {
+        // fuer die Generierung der Antwortentabelle
+        answers = QuestionService.getAnswers(question);
+        for (int i = 0; i < Objects.requireNonNull(answers).size(); ++i) {
+            Answer antwort = new Answer();
+            antwort.setId(i + 1);
+            antwort.setValue(answers.get(i));
+            data.add(antwort);
+        }
+    }
 
-		actionCol.setCellValueFactory(new PropertyValueFactory<>("DUMMY"));
+    /**
+     * Initializes the controller class. This method is automatically called after
+     * the fxml file has been loaded.
+     */
+    @FXML
+    private void initialize() {
+        answerTable.setItems(data);
 
-		Callback<TableColumn<Antwort, String>, TableCell<Antwort, String>> cellFactory = //
-				new Callback<TableColumn<Antwort, String>, TableCell<Antwort, String>>() {
-					@Override
-					public TableCell<Antwort, String> call(final TableColumn<Antwort, String> param) {
-						ImageView imgView = new ImageView(GlobalVars.IMG_EDT);
-						imgView.setFitHeight(30);
-						imgView.setFitWidth(30);
-						return new TableCell<Antwort, String>() {
+        answerIdTableColumn.setCellValueFactory(new PropertyValueFactory<>("nr"));
+        answerValueTableColumn.setCellValueFactory(new PropertyValueFactory<>("antwort"));
 
-							final Button btn = new Button("", imgView);
+        actionCol.setCellValueFactory(new PropertyValueFactory<>("DUMMY"));
 
-							@Override
-							public void updateItem(String item, boolean empty) {
-								super.updateItem(item, empty);
-								if (empty) {
-									setGraphic(null);
-									setText(null);
-								} else {
-									btn.setOnAction(event -> {
-										//TODO edit Antwort
-										Antwort antwort = getTableView().getItems().get(getIndex());
-									});
-									setGraphic(btn);
-									setText(null);
-								}
-							}
-						};
-					}
-				};
+        Callback<TableColumn<Answer, String>, TableCell<Answer, String>> cellFactory = //
+                new Callback<TableColumn<Answer, String>, TableCell<Answer, String>>() {
+                    @Override
+                    public TableCell<Answer, String> call(final TableColumn<Answer, String> param) {
+                        ImageView imgView = new ImageView(GlobalVars.IMG_EDT);
+                        imgView.setFitHeight(30);
+                        imgView.setFitWidth(30);
+                        return new TableCell<Answer, String>() {
 
-		actionCol.setCellFactory(cellFactory);
-		tbl_antworten.getColumns().add(actionCol);
+                            final Button btn = new Button("", imgView);
 
-		delCol.setCellValueFactory(new PropertyValueFactory<>("DUMMY"));
-		Callback<TableColumn<Antwort, String>, TableCell<Antwort, String>> cellFactoryDel = //
-				new Callback<TableColumn<Antwort, String>, TableCell<Antwort, String>>() {
-					@Override
-					public TableCell<Antwort, String> call(final TableColumn<Antwort, String> param) {
-						ImageView imgView = new ImageView(GlobalVars.IMG_DEL);
-						imgView.setFitHeight(30);
-						imgView.setFitWidth(30);
-						return new TableCell<Antwort, String>() {
+                            @Override
+                            public void updateItem(String item, boolean empty) {
+                                super.updateItem(item, empty);
+                                if (empty) {
+                                    setGraphic(null);
+                                    setText(null);
+                                } else {
+                                    btn.setOnAction(event -> {
+                                        //TODO edit Antwort
+                                        Answer antwort = getTableView().getItems().get(getIndex());
+                                    });
+                                    setGraphic(btn);
+                                    setText(null);
+                                }
+                            }
+                        };
+                    }
+                };
 
-							final Button btn = new Button("", imgView);
+        actionCol.setCellFactory(cellFactory);
+        answerTable.getColumns().add(actionCol);
 
-							@Override
-							public void updateItem(String item, boolean empty) {
-								super.updateItem(item, empty);
-								if (empty) {
-									setGraphic(null);
-									setText(null);
-								} else {
-									btn.setOnAction(event -> {
-										//TODO delete Antwort
-										 Antwort antwort = getTableView().getItems().get(getIndex());
-									});
-									setGraphic(btn);
-									setText(null);
-								}
-							}
-						};
-					}
-				};
+        delCol.setCellValueFactory(new PropertyValueFactory<>("DUMMY"));
+        Callback<TableColumn<Answer, String>, TableCell<Answer, String>> cellFactoryDel = //
+                new Callback<TableColumn<Answer, String>, TableCell<Answer, String>>() {
+                    @Override
+                    public TableCell<Answer, String> call(final TableColumn<Answer, String> param) {
+                        ImageView imgView = new ImageView(GlobalVars.IMG_DEL);
+                        imgView.setFitHeight(30);
+                        imgView.setFitWidth(30);
+                        return new TableCell<Answer, String>() {
 
-		delCol.setCellFactory(cellFactoryDel);
-		tbl_antworten.getColumns().add(delCol);
-		
-		fillScene();
-	}
+                            final Button btn = new Button("", imgView);
 
-	private void fillScene() {
-		String string;
-		Pattern MY_PATTERN = Pattern.compile("#\\[[0-9]+]");
-		Matcher m = MY_PATTERN.matcher(question.getQuestion());
-		if (m.find()) {
-			string = question.getQuestion().substring(0, m.start());
-		} else {
-			string = question.getQuestion();
-		}
-		textFieldFE.setText(string);
-		List<Integer> range = IntStream.range(1, QuestionService.getCountPosition(questionnaire.getId()) + 2).boxed()
-				.collect(Collectors.toList());
-		ObservableList<Integer> list = FXCollections.observableArrayList(range);
-		posChoice.setItems(list);
-		posChoice.getSelectionModel().select(question.getPosition() - 1);
+                            @Override
+                            public void updateItem(String item, boolean empty) {
+                                super.updateItem(item, empty);
+                                if (empty) {
+                                    setGraphic(null);
+                                    setText(null);
+                                } else {
+                                    btn.setOnAction(event -> {
+                                        //TODO delete Antwort
+                                        Answer antwort = getTableView().getItems().get(getIndex());
+                                    });
+                                    setGraphic(btn);
+                                    setText(null);
+                                }
+                            }
+                        };
+                    }
+                };
 
-		ObservableList<String> listKat = FXCollections.observableArrayList(QuestionService.getCategories());
-		katChoice.setItems(listKat);
-		katChoice.getSelectionModel().select(question.getCategory());
+        delCol.setCellFactory(cellFactoryDel);
+        answerTable.getColumns().add(delCol);
 
-		ObservableList<String> listArt = FXCollections.observableArrayList("Bewertungsfrage", "Multiple Choice",
-				"Freie Frage");
-		artChoice.setItems(listArt);
-		artChoice.getSelectionModel().select("Freie Frage");
-		artChoice.getSelectionModel().selectedIndexProperty().addListener((observable, oldValue, newValue) -> {
-			artChoice.getSelectionModel().select(newValue.intValue());
-			updateCheckboxes();
-		});
+        fillScene();
+    }
 
-		ObservableList<String> listZahl = FXCollections.observableArrayList("Genau wie die Zahl", "Kleiner gleich Zahl",
-				"Größer gleich Zahl");
-		zahlChoice.setItems(listZahl);
+    private void fillScene() {
+        String string;
+        Pattern MY_PATTERN = Pattern.compile("#\\[[0-9]+]");
+        Matcher m = MY_PATTERN.matcher(question.getQuestion());
+        if (m.find()) {
+            string = question.getQuestion().substring(0, m.start());
+        } else {
+            string = question.getQuestion();
+        }
+        questionTextField.setText(string);
+        List<Integer> range = IntStream.range(1, QuestionService.getCountPosition(questionnaire.getId()) + 2).boxed()
+                .collect(Collectors.toList());
+        ObservableList<Integer> list = FXCollections.observableArrayList(range);
+        positionChoiceBox.setItems(list);
+        positionChoiceBox.getSelectionModel().select(question.getPosition() - 1);
 
-		if (question.getQuestionType().equals(QuestionType.MULTIPLE_CHOICE)) {
-			if (question.getFlags().is(SymbolType.B)) {
-				artChoice.getSelectionModel().select("Bewertungsfrage");
-			} else {
-				artChoice.getSelectionModel().select("Multiple Choice");
-			}
-		} else {
-			artChoice.getSelectionModel().select("Freie Frage");
-		}
+        ObservableList<String> listKat = FXCollections.observableArrayList(QuestionService.getCategories());
+        categoryChoiceBox.setItems(listKat);
+        categoryChoiceBox.getSelectionModel().select(question.getCategory());
 
-		if (question.getFlags().is(SymbolType.MC)) {
-			chckbxMultipleChoice.setSelected(true);
-		} else {
-			chckbxMultipleChoice.setSelected(false);
-		}
+        ObservableList<String> listArt = FXCollections.observableArrayList("Bewertungsfrage", "Multiple Choice",
+                "Freie Frage");
+        questionTypeChoiceBox.setItems(listArt);
+        questionTypeChoiceBox.getSelectionModel().select("Freie Frage");
+        questionTypeChoiceBox.getSelectionModel().selectedIndexProperty().addListener((observable, oldValue, newValue) -> {
+            questionTypeChoiceBox.getSelectionModel().select(newValue.intValue());
+            updateCheckboxes();
+        });
 
-		if (question.getFlags().is(SymbolType.LIST)) {
-			chckbxListe.setSelected(true);
-		} else {
-			chckbxListe.setSelected(false);
-		}
+        ObservableList<String> listZahl = FXCollections.observableArrayList("Genau wie die Zahl", "Kleiner gleich Zahl",
+                "Größer gleich Zahl");
+        numberChoiceBox.setItems(listZahl);
 
-		if (question.getFlags().is(SymbolType.TEXT)) {
-			chckbxTextArea.setSelected(true);
-		} else {
-			chckbxTextArea.setSelected(false);
-		}
+        if (question.getQuestionType().equals(QuestionType.MULTIPLE_CHOICE)) {
+            if (question.getFlags().is(SymbolType.B)) {
+                questionTypeChoiceBox.getSelectionModel().select("Bewertungsfrage");
+            } else {
+                questionTypeChoiceBox.getSelectionModel().select("Multiple Choice");
+            }
+        } else {
+            questionTypeChoiceBox.getSelectionModel().select("Freie Frage");
+        }
 
-		if (question.getFlags().is(SymbolType.REQUIRED)) {
-			chckbxPflichtfrage.setSelected(true);
-		} else {
-			chckbxPflichtfrage.setSelected(false);
-		}
+        if (question.getFlags().is(SymbolType.MC)) {
+            multipleChoiceCheckBox.setSelected(true);
+        } else {
+            multipleChoiceCheckBox.setSelected(false);
+        }
 
-		if (question.getFlags().is(SymbolType.JN)) {
-			chckbxJaNein.setSelected(true);
-			//imageView.setVisible(true);
-			if (question.getFlags().is(SymbolType.JNExcel)) {
-				chckbxX.setSelected(true);
-				// image.showQRImage();
-			} else {
-				chckbxX.setSelected(false);
-				// image.showImage();
-			}
-		} else {
-			//imageView.setVisible(false);
-			chckbxJaNein.setSelected(false);
-		}
+        if (question.getFlags().is(SymbolType.LIST)) {
+            listCheckBox.setSelected(true);
+        } else {
+            listCheckBox.setSelected(false);
+        }
+
+        if (question.getFlags().is(SymbolType.TEXT)) {
+            textAreaCheckBox.setSelected(true);
+        } else {
+            textAreaCheckBox.setSelected(false);
+        }
+
+        if (question.getFlags().is(SymbolType.REQUIRED)) {
+            requiredQuestionCheckBox.setSelected(true);
+        } else {
+            requiredQuestionCheckBox.setSelected(false);
+        }
+
+        if (question.getFlags().is(SymbolType.JN)) {
+            yesNoCheckBox.setSelected(true);
+            //imageView.setVisible(true);
+            if (question.getFlags().is(SymbolType.JNExcel)) {
+                excelFormatCheckBox.setSelected(true);
+                // image.showQRImage();
+            } else {
+                excelFormatCheckBox.setSelected(false);
+                // image.showImage();
+            }
+        } else {
+            //imageView.setVisible(false);
+            yesNoCheckBox.setSelected(false);
+        }
 		/*TODO was macht das?!
 		if (frage.getFlags().contains("A")) {
 			if (frage.getFlags().contains(" ")) {
@@ -292,332 +293,315 @@ public class QuestionController {
 
 			}
 		}*/
-		if (question.getQuestionType().equals(QuestionType.MULTIPLE_CHOICE)) {
-			if(question.getAnswerOptions().size() > 0) {
-				if (question.getAnswerOptions().get(0).equals("#####")) {
-					chckbxUeberschrift.setSelected(true);
-				} else {
-					chckbxUeberschrift.setSelected(false);
-				}
-			} else {
-				chckbxUeberschrift.setSelected(false);
-			}		
-		}
+        if (question.getQuestionType().equals(QuestionType.MULTIPLE_CHOICE)) {
+            if (question.getAnswerOptions().size() > 0) {
+                if (question.getAnswerOptions().get(0).equals("#####")) {
+                    headlineCheckBox.setSelected(true);
+                } else {
+                    headlineCheckBox.setSelected(false);
+                }
+            } else {
+                headlineCheckBox.setSelected(false);
+            }
+        }
 
-		// anneSehrNeu
-		/*
-		 * answers = new ArrayList<String>(); for (short i = 0; i <
-		 * tableFE.getRowCount(); i++) { answers.add(tableFE.getValueAt(i,
-		 * 1).toString()); }
-		 */
+        // anneSehrNeu
+        /*
+         * answers = new ArrayList<String>(); for (short i = 0; i <
+         * tableFE.getRowCount(); i++) { answers.add(tableFE.getValueAt(i,
+         * 1).toString()); }
+         */
 
-		List<Number> numbers = question.getFlags().getAll(Number.class);
+        List<Number> numbers = question.getFlags().getAll(Number.class);
 
-		if (numbers.size() > 0) {
-			Number number = numbers.get(0);
-			textFieldZahl.setText(number.getDigits() + "");
-			chckbxZahl.setSelected(true);
-			switch (number.getOperator()) {
-			case EQ:
-				zahlChoice.getSelectionModel().select("Genau wie die Zahl");
-				break;
-			case LTE:
-				zahlChoice.getSelectionModel().select("Kleiner gleich Zahl");
-				break;
-			case GTE:
-				zahlChoice.getSelectionModel().select("Größer gleich Zahl");
-				break;
-			}
-		} else {
-			chckbxZahl.setSelected(false);
-		}
+        if (numbers.size() > 0) {
+            Number number = numbers.get(0);
+            numberTextField.setText(number.getDigits() + "");
+            numberCheckBox.setSelected(true);
+            switch (number.getOperator()) {
+                case EQ:
+                    numberChoiceBox.getSelectionModel().select("Genau wie die Zahl");
+                    break;
+                case LTE:
+                    numberChoiceBox.getSelectionModel().select("Kleiner gleich Zahl");
+                    break;
+                case GTE:
+                    numberChoiceBox.getSelectionModel().select("Größer gleich Zahl");
+                    break;
+            }
+        } else {
+            numberCheckBox.setSelected(false);
+        }
 
-		updateCheckboxes();
-	}
-	
-	@FXML
-	private void exit() {
-		ScreenController.activate(SceneName.QUESTION_LIST);
-	}
-	
-	@FXML
-	private void save() {
-		if (checkFrageDaten()) {
-			Question neueQuestion = new Question();
-			
-			String string;
-			
-			String oldFrage = question.getQuestion();
-			
-			FlagList flags = question.getFlags();
-			
-			Pattern MY_PATTERNs = Pattern.compile("#\\[[0-9]+]");
-			Matcher ms = MY_PATTERNs.matcher(oldFrage);
-			if (ms.find()) {
-				string = oldFrage.substring(0, ms.start());
-			} else {
-				string = oldFrage;
-			}
-			
-			if(!string.equals(textFieldFE.getText())) {
-				neueQuestion.setQuestion(QuestionService.duplicateQuestion(textFieldFE.getText()));
-			} else {
-				neueQuestion.setQuestion(oldFrage);
-			}
-			oldFrage = "";
-			neueQuestion.setPosition((int)posChoice.getValue());
-			if(question != null) {
-				neueQuestion.setQuestionId(question.getQuestionId());
-			}
+        updateCheckboxes();
+    }
 
-			FrageEditParam param = new FrageEditParam(artChoice, zahlChoice, textFieldZahl, chckbxPflichtfrage, chckbxMultipleChoice,
-					chckbxListe, chckbxTextArea, chckbxJaNein, chckbxUeberschrift, chckbxX, chckbxZahl);
+    @FXML
+    private void exit() {
+        ScreenController.activate(SceneName.QUESTION_LIST);
+    }
 
-			neueQuestion.setQuestionType(param.getType());
-			
-			String selectedKat = katChoice.getSelectionModel().getSelectedItem();
-			if (selectedKat.equals("")) {
-				selectedKat = katChoice.getItems().get(0);
-			}						
-			neueQuestion.setCategory(selectedKat);
-	        
-	        List<React> mcList = flags.getAll(React.class);
-	        for (React react : mcList) {
-	        	if(param.isRequired()) {
-					QuestionService.provideQuestionRequired(questionnaire.getId(), react.getQuestionType(), react.getQuestionId());
-				}
-		        if (QuestionService.isQuestionRequired(questionnaire.getId(), react.getQuestionType(), react.getQuestionId())) {
-		        	param.setRequired(true);
-		        }
-			}
-	        
-			if (artChoice.getSelectionModel().getSelectedItem().equals("Freie Frage")) {
-				QuestionService.getPossibleFlags(flags, param);//floNeu
-				neueQuestion.setFlags(flags);
-				QuestionService.saveShortAnswerQuestion(questionnaire.getId(), neueQuestion);
-			}
-			if (artChoice.getSelectionModel().getSelectedItem().equals("Multiple Choice")) {
-				ArrayList<Integer> antIds = new ArrayList<>();
-				ArrayList<Integer> antIdsRaus = new ArrayList<>();
-				ArrayList<String> ants = new ArrayList<>();
-				if (param.isYesNoQuestion()) {
-					ants.add("Ja");
-					ants.add("Nein");
-				} else {
-					for (int i = 0; i < tbl_antworten.getItems().size(); i++) {
-						ants.add(tbl_antworten.getItems().get(i).getAntwort());
-					}
-				}
-				
-				//anneSehrNeu
-				if(lblQuestion.getText().equals("Frage Bearbeiten")) {
-					for(int i = 0; i < answers.size(); i++) {
-						for (String ant : ants) {
-							if (!answers.isEmpty() && answers.get(i).equals(ant)) {
-								answers.remove(i);
-							}
-						}
-					}
-				}
-			
-				if(lblQuestion.getText().equals("Frage Bearbeiten")) {
-					for (String answer : answers) {
-						int antId = QuestionService.provideAnswerId(answer);
-						antIdsRaus.add(antId);
-					}
-				}
-				
-				if(!antIdsRaus.isEmpty()) {
-					QuestionService.updateFlags(neueQuestion);
-					QuestionService.deleteAnswers(antIdsRaus, neueQuestion.getQuestionId());
-				}
-				//
-				for (String ant : ants) {
-					int antId = QuestionService.provideAnswerId(ant);
-					antIds.add(antId);
-				}
-				QuestionService.getPossibleFlags(flags, param);//floNeu
-				neueQuestion.setFlags(flags);
-				QuestionService.saveMultipleChoice(questionnaire.getId(), neueQuestion, antIds);
-			}
-			if (artChoice.getSelectionModel().getSelectedItem().equals("Bewertungsfrage")) {
-				QuestionService.getPossibleFlags(flags, param);//floNeu
-				neueQuestion.setFlags(flags);
-				QuestionService.saveEvaluationQuestion(questionnaire.getId(), neueQuestion);
-			}
-		
-			ScreenController.activate(SceneName.QUESTION_LIST);
-		} else {
-			Notifications
-					.create()
-					.title("Antwort anlegen").text("\"Die Frage ist fehlerhaft und kann deswegen nicht gespeichert werden!")
-					.showError();
-		}
-	}
-	
-	@FXML
-	private void setPreview() {
-		StartController.makeQuestionnaire(Collections.singletonList(question), true);
-		ScreenController.activate(SceneName.SURVEY_0);
-	}
-	
-	@FXML
-	private void createAnswer() {
-		TextInputDialog dialog = new TextInputDialog("");
-		dialog.setTitle("Antwort anlegen");
-    	dialog.setContentText("Name:");
-    	DialogPane dialogPane = dialog.getDialogPane();
-		dialogPane.getStylesheets().add(getURL("style/application.css").toExternalForm());
-		
-    	Optional<String> result = dialog.showAndWait();
-    	result.ifPresent(name -> {
-    		Antwort antwort = new Antwort();
-    		antwort.setNr(data.size() + 1);
-    		antwort.setAntwort(name);
-    		data.add(antwort);
-        	Notifications.create().title("Antwort anlegen").text("Antwort \"" + name + "\" wurde erfolgreich angelegt.").show();
-    	});
-		
-	}
-	
-	@FXML
-	private void createCategory() {
-		TextInputDialog dialog = new TextInputDialog("");
-		dialog.setTitle("Kategorie anlegen");
-    	dialog.setContentText("Name:");
-    	DialogPane dialogPane = dialog.getDialogPane();
-		dialogPane.getStylesheets().add(getURL("style/application.css").toExternalForm());
-		
-    	Optional<String> result = dialog.showAndWait();
-    	result.ifPresent(name -> {
-    		if(QuestionService.provideCategory(name)) {
-    			ObservableList<String> listKat = FXCollections.observableArrayList(QuestionService.getCategories());
-    			katChoice.setItems(listKat);
-    			katChoice.getSelectionModel().select(name);
-        		Notifications.create().title("Kategorie anlegen").text("Kategorie \"" + name + "\" wurde erfolgreich angelegt.").show();
-    		} else {
-    			Notifications.create().title("Kategorie anlegen").text("Ein Fehler ist aufgetreten.").showError();
-    		}
-    	});
-	}
-	
-	@FXML
-	private void react() {
-		ReactController.question = question;
-		ReactController.questionnaire = questionnaire;
-		
-		try {
-			ScreenController.addScreen(SceneName.REACT, FXMLLoader.load(getURL(SceneName.REACT_PATH)));
-			ScreenController.activate(SceneName.REACT);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-	
-	/**
-	 * Ueberprueft ob alle Bedingungen zum Speichern gegeben sind.
-	 */
-	public boolean checkFrageDaten() {
-		//TODO Button nicht hier blockieren; dynamische Validierung?!
-		System.out.println(textFieldFE.getText());
-		System.out.println(artChoice.getSelectionModel().getSelectedItem());
-		if(!textFieldFE.getText().equals("")) {
-			if(!artChoice.getSelectionModel().getSelectedItem().equals("-- Art der Frage --")) {
-				if((tbl_antworten.getItems().size()<1 || chckbxJaNein.isSelected())&& artChoice.getSelectionModel().getSelectedItem().equals("Multiple Choice")) { //anneSehrNeu ? weiß nicht mehr
-					btnSave.setDisable(true);
-				} else {
-					btnSave.setDisable(false);
-				}
-			} else {
-				btnSave.setDisable(true);
-			}
-		} else {
-			btnSave.setDisable(true);
-		}
+    @FXML
+    private void save() {
+        if (!checkQuestionData()) {
+            Notifications
+                    .create()
+                    .title("Antwort anlegen").text("\"Die Frage ist fehlerhaft und kann deswegen nicht gespeichert werden!")
+                    .showError();
+            return;
+        }
 
+        Question questionToSave = new Question();
 
-		return !btnSave.isDisabled();
-	}
+        String oldQuestion = question.getQuestion();
+        String newQuestion = questionTextField.getText();
 
-	@FXML
-	private void updateCheckboxes() {
-		FrageEditParam param = new FrageEditParam(artChoice, zahlChoice, textFieldZahl, chckbxPflichtfrage, chckbxMultipleChoice,
-				chckbxListe, chckbxTextArea, chckbxJaNein, chckbxUeberschrift, chckbxX, chckbxZahl);
+        FlagList flags = question.getFlags();
 
-		artChoice.setDisable(!param.isTypeActivatable());
-		if(artChoice.isDisabled()) {
-			artChoice.getSelectionModel().select(1);
-		}
+        FrageEditParam param = new FrageEditParam(questionTypeChoiceBox, numberChoiceBox, numberTextField,
+				requiredQuestionCheckBox, multipleChoiceCheckBox, listCheckBox, textAreaCheckBox, yesNoCheckBox,
+				headlineCheckBox, excelFormatCheckBox, numberCheckBox);
 
-		zahlChoice.setDisable(!param.isNumberTypeActivatable());
-		if(zahlChoice.isDisabled()) {
-			zahlChoice.getSelectionModel().clearSelection();
-		}
+        questionToSave.setQuestionType(param.getType());
 
-		textFieldZahl.setDisable(!param.isCountCharsActivatable());
-		if(textFieldZahl.isDisabled()) {
-			textFieldZahl.clear();
-		}
+        String selectedKat = categoryChoiceBox.getSelectionModel().getSelectedItem();
+        if (selectedKat.equals("")) {
+            selectedKat = categoryChoiceBox.getItems().get(0);
+        }
+        questionToSave.setCategory(selectedKat);
 
-		chckbxPflichtfrage.setDisable(!param.isRequiredActivatable());
-		if(chckbxPflichtfrage.isDisabled()) {
-			chckbxPflichtfrage.setSelected(false);
-		}
+        Integer questionId;
+        if (!newQuestion.equals(oldQuestion)) {
+            if (questionToSave.getQuestionType().equals(QuestionType.MULTIPLE_CHOICE)) {
+                questionId = QuestionService.getMultipleChoiceId(newQuestion);
+                if (questionId != null) {
+                    if (QuestionService.getMultipleChoiceQuestionnaireRelationId(questionnaire.getId(), questionId) != null) {
+                        Notifications
+                                .create()
+                                .title("Frage anlegen/ bearbeiten").text("\"Eine gleiche Frage existiert bereits in diesem Fragebogen und kann deswegen nicht gespeichert werden!")
+                                .showError();
+                        return;
+                    }
+                }
+            } else {
+                questionId = QuestionService.getShortAnswerId(newQuestion);
+                if (questionId != null) {
+                    if (QuestionService.getShortAnswerQuestionnaireRelationId(questionnaire.getId(), questionId) != null) {
+                        Notifications
+                                .create()
+                                .title("Frage anlegen/ bearbeiten").text("\"Eine gleiche Frage existiert bereits in diesem Fragebogen und kann deswegen nicht gespeichert werden!")
+                                .showError();
+                        return;
+                    }
+                }
+            }
+        }
 
-		chckbxMultipleChoice.setDisable(!param.isMultipleChoiceActivatable());
-		if(chckbxMultipleChoice.isDisabled()) {
-			chckbxMultipleChoice.setSelected(false);
-		}
+        questionToSave.setQuestion(newQuestion);
 
-		chckbxListe.setDisable(!param.isListActivatable());
-		if(chckbxListe.isDisabled()) {
-			chckbxListe.setSelected(false);
-		}
+        questionToSave.setPosition(positionChoiceBox.getValue());
 
-		chckbxTextArea.setDisable(!param.isTextareaActivatable());
-		if(chckbxTextArea.isDisabled()) {
-			chckbxTextArea.setSelected(false);
-		}
+        List<React> mcList = flags.getAll(React.class);
+        for (React react : mcList) {
+            if (param.isRequired()) {
+                QuestionService.provideQuestionRequired(questionnaire.getId(), react.getQuestionType(), react.getQuestionId());
+            }
+            if (QuestionService.isQuestionRequired(questionnaire.getId(), react.getQuestionType(), react.getQuestionId())) {
+                param.setRequired(true);
+            }
+        }
 
-		chckbxJaNein.setDisable(!param.isYesNoQuestionActivatable());
-		if(chckbxJaNein.isDisabled()) {
-			chckbxJaNein.setSelected(false);
-		}
+        if (param.getType() == QuestionType.MULTIPLE_CHOICE) {
+            if (param.isValuationAsk()) {
+                QuestionService.getPossibleFlags(flags, param);
+                questionToSave.setFlags(flags);
+                QuestionService.saveEvaluationQuestion(questionnaire.getId(), questionToSave);
+            } else {
+            	ArrayList<Answer> answers = new ArrayList<>();
+                ArrayList<Integer> answerIdsToDelete = new ArrayList<>();
 
-		chckbxX.setDisable(!param.isSingleLineActivatable());
-		if(chckbxX.isDisabled()) {
-			chckbxX.setSelected(false);
-		}
+                if (param.isYesNoQuestion()) {
+                    answers.add(new Answer("Ja"));
+                    answers.add(new Answer("Nein"));
+                } else {
+					answers.addAll(answerTable.getItems());
+                }
 
-		chckbxZahl.setDisable(!param.isNumericActivatable());
-		if(chckbxZahl.isDisabled()) {
-			chckbxZahl.setSelected(false);
-		}
+                if (questionLabel.getText().equals("Frage Bearbeiten")) {
+                    for (int i = 0; i < this.answers.size(); i++) {
+                        for (Answer answer : answers) {
+                            if (!this.answers.isEmpty() && this.answers.get(i).equals(answer.getValue())) {
+                                this.answers.remove(i);
+                            }
+                        }
+                    }
 
-		tbl_antworten.setDisable(!param.isAnswersListActivatable());
-		btnNewAnswer.setDisable(!param.isAnswersListActivatable());
-	}
+					answerIdsToDelete = this.answers.stream()
+							.map(QuestionService::getAnswerId)
+							.filter(Objects::nonNull)
+							.collect(Collectors.toCollection(ArrayList::new));
+                }
 
-	public class Antwort {
-		private int nr;
-		private String antwort;
+                if (!answerIdsToDelete.isEmpty()) {
+                    QuestionService.updateFlags(questionToSave);
+                    QuestionService.deleteAnswers(answerIdsToDelete, questionToSave.getQuestionId());
+                }
 
-		public int getNr() {
-			return nr;
-		}
+				answers.forEach(answer ->
+						answer.setId(Objects.requireNonNull(QuestionService.getAnswerId(answer.getValue())))
+				);
 
-		public void setNr(int nr) {
-			this.nr = nr;
-		}
+                QuestionService.getPossibleFlags(flags, param);
+                questionToSave.setFlags(flags);
+                QuestionService.saveMultipleChoice(questionnaire.getId(), questionToSave, answers);
+            }
+        } else {
+            QuestionService.getPossibleFlags(flags, param);//floNeu
+            questionToSave.setFlags(flags);
+            QuestionService.saveShortAnswerQuestion(questionnaire.getId(), questionToSave);
+        }
 
-		public String getAntwort() {
-			return antwort;
-		}
+        ScreenController.activate(SceneName.QUESTION_LIST);
 
-		public void setAntwort(String antwort) {
-			this.antwort = antwort;
-		}
+    }
 
-	}
+    @FXML
+    private void setPreview() {
+        StartController.makeQuestionnaire(Collections.singletonList(question), true);
+        ScreenController.activate(SceneName.SURVEY_0);
+    }
+
+    @FXML
+    private void createAnswer() {
+        TextInputDialog dialog = new TextInputDialog("");
+        dialog.setTitle("Antwort anlegen");
+        dialog.setContentText("Name:");
+        DialogPane dialogPane = dialog.getDialogPane();
+        dialogPane.getStylesheets().add(getURL("style/application.css").toExternalForm());
+
+        Optional<String> result = dialog.showAndWait();
+        result.ifPresent(name -> {
+            Answer antwort = new Answer();
+            antwort.setId(data.size() + 1);
+            antwort.setValue(name);
+            data.add(antwort);
+            Notifications.create().title("Antwort anlegen").text("Antwort \"" + name + "\" wurde erfolgreich angelegt.").show();
+        });
+
+    }
+
+    @FXML
+    private void createCategory() {
+        TextInputDialog dialog = new TextInputDialog("");
+        dialog.setTitle("Kategorie anlegen");
+        dialog.setContentText("Name:");
+        DialogPane dialogPane = dialog.getDialogPane();
+        dialogPane.getStylesheets().add(getURL("style/application.css").toExternalForm());
+
+        Optional<String> result = dialog.showAndWait();
+        result.ifPresent(name -> {
+            if (QuestionService.provideCategory(name)) {
+                ObservableList<String> listKat = FXCollections.observableArrayList(QuestionService.getCategories());
+                categoryChoiceBox.setItems(listKat);
+                categoryChoiceBox.getSelectionModel().select(name);
+                Notifications.create().title("Kategorie anlegen").text("Kategorie \"" + name + "\" wurde erfolgreich angelegt.").show();
+            } else {
+                Notifications.create().title("Kategorie anlegen").text("Ein Fehler ist aufgetreten.").showError();
+            }
+        });
+    }
+
+    @FXML
+    private void react() {
+        ReactController.question = question;
+        ReactController.questionnaire = questionnaire;
+
+        try {
+            ScreenController.addScreen(SceneName.REACT, FXMLLoader.load(getURL(SceneName.REACT_PATH)));
+            ScreenController.activate(SceneName.REACT);
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Ueberprueft ob alle Bedingungen zum Speichern gegeben sind.
+     */
+    public boolean checkQuestionData() {
+        boolean bool;
+        //System.out.println(textFieldFE.getText());
+        //System.out.println(artChoice.getSelectionModel().getSelectedItem());
+        if (!questionTextField.getText().equals("")) {
+            if (!questionTypeChoiceBox.getSelectionModel().getSelectedItem().equals("-- Art der Frage --")) {
+                bool = (answerTable.getItems().size() >= 1 && !yesNoCheckBox.isSelected()) || !questionTypeChoiceBox.getSelectionModel().getSelectedItem().equals("Multiple Choice");
+            } else {
+                bool = false;
+            }
+        } else {
+            bool = false;
+        }
+
+        return bool;
+    }
+
+    @FXML
+    private void updateCheckboxes() {
+        FrageEditParam param = new FrageEditParam(questionTypeChoiceBox, numberChoiceBox, numberTextField, requiredQuestionCheckBox, multipleChoiceCheckBox,
+				listCheckBox, textAreaCheckBox, yesNoCheckBox, headlineCheckBox, excelFormatCheckBox, numberCheckBox);
+
+        questionTypeChoiceBox.setDisable(!param.isTypeActivatable());
+        if (questionTypeChoiceBox.isDisabled()) {
+            questionTypeChoiceBox.getSelectionModel().select(1);
+        }
+
+        numberChoiceBox.setDisable(!param.isNumberTypeActivatable());
+        if (numberChoiceBox.isDisabled()) {
+            numberChoiceBox.getSelectionModel().clearSelection();
+        }
+
+        numberTextField.setDisable(!param.isCountCharsActivatable());
+        if (numberTextField.isDisabled()) {
+            numberTextField.clear();
+        }
+
+        requiredQuestionCheckBox.setDisable(!param.isRequiredActivatable());
+        if (requiredQuestionCheckBox.isDisabled()) {
+            requiredQuestionCheckBox.setSelected(false);
+        }
+
+        multipleChoiceCheckBox.setDisable(!param.isMultipleChoiceActivatable());
+        if (multipleChoiceCheckBox.isDisabled()) {
+            multipleChoiceCheckBox.setSelected(false);
+        }
+
+        listCheckBox.setDisable(!param.isListActivatable());
+        if (listCheckBox.isDisabled()) {
+            listCheckBox.setSelected(false);
+        }
+
+        textAreaCheckBox.setDisable(!param.isTextareaActivatable());
+        if (textAreaCheckBox.isDisabled()) {
+            textAreaCheckBox.setSelected(false);
+        }
+
+        yesNoCheckBox.setDisable(!param.isYesNoQuestionActivatable());
+        if (yesNoCheckBox.isDisabled()) {
+            yesNoCheckBox.setSelected(false);
+        }
+
+        excelFormatCheckBox.setDisable(!param.isSingleLineActivatable());
+        if (excelFormatCheckBox.isDisabled()) {
+            excelFormatCheckBox.setSelected(false);
+        }
+
+        numberCheckBox.setDisable(!param.isNumericActivatable());
+        if (numberCheckBox.isDisabled()) {
+            numberCheckBox.setSelected(false);
+        }
+
+        answerTable.setDisable(!param.isAnswersListActivatable());
+        newAnswerButton.setDisable(!param.isAnswersListActivatable());
+    }
+
 }
