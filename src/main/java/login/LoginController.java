@@ -50,7 +50,7 @@ public class LoginController {
 					ScreenController.addScreen(SceneName.ADMIN, FXMLLoader.load(getURL(SceneName.ADMIN_PATH)));
 					ScreenController.activate(SceneName.ADMIN);
 				} else {
-					GlobalVars.locations = LocationService.getStandort();
+					GlobalVars.locations = LocationService.getLocations();
 					ScreenController.addScreen(SceneName.LOCATION, FXMLLoader.load(getURL(SceneName.LOCATION_PATH)));
 					ScreenController.activate(SceneName.LOCATION);
 				}	

@@ -24,14 +24,9 @@ public class LoginService extends Database {
 		String path = String.format("%s%s.mv.db", DB_PATH, DB_NAME);
 
         String absPath = getURL(path).getPath().replace(".mv.db", "");
+		String url = String.format("jdbc:h2:%s;MODE=MySQL", absPath);
+		try (Connection connection = DriverManager.getConnection(url, user, pwd)) {
 
-		Connection connection;
-		try {
-			String url = String.format("jdbc:h2:%s;MODE=MySQL", absPath);
-			connection = DriverManager.getConnection(url, user,
-					pwd);
-
-			connection.close();
 			Database.user = user;
 			Database.pwd = pwd;
 			Database.url = url;

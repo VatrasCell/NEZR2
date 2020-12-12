@@ -40,19 +40,19 @@ public class ExportControllerImpl implements ExportController {
 	/**
 	  * Erstellt Excel Datei nach neuer Vorlage.
 	  * @param Path String: Dateipfad
-	  * @param fb FragebogenDialog: der Fragebogen
+	  * @param questionnaire FragebogenDialog: der Fragebogen
 	  * @param von String: Datum
 	  * @param bis String: Datum
 	  * @return boolean
 	 */
-	public boolean excelNeu(String Path, Questionnaire fb, String von, String bis) {
-		 List<Question> questions = SurveyService.getQuestions(fb);
+	public boolean excelNeu(String Path, Questionnaire questionnaire, String von, String bis) {
+		 List<Question> questions = SurveyService.getQuestions(questionnaire.getId());
 		 
 		 Row infoRow = this.sheet.createRow(0);
 		 Row katRow = this.sheet.createRow(2);
 		 Row faRow = this.sheet.createRow(3);
 
-		 infoRow.createCell(0).setCellValue(this.crHelper.createRichTextString("\"" + fb.getName() + "\" erstellt am " + fb.getDate() + " mit Befragungen vom " + von + " bis zum " + bis));
+		 infoRow.createCell(0).setCellValue(this.crHelper.createRichTextString("\"" + questionnaire.getName() + "\" erstellt am " + questionnaire.getDate() + " mit Befragungen vom " + von + " bis zum " + bis));
 		 for (int i = 0; i < ExportService.getAnzahlBefragung(); i++) {
 			 this.rows.add(this.sheet.createRow(4 + i));
 		 }

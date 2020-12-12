@@ -66,7 +66,7 @@ public class StartController {
 	 * The constructor (is called before the initialize()-method).
 	 */
 	public StartController() {
-		GlobalVars.activeQuestionnaire = StartService.getActivFragebogen();
+		GlobalVars.activeQuestionnaire = StartService.getActiveQuestionnaire();
 	}
 
 	/**
@@ -517,7 +517,7 @@ public class StartController {
 
 	@FXML
 	private void next() {
-		List<Question> questions = SurveyService.getQuestions(GlobalVars.activeQuestionnaire);
+		List<Question> questions = SurveyService.getQuestions(GlobalVars.activeQuestionnaire.getId());
 		makeQuestionnaire(questions, false);
 		GlobalVars.page = 0;
 		ScreenController.activate("survey_0");

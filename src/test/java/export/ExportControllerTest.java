@@ -19,6 +19,7 @@ import java.util.List;
 
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyInt;
 import static org.powermock.api.mockito.PowerMockito.when;
 
 @RunWith(PowerMockRunner.class)
@@ -43,7 +44,7 @@ public class ExportControllerTest {
         //arrange
         List<Question> questions = new ArrayList<>();
         PowerMockito.mockStatic(SurveyService.class);
-        when(SurveyService.getQuestions(any())).thenReturn(questions);
+        when(SurveyService.getQuestions(anyInt())).thenReturn(questions);
         //act
         boolean result = exportController.excelNeu(PATH, questionnaire, "2020-07-01", "2020-08-01");
         //assert

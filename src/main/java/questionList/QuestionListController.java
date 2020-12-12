@@ -17,17 +17,15 @@ import model.Question;
 import model.Questionnaire;
 import model.SceneName;
 import question.QuestionController;
-import survey.SurveyService;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 import static application.GlobalFuncs.getURL;
 
 public class QuestionListController {
     public static Questionnaire questionnaire;
-    private List<Question> fragen;
+    private List<Question> questions;
     private ObservableList<Question> data = FXCollections.observableArrayList();
 
     @FXML
@@ -56,19 +54,8 @@ public class QuestionListController {
 
     private void getData() {
         data.clear();
-        fragen = SurveyService.getQuestions(questionnaire);
-        ArrayList<Question> headlines = QuestionListService.getHeadlines(questionnaire.getId());
-        for (Question question : headlines) {
-            int pos = question.getPosition();
-            for (int j = 0; j < fragen.size(); j++) {
-                if (fragen.get(j).getPosition() == pos) {
-                    fragen.add(j, question);
-                    break;
-                }
-            }
-        }
-        //System.out.println(fragebogen.toString());
-        data.addAll(fragen);
+        questions = QuestionListService.getQuestions(questionnaire.getId());
+        data.addAll(questions);
     }
 
     /**
@@ -178,10 +165,10 @@ public class QuestionListController {
     @FXML
     private void newQuestion() {
         QuestionController.questionnaire = questionnaire;
-        System.out.println(fragen);
-        System.out.println(fragen.size());
+        System.out.println(questions);
+        System.out.println(questions.size());
 
-        QuestionController.question = new Question(fragen.size());
+        QuestionController.question = new Question(questions.size());
         try {
             ScreenController.addScreen(SceneName.QUESTION,
                     FXMLLoader.load(getURL(SceneName.QUESTION_PATH)));

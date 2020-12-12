@@ -78,10 +78,10 @@ public class SurveyController {
 		if(check()) {
 			if(GlobalVars.page < GlobalVars.countPanel - 1) {
 				GlobalVars.page++;
-				ScreenController.activate("survey_" + GlobalVars.page);
+				ScreenController.activate(SceneName.SURVEY + GlobalVars.page);
 			} else {
 				if(!isPreview) {
-					SurveyService.saveUmfrage(GlobalVars.questionsPerPanel);
+					SurveyService.saveSurvey(GlobalVars.activeQuestionnaire.getId(), GlobalVars.questionsPerPanel);
 					ScreenController.addScreen(SceneName.GRATITUDE,
 							FXMLLoader.load(getURL(SceneName.GRATITUDE_PATH)));
 					ScreenController.activate(SceneName.GRATITUDE);
@@ -179,7 +179,7 @@ public class SurveyController {
 						for(TextArea textArea : question.getAnswersTEXT()) {
 							if(!textArea.getText().equals("") && textArea.isVisible()) {
 								String string = textArea.getText();
-								antwort.add(Database.slashUnicode(string));
+								antwort.add(string);
 							}
 						}
 						question.setAnswer(antwort);
@@ -188,7 +188,7 @@ public class SurveyController {
 						for(TextField textField : question.getAnswersFF()) {
 							if(!textField.getText().equals("") && textField.isVisible()) {
 								String string = textField.getText();
-								antwort.add(Database.slashUnicode(string));
+								antwort.add(string);
 							}
 						}
 						question.setAnswer(antwort);

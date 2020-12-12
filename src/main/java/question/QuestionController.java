@@ -443,7 +443,7 @@ public class QuestionController {
                 }
 
                 if (!answerIdsToDelete.isEmpty()) {
-                    QuestionService.updateFlags(questionToSave);
+                    QuestionService.updateFlags(questionnaire.getId(), questionToSave);
                     QuestionService.deleteAnswers(answerIdsToDelete, questionToSave.getQuestionId());
                 }
 

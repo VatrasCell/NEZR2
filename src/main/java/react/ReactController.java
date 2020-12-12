@@ -71,7 +71,7 @@ public class ReactController {
 	 */
 	public ReactController() {
 		FlagList flags = question.getFlags();
-		fragen = SurveyService.getQuestions(questionnaire);
+		fragen = SurveyService.getQuestions(questionnaire.getId());
 
 		for (React react : flags.getAll(React.class)) {
 			Question question = fragen.get(getY(react.getQuestionId(), react.getQuestionType().toString(), fragen));

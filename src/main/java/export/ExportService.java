@@ -22,14 +22,12 @@ public class ExportService extends Database {
 	 */
 	public static int getAnzahlBefragung() {
 		int re = -1;
-		try {
-			Connection myCon = DriverManager.getConnection(url, user, pwd);
+		try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
 			Statement mySQL = myCon.createStatement();
 			ResultSet myRS = mySQL.executeQuery("SELECT COUNT(idBefragung) FROM Befragung");
 			if (myRS.next()) {
 				re = myRS.getInt("COUNT(idBefragung)");
 			}
-			myCon.close();
 		} catch (SQLException e) {
 			//ErrorLog.fehlerBerichtB("ERROR",
 			//		Datenbank.class + ": " + Thread.currentThread().getStackTrace()[1].getLineNumber(), e.getMessage());
@@ -53,8 +51,7 @@ public class ExportService extends Database {
 		ArrayList<ExcelCell> re = new ArrayList<ExcelCell>();
 		if (((question.getQuestionType().equals(QuestionType.MULTIPLE_CHOICE)) && (question.getFlags().is(SymbolType.B)))
 				|| (question.getFlags().is(SymbolType.LIST)) || (question.getFlags().is(SymbolType.JN))) {
-			try {
-				Connection myCon = DriverManager.getConnection(url, user, pwd);
+			try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
 				Statement mySQL = myCon.createStatement();
 				ResultSet myRS = mySQL.executeQuery(
 						"SELECT b2.idBefragung, antwort FROM Antworten a JOIN B_has_MC b ON a.AntwortNr = b.AntwortNr JOIN Befragung b2 ON b.idBefragung = b2.idBefragung WHERE idFragebogen="
@@ -66,11 +63,11 @@ public class ExportService extends Database {
 				while (myRS.next()) {
 					if (old != myRS.getInt("idBefragung")) {
 						strings = new ArrayList<String>();
-						strings.add(unslashUnicode(myRS.getString("antwort")));
+						strings.add(myRS.getString("antwort"));
 						re.add(new ExcelCell(myRS.getInt("idBefragung"), strings));
 						old = myRS.getInt("idBefragung");
 					} else {
-						strings.add(unslashUnicode(myRS.getString("antwort")));
+						strings.add(myRS.getString("antwort"));
 					}
 				}
 				myCon.close();
@@ -80,8 +77,7 @@ public class ExportService extends Database {
 				//		e.getMessage());
 			}
 		} else if (question.getQuestionType().equals(QuestionType.SHORT_ANSWER)) {
-			try {
-				Connection myCon = DriverManager.getConnection(url, user, pwd);
+			try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
 				Statement mySQL = myCon.createStatement();
 				ResultSet myRS = mySQL.executeQuery(
 						"SELECT b2.idBefragung, antwort FROM Antworten a JOIN B_has_FF b ON a.AntwortNr = b.AntwortNr JOIN Befragung b2 ON b.idBefragung = b2.idBefragung WHERE idFragebogen="
@@ -93,11 +89,11 @@ public class ExportService extends Database {
 				while (myRS.next()) {
 					if (old != myRS.getInt("idBefragung")) {
 						strings = new ArrayList<String>();
-						strings.add(unslashUnicode(myRS.getString("antwort")));
+						strings.add(myRS.getString("antwort"));
 						re.add(new ExcelCell(myRS.getInt("idBefragung"), strings));
 						old = myRS.getInt("idBefragung");
 					} else {
-						strings.add(unslashUnicode(myRS.getString("antwort")));
+						strings.add(myRS.getString("antwort"));
 					}
 				}
 				myCon.close();
@@ -126,13 +122,12 @@ public class ExportService extends Database {
 	 */
 	public static ArrayList<ExcelCell> getAntwortenPosition(Question question, String antwort, String von, String bis) {
 		ArrayList<ExcelCell> re = new ArrayList<ExcelCell>();
-		try {
-			Connection myCon = DriverManager.getConnection(url, user, pwd);
+		try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
 			String statement = "SELECT b2.idBefragung FROM Antworten a JOIN B_has_MC b ON a.AntwortNr = b.AntwortNr JOIN Befragung b2 ON b.idBefragung = b2.idBefragung WHERE idFragebogen=? AND idMultipleChoice=? AND antwort=? AND (b2.Datum BETWEEN ? AND ?)";
 			PreparedStatement psSql = myCon.prepareStatement(statement);
 			psSql.setInt(1, question.getQuestionnaireId());
 			psSql.setInt(2, question.getQuestionId());
-			psSql.setString(3, slashUnicode(antwort));
+			psSql.setString(3, antwort);
 			psSql.setString(4, von);
 			psSql.setString(5, bis);
 			ResultSet myRS = psSql.executeQuery();

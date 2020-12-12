@@ -10,7 +10,7 @@ import java.util.List;
 import static application.GlobalFuncs.getInputStream;
 
 public class GlobalVars {
-	public static final boolean DEV_MODE = false;
+	public static final boolean DEV_MODE = true;
 	public static final boolean IGNORE_CHECK = false;
 	public static int questions = 3;
 	public static final int perColumn = 3;
