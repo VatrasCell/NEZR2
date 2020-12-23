@@ -4,6 +4,8 @@ public class SqlStatement {
 
     private static final String SQL_MAX = "MAX(%s)";
 
+    public static final String SQL_COLUMN_NAME = "name";
+
     //Table location
     public static final String SQL_GET_LOCATION_ID = "SELECT location_id FROM location WHERE name=?";
     public static final String SQL_GET_LOCATION_NAMES = "SELECT location.name FROM location";
@@ -28,6 +30,8 @@ public class SqlStatement {
     public static final String SQL_COLUMN_MAX_QUESTIONNAIRE_ID = String.format(SQL_MAX, SQL_COLUMN_QUESTIONNAIRE_ID);
     public static final String SQL_COLUMN_CREATION_DATE = "creation_date";
     public static final String SQL_COLUMN_QUESTIONNAIRE_NAME = "questionnaire.name";
+    public static final String SQL_COLUMN_IS_ACTIVE = "is_active";
+    public static final String SQL_COLUMN_IS_FINAL = "is_final";
 
     //Table category
     public static final String SQL_CREATE_CATEGORY = "INSERT INTO category VALUES(NULL, ?)";
@@ -92,7 +96,7 @@ public class SqlStatement {
             + "category ON mc1.category_id=category.category_id JOIN "
             + "mc_has_a ON mc1.multiple_choice_id=mc_has_a.multiple_choice_id JOIN "
             + "answer ON mc_has_a.answer_id=answer.answer_id WHERE mc1.question=? "
-            + "UNION SELECT name FROM questionnaire JOIN "
+            + "UNION SELECT answer.name FROM questionnaire JOIN "
             + "q_has_sa ON questionnaire.questionnaire_id=q_has_sa.questionnaire_id JOIN "
             + "short_answer ff1 ON q_has_sa.short_answer_id=ff1.short_answer_id JOIN "
             + "category ON ff1.category_id=category.category_id JOIN short_answer "
@@ -125,6 +129,12 @@ public class SqlStatement {
     public static final String SQL_GET_SURVEY_HAS_SHORT_ANSWER_RELATION_ID = "SELECT s_sa_relation_id FROM s_has_sa WHERE survey_id=? AND short_answer_id=? AND answer_id=?";
     public static final String SQL_CREATE_SURVEY_HAS_SHORT_ANSWER_RELATION = "INSERT INTO s_has_sa VALUES(NULL,?, ?, ?)";
 
+    //Table headline
+    public static final String SQL_GET_HEADLINES = "SELECT * FROM headline";
+    public static final String SQL_GET_HEADLINE_BY_ID = "SELECT * FROM headline WHERE headline_id=?";
+
+    public static final String SQL_COLUMN_HEADLINE_ID = "headline_id";
+
     //Flags
     public static final String SQL_GET_SHORT_ANSWERS_FLAGS = "SELECT flags FROM q_has_sa WHERE questionnaire_id=? AND short_answer_id=?";
     public static final String SQL_GET_MULTIPLE_CHOICE_FLAGS = "SELECT flags FROM q_has_mc WHERE questionnaire_id=? AND multiple_choice_id=?";
@@ -140,7 +150,6 @@ public class SqlStatement {
     public static final String SQL_GET_MAX_MULTIPLE_CHOICE_POSITION = "SELECT MAX(q_has_mc.position) AS position FROM questionnaire JOIN q_has_mc ON questionnaire.questionnaire_id=q_has_mc.questionnaire_id WHERE questionnaire.questionnaire_id=?";
     public static final String SQL_GET_MAX_SHORT_ANSWER_POSITION = "SELECT MAX(q_has_sa.position) AS position FROM questionnaire JOIN q_has_sa ON questionnaire.questionnaire_id=q_has_sa.questionnaire_id WHERE questionnaire.questionnaire_id=?";
 
-    public static final String SQL_GET_HEADLINES = "SELECT mc1.question, mc1.multiple_choice_id, questionnaire.creation_date, q_has_mc.position, q_has_mc.flags, category.name, answer.name FROM questionnaire JOIN q_has_mc ON questionnaire.questionnaire_id=q_has_mc.questionnaire_id JOIN multiple_choice mc1 ON q_has_mc.multiple_choice_id=mc1.multiple_choice_id JOIN category ON mc1.category_id=category.category_id JOIN mc_has_a ON mc1.multiple_choice_id=mc_has_a.multiple_choice_id JOIN answer ON mc_has_a.answer_id=answer.answer_id WHERE questionnaire.questionnaire_id=? AND answer.name='#####'";
-    public static final String SQL_GET_MULTIPLE_CHOICE_QUESTION = "SELECT mc1.question, mc1.multiple_choice_id, questionnaire.creation_date, q_has_mc.position, q_has_mc.flags, category.name FROM questionnaire JOIN q_has_mc ON questionnaire.questionnaire_id=q_has_mc.questionnaire_id JOIN multiple_choice mc1 ON q_has_mc.multiple_choice_id=mc1.multiple_choice_id JOIN category ON mc1.category_id=category.category_id WHERE questionnaire.questionnaire_id=?";
-    public static final String SQL_GET_SHORT_ANSWER_QUESTION = "SELECT ff1.question, ff1.short_answer_id, questionnaire.creation_date, q_has_sa.position, q_has_sa.flags, category.name FROM questionnaire JOIN q_has_sa ON questionnaire.questionnaire_id=q_has_sa.questionnaire_id JOIN short_answer ff1 ON q_has_sa.short_answer_id=ff1.short_answer_id JOIN category ON ff1.category_id=category.category_id WHERE questionnaire.questionnaire_id=?";
+    public static final String SQL_GET_MULTIPLE_CHOICE_QUESTION = "SELECT mc1.question, mc1.multiple_choice_id, questionnaire.creation_date, q_has_mc.position, q_has_mc.flags, category.name, mc1.headline_id FROM questionnaire JOIN q_has_mc ON questionnaire.questionnaire_id=q_has_mc.questionnaire_id JOIN multiple_choice mc1 ON q_has_mc.multiple_choice_id=mc1.multiple_choice_id JOIN category ON mc1.category_id=category.category_id WHERE questionnaire.questionnaire_id=?";
+    public static final String SQL_GET_SHORT_ANSWER_QUESTION = "SELECT ff1.question, ff1.short_answer_id, questionnaire.creation_date, q_has_sa.position, q_has_sa.flags, category.name, ff1.headline_id FROM questionnaire JOIN q_has_sa ON questionnaire.questionnaire_id=q_has_sa.questionnaire_id JOIN short_answer ff1 ON q_has_sa.short_answer_id=ff1.short_answer_id JOIN category ON ff1.category_id=category.category_id WHERE questionnaire.questionnaire_id=?";
 }

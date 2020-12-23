@@ -66,10 +66,10 @@ public class QuestionListController {
     private void initialize() {
         tbl_fragen.setItems(data);
 
-        nameCol.setCellValueFactory(new PropertyValueFactory<>("frage"));
-        katCol.setCellValueFactory(new PropertyValueFactory<>("kategorie"));
-        posCol.setCellValueFactory(new PropertyValueFactory<>("Position"));
-        artCol.setCellValueFactory(new PropertyValueFactory<>("art"));
+        nameCol.setCellValueFactory(new PropertyValueFactory<>(Question.QUESTION));
+        katCol.setCellValueFactory(new PropertyValueFactory<>(Question.CATEGORY));
+        posCol.setCellValueFactory(new PropertyValueFactory<>(Question.POSITION));
+        artCol.setCellValueFactory(new PropertyValueFactory<>(Question.QUESTION_TYPE));
 
         actionCol.setCellValueFactory(new PropertyValueFactory<>("DUMMY"));
 

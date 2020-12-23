@@ -18,14 +18,15 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
 import static application.SqlStatement.SQL_COLUMN_ANSWER_ID;
 import static application.SqlStatement.SQL_COLUMN_ANSWER_NAME;
 import static application.SqlStatement.SQL_COLUMN_CATEGORY_NAME;
 import static application.SqlStatement.SQL_COLUMN_CREATION_DATE;
 import static application.SqlStatement.SQL_COLUMN_FLAGS;
+import static application.SqlStatement.SQL_COLUMN_HEADLINE_ID;
 import static application.SqlStatement.SQL_COLUMN_MULTIPLE_CHOICE_ID;
+import static application.SqlStatement.SQL_COLUMN_NAME;
 import static application.SqlStatement.SQL_COLUMN_POSITION;
 import static application.SqlStatement.SQL_COLUMN_QUESTION;
 import static application.SqlStatement.SQL_COLUMN_SHORT_ANSWER_ID;
@@ -36,6 +37,7 @@ import static application.SqlStatement.SQL_DELETE_SHORT_ANSWER;
 import static application.SqlStatement.SQL_DELETE_SHORT_ANSWER_HAS_ANSWERS_RELATION_BY_QUESTION_ID;
 import static application.SqlStatement.SQL_DELETE_SHORT_ANSWER_QUESTIONNAIRE_RELATION;
 import static application.SqlStatement.SQL_GET_HEADLINES;
+import static application.SqlStatement.SQL_GET_HEADLINE_BY_ID;
 import static application.SqlStatement.SQL_GET_MULTIPLE_CHOICE_IDS_BY_QUESTIONNAIRE_ID;
 import static application.SqlStatement.SQL_GET_MULTIPLE_CHOICE_QUESTION;
 import static application.SqlStatement.SQL_GET_MULTIPLE_CHOICE_QUESTION_ANSWERS;
@@ -52,18 +54,10 @@ public class QuestionListService extends Database {
 
     public static List<Question> getQuestions(int questionnaireId) {
         List<Question> questions = new ArrayList<>();
-        List<Headline> headlines = getHeadlines(questionnaireId);
         questions.addAll(Objects.requireNonNull(getMultipleChoiceQuestions(questionnaireId)));
         questions.addAll(Objects.requireNonNull(getShortAnswerQuestions(questionnaireId)));
 
         questions.sort(Comparator.comparing(Question::getPosition));
-
-        headlines.forEach(
-                headline -> {
-                    Optional<Question> foundQuestion = questions.stream().filter(question -> question.getPosition() == headline.getPosition()).findFirst();
-                    foundQuestion.ifPresent(question -> question.setHeadline(headline.getHeadline()));
-                }
-        );
 
         return questions;
     }
@@ -84,6 +78,10 @@ public class QuestionListService extends Database {
                 question.setFlags(new FlagList(myRS.getString(SQL_COLUMN_FLAGS)));
                 question.setPosition(Integer.parseInt(myRS.getString(SQL_COLUMN_POSITION)));
                 question.setQuestionType(QuestionType.MULTIPLE_CHOICE);
+                int headlineId = myRS.getInt(SQL_COLUMN_HEADLINE_ID);
+                if (headlineId > 0) {
+                    question.setHeadline(getHeadline(headlineId));
+                }
                 question.setQuestionnaireId(questionnaireId);
                 questions.add(question);
             }
@@ -112,6 +110,10 @@ public class QuestionListService extends Database {
                 question.setFlags(new FlagList(myRS.getString(SQL_COLUMN_FLAGS)));
                 question.setPosition(Integer.parseInt(myRS.getString(SQL_COLUMN_POSITION)));
                 question.setQuestionType(QuestionType.SHORT_ANSWER);
+                int headlineId = myRS.getInt(SQL_COLUMN_HEADLINE_ID);
+                if (headlineId > 0) {
+                    question.setHeadline(getHeadline(headlineId));
+                }
                 question.setQuestionnaireId(questionnaireId);
                 questions.add(question);
             }
@@ -128,17 +130,32 @@ public class QuestionListService extends Database {
         List<Headline> headlines = new ArrayList<>();
         try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
             PreparedStatement psSql = myCon.prepareStatement(SQL_GET_HEADLINES);
-            psSql.setInt(1, questionnaireId);
             ResultSet myRS = psSql.executeQuery();
             while (myRS.next()) {
-                int position = Integer.parseInt(myRS.getString(SQL_COLUMN_POSITION));
-                String value = myRS.getString(SQL_COLUMN_QUESTION);
-                headlines.add(new Headline(position, value));
+                int id = myRS.getInt(SQL_COLUMN_HEADLINE_ID);
+                String name = myRS.getString(SQL_COLUMN_NAME);
+                headlines.add(new Headline(id, name));
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
         return headlines;
+    }
+
+    public static Headline getHeadline(int headlineId) {
+        try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
+            PreparedStatement psSql = myCon.prepareStatement(SQL_GET_HEADLINE_BY_ID);
+            psSql.setInt(1, headlineId);
+            ResultSet myRS = psSql.executeQuery();
+            if (myRS.next()) {
+                int id = myRS.getInt(SQL_COLUMN_HEADLINE_ID);
+                String name = myRS.getString(SQL_COLUMN_NAME);
+                return new Headline(id, name);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     /**

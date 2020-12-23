@@ -30,6 +30,7 @@ import model.Question;
 import model.Questionnaire;
 import model.SceneName;
 import question.QuestionController;
+import questionList.QuestionListService;
 import survey.SurveyService;
 
 import java.text.MessageFormat;
@@ -71,7 +72,7 @@ public class ReactController {
 	 */
 	public ReactController() {
 		FlagList flags = question.getFlags();
-		fragen = SurveyService.getQuestions(questionnaire.getId());
+		fragen = QuestionListService.getQuestions(questionnaire.getId());
 
 		for (React react : flags.getAll(React.class)) {
 			Question question = fragen.get(getY(react.getQuestionId(), react.getQuestionType().toString(), fragen));

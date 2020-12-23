@@ -113,10 +113,10 @@ public class QuestionController {
         // fuer die Generierung der Antwortentabelle
         answers = QuestionService.getAnswers(question);
         for (int i = 0; i < Objects.requireNonNull(answers).size(); ++i) {
-            Answer antwort = new Answer();
-            antwort.setId(i + 1);
-            antwort.setValue(answers.get(i));
-            data.add(antwort);
+            Answer answer = new Answer();
+            answer.setId(i + 1);
+            answer.setValue(answers.get(i));
+            data.add(answer);
         }
     }
 
@@ -128,8 +128,8 @@ public class QuestionController {
     private void initialize() {
         answerTable.setItems(data);
 
-        answerIdTableColumn.setCellValueFactory(new PropertyValueFactory<>("nr"));
-        answerValueTableColumn.setCellValueFactory(new PropertyValueFactory<>("antwort"));
+        answerIdTableColumn.setCellValueFactory(new PropertyValueFactory<>(Answer.ID));
+        answerValueTableColumn.setCellValueFactory(new PropertyValueFactory<>(Answer.VALUE));
 
         actionCol.setCellValueFactory(new PropertyValueFactory<>("DUMMY"));
 

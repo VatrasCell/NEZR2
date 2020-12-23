@@ -15,6 +15,12 @@ import java.util.ArrayList;
 import java.util.Comparator;
 
 public class Question implements Comparable<Question>, Comparator<Question> {
+
+    public static final String QUESTION = "question";
+    public static final String CATEGORY = "category";
+    public static final String POSITION = "position";
+    public static final String QUESTION_TYPE = "questionType";
+
     private String question;
     private int questionId;
     private QuestionType questionType;
@@ -22,7 +28,7 @@ public class Question implements Comparable<Question>, Comparator<Question> {
     private String date;
     private FlagList flags;
     private int position;
-    private String headline = "";
+    private Headline headline;
     private ArrayList<String> answerOptions = new ArrayList<>();
     private ArrayList<String> answer = new ArrayList<>();
     private Label questionLabel;
@@ -33,7 +39,6 @@ public class Question implements Comparable<Question>, Comparator<Question> {
     private ArrayList<TextArea> answersTEXT = new ArrayList<>();
     private Question target;
     private int questionnaireId;
-
 
     /**
      *
@@ -147,17 +152,11 @@ public class Question implements Comparable<Question>, Comparator<Question> {
         this.position = position;
     }
 
-    /**
-     * @return the headline
-     */
-    public String getHeadline() {
+    public Headline getHeadline() {
         return headline;
     }
 
-    /**
-     * @param headline the headline to set
-     */
-    public void setHeadline(String headline) {
+    public void setHeadline(Headline headline) {
         this.headline = headline;
     }
 
@@ -468,7 +467,7 @@ public class Question implements Comparable<Question>, Comparator<Question> {
                             GlobalVars.everythingIsAwesome = false;
                         }
                         break;
-					case LTE:
+                    case LTE:
                         try {
                             Integer.parseInt(textField.getText());
                             GlobalVars.everythingIsAwesome = textField.getText().length() <= i;
@@ -476,7 +475,7 @@ public class Question implements Comparable<Question>, Comparator<Question> {
                             GlobalVars.everythingIsAwesome = false;
                         }
                         break;
-					case GTE:
+                    case GTE:
                         try {
                             Integer.parseInt(textField.getText());
                             GlobalVars.everythingIsAwesome = textField.getText().length() >= i;

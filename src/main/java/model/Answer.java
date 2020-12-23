@@ -3,6 +3,10 @@ package model;
 import java.util.Objects;
 
 public class Answer {
+
+    public static final String ID = "id";
+    public static final String VALUE = "value";
+
     private int id;
     private String value;
 

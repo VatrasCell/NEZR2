@@ -10,7 +10,6 @@ import model.QuestionType;
 import model.Questionnaire;
 import question.QuestionService;
 import questionList.QuestionListService;
-import survey.SurveyService;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -22,8 +21,13 @@ import java.util.List;
 import java.util.Objects;
 
 import static application.SqlStatement.SQL_ACTIVATE_QUESTIONNAIRE;
+import static application.SqlStatement.SQL_COLUMN_CREATION_DATE;
+import static application.SqlStatement.SQL_COLUMN_IS_ACTIVE;
+import static application.SqlStatement.SQL_COLUMN_IS_FINAL;
 import static application.SqlStatement.SQL_COLUMN_LOCATION_ID;
 import static application.SqlStatement.SQL_COLUMN_MAX_QUESTIONNAIRE_ID;
+import static application.SqlStatement.SQL_COLUMN_NAME;
+import static application.SqlStatement.SQL_COLUMN_QUESTIONNAIRE_ID;
 import static application.SqlStatement.SQL_CREATE_QUESTIONNAIRE;
 import static application.SqlStatement.SQL_DEACTIVATE_OTHER_QUESTIONNAIRES;
 import static application.SqlStatement.SQL_DEACTIVATE_QUESTIONNAIRE;
@@ -48,12 +52,12 @@ public class AdminService extends Database {
 
             while (myRS.next()) {
                 Questionnaire fb = new Questionnaire();
-                fb.setName(myRS.getString("name"));
-                fb.setDate(myRS.getString("date"));
+                fb.setName(myRS.getString(SQL_COLUMN_NAME));
+                fb.setDate(myRS.getString(SQL_COLUMN_CREATION_DATE));
                 fb.setOrt(location);
-                fb.setActive(myRS.getBoolean("is_active")); // anneNeu
-                fb.setId(myRS.getInt("questionnaire_id")); // anneNeuFlorian
-                fb.setFinal(myRS.getBoolean("is_final"));
+                fb.setActive(myRS.getBoolean(SQL_COLUMN_IS_ACTIVE)); // anneNeu
+                fb.setId(myRS.getInt(SQL_COLUMN_QUESTIONNAIRE_ID)); // anneNeuFlorian
+                fb.setFinal(myRS.getBoolean(SQL_COLUMN_IS_FINAL));
                 questionnaire.add(fb);
             }
             return questionnaire;
@@ -91,7 +95,7 @@ public class AdminService extends Database {
 
     public static boolean copyQuestionnaire(Questionnaire questionnaire, String location) {
         questionnaire.setId(createQuestionnaire(questionnaire.getName(), location));
-        List<Question> questions = SurveyService.getQuestions(questionnaire.getId());
+        List<Question> questions = QuestionListService.getQuestions(questionnaire.getId());
         for (Question question : Objects.requireNonNull(questions)) {
             if (question.getQuestionType().equals(QuestionType.SHORT_ANSWER)) {
                 QuestionService.saveShortAnswerQuestion(questionnaire.getId(), question);

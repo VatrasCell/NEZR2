@@ -21,6 +21,7 @@ import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.ss.util.RegionUtil;
 import org.apache.poi.ss.util.WorkbookUtil;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import questionList.QuestionListService;
 import survey.SurveyService;
 
 import java.io.File;
@@ -46,7 +47,7 @@ public class ExportControllerImpl implements ExportController {
 	  * @return boolean
 	 */
 	public boolean excelNeu(String Path, Questionnaire questionnaire, String von, String bis) {
-		 List<Question> questions = SurveyService.getQuestions(questionnaire.getId());
+		 List<Question> questions = QuestionListService.getQuestions(questionnaire.getId());
 		 
 		 Row infoRow = this.sheet.createRow(0);
 		 Row katRow = this.sheet.createRow(2);

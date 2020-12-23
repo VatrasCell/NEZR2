@@ -12,6 +12,7 @@ import org.mockito.MockitoAnnotations;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
+import questionList.QuestionListService;
 import survey.SurveyService;
 
 import java.util.ArrayList;
@@ -44,7 +45,7 @@ public class ExportControllerTest {
         //arrange
         List<Question> questions = new ArrayList<>();
         PowerMockito.mockStatic(SurveyService.class);
-        when(SurveyService.getQuestions(anyInt())).thenReturn(questions);
+        when(QuestionListService.getQuestions(anyInt())).thenReturn(questions);
         //act
         boolean result = exportController.excelNeu(PATH, questionnaire, "2020-07-01", "2020-08-01");
         //assert

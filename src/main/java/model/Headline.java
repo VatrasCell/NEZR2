@@ -1,47 +1,45 @@
 package model;
 
-/**
- * @author Julian
- * @version 1.0.0
- */
 public class Headline {
-	private int position;
-	private String headline;
-	
-	
-	
-	/**
-	 * @param position the position
-	 * @param headline the headline
-	 */
-	public Headline(int position, String headline) {
-		super();
-		this.position = position;
-		this.headline = headline;
-	}
-	/**
-	 * @return the position
-	 */
-	public int getPosition() {
-		return position;
-	}
-	/**
-	 * @param position the position to set
-	 */
-	public void setPosition(int position) {
-		this.position = position;
-	}
-	/**
-	 * @return the headline
-	 */
-	public String getHeadline() {
-		return headline;
-	}
-	/**
-	 * @param headline the headline to set
-	 */
-	public void setHeadline(String headline) {
-		this.headline = headline;
-	}
-	
+    private int id;
+    private String name;
+
+    /**
+     * @param id   the position
+     * @param name the headline
+     */
+    public Headline(int id, String name) {
+        super();
+        this.id = id;
+        this.name = name;
+    }
+
+    /**
+     * @return the position
+     */
+    public int getId() {
+        return id;
+    }
+
+    /**
+     * @param id the position to set
+     */
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    /**
+     * @return the headline
+     */
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * @param name the headline to set
+     */
+    public void setName(String name) {
+        this.name = name;
+    }
+
 }

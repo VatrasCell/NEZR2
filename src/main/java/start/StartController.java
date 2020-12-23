@@ -32,6 +32,7 @@ import model.PanelInfo;
 import model.Question;
 import model.QuestionType;
 import model.SceneName;
+import questionList.QuestionListService;
 import survey.SurveyController;
 import survey.SurveyService;
 
@@ -198,7 +199,7 @@ public class StartController {
 		// set headline
 		if (!question.getHeadline().equals("") && !info.hasHeadline()) {
 			Label lbl_headline = (Label) screen.lookup("#lbl_headline");
-			lbl_headline.setText(removeMark(question.getHeadline()));
+			lbl_headline.setText(removeMark(question.getHeadline().getName()));
 			info.setHeadline(true);
 		}
 
@@ -517,7 +518,7 @@ public class StartController {
 
 	@FXML
 	private void next() {
-		List<Question> questions = SurveyService.getQuestions(GlobalVars.activeQuestionnaire.getId());
+		List<Question> questions = QuestionListService.getQuestions(GlobalVars.activeQuestionnaire.getId());
 		makeQuestionnaire(questions, false);
 		GlobalVars.page = 0;
 		ScreenController.activate("survey_0");
