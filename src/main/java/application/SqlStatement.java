@@ -3,6 +3,7 @@ package application;
 public class SqlStatement {
 
     private static final String SQL_MAX = "MAX(%s)";
+    private static final String SQL_COUNT = "COUNT(%s)";
 
     public static final String SQL_COLUMN_NAME = "name";
 
@@ -81,6 +82,14 @@ public class SqlStatement {
     //Table survey
     public static final String SQL_CREATE_SURVEY = "INSERT INTO survey VALUES(NULL, CURDATE(), ?)";
     public static final String SQL_GET_MAX_SURVEY_ID = "SELECT MAX(survey_id) FROM survey";
+    public static final String SQL_GET_SURVEY_COUNT = "SELECT COUNT(survey_id) FROM survey";
+    public static final String SQL_GET_MULTIPLE_CHOICE_SURVEY_ID_AND_ANSWER = "SELECT s.survey_id, a.name FROM answer a JOIN s_has_mc rel ON a.answer_id = rel.answer_id JOIN survey s ON rel.survey_id = s.survey_id WHERE questionnaire_id=? AND multiple_choice_id=? AND (s.creation_date BETWEEN ? AND ?)";
+    public static final String SQL_GET_SHORT_ANSWER_SURVEY_ID_AND_ANSWER = "SELECT s.survey_id, a.name FROM answer a JOIN s_has_sa rel ON a.answer_id = rel.answer_id JOIN survey s ON rel.survey_id = s.survey_id WHERE questionnaire_id=? AND short_answer_id=? AND (s.creation_date BETWEEN ? AND ?)";
+    public static final String SQL_GET_MULTIPLE_CHOICE_SURVEY_ID_BY_ANSWER = "SELECT s.survey_id FROM answer a JOIN s_has_mc rel ON a.answer_id = rel.answer_id JOIN survey s ON rel.survey_id = s.survey_id WHERE questionnaire_id=? AND multiple_choice_id=? AND a.name=? AND (s.creation_date BETWEEN ? AND ?)";
+
+    public static final String SQL_COLUMN_SURVEY_ID = "survey_id";
+    public static final String SQL_COLUMN_SURVEY_ID_COUNT = String.format(SQL_COUNT, SQL_COLUMN_SURVEY_ID);
+    public static final String SQL_COLUMN_SURVEY_ID_MAX = String.format(SQL_MAX, SQL_COLUMN_SURVEY_ID);
 
     //Table answer
     public static final String SQL_DELETE_ANSWERS = "DELETE FROM answer WHERE answer_id NOT IN (SELECT answer_id FROM mc_has_a) " +

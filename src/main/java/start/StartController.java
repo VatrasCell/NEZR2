@@ -197,7 +197,7 @@ public class StartController {
 		VBox vBox = (VBox) screen.lookup("#vbox");
 
 		// set headline
-		if (!question.getHeadline().equals("") && !info.hasHeadline()) {
+		if (question.getHeadline() != null && !info.hasHeadline()) {
 			Label lbl_headline = (Label) screen.lookup("#lbl_headline");
 			lbl_headline.setText(removeMark(question.getHeadline().getName()));
 			info.setHeadline(true);
@@ -341,7 +341,7 @@ public class StartController {
 		//hBox.setSpacing(32);
 		// Uebe die schleife aus, wenn count kleiner ist als die groesse der
 		// antwortmoeglichkeiten
-		ArrayList<CheckBox> checkboxs = new ArrayList<>();
+		ArrayList<CheckBox> checkBoxes = new ArrayList<>();
 		
 		for (int count3 = 0; count3 < question.getAnswerOptions().size(); count3++) {
 
@@ -370,15 +370,12 @@ public class StartController {
 			}
 			checkBoxen.add(chckbxSda);
 			if (!question.getFlags().is(SymbolType.MC)) {
-				chckbxSda.selectedProperty().addListener(new ChangeListener<Boolean>() {
-					public void changed(ObservableValue<? extends Boolean> ov, Boolean old_val,
-							Boolean new_val) {
-						// System.out.println("!isMC" + ov + " - " + old_val + " - " + new_val);
-						if (new_val) {
-							for (int i = 0; i < checkBoxen.size(); i++) {
-								if (!checkBoxen.get(i).getText().equals(chckbxSda.getText()))
-									checkBoxen.get(i).setSelected(false);
-							}
+				chckbxSda.selectedProperty().addListener((ov, old_val, new_val) -> {
+					// System.out.println("!isMC" + ov + " - " + old_val + " - " + new_val);
+					if (new_val) {
+						for (CheckBox checkBox : checkBoxen) {
+							if (!checkBox.getText().equals(chckbxSda.getText()))
+								checkBox.setSelected(false);
 						}
 					}
 				});
@@ -394,11 +391,8 @@ public class StartController {
 				 * } });
 				 */
 			} else {
-				chckbxSda.selectedProperty().addListener(new ChangeListener<Boolean>() {
-					public void changed(ObservableValue<? extends Boolean> ov, Boolean old_val,
-							Boolean new_val) {
-						// System.out.println(ov + " - " + old_val + " - " + new_val);
-					}
+				chckbxSda.selectedProperty().addListener((ov, old_val, new_val) -> {
+					// System.out.println(ov + " - " + old_val + " - " + new_val);
 				});
 			}
 
@@ -446,7 +440,7 @@ public class StartController {
 					hBox.getChildren().add(chckbxSda);
 				}
 			}
-			checkboxs.add(chckbxSda);
+			checkBoxes.add(chckbxSda);
 
 			/*
 			 * if(count3 == frageObj.get(y).getAntwort_moeglichkeit().size() - 1) { for(int
@@ -459,7 +453,7 @@ public class StartController {
 		}
 		
 		info.setbHeadlines(true);
-		question.setAnswersMC(checkboxs);
+		question.setAnswersMC(checkBoxes);
 		return hBox;
 	}
 

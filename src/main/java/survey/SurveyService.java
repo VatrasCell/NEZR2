@@ -17,6 +17,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static application.SqlStatement.SQL_COLUMN_SURVEY_ID_MAX;
 import static application.SqlStatement.SQL_CREATE_SURVEY;
 import static application.SqlStatement.SQL_CREATE_SURVEY_HAS_MULTIPLE_CHOICE_RELATION;
 import static application.SqlStatement.SQL_CREATE_SURVEY_HAS_SHORT_ANSWER_RELATION;
@@ -110,9 +111,10 @@ public class SurveyService extends Database {
             psSql.setInt(1, questionnaireId);
             psSql.executeUpdate();
 
-            ResultSet myRS = psSql.executeQuery(SQL_GET_MAX_SURVEY_ID);
+            psSql = myCon.prepareStatement(SQL_GET_MAX_SURVEY_ID);
+            ResultSet myRS = psSql.executeQuery();
             if (myRS.next()) {
-                return myRS.getInt("MAX(idBefragung)");
+                return myRS.getInt(SQL_COLUMN_SURVEY_ID_MAX);
             }
         } catch (SQLException e) {
             e.printStackTrace();

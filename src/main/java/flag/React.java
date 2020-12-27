@@ -7,12 +7,7 @@ public class React extends Flag {
 	private QuestionType questionType;
 	private int questionId;
 	private int answerPos;
-	
-	/**
-	 * @param questionType
-	 * @param questionId
-	 * @param answerPos
-	 */
+
 	public React(QuestionType questionType, int questionId, int answerPos) {
 		super();
 		this.questionType = questionType;
@@ -64,7 +59,7 @@ public class React extends Flag {
 	
 	@Override
 	public String toString() {
-		return questionType.toString() + questionId + ANSWER + answerPos;
+		return questionType.getQuestionType() + questionId + ANSWER + answerPos;
 	}
 	
 	

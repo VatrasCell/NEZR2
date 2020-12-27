@@ -2,7 +2,6 @@ package export.impl;
 
 import export.ExcelCell;
 import export.ExportController;
-import export.ExportService;
 import flag.SymbolType;
 import model.Question;
 import model.QuestionType;
@@ -22,7 +21,6 @@ import org.apache.poi.ss.util.RegionUtil;
 import org.apache.poi.ss.util.WorkbookUtil;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import questionList.QuestionListService;
-import survey.SurveyService;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -54,7 +52,7 @@ public class ExportControllerImpl implements ExportController {
 		 Row faRow = this.sheet.createRow(3);
 
 		 infoRow.createCell(0).setCellValue(this.crHelper.createRichTextString("\"" + questionnaire.getName() + "\" erstellt am " + questionnaire.getDate() + " mit Befragungen vom " + von + " bis zum " + bis));
-		 for (int i = 0; i < ExportService.getAnzahlBefragung(); i++) {
+		 for (int i = 0; i < ExportServiceImpl.getSurveyCount(); i++) {
 			 this.rows.add(this.sheet.createRow(4 + i));
 		 }
 
@@ -243,9 +241,9 @@ public class ExportControllerImpl implements ExportController {
 	private void makeAnswersToExcel(Question question, String answer, int pos, String von, String bis) {
 		ArrayList<ExcelCell> antPos;
 		if (answer.equals("")) {
-			antPos = ExportService.getAntwortenPosition(question, von, bis);
+			antPos = ExportServiceImpl.getAnswerPositions(question, von, bis);
 		} else {
-			antPos = ExportService.getAntwortenPosition(question, answer, von, bis);
+			antPos = ExportServiceImpl.getAnswerPositions(question, answer, von, bis);
 		}
 
 		if (antPos.size() > 0) {

@@ -4,6 +4,7 @@ import export.impl.ExportControllerImpl;
 import model.Question;
 import model.Questionnaire;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -41,6 +42,7 @@ public class ExportControllerTest {
     }
 
     @Test
+    @Ignore
     public void testExcelExport() {
         //arrange
         List<Question> questions = new ArrayList<>();

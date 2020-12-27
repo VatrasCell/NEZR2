@@ -78,6 +78,7 @@ public class QuestionListService extends Database {
                 question.setFlags(new FlagList(myRS.getString(SQL_COLUMN_FLAGS)));
                 question.setPosition(Integer.parseInt(myRS.getString(SQL_COLUMN_POSITION)));
                 question.setQuestionType(QuestionType.MULTIPLE_CHOICE);
+                question.setAnswerOptions(QuestionService.getAnswers(question));
                 int headlineId = myRS.getInt(SQL_COLUMN_HEADLINE_ID);
                 if (headlineId > 0) {
                     question.setHeadline(getHeadline(headlineId));
