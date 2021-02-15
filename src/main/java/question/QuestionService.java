@@ -1,17 +1,18 @@
 package question;
 
 import application.Database;
+import application.NotificationController;
 import flag.FlagList;
 import flag.Number;
 import flag.NumberOperator;
+import flag.React;
 import flag.Symbol;
 import flag.SymbolType;
+import message.MessageId;
 import model.Answer;
-import model.FrageEditParam;
 import model.Question;
+import model.QuestionEditParam;
 import model.QuestionType;
-import org.controlsfx.control.Notifications;
-import questionList.QuestionListService;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -33,6 +34,7 @@ import static application.SqlStatement.SQL_COLUMN_MULTIPLE_CHOICE_QUESTIONNAIRE_
 import static application.SqlStatement.SQL_COLUMN_NAME;
 import static application.SqlStatement.SQL_COLUMN_POSITION;
 import static application.SqlStatement.SQL_COLUMN_SHORT_ANSWER_ID;
+import static application.SqlStatement.SQL_COLUMN_SHORT_ANSWER_QUESTIONNAIRE_RELATION_ID;
 import static application.SqlStatement.SQL_CREATE_ANSWER;
 import static application.SqlStatement.SQL_CREATE_CATEGORY;
 import static application.SqlStatement.SQL_CREATE_MULTIPLE_CHOICE;
@@ -57,6 +59,8 @@ import static application.SqlStatement.SQL_GET_MULTIPLE_CHOICE_QUESTIONNAIRE_REL
 import static application.SqlStatement.SQL_GET_SHORT_ANSWERS_FLAGS;
 import static application.SqlStatement.SQL_GET_SHORT_ANSWER_ID;
 import static application.SqlStatement.SQL_GET_SHORT_ANSWER_QUESTIONNAIRE_RELATION_ID;
+import static application.SqlStatement.SQL_GET_TARGET_QUESTION_FLAG_AND_ID_FOR_MULTIPLE_CHOICE;
+import static application.SqlStatement.SQL_GET_TARGET_QUESTION_FLAG_AND_ID_FOR_SHORT_ANSWER;
 import static application.SqlStatement.SQL_SET_FLAGS_ON_MULTIPLE_CHOICE_QUESTIONNAIRE_RELATION;
 import static application.SqlStatement.SQL_SET_FLAGS_ON_SHORT_ANSWER_QUESTIONNAIRE_RELATION;
 import static application.SqlStatement.SQL_SET_POSITION_ON_MULTIPLE_CHOICE_QUESTIONNAIRE_RELATION;
@@ -93,7 +97,7 @@ public class QuestionService extends Database {
         return Math.max(maxPosFf, maxPosMc);
     }
 
-    public static Integer getMaxMultipleChoicePosition(int questionnaireId) {
+    private static Integer getMaxMultipleChoicePosition(int questionnaireId) {
         try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
             PreparedStatement psSql = myCon.prepareStatement(SQL_GET_MAX_MULTIPLE_CHOICE_POSITION);
             psSql.setInt(1, questionnaireId);
@@ -108,7 +112,7 @@ public class QuestionService extends Database {
         return null;
     }
 
-    public static Integer getMaxShortAnswerPosition(int questionnaireId) {
+    private static Integer getMaxShortAnswerPosition(int questionnaireId) {
         try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
             PreparedStatement psSql = myCon.prepareStatement(SQL_GET_MAX_SHORT_ANSWER_POSITION);
             psSql.setInt(1, questionnaireId);
@@ -123,11 +127,11 @@ public class QuestionService extends Database {
         return null;
     }
 
-    public static ArrayList<String> getCategories() {
+    public static List<String> getCategories() {
         try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
             Statement mySQL = myCon.createStatement();
             ResultSet myRS = mySQL.executeQuery(SQL_GET_CATEGORIE_NAMES);
-            ArrayList<String> categories = new ArrayList<>();
+            List<String> categories = new ArrayList<>();
 
             while (myRS.next()) {
                 categories.add(myRS.getString(SQL_COLUMN_CATEGORY_NAME));
@@ -140,7 +144,8 @@ public class QuestionService extends Database {
         return null;
     }
 
-    public static void getPossibleFlags(FlagList flags, FrageEditParam param) {
+    // rework method
+    public static void getPossibleFlags(FlagList flags, QuestionEditParam param) {
         if (param.isRequired()) {
             flags.add(new Symbol(SymbolType.REQUIRED));
         }
@@ -150,7 +155,7 @@ public class QuestionService extends Database {
         if (param.isMultipleChoice()) {
             flags.add(new Symbol(SymbolType.MC));
         }
-        if (param.isTextarea()) {
+        if (param.isTextArea()) {
             flags.add(new Symbol(SymbolType.TEXT));
         }
         if (param.isYesNoQuestion()) {
@@ -181,14 +186,67 @@ public class QuestionService extends Database {
         }
     }
 
-    public static void updateFlags(int questionnaireId, Question question) {
-        QuestionListService.deleteMultipleChoiceReactFlagsFromTargetQuestion(questionnaireId, question.getQuestionId());
-        QuestionListService.deleteShortAnswerReactFlagsFromTargetQuestion(questionnaireId, question.getQuestionId());
+    public static void deleteFlagsFromTargetQuestion(int questionnaireId, int questionId) {
+        deleteMultipleChoiceReactFlagsFromTargetQuestion(questionnaireId, questionId);
+        deleteShortAnswerReactFlagsFromTargetQuestion(questionnaireId, questionId);
+    }
+
+    private static void deleteShortAnswerReactFlagsFromTargetQuestion(int questionnaireId, int questionId) {
+
+        try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
+            PreparedStatement psSql = myCon.prepareStatement(SQL_GET_TARGET_QUESTION_FLAG_AND_ID_FOR_SHORT_ANSWER);
+            psSql.setInt(1, questionId);
+            psSql.setInt(2, questionnaireId);
+            ResultSet myRS = psSql.executeQuery();
+
+            while (myRS.next()) {
+                FlagList flags = new FlagList(myRS.getString(SQL_COLUMN_FLAGS));
+                int targetQuestionId = myRS.getInt(SQL_COLUMN_SHORT_ANSWER_ID);
+                List<React> flagsToDelete = flags.getAll(React.class);
+                if (!flagsToDelete.isEmpty()) {
+                    flags.removeAll(flagsToDelete);
+
+                    psSql = myCon.prepareStatement(SQL_UPDATE_SHORT_ANSWERS_FLAGS);
+                    psSql.setInt(1, questionnaireId);
+                    psSql.setInt(2, targetQuestionId);
+                    psSql.execute();
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static void deleteMultipleChoiceReactFlagsFromTargetQuestion(int questionnaireId, int questionId) {
+        try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
+
+            PreparedStatement psSql = myCon.prepareStatement(SQL_GET_TARGET_QUESTION_FLAG_AND_ID_FOR_MULTIPLE_CHOICE);
+            psSql.setInt(1, questionId);
+            psSql.setInt(2, questionnaireId);
+            ResultSet myRS = psSql.executeQuery();
+
+            while (myRS.next()) {
+                FlagList flags = new FlagList(myRS.getString(SQL_COLUMN_FLAGS));
+                int targetQuestionId = myRS.getInt(SQL_COLUMN_MULTIPLE_CHOICE_ID);
+                List<React> flagsToDelete = flags.getAll(React.class);
+                if (!flagsToDelete.isEmpty()) {
+                    flags.removeAll(flagsToDelete);
+
+                    psSql = myCon.prepareStatement(SQL_UPDATE_MULTIPLE_CHOICE_FLAGS);
+                    psSql.setInt(1, questionnaireId);
+                    psSql.setInt(2, targetQuestionId);
+                    psSql.execute();
+                }
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     public static void provideQuestionRequired(int questionnaireId, QuestionType type, int questionId) {
         FlagList flagList = new FlagList(getFlags(questionnaireId, type, questionId));
-        if (!flagList.is(SymbolType.REQUIRED)) {
+        if (!flagList.has(SymbolType.REQUIRED)) {
             flagList.add(new Symbol(SymbolType.REQUIRED));
 
             updateFlags(type, flagList.createFlagString(), questionnaireId, questionId);
@@ -342,14 +400,13 @@ public class QuestionService extends Database {
         deleteAnswers();
     }
 
-    public static boolean provideCategory(String category) {
+    public static void provideCategory(String category) {
         if (checkCategory(category)) {
-            Notifications.create().title("Kategorie anlegen").text("Die Kategorie existiert bereits!").showError();
+            NotificationController
+                    .createErrorMessage(MessageId.TITLE_CREATE_CATEGORY, MessageId.MESSAGE_CATEGORY_ALREADY_EXISTS);
         } else {
             createCategory(category);
         }
-        //TODO Bool Wert entfernen
-        return true;
     }
 
     public static void createCategory(String category) {
@@ -358,8 +415,12 @@ public class QuestionService extends Database {
             psSql.setString(1, category);
             psSql.execute();
 
+            NotificationController
+                    .createMessage(MessageId.TITLE_CREATE_CATEGORY, MessageId.MESSAGE_CATEGORY_CREATED_SUCCESSFULLY, category);
         } catch (SQLException e) {
             e.printStackTrace();
+            NotificationController
+                    .createErrorMessage(MessageId.TITLE_CREATE_CATEGORY, MessageId.MESSAGE_UNDEFINED_ERROR);
         }
     }
 
@@ -568,7 +629,7 @@ public class QuestionService extends Database {
             ResultSet myRS = psSql.executeQuery();
 
             if (myRS.next()) {
-                return myRS.getInt(SQL_COLUMN_MULTIPLE_CHOICE_QUESTIONNAIRE_RELATION_ID);
+                return myRS.getInt(SQL_COLUMN_SHORT_ANSWER_QUESTIONNAIRE_RELATION_ID);
             }
         } catch (SQLException e) {
             e.printStackTrace();

@@ -2,7 +2,6 @@ package questionList;
 
 import application.Database;
 import flag.FlagList;
-import flag.React;
 import model.Answer;
 import model.Headline;
 import model.Question;
@@ -45,10 +44,6 @@ import static application.SqlStatement.SQL_GET_OTHER_MULTIPLE_CHOICE_QUESTIONNAI
 import static application.SqlStatement.SQL_GET_OTHER_SHORT_ANSWER_QUESTIONNAIRE_RELATION_IDS;
 import static application.SqlStatement.SQL_GET_SHORT_ANSWER_IDS_BY_QUESTIONNAIRE_ID;
 import static application.SqlStatement.SQL_GET_SHORT_ANSWER_QUESTION;
-import static application.SqlStatement.SQL_GET_TARGET_QUESTION_FLAG_AND_ID_FOR_MULTIPLE_CHOICE;
-import static application.SqlStatement.SQL_GET_TARGET_QUESTION_FLAG_AND_ID_FOR_SHORT_ANSWER;
-import static application.SqlStatement.SQL_UPDATE_MULTIPLE_CHOICE_FLAGS;
-import static application.SqlStatement.SQL_UPDATE_SHORT_ANSWERS_FLAGS;
 
 public class QuestionListService extends Database {
 
@@ -159,19 +154,12 @@ public class QuestionListService extends Database {
         return null;
     }
 
-    /**
-     * Loescht die gegebene Frage
-     *
-     * @param question FrageErstellen: die Frage
-     */
-    // anneSehrNeu
     public static void deleteQuestion(int questionnaireId, Question question) {
         deleteQuestion(questionnaireId, question.getQuestionId(), question.getQuestionType());
     }
 
     public static void deleteQuestion(int questionnaireId, int questionId, QuestionType questionType) {
-        deleteMultipleChoiceReactFlagsFromTargetQuestion(questionnaireId, questionId);
-        deleteShortAnswerReactFlagsFromTargetQuestion(questionnaireId, questionId);
+        QuestionService.deleteFlagsFromTargetQuestion(questionnaireId, questionId);
 
         if (questionType.equals(QuestionType.MULTIPLE_CHOICE)) {
 
@@ -309,59 +297,6 @@ public class QuestionListService extends Database {
         }
 
         return answers;
-    }
-
-    public static void deleteShortAnswerReactFlagsFromTargetQuestion(int questionnaireId, int questionId) {
-
-        try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
-            PreparedStatement psSql = myCon.prepareStatement(SQL_GET_TARGET_QUESTION_FLAG_AND_ID_FOR_SHORT_ANSWER);
-            psSql.setInt(1, questionId);
-            psSql.setInt(2, questionnaireId);
-            ResultSet myRS = psSql.executeQuery();
-
-            while (myRS.next()) {
-                FlagList flags = new FlagList(myRS.getString(SQL_COLUMN_FLAGS));
-                int targetQuestionId = myRS.getInt(SQL_COLUMN_SHORT_ANSWER_ID);
-                List<React> flagsToDelete = flags.getAll(React.class);
-                if (!flagsToDelete.isEmpty()) {
-                    flags.removeAll(flagsToDelete);
-
-                    psSql = myCon.prepareStatement(SQL_UPDATE_SHORT_ANSWERS_FLAGS);
-                    psSql.setInt(1, questionnaireId);
-                    psSql.setInt(2, targetQuestionId);
-                    psSql.execute();
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public static void deleteMultipleChoiceReactFlagsFromTargetQuestion(int questionnaireId, int questionId) {
-        try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
-
-            PreparedStatement psSql = myCon.prepareStatement(SQL_GET_TARGET_QUESTION_FLAG_AND_ID_FOR_MULTIPLE_CHOICE);
-            psSql.setInt(1, questionId);
-            psSql.setInt(2, questionnaireId);
-            ResultSet myRS = psSql.executeQuery();
-
-            while (myRS.next()) {
-                FlagList flags = new FlagList(myRS.getString(SQL_COLUMN_FLAGS));
-                int targetQuestionId = myRS.getInt(SQL_COLUMN_MULTIPLE_CHOICE_ID);
-                List<React> flagsToDelete = flags.getAll(React.class);
-                if (!flagsToDelete.isEmpty()) {
-                    flags.removeAll(flagsToDelete);
-
-                    psSql = myCon.prepareStatement(SQL_UPDATE_MULTIPLE_CHOICE_FLAGS);
-                    psSql.setInt(1, questionnaireId);
-                    psSql.setInt(2, targetQuestionId);
-                    psSql.execute();
-                }
-            }
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
     }
 
     public static List<Integer> getMultipleChoiceQuestionsByQuestionnaireId(int questionnaireId) {

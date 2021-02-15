@@ -50,60 +50,6 @@ public class SurveyService extends Database {
         resetQuestionnaire();
     }
 
-    public static void createSurveyMultipleChoiceRelation(int surveyId, int questionId, int answerId) {
-        try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
-            PreparedStatement psSql = myCon.prepareStatement(SQL_CREATE_SURVEY_HAS_MULTIPLE_CHOICE_RELATION);
-            psSql.setInt(1, surveyId);
-            psSql.setInt(2, questionId);
-            psSql.setInt(3, answerId);
-            psSql.execute();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public static boolean existsSurveyMultipleChoiceRelation(int surveyId, int questionId, int answerId) {
-        try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
-            PreparedStatement psSql = myCon.prepareStatement(SQL_GET_SURVEY_HAS_MULTIPLE_CHOICE_RELATION_ID);
-            psSql.setInt(1, surveyId);
-            psSql.setInt(2, questionId);
-            psSql.setInt(3, answerId);
-            ResultSet myRS = psSql.executeQuery();
-            return myRS.next();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        return false;
-    }
-
-    public static void createSurveyShortAnswerRelation(int surveyId, int questionId, int answerId) {
-        try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
-            PreparedStatement psSql = myCon.prepareStatement(SQL_CREATE_SURVEY_HAS_SHORT_ANSWER_RELATION);
-            psSql.setInt(1, surveyId);
-            psSql.setInt(2, questionId);
-            psSql.setInt(3, answerId);
-            psSql.execute();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public static boolean existsSurveyShortAnswerRelation(int surveyId, int questionId, int answerId) {
-        try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
-            PreparedStatement psSql = myCon.prepareStatement(SQL_GET_SURVEY_HAS_SHORT_ANSWER_RELATION_ID);
-            psSql.setInt(1, surveyId);
-            psSql.setInt(2, questionId);
-            psSql.setInt(3, answerId);
-            ResultSet myRS = psSql.executeQuery();
-            return myRS.next();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        return false;
-    }
-
     public static int createSurvey(int questionnaireId) {
         try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
 
@@ -123,13 +69,6 @@ public class SurveyService extends Database {
         return -1;
     }
 
-    public static List<Question> discardSecondDimension(List<ArrayList<Question>> questionsLists) {
-        List<Question> results = new ArrayList<>();
-        questionsLists.forEach(results::addAll);
-
-        return results;
-    }
-
     public static void resetQuestionnaire() {
 
         for (ArrayList<Question> questions : GlobalVars.questionsPerPanel) {
@@ -146,5 +85,66 @@ public class SurveyService extends Database {
                 }
             }
         }
+    }
+
+    private static void createSurveyMultipleChoiceRelation(int surveyId, int questionId, int answerId) {
+        try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
+            PreparedStatement psSql = myCon.prepareStatement(SQL_CREATE_SURVEY_HAS_MULTIPLE_CHOICE_RELATION);
+            psSql.setInt(1, surveyId);
+            psSql.setInt(2, questionId);
+            psSql.setInt(3, answerId);
+            psSql.execute();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static boolean existsSurveyMultipleChoiceRelation(int surveyId, int questionId, int answerId) {
+        try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
+            PreparedStatement psSql = myCon.prepareStatement(SQL_GET_SURVEY_HAS_MULTIPLE_CHOICE_RELATION_ID);
+            psSql.setInt(1, surveyId);
+            psSql.setInt(2, questionId);
+            psSql.setInt(3, answerId);
+            ResultSet myRS = psSql.executeQuery();
+            return myRS.next();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+
+    private static void createSurveyShortAnswerRelation(int surveyId, int questionId, int answerId) {
+        try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
+            PreparedStatement psSql = myCon.prepareStatement(SQL_CREATE_SURVEY_HAS_SHORT_ANSWER_RELATION);
+            psSql.setInt(1, surveyId);
+            psSql.setInt(2, questionId);
+            psSql.setInt(3, answerId);
+            psSql.execute();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static boolean existsSurveyShortAnswerRelation(int surveyId, int questionId, int answerId) {
+        try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
+            PreparedStatement psSql = myCon.prepareStatement(SQL_GET_SURVEY_HAS_SHORT_ANSWER_RELATION_ID);
+            psSql.setInt(1, surveyId);
+            psSql.setInt(2, questionId);
+            psSql.setInt(3, answerId);
+            ResultSet myRS = psSql.executeQuery();
+            return myRS.next();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+
+    private static List<Question> discardSecondDimension(List<ArrayList<Question>> questionsLists) {
+        List<Question> results = new ArrayList<>();
+        questionsLists.forEach(results::addAll);
+
+        return results;
     }
 }

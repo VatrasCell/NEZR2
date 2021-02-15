@@ -8,22 +8,23 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 
 import static application.SqlStatement.SQL_COLUMN_LOCATION_NAME;
 import static application.SqlStatement.SQL_GET_LOCATION_NAMES;
 
 public class LocationService extends Database {
 
-    public static ArrayList<String> getLocations() {
+    public static List<String> getLocations() {
 
         try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
             PreparedStatement psSql = myCon.prepareStatement(SQL_GET_LOCATION_NAMES);
             ResultSet myRS = psSql.executeQuery();
-            ArrayList<String> ort = new ArrayList<>();
+            List<String> locations = new ArrayList<>();
             while (myRS.next()) {
-                ort.add(myRS.getString(SQL_COLUMN_LOCATION_NAME));
+                locations.add(myRS.getString(SQL_COLUMN_LOCATION_NAME));
             }
-            return ort;
+            return locations;
         } catch (SQLException e) {
             e.printStackTrace();
         }

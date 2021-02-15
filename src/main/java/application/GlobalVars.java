@@ -20,7 +20,7 @@ public class GlobalVars {
 	public static int countPanel;
 	public static List<ArrayList<Question>> questionsPerPanel = new ArrayList<>();
 	public static boolean everythingIsAwesome = true;
-	public static ArrayList<String> locations;
+	public static List<String> locations;
 	
 	public static final Image IMG_DEL = new Image(getInputStream("images/icons/delete_2.png"));
 	public static final Image IMG_COP = new Image(getInputStream("images/icons/copy_2.png"));

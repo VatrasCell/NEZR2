@@ -1,6 +1,5 @@
 package survey;
 
-import application.Database;
 import application.GlobalVars;
 import application.ScreenController;
 import flag.Number;
@@ -156,7 +155,7 @@ public class SurveyController {
 		if(GlobalVars.everythingIsAwesome) {
 			for(Question question : GlobalVars.questionsPerPanel.get(GlobalVars.page)) {
 				if(question.getQuestionType().equals(QuestionType.MULTIPLE_CHOICE)) {
-					if(question.getFlags().is(SymbolType.LIST)) {
+					if(question.getFlags().has(SymbolType.LIST)) {
 						ArrayList<String> antwort = new ArrayList<>();
 						for(ListView<String> listView : question.getAnswersLIST()) {
 							if(listView.isVisible()) {
@@ -174,7 +173,7 @@ public class SurveyController {
 						question.setAnswer(antwort);
 					}
 				} else {
-					if(question.getFlags().is(SymbolType.TEXT)) {
+					if(question.getFlags().has(SymbolType.TEXT)) {
 						ArrayList<String> antwort = new ArrayList<>();
 						for(TextArea textArea : question.getAnswersTEXT()) {
 							if(!textArea.getText().equals("") && textArea.isVisible()) {
@@ -363,7 +362,7 @@ public class SurveyController {
 	 * @return boolean
 	 */
 	private boolean checkPflichtfrage(Question question) {
-		if(question.getFlags().is(SymbolType.REQUIRED) && question.getQuestionLabel().isVisible()) {
+		if(question.getFlags().has(SymbolType.REQUIRED) && question.getQuestionLabel().isVisible()) {
 			if (question.getQuestionType().equals(QuestionType.MULTIPLE_CHOICE)) {
 				boolean selected = false;
 				for (CheckBox checkbox : question.getAnswersMC()) {
@@ -382,7 +381,7 @@ public class SurveyController {
 					return false;
 				}
 			} else {
-				if (question.getFlags().is(SymbolType.LIST)) {
+				if (question.getFlags().has(SymbolType.LIST)) {
 					for (ListView<String> listView : question.getAnswersLIST()) {
 						if (listView.getSelectionModel().isEmpty()) {
 //							BalloonTip fehler = new BalloonTip(button, "Das ist eine Pflichtfrage!");
@@ -395,7 +394,7 @@ public class SurveyController {
 						}
 					}
 
-				} else if (question.getFlags().is(SymbolType.TEXT)) {
+				} else if (question.getFlags().has(SymbolType.TEXT)) {
 					for (TextArea myText : question.getAnswersTEXT()) {
 						if (myText.getText().isEmpty()) {
 //							BalloonTip fehler = new BalloonTip(button, "Das ist eine Pflichtfrage!");

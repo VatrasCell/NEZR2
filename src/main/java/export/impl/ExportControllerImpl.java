@@ -106,8 +106,8 @@ public class ExportControllerImpl implements ExportController {
 				faRow.createCell(over).setCellValue(this.crHelper.createRichTextString(question.getQuestion()));
 				faRow.getCell(over).setCellStyle(formatTableHead);
 				makeAnswersToExcel(question, "", over, von, bis);
-			} else if (/*(question.getFlags().indexOf("B") >= 0) || */(question.getFlags().is(SymbolType.JNExcel)) && (question.getFlags().is(SymbolType.JN))
-					|| (question.getFlags().is(SymbolType.LIST))) {
+			} else if (/*(question.getFlags().indexOf("B") >= 0) || */(question.getFlags().has(SymbolType.JNExcel)) && (question.getFlags().has(SymbolType.JN))
+					|| (question.getFlags().has(SymbolType.LIST))) {
 				/*if (question.getKategorie().equals(question.getFrage())false) {
 					for (int j = 0; j < question.getAntwort_moeglichkeit().size(); j++) {
 						faRow.createCell(over + j).setCellValue(
@@ -122,7 +122,7 @@ public class ExportControllerImpl implements ExportController {
 
 					over += question.getAntwort_moeglichkeit().size() - 1;
 					anzahl += question.getAntwort_moeglichkeit().size() - 1;
-				} else*/ if ((question.getFlags().is(SymbolType.JNExcel)) && (question.getFlags().is(SymbolType.JN))) {
+				} else*/ if ((question.getFlags().has(SymbolType.JNExcel)) && (question.getFlags().has(SymbolType.JN))) {
 					faRow.createCell(over).setCellValue(this.crHelper.createRichTextString(question.getQuestion()));
 					faRow.getCell(over).setCellStyle(formatTableHead);
 					makeAnswersToExcel(question, "ja", over, von, bis);

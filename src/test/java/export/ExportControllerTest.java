@@ -4,7 +4,6 @@ import export.impl.ExportControllerImpl;
 import model.Question;
 import model.Questionnaire;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -14,19 +13,21 @@ import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import questionList.QuestionListService;
-import survey.SurveyService;
+import util.DBTestUtil;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.powermock.api.mockito.PowerMockito.when;
 
+/**
+ * {@link ExportController}
+ */
 @RunWith(PowerMockRunner.class)
-@PrepareForTest(SurveyService.class)
-public class ExportControllerTest {
+@PrepareForTest(QuestionListService.class)
+public class ExportControllerTest extends DBTestUtil {
 
     public final static String PATH = "1_TEST-ORT_TEST-FRAGEBOGEN.xlsx";
 
@@ -38,15 +39,14 @@ public class ExportControllerTest {
 
     @Before
     public void init() {
-        MockitoAnnotations.initMocks(SurveyService.class);
+        MockitoAnnotations.initMocks(QuestionListService.class);
     }
 
     @Test
-    @Ignore
     public void testExcelExport() {
         //arrange
         List<Question> questions = new ArrayList<>();
-        PowerMockito.mockStatic(SurveyService.class);
+        PowerMockito.mockStatic(QuestionListService.class);
         when(QuestionListService.getQuestions(anyInt())).thenReturn(questions);
         //act
         boolean result = exportController.excelNeu(PATH, questionnaire, "2020-07-01", "2020-08-01");

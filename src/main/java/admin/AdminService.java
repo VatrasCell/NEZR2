@@ -100,7 +100,7 @@ public class AdminService extends Database {
             if (question.getQuestionType().equals(QuestionType.SHORT_ANSWER)) {
                 QuestionService.saveShortAnswerQuestion(questionnaire.getId(), question);
             } else {
-                if (question.getFlags().is(SymbolType.B)) {
+                if (question.getFlags().has(SymbolType.B)) {
                     QuestionService.saveEvaluationQuestion(questionnaire.getId(), question);
                 } else {
                     ArrayList<Answer> answers = new ArrayList<>();

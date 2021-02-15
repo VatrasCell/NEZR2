@@ -571,7 +571,7 @@ public class Question implements Comparable<Question>, Comparator<Question> {
                     answersMC.forEach(checkBox -> checkBox.setVisible(true));
                     answersLIST.forEach(stringListView -> stringListView.setVisible(true));
 
-                    if (getFlags().is(SymbolType.B)) {
+                    if (getFlags().has(SymbolType.B)) {
                         scene.lookup("#lblNull").setVisible(true);
                         scene.lookup("#lblEins").setVisible(true);
                         scene.lookup("#lblZehn").setVisible(true);
@@ -583,7 +583,7 @@ public class Question implements Comparable<Question>, Comparator<Question> {
                     answersMC.forEach(checkBox -> checkBox.setVisible(false));
                     answersLIST.forEach(stringListView -> stringListView.setVisible(false));
 
-                    if (getFlags().is(SymbolType.B)) {
+                    if (getFlags().has(SymbolType.B)) {
                         scene.lookup("#lblNull").setVisible(false);
                         scene.lookup("#lblEins").setVisible(false);
                         scene.lookup("#lblZehn").setVisible(false);

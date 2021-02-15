@@ -1,0 +1,1 @@
+INSERT INTO questionnaire VALUES(NULL, '2021-01-01', 'Besucherumfrage', TRUE, 2, FALSE);

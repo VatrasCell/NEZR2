@@ -26,7 +26,7 @@ public class FlagList {
 	public List<Symbol> getPossibleFlags() {
 		List<Symbol> results = new ArrayList<>();
 		for (SymbolType symbolType : SymbolType.values()) {
-			if(!this.is(symbolType))
+			if(!this.has(symbolType))
 				results.add(new Symbol(symbolType));
 		}
 		return results;
@@ -60,7 +60,7 @@ public class FlagList {
 		}
 	}
 	
-	public boolean is(SymbolType expectation) {
+	public boolean has(SymbolType expectation) {
 		return getSymbol(expectation) != null;
 	}
 	

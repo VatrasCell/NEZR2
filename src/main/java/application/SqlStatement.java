@@ -44,7 +44,7 @@ public class SqlStatement {
 
     //Table multiple_choice
     public static final String SQL_GET_MULTIPLE_CHOICE_ID = "SELECT multiple_choice_id FROM multiple_choice WHERE question=?";
-    public static final String SQL_CREATE_MULTIPLE_CHOICE = "INSERT INTO multiple_choice VALUES(NULL, ?, ?)";
+    public static final String SQL_CREATE_MULTIPLE_CHOICE = "INSERT INTO multiple_choice VALUES(NULL, ?, ?, NULL)";
     public static final String SQL_DELETE_MULTIPLE_CHOICE = "DELETE FROM multiple_choice WHERE multiple_choice_id=?";
 
     public static final String SQL_COLUMN_QUESTION = "question";
@@ -65,7 +65,7 @@ public class SqlStatement {
     //Table short_answer
     public static final String SQL_GET_SHORT_ANSWER_ID = "SELECT short_answer_id FROM short_answer WHERE question=?";
     public static final String SQL_GET_SHORT_ANSWER_ID_BY_QUESTIONNAIRE_ID = "SELECT short_answer_id FROM short_answer JOIN q_has_sa ON short_answer.short_answer_id=q_has_sa.short_answer_id WHERE question=? AND questionnaire_id=?";
-    public static final String SQL_CREATE_SHORT_ANSWER = "INSERT INTO short_answer VALUES(NULL, ? , ?)";
+    public static final String SQL_CREATE_SHORT_ANSWER = "INSERT INTO short_answer VALUES(NULL, ? , ?, NULL)";
     public static final String SQL_DELETE_SHORT_ANSWER = "DELETE FROM short_answer WHERE short_answer_id=?";
 
     public static final String SQL_COLUMN_SHORT_ANSWER_ID = "short_answer_id";
@@ -78,6 +78,8 @@ public class SqlStatement {
     public static final String SQL_CREATE_SHORT_ANSWER_QUESTIONNAIRE_RELATION = "INSERT INTO q_has_sa VALUES (NULL, ?, ?, ?, ?)";
     public static final String SQL_DELETE_SHORT_ANSWER_QUESTIONNAIRE_RELATION = "DELETE FROM q_has_sa WHERE short_answer_id=? AND questionnaire_id=?";
     public static final String SQL_GET_SHORT_ANSWER_IDS_BY_QUESTIONNAIRE_ID = "SELECT short_answer_id FROM q_has_sa WHERE questionnaire_id=?";
+
+    public static final String SQL_COLUMN_SHORT_ANSWER_QUESTIONNAIRE_RELATION_ID = "q_sa_relation_id";
 
     //Table survey
     public static final String SQL_CREATE_SURVEY = "INSERT INTO survey VALUES(NULL, CURDATE(), ?)";

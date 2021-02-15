@@ -91,7 +91,6 @@ public class QuestionListController {
                                 super.updateItem(item, empty);
                                 if (empty) {
                                     setGraphic(null);
-                                    setText(null);
                                 } else {
                                     btn.setOnAction(event -> {
                                         QuestionController.questionnaire = questionnaire;
@@ -106,7 +105,6 @@ public class QuestionListController {
                                         }
                                     });
                                     setGraphic(btn);
-                                    setText(null);
                                 }
                             }
                         };

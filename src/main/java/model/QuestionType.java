@@ -28,4 +28,9 @@ public enum QuestionType {
     public static QuestionType get(String value) {
         return lookup.get(value);
     }
+
+    @Override
+    public String toString() {
+        return this.equals(SHORT_ANSWER) ? "Freie Frage" : "Multiple Choice";
+    }
 }
