@@ -21,8 +21,8 @@ public class DBTestUtil extends Database {
 
         String absPath = getURL(path).getPath().replace(".mv.db", "");
         Database.url = String.format("jdbc:h2:%s;MODE=MySQL", absPath);
-        Database.user = "root";
-        Database.pwd = "1234";
+        Database.user = "tester";
+        Database.pwd = "EZ4.6emdwsu)9!TA";
 
         restDatabase();
         addLocations();

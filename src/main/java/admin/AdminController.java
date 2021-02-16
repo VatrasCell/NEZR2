@@ -31,6 +31,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.util.Callback;
 import javafx.util.Pair;
+import login.LoginService;
 import model.Questionnaire;
 import model.SceneName;
 import org.controlsfx.control.Notifications;
@@ -478,6 +479,7 @@ public class AdminController {
 	
 	@FXML
 	private void logout() {
+		LoginService.login("usr", "Q#DQ8Ka&9Vq6`;)s");
 		ScreenController.activate(SceneName.START);
 	}
 	

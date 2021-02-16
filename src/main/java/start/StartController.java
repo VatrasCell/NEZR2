@@ -504,7 +504,7 @@ public class StartController {
 
 	@FXML
 	private void adminLogin() {
-		ScreenController.activate(SceneName.LOGIN, "toAdmin", true);
+		ScreenController.activate(SceneName.LOGIN);
 	}
 
 	@FXML

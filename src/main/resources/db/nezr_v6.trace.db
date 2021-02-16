@@ -282,3 +282,34 @@ SELECT answer.name, mc1.question FROM questionnaire JOIN q_has_mc ON questionnai
 org.h2.jdbc.JdbcSQLException: Syntax Fehler in SQL Befehl "SELECT ANSWER.NAME QUESTIONNAIRE JOIN[*] Q_HAS_MC ON QUESTIONNAIRE.QUESTIONNAIRE_ID=Q_HAS_MC.QUESTIONNAIRE_ID JOIN MULTIPLE_CHOICE MC1 ON Q_HAS_MC.MULTIPLE_CHOICE_ID=MC1.MULTIPLE_CHOICE_ID JOIN CATEGORY ON MC1.CATEGORY_ID=CATEGORY.CATEGORY_ID JOIN MC_HAS_A ON MC1.MULTIPLE_CHOICE_ID=MC_HAS_A.MULTIPLE_CHOICE_ID JOIN ANSWER ON MC_HAS_A.ANSWER_ID=ANSWER.ANSWER_ID WHERE MC1.QUESTION='Geschlecht' UNION SELECT ANSWER.NAME FROM QUESTIONNAIRE JOIN Q_HAS_SA ON QUESTIONNAIRE.QUESTIONNAIRE_ID=Q_HAS_SA.QUESTIONNAIRE_ID JOIN SHORT_ANSWER FF1 ON Q_HAS_SA.SHORT_ANSWER_ID=FF1.SHORT_ANSWER_ID JOIN CATEGORY ON FF1.CATEGORY_ID=CATEGORY.CATEGORY_ID JOIN SHORT_ANSWER JOIN SA_HAS_A ON FF1.SHORT_ANSWER_ID=SA_HAS_A.SHORT_ANSWER_ID JOIN ANSWER ON SA_HAS_A.ANSWER_ID=ANSWER.ANSWER_ID WHERE FF1.QUESTION='Geschlecht' "
 Syntax error in SQL statement "SELECT ANSWER.NAME QUESTIONNAIRE JOIN[*] Q_HAS_MC ON QUESTIONNAIRE.QUESTIONNAIRE_ID=Q_HAS_MC.QUESTIONNAIRE_ID JOIN MULTIPLE_CHOICE MC1 ON Q_HAS_MC.MULTIPLE_CHOICE_ID=MC1.MULTIPLE_CHOICE_ID JOIN CATEGORY ON MC1.CATEGORY_ID=CATEGORY.CATEGORY_ID JOIN MC_HAS_A ON MC1.MULTIPLE_CHOICE_ID=MC_HAS_A.MULTIPLE_CHOICE_ID JOIN ANSWER ON MC_HAS_A.ANSWER_ID=ANSWER.ANSWER_ID WHERE MC1.QUESTION='Geschlecht' UNION SELECT ANSWER.NAME FROM QUESTIONNAIRE JOIN Q_HAS_SA ON QUESTIONNAIRE.QUESTIONNAIRE_ID=Q_HAS_SA.QUESTIONNAIRE_ID JOIN SHORT_ANSWER FF1 ON Q_HAS_SA.SHORT_ANSWER_ID=FF1.SHORT_ANSWER_ID JOIN CATEGORY ON FF1.CATEGORY_ID=CATEGORY.CATEGORY_ID JOIN SHORT_ANSWER JOIN SA_HAS_A ON FF1.SHORT_ANSWER_ID=SA_HAS_A.SHORT_ANSWER_ID JOIN ANSWER ON SA_HAS_A.ANSWER_ID=ANSWER.ANSWER_ID WHERE FF1.QUESTION='Geschlecht' "; SQL statement:
 SELECT answer.name questionnaire JOIN q_has_mc ON questionnaire.questionnaire_id=q_has_mc.questionnaire_id JOIN multiple_choice mc1 ON q_has_mc.multiple_choice_id=mc1.multiple_choice_id JOIN category ON mc1.category_id=category.category_id JOIN mc_has_a ON mc1.multiple_choice_id=mc_has_a.multiple_choice_id JOIN answer ON mc_has_a.answer_id=answer.answer_id WHERE mc1.question='Geschlecht' UNION SELECT answer.name FROM questionnaire JOIN q_has_sa ON questionnaire.questionnaire_id=q_has_sa.questionnaire_id JOIN short_answer ff1 ON q_has_sa.short_answer_id=ff1.short_answer_id JOIN category ON ff1.category_id=category.category_id JOIN short_answer JOIN sa_has_a ON ff1.short_answer_id=sa_has_a.short_answer_id JOIN answer ON sa_has_a.answer_id=answer.answer_id WHERE ff1.question='Geschlecht' [42000-196]
+2021-02-16 15:41:35 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLException: Nicht genug Rechte für Objekt "PUBLIC.ANSWER"
+Not enough rights for object "PUBLIC.ANSWER"; SQL statement:
+SELECT * FROM ANSWER [90096-196]
+	at org.h2.message.DbException.getJdbcSQLException(DbException.java:345)
+	at org.h2.message.DbException.get(DbException.java:179)
+	at org.h2.message.DbException.get(DbException.java:155)
+	at org.h2.engine.User.checkRight(User.java:101)
+	at org.h2.table.TableFilter.<init>(TableFilter.java:139)
+	at org.h2.command.Parser.readTableFilter(Parser.java:1287)
+	at org.h2.command.Parser.parseSelectSimpleFromPart(Parser.java:1946)
+	at org.h2.command.Parser.parseSelectSimple(Parser.java:2095)
+	at org.h2.command.Parser.parseSelectSub(Parser.java:1940)
+	at org.h2.command.Parser.parseSelectUnion(Parser.java:1755)
+	at org.h2.command.Parser.parseSelect(Parser.java:1743)
+	at org.h2.command.Parser.parsePrepared(Parser.java:449)
+	at org.h2.command.Parser.parse(Parser.java:321)
+	at org.h2.command.Parser.parse(Parser.java:293)
+	at org.h2.command.Parser.prepareCommand(Parser.java:258)
+	at org.h2.engine.Session.prepareLocal(Session.java:578)
+	at org.h2.engine.Session.prepareCommand(Session.java:519)
+	at org.h2.jdbc.JdbcConnection.prepareCommand(JdbcConnection.java:1204)
+	at org.h2.jdbc.JdbcStatement.executeInternal(JdbcStatement.java:176)
+	at org.h2.jdbc.JdbcStatement.execute(JdbcStatement.java:164)
+	at org.h2.server.web.WebApp.getResult(WebApp.java:1380)
+	at org.h2.server.web.WebApp.query(WebApp.java:1053)
+	at org.h2.server.web.WebApp$1.next(WebApp.java:1015)
+	at org.h2.server.web.WebApp$1.next(WebApp.java:1002)
+	at org.h2.server.web.WebThread.process(WebThread.java:164)
+	at org.h2.server.web.WebThread.run(WebThread.java:89)
+	at java.lang.Thread.run(Unknown Source)

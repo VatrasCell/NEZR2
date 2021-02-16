@@ -1,14 +1,12 @@
 package login;
 
-import application.GlobalVars;
+import application.NotificationController;
 import application.ScreenController;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
-import location.LocationService;
+import message.MessageId;
 import model.SceneName;
 
 import java.io.IOException;
@@ -16,53 +14,40 @@ import java.io.IOException;
 import static application.GlobalFuncs.getURL;
 
 public class LoginController {
-	
-	public static boolean toAdmin = false;
-	
-	@FXML
-	private TextField username;
-	
-	@FXML
-	private PasswordField password;
-	
-	@FXML
-	private Button btn_login;
-	
-	@FXML
-	private Button btn_exit;
-	
-	@FXML
-	private void initialize() throws IOException {
-		if(GlobalVars.DEV_MODE) {
-			username.setText("root");
-			password.setText("1234");
-			login(new ActionEvent());
+
+    @FXML
+    private TextField username;
+
+    @FXML
+    private PasswordField password;
+
+    @FXML
+    private void initialize() {
+    }
+
+    @FXML
+    private void login() throws IOException {
+        if (!username.getText().equals("") && !password.getText().equals("")) {
+            if (LoginService.login(username.getText(), password.getText())) {
+                ScreenController.addScreen(SceneName.ADMIN, FXMLLoader.load(getURL(SceneName.ADMIN_PATH)));
+				reset();
+                ScreenController.activate(SceneName.ADMIN);
+            } else {
+                NotificationController.createErrorMessage(MessageId.TITLE_LOGIN, MessageId.MESSAGE_LOGIN_WRONG_DATA);
+            }
+        } else {
+			NotificationController.createErrorMessage(MessageId.TITLE_LOGIN, MessageId.MESSAGE_LOGIN_WRONG_DATA);
 		}
-	}
-	
-	@FXML
-	private void login(ActionEvent event) throws IOException {
-		//System.out.println("doLogin");
-		if(!username.getText().equals("") && !password.getText().equals("")) {
-			if(LoginService.testDB(username.getText(), password.getText())) {
-				//System.out.println("logged in");
-				if(toAdmin) {
-					ScreenController.addScreen(SceneName.ADMIN, FXMLLoader.load(getURL(SceneName.ADMIN_PATH)));
-					ScreenController.activate(SceneName.ADMIN);
-				} else {
-					GlobalVars.locations = LocationService.getLocations();
-					ScreenController.addScreen(SceneName.LOCATION, FXMLLoader.load(getURL(SceneName.LOCATION_PATH)));
-					ScreenController.activate(SceneName.LOCATION);
-				}	
-			} else {
-				//System.out.println("login wrong values");
-			}
-		}
-	}
-	
-	@FXML
-	private void exit(ActionEvent event) {
-		//System.out.println("exit");
-		System.exit(0);
+    }
+
+    @FXML
+    private void exit() {
+		reset();
+        ScreenController.activate(SceneName.START);
+    }
+
+    private void reset() {
+    	username.setText("");
+    	password.setText("");
 	}
 }
