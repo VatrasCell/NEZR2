@@ -27,8 +27,8 @@
                   <RowConstraints maxHeight="135.0" minHeight="10.0" prefHeight="75.0" vgrow="ALWAYS" />
               </rowConstraints>
                <children>
-                  <Label fx:id="lbl_fragebogen" alignment="CENTER" maxWidth="1.7976931348623157E308" text="Fragebogen XXX" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="CENTER" />
-                  <Label fx:id="lbl_warning" alignment="CENTER" maxWidth="1.7976931348623157E308" text="Label" textAlignment="CENTER" textFill="#c90000" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.valignment="CENTER">
+                  <Label fx:id="questionnaireLabel" alignment="CENTER" maxWidth="1.7976931348623157E308" text="Fragebogen XXX" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="CENTER" />
+                  <Label fx:id="warningLabel" alignment="CENTER" maxWidth="1.7976931348623157E308" text="Label" textAlignment="CENTER" textFill="#c90000" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.valignment="CENTER">
                      <font>
                         <Font name="System Bold" size="12.0" />
                      </font>
@@ -37,7 +37,7 @@
             </GridPane>
          </center>
          <bottom>
-            <Button fx:id="btn_start" mnemonicParsing="false" onAction="#next" text="Start" BorderPane.alignment="CENTER">
+            <Button fx:id="startButton" mnemonicParsing="false" onAction="#next" text="Start" BorderPane.alignment="CENTER">
                <BorderPane.margin>
                   <Insets bottom="16.0" />
                </BorderPane.margin>

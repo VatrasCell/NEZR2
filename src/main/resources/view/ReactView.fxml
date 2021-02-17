@@ -21,9 +21,9 @@
         	<Label text="Keine Bedinungen gesetzt." />
     	</placeholder>
         <columns>
-          <TableColumn fx:id="questions" prefWidth="63.0" text="Frage" />
-          <TableColumn fx:id="answers" prefWidth="509.0" text="Antwort" />
-          <TableColumn fx:id="comments" prefWidth="204.0" text="Frage ist sichtbar, wenn..." />
+          <TableColumn fx:id="questionsColumn" prefWidth="63.0" text="Frage" />
+          <TableColumn fx:id="answersColumn" prefWidth="509.0" text="Antwort" />
+          <TableColumn fx:id="commentsColumn" prefWidth="204.0" text="Frage ist sichtbar, wenn..." />
         </columns>
          <BorderPane.margin>
             <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />

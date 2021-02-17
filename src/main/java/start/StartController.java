@@ -42,20 +42,21 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static application.GlobalFuncs.getURL;
+import static model.SceneName.SURVEY_0;
 
 public class StartController {
 
 	@FXML
-	Label lbl_fragebogen;
+	Label questionnaireLabel;
 
 	@FXML
-	Label lbl_warning;
+	Label warningLabel;
 	
 	@FXML
 	Pane pane;
 	
 	@FXML
-	Button btn_start;
+	Button startButton;
 
 	private static StringProperty questionnaireText = new SimpleStringProperty();
 	private static StringProperty questionnaireWarn = new SimpleStringProperty();
@@ -96,7 +97,7 @@ public class StartController {
 			break;
 		}
 		
-		String image = this.getClass().getClassLoader().getResource(value).toExternalForm();
+		String image = getURL(value).toExternalForm();
 		pane.setStyle("-fx-background-image: url('" + image + "');" +
 				"-fx-background-repeat: no-repeat;" +
 	  			"-fx-background-attachment: fixed;" +
@@ -104,18 +105,23 @@ public class StartController {
 	  			"-fx-background-position: 98% 5%;");
 		
 		setStartText();
-		lbl_fragebogen.textProperty().bind(questionnaireText);
-		lbl_warning.textProperty().bind(questionnaireWarn);
-		lbl_warning.setStyle("-fx-text-fill: #c90000;");
+		questionnaireLabel.textProperty().bind(questionnaireText);
+		warningLabel.textProperty().bind(questionnaireWarn);
+		warningLabel.setStyle("-fx-text-fill: #c90000;");
 	}
 
 	public static void setStartText() {
-		questionnaireText
-				.set(GlobalVars.activeQuestionnaire == null ? "" : "Fragebogen: " + GlobalVars.activeQuestionnaire.getName());
-		questionnaireWarn.set(GlobalVars.activeQuestionnaire == null ? "kein Fragebogen ausgewählt"
-				: !GlobalVars.activeQuestionnaire.getOrt().equals(GlobalVars.location)
-						? "Fragebogen ist nicht für diesen Standort optimiert"
-						: "");
+		if(GlobalVars.activeQuestionnaire != null) {
+			questionnaireText.set(String.format("Fragebogen: %s", GlobalVars.activeQuestionnaire.getName()));
+			if(!GlobalVars.activeQuestionnaire.getOrt().equals(GlobalVars.location)) {
+				questionnaireWarn.set("Fragebogen ist nicht für diesen Standort optimiert");
+			} else {
+				questionnaireWarn.set("");
+			}
+		} else {
+			questionnaireText.set("");
+			questionnaireWarn.set("kein Fragebogen ausgewählt");
+		}
 	}
 
 	public static void makeQuestionnaire(List<Question> questions, boolean isPreview) {
@@ -128,8 +134,8 @@ public class StartController {
 			stack.push(questions.get(v));
 		}
 
-		List<ArrayList<Question>> fragenJePanel = new ArrayList<>();
-		List<Pane> allePanel = new ArrayList<>();
+		List<ArrayList<Question>> questionsPerPanel = new ArrayList<>();
+		List<Pane> allPanels = new ArrayList<>();
 		do {
 			int questionsOnPanel = 0;
 			String lastKat = "";
@@ -140,16 +146,17 @@ public class StartController {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-			if (scene == null)
+			if (scene == null) {
 				throw new NullPointerException();
+			}
 			PanelInfo info = new PanelInfo();
-			fragenJePanel.add(new ArrayList<>());
+			questionsPerPanel.add(new ArrayList<>());
 			do {
 				Question question = stack.peek();
 				if(lastKat.equals("") || lastKat.equals(question.getCategory())) {
 					question = stack.pop();
 					addQuestionToPanel(question, scene, info);
-					fragenJePanel.get(allePanel.size()).add(info.getQuestion());
+					questionsPerPanel.get(allPanels.size()).add(info.getQuestion());
 					lastKat = question.getCategory();
 					if (stack.isEmpty())
 						break;
@@ -158,17 +165,17 @@ public class StartController {
 					break;
 				}
 			} while (++questionsOnPanel < GlobalVars.perColumn);
-			allePanel.add(scene);
+			allPanels.add(scene);
 		} while (!stack.isEmpty());
 
-		for (int i = 0; i < allePanel.size(); ++i) {
-			ProgressBar progressBar = (ProgressBar) allePanel.get(i).lookup("#progressBar");
-			progressBar.setProgress((float) (i + 1) / (float) allePanel.size());
+		for (int i = 0; i < allPanels.size(); ++i) {
+			ProgressBar progressBar = (ProgressBar) allPanels.get(i).lookup("#progressBar");
+			progressBar.setProgress((float) (i + 1) / (float) allPanels.size());
 
-			Label lbl_count = (Label) allePanel.get(i).lookup("#lbl_count");
-			lbl_count.setText("Frage " + (i + 1) + "/" + allePanel.size());
+			Label lbl_count = (Label) allPanels.get(i).lookup("#lbl_count");
+			lbl_count.setText("Frage " + (i + 1) + "/" + allPanels.size());
 					
-			ScreenController.addScreen("survey_" + i, allePanel.get(i));
+			ScreenController.addScreen("survey_" + i, allPanels.get(i));
 		}
 		
 		//add reaction listener
@@ -186,8 +193,8 @@ public class StartController {
 			}
 		}
 
-		GlobalVars.questionsPerPanel = fragenJePanel;
-		GlobalVars.countPanel = allePanel.size();
+		GlobalVars.questionsPerPanel = questionsPerPanel;
+		GlobalVars.countPanel = allPanels.size();
 	}
 
 	private static void addQuestionToPanel(Question question, Pane screen, PanelInfo info) {
@@ -512,7 +519,6 @@ public class StartController {
 		List<Question> questions = QuestionListService.getQuestions(GlobalVars.activeQuestionnaire.getId());
 		makeQuestionnaire(questions, false);
 		GlobalVars.page = 0;
-		ScreenController.activate("survey_0");
-		// questions.forEach((Frage frage) -> System.out.println(frage));
+		ScreenController.activate(SURVEY_0);
 	}
 }

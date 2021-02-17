@@ -30,24 +30,24 @@ public class LoginController {
         if (!username.getText().equals("") && !password.getText().equals("")) {
             if (LoginService.login(username.getText(), password.getText())) {
                 ScreenController.addScreen(SceneName.ADMIN, FXMLLoader.load(getURL(SceneName.ADMIN_PATH)));
-				reset();
+                reset();
                 ScreenController.activate(SceneName.ADMIN);
             } else {
                 NotificationController.createErrorMessage(MessageId.TITLE_LOGIN, MessageId.MESSAGE_LOGIN_WRONG_DATA);
             }
         } else {
-			NotificationController.createErrorMessage(MessageId.TITLE_LOGIN, MessageId.MESSAGE_LOGIN_WRONG_DATA);
-		}
+            NotificationController.createErrorMessage(MessageId.TITLE_LOGIN, MessageId.MESSAGE_LOGIN_WRONG_DATA);
+        }
     }
 
     @FXML
     private void exit() {
-		reset();
+        reset();
         ScreenController.activate(SceneName.START);
     }
 
     private void reset() {
-    	username.setText("");
-    	password.setText("");
-	}
+        username.setText("");
+        password.setText("");
+    }
 }

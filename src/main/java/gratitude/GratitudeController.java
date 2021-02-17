@@ -5,10 +5,10 @@ import javafx.fxml.FXML;
 import model.SceneName;
 
 public class GratitudeController {
-	
-	@FXML
-	private void exit() {
-		ScreenController.activate(SceneName.START);
-	}
+
+    @FXML
+    private void exit() {
+        ScreenController.activate(SceneName.START);
+    }
 
 }

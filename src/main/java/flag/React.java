@@ -2,6 +2,8 @@ package flag;
 
 import model.QuestionType;
 
+import java.util.Objects;
+
 public class React extends Flag {
 	private final String ANSWER = "A";
 	private QuestionType questionType;
@@ -15,44 +17,26 @@ public class React extends Flag {
 		this.answerPos = answerPos;
 	}
 
-	/**
-	 * @return the questionType
-	 */
 	public QuestionType getQuestionType() {
 		return questionType;
 	}
-	
-	/**
-	 * @param questionType the questionType to set
-	 */
+
 	public void setQuestionType(QuestionType questionType) {
 		this.questionType = questionType;
 	}
-	
-	/**
-	 * @return the questionId
-	 */
+
 	public int getQuestionId() {
 		return questionId;
 	}
-	
-	/**
-	 * @param questionId the questionId to set
-	 */
+
 	public void setQuestionId(int questionId) {
 		this.questionId = questionId;
 	}
-	
-	/**
-	 * @return the answerId
-	 */
+
 	public int getAnswerPos() {
 		return answerPos;
 	}
-	
-	/**
-	 * @param answerPos the answerId to set
-	 */
+
 	public void setAnswerPos(int answerPos) {
 		this.answerPos = answerPos;
 	}
@@ -61,6 +45,19 @@ public class React extends Flag {
 	public String toString() {
 		return questionType.getQuestionType() + questionId + ANSWER + answerPos;
 	}
-	
-	
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		React react = (React) o;
+		return getQuestionId() == react.getQuestionId() &&
+				getAnswerPos() == react.getAnswerPos() &&
+				getQuestionType() == react.getQuestionType();
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(ANSWER, getQuestionType(), getQuestionId(), getAnswerPos());
+	}
 }

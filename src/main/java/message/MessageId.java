@@ -2,6 +2,7 @@ package message;
 
 public enum MessageId {
 
+    TITLE_UNDEFINED,
     TITLE_CREATE_CATEGORY,
     TITLE_LOGIN,
 

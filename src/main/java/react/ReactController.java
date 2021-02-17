@@ -27,345 +27,231 @@ import javafx.scene.text.Text;
 import javafx.util.Callback;
 import javafx.util.Pair;
 import model.Question;
+import model.QuestionType;
 import model.Questionnaire;
+import model.ReactTableElement;
 import model.SceneName;
 import question.QuestionController;
 import questionList.QuestionListService;
-import survey.SurveyService;
 
-import java.text.MessageFormat;
 import java.util.List;
 import java.util.Optional;
 
 public class ReactController {
 
-	public static Question question;
-	public static List<Question> fragen;
-	public static Questionnaire questionnaire;
-	
-	private final int MAX_COUNT_REACTIONS = 1;
-	private final String REACT_DESCRIPTION = "...die Antwortmöglichkeit \"{1}\" der Frage \"{0}\" ausgewählt wurde.";
+    public static Question question;
+    public static List<Question> questions;
+    public static Questionnaire questionnaire;
 
-	private ObservableList<ReactTableElement> data = FXCollections.observableArrayList();
-	private ObservableList<Question> fragenData = FXCollections.observableArrayList();
-	private ObservableList<String> antwortData = FXCollections.observableArrayList();
-	
-	private boolean hasQuestion = false;
-	private boolean hasAnswer = false;
-	
-	@FXML
-	private Button btn_new;
+    private final int MAX_COUNT_REACTIONS = 1;
 
-	@FXML
-	private TableView<ReactTableElement> tbl_react;
-	@FXML
-	private TableColumn<ReactTableElement, String> questions;
-	@FXML
-	private TableColumn<ReactTableElement, String> answers;
-	@FXML
-	private TableColumn<ReactTableElement, String> comments;
-	@FXML
-	private TableColumn<ReactTableElement, String> delCol = new TableColumn<>("Löschen");
+    private ObservableList<ReactTableElement> data = FXCollections.observableArrayList();
+    private ObservableList<Question> questionData = FXCollections.observableArrayList();
+    private ObservableList<String> answerData = FXCollections.observableArrayList();
 
-	/**
-	 * The constructor (is called before the initialize()-method).
-	 */
-	public ReactController() {
-		FlagList flags = question.getFlags();
-		fragen = QuestionListService.getQuestions(questionnaire.getId());
+    private boolean hasQuestion = false;
+    private boolean hasAnswer = false;
 
-		for (React react : flags.getAll(React.class)) {
-			Question question = fragen.get(getY(react.getQuestionId(), react.getQuestionType().toString(), fragen));
-			data.add(new ReactTableElement(question, react.getAnswerPos()));
-		}
+    @FXML
+    private Button btn_new;
 
-		fragenData.addAll(fragen);
-		for (int i = 0; i < fragen.size(); ++i) {
-			if(fragen.get(i).getQuestionType().equals(question.getQuestionType()) && fragen.get(i).getQuestionId() == question.getQuestionId()) {
-				fragenData.remove(i);
-			}
-		}
-	}
+    @FXML
+    private TableView<ReactTableElement> tbl_react;
+    @FXML
+    private TableColumn<ReactTableElement, String> questionsColumn;
+    @FXML
+    private TableColumn<ReactTableElement, String> answersColumn;
+    @FXML
+    private TableColumn<ReactTableElement, String> commentsColumn;
+    @FXML
+    private TableColumn<ReactTableElement, String> delCol = new TableColumn<>("Löschen");
 
-	/**
-	 * Initializes the controller class. This method is automatically called after
-	 * the fxml file has been loaded.
-	 */
-	@FXML
-	private void initialize() {
+    /**
+     * The constructor (is called before the initialize()-method).
+     */
+    public ReactController() {
+        FlagList flags = question.getFlags();
+        questions = QuestionListService.getQuestions(questionnaire.getId());
 
-		tbl_react.setItems(data);
+        for (React react : flags.getAll(React.class)) {
+            Question question = questions.get(getY(react.getQuestionId(), react.getQuestionType(), questions));
+            data.add(new ReactTableElement(question, react.getAnswerPos(), react));
+        }
 
-		questions.setCellValueFactory(new PropertyValueFactory<ReactTableElement, String>("question"));
-		answers.setCellValueFactory(new PropertyValueFactory<ReactTableElement, String>("answer"));
-		comments.setCellValueFactory(new PropertyValueFactory<ReactTableElement, String>("comment"));
-		comments.setCellFactory(
-				new Callback<TableColumn<ReactTableElement, String>, TableCell<ReactTableElement, String>>() {
+        questionData.addAll(questions);
+        for (int i = 0; i < questions.size(); ++i) {
+            if (questions.get(i).getQuestionType().equals(question.getQuestionType()) && questions.get(i).getQuestionId() == question.getQuestionId()) {
+                questionData.remove(i);
+            }
+        }
+    }
 
-					@Override
-					public TableCell<ReactTableElement, String> call(TableColumn<ReactTableElement, String> param) {
-						TableCell<ReactTableElement, String> cell = new TableCell<>();
-						Text text = new Text();
-						cell.setGraphic(text);
-						cell.setPrefHeight(Control.USE_COMPUTED_SIZE);
-						text.wrappingWidthProperty().bind(cell.widthProperty());
-						text.textProperty().bind(cell.itemProperty());
-						return cell;
-					}
+    /**
+     * Initializes the controller class. This method is automatically called after
+     * the fxml file has been loaded.
+     */
+    @FXML
+    private void initialize() {
 
+        tbl_react.setItems(data);
+
+        questionsColumn.setCellValueFactory(new PropertyValueFactory<>("question"));
+        answersColumn.setCellValueFactory(new PropertyValueFactory<>("answer"));
+        commentsColumn.setCellValueFactory(new PropertyValueFactory<>("comment"));
+        commentsColumn.setCellFactory(
+				param -> {
+					TableCell<ReactTableElement, String> cell = new TableCell<>();
+					Text text = new Text();
+					cell.setGraphic(text);
+					cell.setPrefHeight(Control.USE_COMPUTED_SIZE);
+					text.wrappingWidthProperty().bind(cell.widthProperty());
+					text.textProperty().bind(cell.itemProperty());
+					return cell;
 				});
 
-		delCol.setCellValueFactory(new PropertyValueFactory<>("DUMMY"));
-		Callback<TableColumn<ReactTableElement, String>, TableCell<ReactTableElement, String>> cellFactoryDel = //
-				new Callback<TableColumn<ReactTableElement, String>, TableCell<ReactTableElement, String>>() {
-					@Override
-					public TableCell<ReactTableElement, String> call(
-							final TableColumn<ReactTableElement, String> param) {
-						final TableCell<ReactTableElement, String> cell = new TableCell<ReactTableElement, String>() {
+        delCol.setCellValueFactory(new PropertyValueFactory<>("DUMMY"));
+        Callback<TableColumn<ReactTableElement, String>, TableCell<ReactTableElement, String>> cellFactoryDel = //
+                new Callback<TableColumn<ReactTableElement, String>, TableCell<ReactTableElement, String>>() {
+                    @Override
+                    public TableCell<ReactTableElement, String> call(
+                            final TableColumn<ReactTableElement, String> param) {
+                        return new TableCell<ReactTableElement, String>() {
 
-							final Button btn = new Button("DEL");
+                            final Button btn = new Button("DEL");
 
-							@Override
-							public void updateItem(String item, boolean empty) {
-								super.updateItem(item, empty);
-								if (empty) {
-									setGraphic(null);
-									setText(null);
-								} else {
-									btn.setOnAction(event -> {
-										ReactTableElement reactTableElement = getTableView().getItems().get(getIndex());
-										
-										for(int i = 0; i < question.getFlags().getAll(React.class).size(); ++i) {
-											System.out.println(question.getFlags().getAll(React.class).get(i).toString() + " - " + reactTableElement.getFlag().toString());
-											if(question.getFlags().getAll(React.class).get(i).toString().equals(reactTableElement.getFlag().toString())) {
-												List<React> reacts = question.getFlags().getAll(React.class);
-												reacts.remove(i);
-												question.getFlags().replaceAll(React.class, reacts);
-											}
-										}
-									
-										data.remove(reactTableElement);
-									});
-									setGraphic(btn);
-									setText(null);
-								}
-							}
-						};
-						return cell;
+                            @Override
+                            public void updateItem(String item, boolean empty) {
+                                super.updateItem(item, empty);
+                                if (empty) {
+                                    setGraphic(null);
+                                    setText(null);
+                                } else {
+                                    btn.setOnAction(event -> {
+                                        ReactTableElement reactTableElement = getTableView().getItems().get(getIndex());
+
+                                        for (int i = 0; i < question.getFlags().getAll(React.class).size(); ++i) {
+                                            //System.out.println(question.getFlags().getAll(React.class).get(i).toString() + " - " + reactTableElement.getFlag().toString());
+                                            if (question.getFlags().getAll(React.class).get(i).equals(reactTableElement.getFlag())) {
+                                                List<React> reacts = question.getFlags().getAll(React.class);
+                                                reacts.remove(i);
+                                                question.getFlags().replaceAll(React.class, reacts);
+                                            }
+                                        }
+
+                                        data.remove(reactTableElement);
+                                    });
+                                    setGraphic(btn);
+                                    setText(null);
+                                }
+                            }
+                        };
+                    }
+                };
+
+        delCol.setCellFactory(cellFactoryDel);
+        tbl_react.getColumns().add(delCol);
+
+        ObservableList<Flag> flagData = FXCollections.observableArrayList();
+        flagData.setAll(question.getFlags().getAll(React.class));
+        BooleanBinding invalid = Bindings.size(flagData).greaterThanOrEqualTo(MAX_COUNT_REACTIONS);
+
+        btn_new.disableProperty().bind(invalid);
+    }
+
+    @FXML
+    private void createNew() {
+        Dialog<Pair<React, ReactTableElement>> dialog = new Dialog<>();
+        dialog.setTitle("Neu Bedinung auswählen");
+        ButtonType okButtonType = new ButtonType("OK", ButtonData.OK_DONE);
+        dialog.getDialogPane().getButtonTypes().addAll(okButtonType, ButtonType.CANCEL);
+        final Button okButton = (Button) dialog.getDialogPane().lookupButton(okButtonType);
+        okButton.setDisable(true);
+        dialog.setResizable(true);
+        dialog.getDialogPane().getStylesheets()
+                .add(ScreenController.class.getClassLoader().getResource(ScreenController.styleSheet).toExternalForm());
+
+        HBox hBox = new HBox(8);
+
+        ComboBox<Question> questionComboBox = new ComboBox<>();
+        questionComboBox.valueProperty().addListener((ov, oldQuestion, newQuestion) -> {
+			if (newQuestion != null) {
+				hasQuestion = true;
+				okButton.setDisable(!(hasQuestion && hasAnswer));
+				answerData.clear();
+				for (String answer : newQuestion.getAnswerOptions()) {
+					if (answer.equals("")) {
+						answer = "<Textfeld>";
 					}
-				};
-
-		delCol.setCellFactory(cellFactoryDel);
-		tbl_react.getColumns().add(delCol);
-		
-		ObservableList<Flag> flagData = FXCollections.observableArrayList();
-		flagData.setAll(question.getFlags().getAll(React.class));
-		BooleanBinding invalid = Bindings.size(flagData).greaterThanOrEqualTo(MAX_COUNT_REACTIONS);
-		
-		btn_new.disableProperty().bind(invalid);
-	}
-
-	@FXML
-	private void createNew() {
-		Dialog<Pair<React, ReactTableElement>> dialog = new Dialog<>();
-		dialog.setTitle("Neu Bedinung auswählen");
-		ButtonType okButtonType = new ButtonType("OK", ButtonData.OK_DONE);
-		dialog.getDialogPane().getButtonTypes().addAll(okButtonType, ButtonType.CANCEL);
-		final Button okButton = (Button) dialog.getDialogPane().lookupButton(okButtonType);
-		okButton.setDisable(true);
-		dialog.setResizable(true);
-		dialog.getDialogPane().getStylesheets()
-				.add(ScreenController.class.getClassLoader().getResource(ScreenController.styleSheet).toExternalForm());
-
-		HBox hBox = new HBox(8);
-
-		ComboBox<Question> question = new ComboBox<Question>();
-		question.valueProperty().addListener(new ChangeListener<Question>() {
-			@Override
-			public void changed(ObservableValue ov, Question oldQuestion, Question newQuestion) {
-				if(newQuestion != null) {
-					hasQuestion = true;
-					okButton.setDisable(!(hasQuestion && hasAnswer));
-					antwortData.clear();
-					for (String antwort : newQuestion.getAnswerOptions()) {
-						if(antwort.equals("")) {
-							antwort = "<Textfeld>";
-						}
-						antwortData.add(antwort);
-					}
-				} else {
-					hasQuestion = false;
+					answerData.add(answer);
 				}
+			} else {
+				hasQuestion = false;
 			}
 		});
 
-		question.setItems(fragenData);
-		ComboBox<String> answer = new ComboBox<String>();
-		answer.valueProperty().addListener(new ChangeListener<String>() {
-			@Override
-			public void changed(ObservableValue ov, String oldAntwort, String newAntwort) {
-				if(newAntwort != null) {
-					hasAnswer = true;
-					okButton.setDisable(!(hasQuestion && hasAnswer));
-				} else {
-					hasAnswer = false;
-				}
-			}
-		});
-		answer.setItems(antwortData);
-		hBox.getChildren().add(new Label("Frage:"));
-		hBox.getChildren().add(question);
-		hBox.getChildren().add(new Label("Antwort:"));
-		hBox.getChildren().add(answer);
+        questionComboBox.setItems(questionData);
+        ComboBox<String> answer = new ComboBox<>();
+        answer.valueProperty().addListener((ov, oldAnswer, newAnswer) -> {
+            if (newAnswer != null) {
+                hasAnswer = true;
+                okButton.setDisable(!(hasQuestion && hasAnswer));
+            } else {
+                hasAnswer = false;
+            }
+        });
+        answer.setItems(answerData);
+        hBox.getChildren().add(new Label("Frage:"));
+        hBox.getChildren().add(questionComboBox);
+        hBox.getChildren().add(new Label("Antwort:"));
+        hBox.getChildren().add(answer);
 
-		dialog.getDialogPane().setContent(hBox);
-		
-		dialog.setResultConverter(dialogButton -> {
-			if (dialogButton == okButtonType) {
-				Question frage = question.getSelectionModel().getSelectedItem();
-				int answerPos = answer.getSelectionModel().getSelectedIndex();
-				React react = new React(frage.getQuestionType(), frage.getQuestionId(), answerPos);
-				ReactTableElement tableElement = new ReactTableElement(frage, answerPos, react);
-				Pair<React, ReactTableElement> result = new Pair<React, ReactTableElement>(react, tableElement);
-				return result;
-			}
-			return null;
-		});
+        dialog.getDialogPane().setContent(hBox);
 
-		Optional<Pair<React, ReactTableElement>> result = dialog.showAndWait();
-		result.ifPresent(pair -> {
-			ReactController.question.getFlags().add(pair.getKey());
-			data.add(pair.getValue());
-		});
-	}
-	
-	@FXML
-	private void save() {
-		QuestionController.question = question;
-		ScreenController.activate(SceneName.QUESTION);
-	}
+        dialog.setResultConverter(dialogButton -> {
+            if (dialogButton == okButtonType) {
+                Question question = questionComboBox.getSelectionModel().getSelectedItem();
+                int answerPos = answer.getSelectionModel().getSelectedIndex();
+                React react = new React(question.getQuestionType(), question.getQuestionId(), answerPos);
+                ReactTableElement tableElement = new ReactTableElement(question, answerPos, react);
+                return new Pair<>(react, tableElement);
+            }
+            return null;
+        });
 
-	@FXML
-	private void exit() {
-		ScreenController.activate(SceneName.QUESTION);
-	}
+        Optional<Pair<React, ReactTableElement>> result = dialog.showAndWait();
+        result.ifPresent(pair -> {
+            ReactController.question.getFlags().add(pair.getKey());
+            data.add(pair.getValue());
+        });
+    }
 
-	/**
-	 * Gibt die Position des "FrageErstellen" Objektes in dem ArrayList "fragen" zurück
-	 * welche die entsprechende Fragen- ID und Fragenart hat. F�r die Vorschau!
-	 * <p>
-	 * 
-	 * @param x
-	 *            int: Fragen- ID
-	 * @param s
-	 *            String: Fragenart
-	 * @param fragen
-	 *            ArrayList FrageErstellen: alle Fragen
-	 * @return Postition im ArrayList "fragen" als int.
-	 */
-	private static int getY(int x, String s, List<Question> fragen) {
-		// TODO
+    @FXML
+    private void save() {
+        QuestionController.question = question;
+        ScreenController.activate(SceneName.QUESTION);
+    }
 
-		for (int i = 0; i < fragen.size(); i++) {
-			if (x == fragen.get(i).getQuestionId() && s.equals(fragen.get(i).getQuestionType())) {
-				return i;
-			}
-		}
-		return -1;
-	}
+    @FXML
+    private void exit() {
+        ScreenController.activate(SceneName.QUESTION);
+    }
 
-	public class ReactTableElement {
-		private String question;
-		private String answer;
-		private String comment;
-		private React flag;
-		
-		public ReactTableElement(Question question, int answerPos) {
-			super();
-			this.question = question.getQuestion();
-			this.answer = question.getAnswerOptions().get(answerPos);
-			this.comment = MessageFormat.format(REACT_DESCRIPTION, this.question, answer);
-			this.flag = getFlagFromFlagList(question, answerPos);
-		}
-		
-		public ReactTableElement(Question question, int answerPos, React flag) {
-			super();
-			this.question = question.getQuestion();
-			this.answer = question.getAnswerOptions().get(answerPos);
-			this.comment = MessageFormat.format(REACT_DESCRIPTION, this.question, answer);
-			this.flag = flag;
-		}
-
-		/**
-		 * @return the question
-		 */
-		public String getQuestion() {
-			return question;
-		}
-
-		/**
-		 * @param question
-		 *            the question to set
-		 */
-		public void setQuestion(String question) {
-			this.question = question;
-		}
-
-		/**
-		 * @return the answer
-		 */
-		public String getAnswer() {
-			return answer;
-		}
-
-		/**
-		 * @param answer
-		 *            the answer to set
-		 */
-		public void setAnswer(String answer) {
-			this.answer = answer;
-		}
-
-		/**
-		 * @return the comment
-		 */
-		public String getComment() {
-			return comment;
-		}
-
-		/**
-		 * @param comment
-		 *            the comment to set
-		 */
-		public void setComment(String comment) {
-			this.comment = comment;
-		}
-		
-		/**
-		 * @return the flag
-		 */
-		public React getFlag() {
-			return flag;
-		}
-
-		/**
-		 * @param flag the flag to set
-		 */
-		public void setFlag(React flag) {
-			this.flag = flag;
-		}
-
-		private React getFlagFromFlagList(Question question, int answerPos) {
-			for (React react : question.getFlags().getAll(React.class)) {
-				if(react.getQuestionType().equals(question.getQuestionType()) &&
-						react.getQuestionId() == question.getQuestionId() &&
-						react.getAnswerPos() == answerPos) {
-							return react;
-						}
-			}
-			
-			return null;
-		}
-
-	}
+    /**
+     * Gibt die Position des "FrageErstellen" Objektes in dem ArrayList "questions" zurück
+     * welche die entsprechende Fragen- ID und Fragenart hat. F�r die Vorschau!
+     * <p>
+     *
+     * @param x            int: Fragen- ID
+     * @param questionType QuestionType: Fragenart
+     * @param questions    ArrayList FrageErstellen: alle Fragen
+     * @return Postition im ArrayList "questions" als int.
+     */
+    private static int getY(int x, QuestionType questionType, List<Question> questions) {
+        for (int i = 0; i < questions.size(); i++) {
+            if (x == questions.get(i).getQuestionId() && questionType.equals(questions.get(i).getQuestionType())) {
+                return i;
+            }
+        }
+        return -1;
+    }
 }
