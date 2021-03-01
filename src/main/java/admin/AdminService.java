@@ -55,8 +55,8 @@ public class AdminService extends Database {
                 fb.setName(myRS.getString(SQL_COLUMN_NAME));
                 fb.setDate(myRS.getString(SQL_COLUMN_CREATION_DATE));
                 fb.setOrt(location);
-                fb.setActive(myRS.getBoolean(SQL_COLUMN_IS_ACTIVE)); // anneNeu
-                fb.setId(myRS.getInt(SQL_COLUMN_QUESTIONNAIRE_ID)); // anneNeuFlorian
+                fb.setActive(myRS.getBoolean(SQL_COLUMN_IS_ACTIVE));
+                fb.setId(myRS.getInt(SQL_COLUMN_QUESTIONNAIRE_ID));
                 fb.setFinal(myRS.getBoolean(SQL_COLUMN_IS_FINAL));
                 questionnaire.add(fb);
             }
