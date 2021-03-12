@@ -1,6 +1,8 @@
 package admin;
 
+import application.DialogMessageController;
 import application.GlobalVars;
+import application.NotificationController;
 import application.ScreenController;
 import export.ExportController;
 import export.impl.ExportControllerImpl;
@@ -31,9 +33,10 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.util.Pair;
 import login.LoginService;
+import message.DialogId;
+import message.MessageId;
 import model.Questionnaire;
 import model.SceneName;
-import org.controlsfx.control.Notifications;
 import questionList.QuestionListController;
 import start.StartController;
 
@@ -43,8 +46,18 @@ import java.util.ArrayList;
 import java.util.Objects;
 import java.util.Optional;
 
+import static application.DialogMessageController.getDialogMessage;
 import static application.GlobalFuncs.getURL;
-import static application.ScreenController.styleSheet;
+import static application.ScreenController.STYLESHEET;
+import static application.TableColumnNameController.getColumnName;
+import static message.TableColumnNameId.ADMIN_ACTIVE;
+import static message.TableColumnNameId.ADMIN_COPY;
+import static message.TableColumnNameId.ADMIN_DELETE;
+import static message.TableColumnNameId.ADMIN_EDIT;
+import static message.TableColumnNameId.ADMIN_FINAL;
+import static message.TableColumnNameId.ADMIN_RENAME;
+import static message.TableColumnNameId.ADMIN_SQL_EXPORT;
+import static message.TableColumnNameId.ADMIN_XLS_EXPORT;
 
 public class AdminController {
 
@@ -58,21 +71,21 @@ public class AdminController {
     @FXML
     private TableColumn<Questionnaire, String> dateColumn;
     @FXML
-    private TableColumn<Questionnaire, Boolean> activeColumn = new TableColumn<>("Aktiv");
+    private TableColumn<Questionnaire, Boolean> activeColumn = new TableColumn<>(getColumnName(ADMIN_ACTIVE));
     @FXML
-    private TableColumn<Questionnaire, Boolean> finalColumn = new TableColumn<>("Final");
+    private TableColumn<Questionnaire, Boolean> finalColumn = new TableColumn<>(getColumnName(ADMIN_FINAL));
     @FXML
-    private TableColumn<Questionnaire, String> editButtonColumn = new TableColumn<>("Bearbeiten");
+    private TableColumn<Questionnaire, String> editButtonColumn = new TableColumn<>(getColumnName(ADMIN_EDIT));
     @FXML
-    private TableColumn<Questionnaire, String> copyButtonColumn = new TableColumn<>("Kopieren");
+    private TableColumn<Questionnaire, String> copyButtonColumn = new TableColumn<>(getColumnName(ADMIN_COPY));
     @FXML
-    private TableColumn<Questionnaire, String> renameButtonColumn = new TableColumn<>("Umbenennen");
+    private TableColumn<Questionnaire, String> renameButtonColumn = new TableColumn<>(getColumnName(ADMIN_RENAME));
     @FXML
-    private TableColumn<Questionnaire, String> sqlExportButtonColumn = new TableColumn<>("SQL Export");
+    private TableColumn<Questionnaire, String> sqlExportButtonColumn = new TableColumn<>(getColumnName(ADMIN_SQL_EXPORT));
     @FXML
-    private TableColumn<Questionnaire, String> xlsExportButtonColumn = new TableColumn<>("XLS Export");
+    private TableColumn<Questionnaire, String> xlsExportButtonColumn = new TableColumn<>(getColumnName(ADMIN_XLS_EXPORT));
     @FXML
-    private TableColumn<Questionnaire, String> deleteButtonColumn = new TableColumn<>("L\u00f6schen");
+    private TableColumn<Questionnaire, String> deleteButtonColumn = new TableColumn<>(getColumnName(ADMIN_DELETE));
 
     /**
      * The constructor (is called before the initialize()-method).
@@ -81,7 +94,7 @@ public class AdminController {
         getData();
         data.addListener((ListChangeListener<Questionnaire>) change -> {
             change.next();
-            if(questionnaireTableView != null) {
+            if (questionnaireTableView != null) {
                 questionnaireTableView.refresh();
             }
         });
@@ -101,12 +114,12 @@ public class AdminController {
     private void initialize() {
         questionnaireTableView.setItems(data);
 
-        nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
-        dateColumn.setCellValueFactory(new PropertyValueFactory<>("date"));
+        nameColumn.setCellValueFactory(new PropertyValueFactory<>(Questionnaire.NAME));
+        dateColumn.setCellValueFactory(new PropertyValueFactory<>(Questionnaire.DATE));
         activeColumn.setCellValueFactory(cellData -> {
             Questionnaire questionnaire = cellData.getValue();
             ObservableBooleanValue property = questionnaire.isActive();
-            
+
             property.addListener((observable, oldValue, newValue) -> {
                 questionnaire.setActive(newValue);
                 if (newValue) {
@@ -142,22 +155,22 @@ public class AdminController {
         });
         finalColumn.setCellFactory(CheckBoxTableCell.forTableColumn(finalColumn));
 
-        editButtonColumn.setCellValueFactory(new PropertyValueFactory<>("edit"));
+        editButtonColumn.setCellValueFactory(new PropertyValueFactory<>(Questionnaire.EDIT));
         questionnaireTableView.getColumns().add(editButtonColumn);
 
-        copyButtonColumn.setCellValueFactory(new PropertyValueFactory<>("copy"));
+        copyButtonColumn.setCellValueFactory(new PropertyValueFactory<>(Questionnaire.COPY));
         questionnaireTableView.getColumns().add(copyButtonColumn);
 
-        renameButtonColumn.setCellValueFactory(new PropertyValueFactory<>("rename"));
+        renameButtonColumn.setCellValueFactory(new PropertyValueFactory<>(Questionnaire.RENAME));
         questionnaireTableView.getColumns().add(renameButtonColumn);
 
-        sqlExportButtonColumn.setCellValueFactory(new PropertyValueFactory<>("sqlExport"));
+        sqlExportButtonColumn.setCellValueFactory(new PropertyValueFactory<>(Questionnaire.SQL_EXPORT));
         questionnaireTableView.getColumns().add(sqlExportButtonColumn);
 
-        xlsExportButtonColumn.setCellValueFactory(new PropertyValueFactory<>("xlsExport"));
+        xlsExportButtonColumn.setCellValueFactory(new PropertyValueFactory<>(Questionnaire.XLS_EXPORT));
         questionnaireTableView.getColumns().add(xlsExportButtonColumn);
 
-        deleteButtonColumn.setCellValueFactory(new PropertyValueFactory<>("delete"));
+        deleteButtonColumn.setCellValueFactory(new PropertyValueFactory<>(Questionnaire.DELETE));
         questionnaireTableView.getColumns().add(deleteButtonColumn);
 
     }
@@ -188,19 +201,25 @@ public class AdminController {
         Button button = new Button("", imgView);
         button.setOnAction(event -> {
             ChoiceDialog<String> dialog = new ChoiceDialog<>(GlobalVars.location, GlobalVars.locations);
-            dialog.setTitle("Fragebogen kopieren");
-            dialog.setHeaderText("Fragebogen kopieren");
-            dialog.setContentText("Standort wählen:");
+            DialogMessageController.setMessage(dialog,
+                    DialogId.TITLE_COPY_QUESTIONNAIRE,
+                    DialogId.CONTENT_TEXT_COPY_QUESTIONNAIRE);
             DialogPane dialogPane = dialog.getDialogPane();
-            dialogPane.getStylesheets().add(getURL(styleSheet).toExternalForm());
+            dialogPane.getStylesheets().add(getURL(STYLESHEET).toExternalForm());
 
             Optional<String> result = dialog.showAndWait();
             result.ifPresent(ort -> {
                         if (AdminService.copyQuestionnaire(questionnaire, ort)) {
                             getData();
-                            Notifications.create().title("Fragebogen kopieren").text("Der Fragebogen \"" + questionnaire.getName() + "\" wurde erfolgreich\nnach \"" + ort + "\" kopiert.").show();
+                            NotificationController.createMessage(
+                                    MessageId.TITLE_COPY_QUESTIONNAIRE,
+                                    MessageId.MESSAGE_COPYED_QUESTIONNAIRE_SUCCESSFULLY,
+                                    questionnaire.getName(),
+                                    ort);
                         } else {
-                            Notifications.create().title("Fragebogen kopieren").text("Ein Fehler ist aufgetreten.").showError();
+                            NotificationController.createErrorMessage(
+                                    MessageId.TITLE_COPY_QUESTIONNAIRE,
+                                    MessageId.MESSAGE_UNDEFINED_ERROR);
                         }
                     }
             );
@@ -217,11 +236,12 @@ public class AdminController {
         Button button = new Button("", imgView);
         button.setOnAction(event -> {
             TextInputDialog dialog = new TextInputDialog("");
-            dialog.setTitle("Fragebogen umbenennen");
-            dialog.setContentText("neuer Name:");
+            DialogMessageController.setMessage(dialog,
+                    DialogId.TITLE_RENAME_QUESTIONNAIRE,
+                    DialogId.CONTENT_TEXT_RENAME_QUESTIONNAIRE);
             DialogPane dialogPane = dialog.getDialogPane();
             dialogPane.getStylesheets().add(
-                    getURL("style/application.css").toExternalForm());
+                    getURL(STYLESHEET).toExternalForm());
 
             Optional<String> result = dialog.showAndWait();
             result.ifPresent(questionnaire::setName);
@@ -255,11 +275,18 @@ public class AdminController {
             ExportController exportController = new ExportControllerImpl();
             Optional<Pair<String, String>> result = getDatePickerDialog();
             result.ifPresent(dates -> {
-                if (exportController.excelNeu(questionnaire.getId() + "_" + questionnaire.getOrt() + "_" + questionnaire.getName() + ".xlsx", questionnaire,
-                        dates.getKey(), dates.getValue())) {
-                    Notifications.create().title("Excel Export").text("Export erfolgreich abgeschlossen.").show();
+                if (exportController.excelNeu(
+                        String.format("%s_%s_%s.xlsx", questionnaire.getId(), questionnaire.getLocation(), questionnaire.getName()),
+                        questionnaire,
+                        dates.getKey(),
+                        dates.getValue())) {
+                    NotificationController.createMessage(
+                            MessageId.TITLE_EXCEL_EXPORT,
+                            MessageId.MESSAGE_EXPORTED_QUESTIONNAIRE_SUCCESSFULLY);
                 } else {
-                    Notifications.create().title("Excel Export").text("Ein Fehler ist aufgetreten.").showError();
+                    NotificationController.createErrorMessage(
+                            MessageId.TITLE_EXCEL_EXPORT,
+                            MessageId.MESSAGE_UNDEFINED_ERROR);
                 }
             });
         });
@@ -274,20 +301,26 @@ public class AdminController {
         Button button = new Button("", imgView);
         button.setOnAction(event -> {
             Alert alert = new Alert(AlertType.CONFIRMATION);
-            alert.setTitle("Fragebogen löschen");
-            alert.setHeaderText("Wollen Sie den Fragebogen wirklich löschen?");
-            alert.setContentText("Fortfahren?");
+            DialogMessageController.setMessage(alert,
+                    DialogId.TITLE_REMOVE_QUESTIONNAIRE,
+                    DialogId.HEADER_TEXT_REMOVE_QUESTIONNAIRE,
+                    DialogId.CONTENT_TEXT_REMOVE_QUESTIONNAIRE);
 
             DialogPane dialogPane = alert.getDialogPane();
-            dialogPane.getStylesheets().add(getURL("style/application.css").toExternalForm());
+            dialogPane.getStylesheets().add(getURL(STYLESHEET).toExternalForm());
 
             Optional<ButtonType> result = alert.showAndWait();
             if (result.isPresent() && result.get() == ButtonType.OK) {
                 if (AdminService.deleteQuestionnaire(questionnaire.getId())) {
                     getData();
-                    Notifications.create().title("Fragebogen löschen").text("Fragebogen \"" + questionnaire.getName() + "\" wurde erfolgreich abgeschlossen.").show();
+                    NotificationController.createErrorMessage(
+                            MessageId.TITLE_REMOVE_QUESTIONNAIRE,
+                            MessageId.MESSAGE_DELETED_QUESTIONNAIRE_SUCCESSFULLY,
+                            questionnaire.getName());
                 } else {
-                    Notifications.create().title("Fragebogen löschen").text("Ein Fehler ist aufgetreten.").showError();
+                    NotificationController.createErrorMessage(
+                            MessageId.TITLE_REMOVE_QUESTIONNAIRE,
+                            MessageId.MESSAGE_UNDEFINED_ERROR);
                 }
             }
         });
@@ -298,12 +331,14 @@ public class AdminController {
     private static Optional<Pair<String, String>> getDatePickerDialog() {
         // Create the custom dialog.
         Dialog<Pair<String, String>> dialog = new Dialog<>();
-        dialog.setTitle("Excel Export");
-
+        DialogMessageController.setMessage(dialog, DialogId.TITLE_EXCEL_EXPORT);
         DialogPane dialogPane = dialog.getDialogPane();
-        dialogPane.getStylesheets().add(getURL("style/application.css").toExternalForm());
+        dialogPane.getStylesheets().add(getURL(STYLESHEET).toExternalForm());
 
-        ButtonType okButtonType = new ButtonType("Export", ButtonData.OK_DONE);
+        ButtonType okButtonType = new ButtonType(
+                getDialogMessage(DialogId.BUTTON_EXCEL_EXPORT),
+                ButtonData.OK_DONE
+        );
         dialog.getDialogPane().getButtonTypes().addAll(okButtonType, ButtonType.CANCEL);
 
         GridPane grid = new GridPane();
@@ -311,23 +346,23 @@ public class AdminController {
         grid.setVgap(10);
         grid.setPadding(new Insets(20, 150, 10, 10));
 
-        DatePicker von = new DatePicker(LocalDate.now());
-        von.setPromptText("von");
-        DatePicker bis = new DatePicker(LocalDate.now());
-        von.setPromptText("bis");
+        DatePicker datePickerFrom = new DatePicker(LocalDate.now());
+        datePickerFrom.setPromptText(getDialogMessage(DialogId.DATEPICKER_EXPORT_FROM));
+        DatePicker datePickerTo = new DatePicker(LocalDate.now());
+        datePickerFrom.setPromptText(getDialogMessage(DialogId.DATEPICKER_EXPORT_TO));
 
-        grid.add(new Label("Von: "), 0, 0);
-        grid.add(von, 1, 0);
-        grid.add(new Label("Bis: "), 0, 1);
-        grid.add(bis, 1, 1);
+        grid.add(new Label(getDialogMessage(DialogId.DATEPICKER_EXPORT_FROM_LABEL)), 0, 0);
+        grid.add(datePickerFrom, 1, 0);
+        grid.add(new Label(getDialogMessage(DialogId.DATEPICKER_EXPORT_TO_LABEL)), 0, 1);
+        grid.add(datePickerTo, 1, 1);
 
         dialog.getDialogPane().setContent(grid);
 
-        Platform.runLater(von::requestFocus);
+        Platform.runLater(datePickerFrom::requestFocus);
 
         dialog.setResultConverter(dialogButton -> {
             if (dialogButton == okButtonType) {
-                return new Pair<>(von.getValue().toString(), bis.getValue().toString());
+                return new Pair<>(datePickerFrom.getValue().toString(), datePickerTo.getValue().toString());
             }
             return null;
         });
@@ -338,10 +373,12 @@ public class AdminController {
     @FXML
     private void newQuestionnaire() {
         TextInputDialog dialog = new TextInputDialog("");
-        dialog.setTitle("Fragebogen erstellen");
-        dialog.setContentText("Name:");
+        DialogMessageController.setMessage(
+                dialog,
+                DialogId.TITLE_CREATE_QUESTIONNAIRE,
+                DialogId.CONTENT_TEXT_CREATE_QUESTIONNAIRE);
         DialogPane dialogPane = dialog.getDialogPane();
-        dialogPane.getStylesheets().add(getURL("style/application.css").toExternalForm());
+        dialogPane.getStylesheets().add(getURL(STYLESHEET).toExternalForm());
 
         Optional<String> result = dialog.showAndWait();
         result.ifPresent(name -> {

@@ -28,7 +28,7 @@ public class StartService extends Database {
                 questionnaire.setName(myRS.getString(SQL_COLUMN_QUESTIONNAIRE_NAME));
                 questionnaire.setDate(myRS.getString(SQL_COLUMN_CREATION_DATE));
                 questionnaire.setId(myRS.getInt(SQL_COLUMN_QUESTIONNAIRE_ID));
-                questionnaire.setOrt(myRS.getString(SQL_COLUMN_LOCATION_NAME));
+                questionnaire.setLocation(myRS.getString(SQL_COLUMN_LOCATION_NAME));
                 questionnaire.setActive(true);
                 return questionnaire;
             }

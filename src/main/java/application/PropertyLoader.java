@@ -1,6 +1,6 @@
 package application;
 
-import message.MessageId;
+import message.AbstractId;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -23,7 +23,7 @@ public class PropertyLoader {
         }
     }
 
-    public String getPropertyValue(MessageId messageId) {
-        return properties.getProperty(messageId.name());
+    public <T extends AbstractId> String getPropertyValue(T id) {
+        return properties.getProperty(id.name());
     }
 }

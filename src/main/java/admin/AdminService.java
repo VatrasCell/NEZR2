@@ -54,7 +54,7 @@ public class AdminService extends Database {
                 Questionnaire fb = new Questionnaire();
                 fb.setName(myRS.getString(SQL_COLUMN_NAME));
                 fb.setDate(myRS.getString(SQL_COLUMN_CREATION_DATE));
-                fb.setOrt(location);
+                fb.setLocation(location);
                 fb.setActive(myRS.getBoolean(SQL_COLUMN_IS_ACTIVE));
                 fb.setId(myRS.getInt(SQL_COLUMN_QUESTIONNAIRE_ID));
                 fb.setFinal(myRS.getBoolean(SQL_COLUMN_IS_FINAL));

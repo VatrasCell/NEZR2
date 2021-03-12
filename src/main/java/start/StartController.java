@@ -113,7 +113,7 @@ public class StartController {
 	public static void setStartText() {
 		if(GlobalVars.activeQuestionnaire != null) {
 			questionnaireText.set(String.format("Fragebogen: %s", GlobalVars.activeQuestionnaire.getName()));
-			if(!GlobalVars.activeQuestionnaire.getOrt().equals(GlobalVars.location)) {
+			if(!GlobalVars.activeQuestionnaire.getLocation().equals(GlobalVars.location)) {
 				questionnaireWarn.set("Fragebogen ist nicht für diesen Standort optimiert");
 			} else {
 				questionnaireWarn.set("");

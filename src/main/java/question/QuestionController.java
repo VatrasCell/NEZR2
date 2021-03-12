@@ -45,6 +45,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static application.GlobalFuncs.getURL;
+import static application.ScreenController.STYLESHEET;
 
 public class QuestionController {
     public static Questionnaire questionnaire;
@@ -477,7 +478,7 @@ public class QuestionController {
         dialog.setTitle("Antwort anlegen");
         dialog.setContentText("Name:");
         DialogPane dialogPane = dialog.getDialogPane();
-        dialogPane.getStylesheets().add(getURL("style/application.css").toExternalForm());
+        dialogPane.getStylesheets().add(getURL(STYLESHEET).toExternalForm());
 
         Optional<String> result = dialog.showAndWait();
         result.ifPresent(name -> {
@@ -496,7 +497,7 @@ public class QuestionController {
         dialog.setTitle("Kategorie anlegen");
         dialog.setContentText("Name:");
         DialogPane dialogPane = dialog.getDialogPane();
-        dialogPane.getStylesheets().add(getURL("style/application.css").toExternalForm());
+        dialogPane.getStylesheets().add(getURL(STYLESHEET).toExternalForm());
 
         Optional<String> result = dialog.showAndWait();
         result.ifPresent(name -> {

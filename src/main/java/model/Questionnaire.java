@@ -7,10 +7,24 @@ import javafx.beans.value.ObservableBooleanValue;
 import javafx.scene.control.Button;
 
 public class Questionnaire {
+
+    public static String ID = "id";
+    public static String DATE = "date";
+    public static String NAME = "name";
+    public static String LOCATION = "location";
+    public static String IS_ACTIVE = "isActive";
+    public static String IS_FINAL = "isFinal";
+    public static String EDIT = "edit";
+    public static String COPY = "copy";
+    public static String RENAME = "rename";
+    public static String SQL_EXPORT = "sqlExport";
+    public static String XLS_EXPORT = "xlsExport";
+    public static String DELETE = "delete";
+
     private int id;
     private String date;
     private String name;
-    private String ort;
+    private String location;
     private BooleanProperty isActive = new SimpleBooleanProperty();
     private BooleanProperty isFinal = new SimpleBooleanProperty();
     private Button edit;
@@ -53,12 +67,12 @@ public class Questionnaire {
         this.name = name;
     }
 
-    public String getOrt() {
-        return ort;
+    public String getLocation() {
+        return location;
     }
 
-    public void setOrt(String ort) {
-        this.ort = ort;
+    public void setLocation(String location) {
+        this.location = location;
     }
 
     public ObservableBooleanValue isActive() {
@@ -139,7 +153,7 @@ public class Questionnaire {
 
     @Override
     public String toString() {
-        return "Questionnaire [id=" + id + ", date=" + date + ", name=" + name + ", ort=" + ort + ", activ=" + isActive
+        return "Questionnaire [id=" + id + ", date=" + date + ", name=" + name + ", ort=" + location + ", activ=" + isActive
                 + ", isFinal=" + isFinal + "]";
     }
 

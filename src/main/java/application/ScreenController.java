@@ -12,14 +12,14 @@ public class ScreenController {
     private static HashMap<String, Pane> screenMap = new HashMap<>();
     private static Stage primaryStage;
 
-    public static final String styleSheet = "style/application.css";
+    public static final String STYLESHEET = "style/application.css";
 
     public static void setPrimaryStage(Stage primaryStage) {
         ScreenController.primaryStage = primaryStage;
     }
 
     public static void addScreen(String name, Pane pane) {
-        pane.getStylesheets().add(getURL(styleSheet).toExternalForm());
+        pane.getStylesheets().add(getURL(STYLESHEET).toExternalForm());
         screenMap.put(name, pane);
     }
 

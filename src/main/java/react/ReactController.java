@@ -6,8 +6,6 @@ import flag.FlagList;
 import flag.React;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -168,7 +166,7 @@ public class ReactController {
         okButton.setDisable(true);
         dialog.setResizable(true);
         dialog.getDialogPane().getStylesheets()
-                .add(ScreenController.class.getClassLoader().getResource(ScreenController.styleSheet).toExternalForm());
+                .add(ScreenController.class.getClassLoader().getResource(ScreenController.STYLESHEET).toExternalForm());
 
         HBox hBox = new HBox(8);
 

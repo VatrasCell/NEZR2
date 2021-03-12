@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static application.GlobalFuncs.getURL;
-import static application.ScreenController.styleSheet;
+import static application.ScreenController.STYLESHEET;
 
 
 public class SurveyController {
@@ -115,7 +115,7 @@ public class SurveyController {
 			alert.setContentText("Fortfahren?");
 			
 			DialogPane dialogPane = alert.getDialogPane();
-			dialogPane.getStylesheets().add(getURL(styleSheet).toExternalForm());
+			dialogPane.getStylesheets().add(getURL(STYLESHEET).toExternalForm());
 
 			Optional<ButtonType> result = alert.showAndWait();
 			if (result.isPresent() && result.get() == ButtonType.OK){
@@ -132,7 +132,7 @@ public class SurveyController {
 		alert.setContentText("Fortfahren?");
 		
 		DialogPane dialogPane = alert.getDialogPane();
-		dialogPane.getStylesheets().add(getURL("style/application.css").toExternalForm());
+		dialogPane.getStylesheets().add(getURL(STYLESHEET).toExternalForm());
 
 		Optional<ButtonType> result = alert.showAndWait();
 		if (result.isPresent() && result.get() == ButtonType.OK){
