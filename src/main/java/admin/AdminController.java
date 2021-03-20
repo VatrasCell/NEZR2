@@ -12,7 +12,6 @@ import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
@@ -52,12 +51,12 @@ import static application.ScreenController.STYLESHEET;
 import static application.TableColumnNameController.getColumnName;
 import static message.TableColumnNameId.ADMIN_ACTIVE;
 import static message.TableColumnNameId.ADMIN_COPY;
-import static message.TableColumnNameId.ADMIN_DELETE;
-import static message.TableColumnNameId.ADMIN_EDIT;
 import static message.TableColumnNameId.ADMIN_FINAL;
 import static message.TableColumnNameId.ADMIN_RENAME;
 import static message.TableColumnNameId.ADMIN_SQL_EXPORT;
 import static message.TableColumnNameId.ADMIN_XLS_EXPORT;
+import static message.TableColumnNameId.DELETE;
+import static message.TableColumnNameId.EDIT;
 
 public class AdminController {
 
@@ -75,7 +74,7 @@ public class AdminController {
     @FXML
     private TableColumn<Questionnaire, Boolean> finalColumn = new TableColumn<>(getColumnName(ADMIN_FINAL));
     @FXML
-    private TableColumn<Questionnaire, String> editButtonColumn = new TableColumn<>(getColumnName(ADMIN_EDIT));
+    private TableColumn<Questionnaire, String> editButtonColumn = new TableColumn<>(getColumnName(EDIT));
     @FXML
     private TableColumn<Questionnaire, String> copyButtonColumn = new TableColumn<>(getColumnName(ADMIN_COPY));
     @FXML
@@ -85,7 +84,7 @@ public class AdminController {
     @FXML
     private TableColumn<Questionnaire, String> xlsExportButtonColumn = new TableColumn<>(getColumnName(ADMIN_XLS_EXPORT));
     @FXML
-    private TableColumn<Questionnaire, String> deleteButtonColumn = new TableColumn<>(getColumnName(ADMIN_DELETE));
+    private TableColumn<Questionnaire, String> deleteButtonColumn = new TableColumn<>(getColumnName(DELETE));
 
     /**
      * The constructor (is called before the initialize()-method).
@@ -184,7 +183,7 @@ public class AdminController {
             try {
                 QuestionListController.questionnaire = questionnaire;
                 ScreenController.addScreen(SceneName.QUESTION_LIST,
-                        FXMLLoader.load(getURL(SceneName.QUESTION_LIST_PATH)));
+                        getURL(SceneName.QUESTION_LIST_PATH));
                 ScreenController.activate(SceneName.QUESTION_LIST);
             } catch (IOException e) {
                 e.printStackTrace();
@@ -390,13 +389,13 @@ public class AdminController {
     }
 
     @FXML
-    private void logout() {
+    private void logout() throws IOException {
         LoginService.login("usr", "Q#DQ8Ka&9Vq6`;)s");
         ScreenController.activate(SceneName.START);
     }
 
     @FXML
-    private void changeLocation() {
+    private void changeLocation() throws IOException {
         ScreenController.activate(SceneName.LOCATION);
     }
 

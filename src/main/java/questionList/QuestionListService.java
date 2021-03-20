@@ -1,7 +1,9 @@
 package questionList;
 
 import application.Database;
+import application.NotificationController;
 import flag.FlagList;
+import message.MessageId;
 import model.Answer;
 import model.Headline;
 import model.Question;
@@ -29,6 +31,7 @@ import static application.SqlStatement.SQL_COLUMN_NAME;
 import static application.SqlStatement.SQL_COLUMN_POSITION;
 import static application.SqlStatement.SQL_COLUMN_QUESTION;
 import static application.SqlStatement.SQL_COLUMN_SHORT_ANSWER_ID;
+import static application.SqlStatement.SQL_CREATE_HEADLINE;
 import static application.SqlStatement.SQL_DELETE_MULTIPLE_CHOICE;
 import static application.SqlStatement.SQL_DELETE_MULTIPLE_CHOICE_ANSWERS_RELATION_BY_QUESTION_ID;
 import static application.SqlStatement.SQL_DELETE_MULTIPLE_CHOICE_QUESTIONNAIRE_RELATION;
@@ -37,6 +40,8 @@ import static application.SqlStatement.SQL_DELETE_SHORT_ANSWER_HAS_ANSWERS_RELAT
 import static application.SqlStatement.SQL_DELETE_SHORT_ANSWER_QUESTIONNAIRE_RELATION;
 import static application.SqlStatement.SQL_GET_HEADLINES;
 import static application.SqlStatement.SQL_GET_HEADLINE_BY_ID;
+import static application.SqlStatement.SQL_GET_HEADLINE_BY_NAME;
+import static application.SqlStatement.SQL_GET_HEADLINE_ID;
 import static application.SqlStatement.SQL_GET_MULTIPLE_CHOICE_IDS_BY_QUESTIONNAIRE_ID;
 import static application.SqlStatement.SQL_GET_MULTIPLE_CHOICE_QUESTION;
 import static application.SqlStatement.SQL_GET_MULTIPLE_CHOICE_QUESTION_ANSWERS;
@@ -68,7 +73,7 @@ public class QuestionListService extends Database {
                 Question question = new Question();
                 question.setQuestion(myRS.getString(SQL_COLUMN_QUESTION));
                 question.setQuestionId(myRS.getInt(SQL_COLUMN_MULTIPLE_CHOICE_ID));
-                question.setCategory(myRS.getString(SQL_COLUMN_CATEGORY_NAME));
+                question.setCategory(QuestionService.provideCategory(myRS.getString(SQL_COLUMN_CATEGORY_NAME)));
                 question.setDate(myRS.getString(SQL_COLUMN_CREATION_DATE));
                 question.setFlags(new FlagList(myRS.getString(SQL_COLUMN_FLAGS)));
                 question.setPosition(Integer.parseInt(myRS.getString(SQL_COLUMN_POSITION)));
@@ -101,7 +106,7 @@ public class QuestionListService extends Database {
                 Question question = new Question();
                 question.setQuestion(myRS.getString(SQL_COLUMN_QUESTION));
                 question.setQuestionId(myRS.getInt(SQL_COLUMN_SHORT_ANSWER_ID));
-                question.setCategory(myRS.getString(SQL_COLUMN_CATEGORY_NAME));
+                question.setCategory(QuestionService.provideCategory(myRS.getString(SQL_COLUMN_CATEGORY_NAME)));
                 question.setDate(myRS.getString(SQL_COLUMN_CREATION_DATE));
                 question.setFlags(new FlagList(myRS.getString(SQL_COLUMN_FLAGS)));
                 question.setPosition(Integer.parseInt(myRS.getString(SQL_COLUMN_POSITION)));
@@ -152,6 +157,74 @@ public class QuestionListService extends Database {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public static Headline getHeadlineByName(String name) {
+        try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
+            PreparedStatement psSql = myCon.prepareStatement(SQL_GET_HEADLINE_BY_NAME);
+            psSql.setString(1, name);
+            ResultSet myRS = psSql.executeQuery();
+            if (myRS.next()) {
+                return new Headline(
+                        myRS.getInt(SQL_COLUMN_HEADLINE_ID),
+                        myRS.getString(SQL_COLUMN_NAME)
+                );
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static void createHeadline(String name) {
+        try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
+            PreparedStatement psSql = myCon.prepareStatement(SQL_CREATE_HEADLINE);
+            psSql.setString(1, name);
+            psSql.execute();
+
+            NotificationController
+                    .createMessage(MessageId.TITLE_CREATE_HEADLINE, MessageId.MESSAGE_CREATE_HEADLINE, name);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            NotificationController
+                    .createErrorMessage(MessageId.TITLE_CREATE_HEADLINE, MessageId.MESSAGE_UNDEFINED_ERROR);
+        }
+    }
+
+    public static boolean checkHeadline(String name) {
+        try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
+            PreparedStatement psSql = myCon.prepareStatement(SQL_GET_HEADLINE_ID);
+            psSql.setString(1, name);
+            ResultSet myRS = psSql.executeQuery();
+
+            if (myRS.next()) {
+                return true;
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public static void createUniqueHeadline(String name) {
+        if (checkHeadline(name)) {
+            NotificationController
+                    .createErrorMessage(MessageId.TITLE_CREATE_HEADLINE, MessageId.MESSAGE_CATEGORY_HEADLINE_EXISTS);
+        } else {
+            createHeadline(name);
+        }
+    }
+
+    public static Headline provideHeadline(String name) {
+        Headline headline = getHeadlineByName(name);
+
+        if (headline == null) {
+            createUniqueHeadline(name);
+            headline = getHeadlineByName(name);
+        }
+
+        return headline;
     }
 
     public static void deleteQuestion(int questionnaireId, Question question) {

@@ -3,6 +3,7 @@ package question;
 import application.NotificationController;
 import flag.FlagList;
 import message.MessageId;
+import model.Category;
 import model.QuestionEditParam;
 import model.QuestionType;
 import org.junit.Before;
@@ -43,13 +44,27 @@ public class QuestionServiceTest extends DBTestUtil {
     public void testGetCategories() {
 
         //arrange
-        List<String> categories = Arrays.asList("A1", "A2", "A3", "A4", "A5", "A6", "A7",
-        "B1", "B2", "B3", "B4", "C1", "C2", "C3", "D1");
+        List<Category> categories = Arrays.asList(
+                new Category(1, "A1"),
+                new Category(2, "A2"),
+                new Category(3, "A3"),
+                new Category(4, "A4"),
+                new Category(5, "A5"),
+                new Category(6, "A6"),
+                new Category(7, "A7"),
+                new Category(8, "B1"),
+                new Category(9, "B2"),
+                new Category(10, "B3"),
+                new Category(11, "B4"),
+                new Category(12, "C1"),
+                new Category(13, "C2"),
+                new Category(14, "C3"),
+                new Category(15, "D1"));
 
         addCategories();
 
         //act
-        List<String> results = QuestionService.getCategories();
+        List<Category> results = QuestionService.getCategories();
 
         //assert
         assertEquals(categories, results);
@@ -62,7 +77,7 @@ public class QuestionServiceTest extends DBTestUtil {
         //arrange
         FlagList flagList = new FlagList();
         QuestionEditParam param = new QuestionEditParam(QuestionType.MULTIPLE_CHOICE, true, false, false,
-                false, false, false, false, false, false,
+                false, false, false, false, false,
                 null, 0);
 
         //act
@@ -118,7 +133,7 @@ public class QuestionServiceTest extends DBTestUtil {
         addCategories();
 
         //act
-        QuestionService.provideCategory("A1");
+        QuestionService.createUniqueCategory("A1");
 
         //assert
         verifyStatic(NotificationController.class);
@@ -140,10 +155,10 @@ public class QuestionServiceTest extends DBTestUtil {
         NotificationController.createMessage(
                 eq(MessageId.TITLE_CREATE_CATEGORY), eq(MessageId.MESSAGE_CATEGORY_CREATED_SUCCESSFULLY), eq(category));
 
-        List<String> result = QuestionService.getCategories();
+        List<Category> result = QuestionService.getCategories();
         assertNotNull(result);
         assertEquals(1, result.size());
-        assertEquals(category, result.get(0));
+        assertEquals(category, result.get(0).getName());
     }
 
     @Test
@@ -227,18 +242,18 @@ public class QuestionServiceTest extends DBTestUtil {
         addCategories();
 
         //act
-        Integer result = QuestionService.getCategoryId("A1");
+        Category result = QuestionService.getCategory("A1");
 
         //assert
         assertNotNull(result);
-        assertEquals(1, result.intValue());
+        assertEquals(1, result.getId());
     }
 
     @Test
     public void testGetCategoryIdNull() {
 
         //act
-        Integer result = QuestionService.getCategoryId("A1");
+        Category result = QuestionService.getCategory("A1");
 
         //assert
         assertNull(result);
@@ -251,22 +266,22 @@ public class QuestionServiceTest extends DBTestUtil {
         addCategories();
 
         //act
-        Integer result = QuestionService.provideCategoryId("A1");
+        Category result = QuestionService.provideCategory("A1");
 
         //assert
         assertNotNull(result);
-        assertEquals(1, result.intValue());
+        assertEquals(1, result.getId());
     }
 
     @Test
     public void testProvideCategoryIdDoNotExists() {
 
         //act
-        Integer result = QuestionService.provideCategoryId("A1");
+        Category result = QuestionService.provideCategory("A1");
 
         //assert
         assertNotNull(result);
-        assertEquals(1, result.intValue());
+        assertEquals(1, result.getId());
     }
 
     @Test

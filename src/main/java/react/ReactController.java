@@ -32,6 +32,7 @@ import model.SceneName;
 import question.QuestionController;
 import questionList.QuestionListService;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
@@ -97,15 +98,15 @@ public class ReactController {
         answersColumn.setCellValueFactory(new PropertyValueFactory<>("answer"));
         commentsColumn.setCellValueFactory(new PropertyValueFactory<>("comment"));
         commentsColumn.setCellFactory(
-				param -> {
-					TableCell<ReactTableElement, String> cell = new TableCell<>();
-					Text text = new Text();
-					cell.setGraphic(text);
-					cell.setPrefHeight(Control.USE_COMPUTED_SIZE);
-					text.wrappingWidthProperty().bind(cell.widthProperty());
-					text.textProperty().bind(cell.itemProperty());
-					return cell;
-				});
+                param -> {
+                    TableCell<ReactTableElement, String> cell = new TableCell<>();
+                    Text text = new Text();
+                    cell.setGraphic(text);
+                    cell.setPrefHeight(Control.USE_COMPUTED_SIZE);
+                    text.wrappingWidthProperty().bind(cell.widthProperty());
+                    text.textProperty().bind(cell.itemProperty());
+                    return cell;
+                });
 
         delCol.setCellValueFactory(new PropertyValueFactory<>("DUMMY"));
         Callback<TableColumn<ReactTableElement, String>, TableCell<ReactTableElement, String>> cellFactoryDel = //
@@ -172,20 +173,20 @@ public class ReactController {
 
         ComboBox<Question> questionComboBox = new ComboBox<>();
         questionComboBox.valueProperty().addListener((ov, oldQuestion, newQuestion) -> {
-			if (newQuestion != null) {
-				hasQuestion = true;
-				okButton.setDisable(!(hasQuestion && hasAnswer));
-				answerData.clear();
-				for (String answer : newQuestion.getAnswerOptions()) {
-					if (answer.equals("")) {
-						answer = "<Textfeld>";
-					}
-					answerData.add(answer);
-				}
-			} else {
-				hasQuestion = false;
-			}
-		});
+            if (newQuestion != null) {
+                hasQuestion = true;
+                okButton.setDisable(!(hasQuestion && hasAnswer));
+                answerData.clear();
+                for (String answer : newQuestion.getAnswerOptions()) {
+                    if (answer.equals("")) {
+                        answer = "<Textfeld>";
+                    }
+                    answerData.add(answer);
+                }
+            } else {
+                hasQuestion = false;
+            }
+        });
 
         questionComboBox.setItems(questionData);
         ComboBox<String> answer = new ComboBox<>();
@@ -224,13 +225,13 @@ public class ReactController {
     }
 
     @FXML
-    private void save() {
+    private void save() throws IOException {
         QuestionController.question = question;
         ScreenController.activate(SceneName.QUESTION);
     }
 
     @FXML
-    private void exit() {
+    private void exit() throws IOException {
         ScreenController.activate(SceneName.QUESTION);
     }
 

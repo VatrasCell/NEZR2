@@ -36,8 +36,8 @@ public class SqlStatement {
 
     //Table category
     public static final String SQL_CREATE_CATEGORY = "INSERT INTO category VALUES(NULL, ?)";
-    public static final String SQL_GET_CATEGORY_ID = "SELECT category_id FROM category WHERE name=?";
-    public static final String SQL_GET_CATEGORIE_NAMES = "SELECT category.name FROM category";
+    public static final String SQL_GET_CATEGORY_BY_NAME = "SELECT * FROM category WHERE name=?";
+    public static final String SQL_GET_CATEGORIES = "SELECT * FROM category";
 
     public static final String SQL_COLUMN_CATEGORY_ID = "category_id";
     public static final String SQL_COLUMN_CATEGORY_NAME = "category.name";
@@ -46,6 +46,8 @@ public class SqlStatement {
     public static final String SQL_GET_MULTIPLE_CHOICE_ID = "SELECT multiple_choice_id FROM multiple_choice WHERE question=?";
     public static final String SQL_CREATE_MULTIPLE_CHOICE = "INSERT INTO multiple_choice VALUES(NULL, ?, ?, NULL)";
     public static final String SQL_DELETE_MULTIPLE_CHOICE = "DELETE FROM multiple_choice WHERE multiple_choice_id=?";
+    public static final String SQL_SET_CATEGORY_ON_MULTIPLE_CHOICE = "UPDATE multiple_choice SET category_id=? WHERE multiple_choice_id=?";
+    public static final String SQL_SET_HEADLINE_ON_MULTIPLE_CHOICE = "UPDATE multiple_choice SET headline_id=? WHERE multiple_choice_id=?";
 
     public static final String SQL_COLUMN_QUESTION = "question";
     public static final String SQL_COLUMN_MULTIPLE_CHOICE_ID = "multiple_choice_id";
@@ -67,6 +69,8 @@ public class SqlStatement {
     public static final String SQL_GET_SHORT_ANSWER_ID_BY_QUESTIONNAIRE_ID = "SELECT short_answer_id FROM short_answer JOIN q_has_sa ON short_answer.short_answer_id=q_has_sa.short_answer_id WHERE question=? AND questionnaire_id=?";
     public static final String SQL_CREATE_SHORT_ANSWER = "INSERT INTO short_answer VALUES(NULL, ? , ?, NULL)";
     public static final String SQL_DELETE_SHORT_ANSWER = "DELETE FROM short_answer WHERE short_answer_id=?";
+    public static final String SQL_SET_CATEGORY_ON_SHORT_ANSWER = "UPDATE short_answer SET category_id=? WHERE short_answer_id=?";
+    public static final String SQL_SET_HEADLINE_ON_SHORT_ANSWER = "UPDATE short_answer SET headline_id=? WHERE short_answer_id=?";
 
     public static final String SQL_COLUMN_SHORT_ANSWER_ID = "short_answer_id";
 
@@ -143,6 +147,9 @@ public class SqlStatement {
     //Table headline
     public static final String SQL_GET_HEADLINES = "SELECT * FROM headline";
     public static final String SQL_GET_HEADLINE_BY_ID = "SELECT * FROM headline WHERE headline_id=?";
+    public static final String SQL_CREATE_HEADLINE = "INSERT INTO headline VALUES(NULL, ?)";
+    public static final String SQL_GET_HEADLINE_BY_NAME = "SELECT * FROM headline WHERE name=?";
+    public static final String SQL_GET_HEADLINE_ID = "SELECT headline_id FROM headline WHERE name=?";
 
     public static final String SQL_COLUMN_HEADLINE_ID = "headline_id";
 

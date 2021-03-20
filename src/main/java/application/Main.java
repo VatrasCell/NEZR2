@@ -1,7 +1,6 @@
 package application;
 
 import javafx.application.Application;
-import javafx.fxml.FXMLLoader;
 import javafx.stage.Stage;
 import location.LocationService;
 import login.LoginService;
@@ -26,8 +25,8 @@ public class Main extends Application {
         LoginService.login("usr", "Q#DQ8Ka&9Vq6`;)s");
         GlobalVars.locations = LocationService.getLocations();
 
-        ScreenController.addScreen(SceneName.LOGIN, FXMLLoader.load(getURL(SceneName.LOGIN_PATH)));
-        ScreenController.addScreen(SceneName.LOCATION, FXMLLoader.load(getURL(SceneName.LOCATION_PATH)));
+        ScreenController.addScreen(SceneName.LOGIN, getURL(SceneName.LOGIN_PATH));
+        ScreenController.addScreen(SceneName.LOCATION, getURL(SceneName.LOCATION_PATH));
         ScreenController.activate(SceneName.LOCATION);
     }
 

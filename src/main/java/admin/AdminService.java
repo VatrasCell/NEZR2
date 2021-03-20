@@ -33,8 +33,8 @@ import static application.SqlStatement.SQL_DEACTIVATE_OTHER_QUESTIONNAIRES;
 import static application.SqlStatement.SQL_DEACTIVATE_QUESTIONNAIRE;
 import static application.SqlStatement.SQL_DELETE_QUESTIONNAIRE;
 import static application.SqlStatement.SQL_GET_LAST_QUESTIONNAIRE_ID;
-import static application.SqlStatement.SQL_GET_QUESTIONNAIRES_BY_LOCATION_ID;
 import static application.SqlStatement.SQL_GET_LOCATION_ID;
+import static application.SqlStatement.SQL_GET_QUESTIONNAIRES_BY_LOCATION_ID;
 import static application.SqlStatement.SQL_IS_QUESTIONNAIRE_FINAL;
 import static application.SqlStatement.SQL_RENAME_QUESTIONNAIRE;
 import static application.SqlStatement.SQL_SET_QUESTIONNAIRE_FINAL_STATUS;
@@ -144,11 +144,11 @@ public class AdminService extends Database {
         return false;
     }
 
-    public static boolean renameQuestionnaire(Questionnaire fb) {
+    public static boolean renameQuestionnaire(Questionnaire questionnaire) {
         try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
             PreparedStatement psSql = myCon.prepareStatement(SQL_RENAME_QUESTIONNAIRE);
-            psSql.setString(1, fb.getName());
-            psSql.setInt(2, fb.getId());
+            psSql.setString(1, questionnaire.getName());
+            psSql.setInt(2, questionnaire.getId());
             psSql.execute();
 
             return true;

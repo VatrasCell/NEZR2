@@ -1,9 +1,9 @@
 package login;
 
+import application.GlobalVars;
 import application.NotificationController;
 import application.ScreenController;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import message.MessageId;
@@ -29,7 +29,7 @@ public class LoginController {
     private void login() throws IOException {
         if (!username.getText().equals("") && !password.getText().equals("")) {
             if (LoginService.login(username.getText(), password.getText())) {
-                ScreenController.addScreen(SceneName.ADMIN, FXMLLoader.load(getURL(SceneName.ADMIN_PATH)));
+                ScreenController.addScreen(SceneName.ADMIN, getURL(SceneName.ADMIN_PATH));
                 reset();
                 ScreenController.activate(SceneName.ADMIN);
             } else {
@@ -40,8 +40,19 @@ public class LoginController {
         }
     }
 
+    public static void devLogin() throws IOException {
+        if (GlobalVars.DEV_MODE) {
+            if (LoginService.login("root", "1234")) {
+                ScreenController.addScreen(SceneName.ADMIN, getURL(SceneName.ADMIN_PATH));
+                ScreenController.activate(SceneName.ADMIN);
+            } else {
+                NotificationController.createErrorMessage(MessageId.TITLE_LOGIN, MessageId.MESSAGE_LOGIN_WRONG_DATA);
+            }
+        }
+    }
+
     @FXML
-    private void exit() {
+    private void exit() throws IOException {
         reset();
         ScreenController.activate(SceneName.START);
     }

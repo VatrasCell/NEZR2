@@ -2,11 +2,11 @@ package model;
 
 import java.util.Objects;
 
-public class Headline {
+public class Category {
     private int id;
     private String name;
 
-    public Headline(int id, String name) {
+    public Category(int id, String name) {
         super();
         this.id = id;
         this.name = name;
@@ -37,9 +37,9 @@ public class Headline {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Headline headline = (Headline) o;
-        return getId() == headline.getId() &&
-                Objects.equals(getName(), headline.getName());
+        Category category = (Category) o;
+        return getId() == category.getId() &&
+                Objects.equals(getName(), category.getName());
     }
 
     @Override

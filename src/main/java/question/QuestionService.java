@@ -10,9 +10,12 @@ import flag.Symbol;
 import flag.SymbolType;
 import message.MessageId;
 import model.Answer;
+import model.Category;
+import model.Headline;
 import model.Question;
 import model.QuestionEditParam;
 import model.QuestionType;
+import questionList.QuestionListService;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -47,8 +50,8 @@ import static application.SqlStatement.SQL_DELETE_MULTIPLE_CHOICE_ANSWERS_RELATI
 import static application.SqlStatement.SQL_DELETE_MULTIPLE_CHOICE_ANSWERS_RELATION_BY_ID;
 import static application.SqlStatement.SQL_GET_ANSWERS;
 import static application.SqlStatement.SQL_GET_ANSWER_ID;
-import static application.SqlStatement.SQL_GET_CATEGORIE_NAMES;
-import static application.SqlStatement.SQL_GET_CATEGORY_ID;
+import static application.SqlStatement.SQL_GET_CATEGORIES;
+import static application.SqlStatement.SQL_GET_CATEGORY_BY_NAME;
 import static application.SqlStatement.SQL_GET_MAX_MULTIPLE_CHOICE_POSITION;
 import static application.SqlStatement.SQL_GET_MAX_SHORT_ANSWER_POSITION;
 import static application.SqlStatement.SQL_GET_MULTIPLE_CHOICE_ANSWERS_RELATION_ID;
@@ -61,8 +64,12 @@ import static application.SqlStatement.SQL_GET_SHORT_ANSWER_ID;
 import static application.SqlStatement.SQL_GET_SHORT_ANSWER_QUESTIONNAIRE_RELATION_ID;
 import static application.SqlStatement.SQL_GET_TARGET_QUESTION_FLAG_AND_ID_FOR_MULTIPLE_CHOICE;
 import static application.SqlStatement.SQL_GET_TARGET_QUESTION_FLAG_AND_ID_FOR_SHORT_ANSWER;
+import static application.SqlStatement.SQL_SET_CATEGORY_ON_MULTIPLE_CHOICE;
+import static application.SqlStatement.SQL_SET_CATEGORY_ON_SHORT_ANSWER;
 import static application.SqlStatement.SQL_SET_FLAGS_ON_MULTIPLE_CHOICE_QUESTIONNAIRE_RELATION;
 import static application.SqlStatement.SQL_SET_FLAGS_ON_SHORT_ANSWER_QUESTIONNAIRE_RELATION;
+import static application.SqlStatement.SQL_SET_HEADLINE_ON_MULTIPLE_CHOICE;
+import static application.SqlStatement.SQL_SET_HEADLINE_ON_SHORT_ANSWER;
 import static application.SqlStatement.SQL_SET_POSITION_ON_MULTIPLE_CHOICE_QUESTIONNAIRE_RELATION;
 import static application.SqlStatement.SQL_SET_POSITION_ON_SHORT_ANSWER_QUESTIONNAIRE_RELATION;
 import static application.SqlStatement.SQL_UPDATE_MULTIPLE_CHOICE_FLAGS;
@@ -127,14 +134,18 @@ public class QuestionService extends Database {
         return null;
     }
 
-    public static List<String> getCategories() {
+    public static List<Category> getCategories() {
         try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
             Statement mySQL = myCon.createStatement();
-            ResultSet myRS = mySQL.executeQuery(SQL_GET_CATEGORIE_NAMES);
-            List<String> categories = new ArrayList<>();
+            ResultSet myRS = mySQL.executeQuery(SQL_GET_CATEGORIES);
+            List<Category> categories = new ArrayList<>();
 
             while (myRS.next()) {
-                categories.add(myRS.getString(SQL_COLUMN_CATEGORY_NAME));
+                Category category = new Category(
+                        myRS.getInt(SQL_COLUMN_CATEGORY_ID),
+                        myRS.getString(SQL_COLUMN_CATEGORY_NAME)
+                );
+                categories.add(category);
             }
 
             return categories;
@@ -144,7 +155,7 @@ public class QuestionService extends Database {
         return null;
     }
 
-    // rework method
+    // TODO rework method
     public static void getPossibleFlags(FlagList flags, QuestionEditParam param) {
         if (param.isRequired()) {
             flags.add(new Symbol(SymbolType.REQUIRED));
@@ -179,9 +190,7 @@ public class QuestionService extends Database {
             }
         }
 
-        //
-
-        if (param.isValuationAsk()) {
+        if (param.isEvaluationQuestion()) {
             flags.add(new Symbol(SymbolType.B));
         }
     }
@@ -293,10 +302,18 @@ public class QuestionService extends Database {
     public static void saveShortAnswerQuestion(int questionnaireId, Question question) {
 
         // category
-        Integer categoryId = provideCategoryId(question.getCategory());
+        Category category = provideCategory(question.getCategory().getName());
+
+        //headline
+        Headline headline = question.getHeadline() == null ? null : QuestionListService.provideHeadline(question.getHeadline().getName());
 
         // question
-        Integer shortAnswerId = provideShortAnswerQuestion(question.getQuestion(), categoryId);
+        Integer shortAnswerId = provideShortAnswerQuestion(question.getQuestion(), category.getId());
+
+        setCategoryOnShortAnswer(category.getId(), shortAnswerId);
+        if (headline != null) {
+            setHeadlineOnShortAnswer(headline.getId(), shortAnswerId);
+        }
 
         // questionnaire
         Integer relationId = getShortAnswerQuestionnaireRelationId(questionnaireId, shortAnswerId);
@@ -312,10 +329,18 @@ public class QuestionService extends Database {
     public static void saveMultipleChoice(int questionnaireId, Question question, ArrayList<Answer> answers) {
 
         // category
-        Integer categoryId = provideCategoryId(question.getCategory());
+        Category category = provideCategory(question.getCategory().getName());
+
+        //headline
+        Headline headline = question.getHeadline() == null ? null : QuestionListService.provideHeadline(question.getHeadline().getName());
 
         // question
-        Integer multipleChoiceId = provideMultipleChoiceQuestion(question.getQuestion(), categoryId);
+        Integer multipleChoiceId = provideMultipleChoiceQuestion(question.getQuestion(), category.getId());
+
+        setCategoryOnMultipleChoice(category.getId(), multipleChoiceId);
+        if (headline != null) {
+            setHeadlineOnMultipleChoice(headline.getId(), multipleChoiceId);
+        }
 
         // answers
         List<Integer> oldRelationIds = getMultipleChoiceAnswersRelationIds(Objects.requireNonNull(multipleChoiceId));
@@ -352,10 +377,18 @@ public class QuestionService extends Database {
     public static void saveEvaluationQuestion(int questionnaireId, Question question) {
 
         // category
-        Integer categoryId = provideCategoryId(question.getCategory());
+        Category category = provideCategory(question.getCategory().getName());
+
+        //headline
+        Headline headline = question.getHeadline() == null ? null : QuestionListService.provideHeadline(question.getHeadline().getName());
 
         // question
-        Integer evaluationQuestionId = provideMultipleChoiceQuestion(question.getQuestion(), categoryId);
+        Integer evaluationQuestionId = provideMultipleChoiceQuestion(question.getQuestion(), category.getId());
+
+        setCategoryOnMultipleChoice(category.getId(), evaluationQuestionId);
+        if (headline != null) {
+            setHeadlineOnMultipleChoice(headline.getId(), evaluationQuestionId);
+        }
 
         // questionnaire
         Integer relationId = getMultipleChoiceQuestionnaireRelationId(questionnaireId, Objects.requireNonNull(evaluationQuestionId));
@@ -400,7 +433,7 @@ public class QuestionService extends Database {
         deleteAnswers();
     }
 
-    public static void provideCategory(String category) {
+    public static void createUniqueCategory(String category) {
         if (checkCategory(category)) {
             NotificationController
                     .createErrorMessage(MessageId.TITLE_CREATE_CATEGORY, MessageId.MESSAGE_CATEGORY_ALREADY_EXISTS);
@@ -426,7 +459,7 @@ public class QuestionService extends Database {
 
     public static boolean checkCategory(String category) {
         try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
-            PreparedStatement psSql = myCon.prepareStatement(SQL_GET_CATEGORY_ID);
+            PreparedStatement psSql = myCon.prepareStatement(SQL_GET_CATEGORY_BY_NAME);
             psSql.setString(1, category);
             ResultSet myRS = psSql.executeQuery();
 
@@ -470,14 +503,17 @@ public class QuestionService extends Database {
         return null;
     }
 
-    public static Integer getCategoryId(String category) {
+    public static Category getCategory(String name) {
         try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
-            PreparedStatement psSql = myCon.prepareStatement(SQL_GET_CATEGORY_ID);
-            psSql.setString(1, category);
+            PreparedStatement psSql = myCon.prepareStatement(SQL_GET_CATEGORY_BY_NAME);
+            psSql.setString(1, name);
             ResultSet myRS = psSql.executeQuery();
 
             if (myRS.next()) {
-                return myRS.getInt(SQL_COLUMN_CATEGORY_ID);
+                return new Category(
+                        myRS.getInt(SQL_COLUMN_CATEGORY_ID),
+                        myRS.getString(SQL_COLUMN_CATEGORY_NAME)
+                );
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -485,15 +521,15 @@ public class QuestionService extends Database {
         return null;
     }
 
-    public static Integer provideCategoryId(String category) {
-        Integer categoryId = getCategoryId(category);
+    public static Category provideCategory(String name) {
+        Category category = getCategory(name);
 
-        if (categoryId == null) {
-            provideCategory(category);
-            categoryId = getCategoryId(category);
+        if (category == null) {
+            createUniqueCategory(name);
+            category = getCategory(name);
         }
 
-        return categoryId;
+        return category;
     }
 
     public static void createMultipleChoiceQuestion(String question, int categoryId) {
@@ -637,6 +673,50 @@ public class QuestionService extends Database {
         return null;
     }
 
+    public static void setCategoryOnMultipleChoice(int categoryId, int multipleChoiceId) {
+        try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
+            PreparedStatement psSql = myCon.prepareStatement(SQL_SET_CATEGORY_ON_MULTIPLE_CHOICE);
+            psSql.setInt(1, categoryId);
+            psSql.setInt(2, multipleChoiceId);
+            psSql.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void setHeadlineOnMultipleChoice(int headline, int multipleChoiceId) {
+        try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
+            PreparedStatement psSql = myCon.prepareStatement(SQL_SET_HEADLINE_ON_MULTIPLE_CHOICE);
+            psSql.setInt(1, headline);
+            psSql.setInt(2, multipleChoiceId);
+            psSql.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void setCategoryOnShortAnswer(int categoryId, int shortAnswerId) {
+        try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
+            PreparedStatement psSql = myCon.prepareStatement(SQL_SET_CATEGORY_ON_SHORT_ANSWER);
+            psSql.setInt(1, categoryId);
+            psSql.setInt(2, shortAnswerId);
+            psSql.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void setHeadlineOnShortAnswer(int headline, int shortAnswerId) {
+        try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
+            PreparedStatement psSql = myCon.prepareStatement(SQL_SET_HEADLINE_ON_SHORT_ANSWER);
+            psSql.setInt(1, headline);
+            psSql.setInt(2, shortAnswerId);
+            psSql.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
     public static void setFlagsOnMultipleChoiceQuestionnaireRelation(String flags, int relationId) {
         try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
             PreparedStatement psSql = myCon.prepareStatement(SQL_SET_FLAGS_ON_MULTIPLE_CHOICE_QUESTIONNAIRE_RELATION);
@@ -739,5 +819,21 @@ public class QuestionService extends Database {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    public static boolean doQuestionExistsInQuestionnaire(String question, int questionnaireId, QuestionType questionType) {
+        if (questionType.equals(QuestionType.MULTIPLE_CHOICE)) {
+            Integer questionId = QuestionService.getMultipleChoiceId(question);
+            if (questionId != null) {
+                return QuestionService.getMultipleChoiceQuestionnaireRelationId(questionnaireId, questionId) != null;
+            }
+        } else {
+            Integer questionId = QuestionService.getShortAnswerId(question);
+            if (questionId != null) {
+                return QuestionService.getShortAnswerQuestionnaireRelationId(questionnaireId, questionId) != null;
+            }
+        }
+
+        return false;
     }
 }

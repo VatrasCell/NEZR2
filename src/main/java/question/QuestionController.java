@@ -1,6 +1,8 @@
 package question;
 
+import application.DialogMessageController;
 import application.GlobalVars;
+import application.NotificationController;
 import application.ScreenController;
 import flag.FlagList;
 import flag.Number;
@@ -9,27 +11,28 @@ import flag.SymbolType;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.DialogPane;
 import javafx.scene.control.Label;
-import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.ImageView;
-import javafx.util.Callback;
+import message.DialogId;
+import message.MessageId;
 import model.Answer;
-import model.QuestionEditParam;
+import model.Category;
+import model.Headline;
 import model.Question;
+import model.QuestionEditParam;
 import model.QuestionType;
 import model.Questionnaire;
 import model.SceneName;
-import org.controlsfx.control.Notifications;
+import questionList.QuestionListService;
 import react.ReactController;
 import start.StartController;
 
@@ -46,10 +49,16 @@ import java.util.stream.IntStream;
 
 import static application.GlobalFuncs.getURL;
 import static application.ScreenController.STYLESHEET;
+import static application.TableColumnNameController.getColumnName;
+import static message.TableColumnNameId.DELETE;
+import static message.TableColumnNameId.EDIT;
+import static model.QuestionType.MULTIPLE_CHOICE_STRING;
+import static model.QuestionType.SHORT_ANSWER_STRING;
 
 public class QuestionController {
     public static Questionnaire questionnaire;
     public static Question question;
+    public Button saveButton;
     private ArrayList<String> answers;
     private ObservableList<Answer> data = FXCollections.observableArrayList();
 
@@ -64,11 +73,13 @@ public class QuestionController {
     @FXML
     private ChoiceBox<Integer> positionChoiceBox;
     @FXML
-    private ChoiceBox<String> categoryChoiceBox;
+    private ChoiceBox<Category> categoryChoiceBox;
     @FXML
     private ChoiceBox<String> questionTypeChoiceBox;
     @FXML
     private ChoiceBox<String> numberChoiceBox;
+    @FXML
+    private ChoiceBox<Headline> headlineChoiceBox;
 
     //@FXML
     //private ImageView imageView;
@@ -84,14 +95,11 @@ public class QuestionController {
     @FXML
     private CheckBox yesNoCheckBox;
     @FXML
-    private CheckBox headlineCheckBox;
-    @FXML
     private CheckBox excelFormatCheckBox;
     @FXML
     private CheckBox numberCheckBox;
-
     @FXML
-    private Button saveButton;
+    private CheckBox evaluationQuestionCheckBox;
 
     @FXML
     private Button newAnswerButton;
@@ -103,9 +111,9 @@ public class QuestionController {
     @FXML
     private TableColumn<Answer, String> answerValueTableColumn;
     @FXML
-    private TableColumn<Answer, String> actionCol = new TableColumn<>("Bearbeiten");
+    private TableColumn<Answer, String> editButtonColumn = new TableColumn<>(getColumnName(EDIT));
     @FXML
-    private TableColumn<Answer, String> delCol = new TableColumn<>("Löschen");
+    private TableColumn<Answer, String> deleteButtonColumn = new TableColumn<>(getColumnName(DELETE));
 
     /**
      * The constructor (is called before the initialize()-method).
@@ -132,119 +140,91 @@ public class QuestionController {
         answerIdTableColumn.setCellValueFactory(new PropertyValueFactory<>(Answer.ID));
         answerValueTableColumn.setCellValueFactory(new PropertyValueFactory<>(Answer.VALUE));
 
-        actionCol.setCellValueFactory(new PropertyValueFactory<>("DUMMY"));
+        editButtonColumn.setCellValueFactory(new PropertyValueFactory<>(Questionnaire.EDIT));
+        answerTable.getColumns().add(editButtonColumn);
 
-        Callback<TableColumn<Answer, String>, TableCell<Answer, String>> cellFactory = //
-                new Callback<TableColumn<Answer, String>, TableCell<Answer, String>>() {
-                    @Override
-                    public TableCell<Answer, String> call(final TableColumn<Answer, String> param) {
-                        ImageView imgView = new ImageView(GlobalVars.IMG_EDT);
-                        imgView.setFitHeight(30);
-                        imgView.setFitWidth(30);
-                        return new TableCell<Answer, String>() {
-
-                            final Button btn = new Button("", imgView);
-
-                            @Override
-                            public void updateItem(String item, boolean empty) {
-                                super.updateItem(item, empty);
-                                if (empty) {
-                                    setGraphic(null);
-                                    setText(null);
-                                } else {
-                                    btn.setOnAction(event -> {
-                                        //TODO edit Antwort
-                                        Answer antwort = getTableView().getItems().get(getIndex());
-                                    });
-                                    setGraphic(btn);
-                                    setText(null);
-                                }
-                            }
-                        };
-                    }
-                };
-
-        actionCol.setCellFactory(cellFactory);
-        answerTable.getColumns().add(actionCol);
-
-        delCol.setCellValueFactory(new PropertyValueFactory<>("DUMMY"));
-        Callback<TableColumn<Answer, String>, TableCell<Answer, String>> cellFactoryDel = //
-                new Callback<TableColumn<Answer, String>, TableCell<Answer, String>>() {
-                    @Override
-                    public TableCell<Answer, String> call(final TableColumn<Answer, String> param) {
-                        ImageView imgView = new ImageView(GlobalVars.IMG_DEL);
-                        imgView.setFitHeight(30);
-                        imgView.setFitWidth(30);
-                        return new TableCell<Answer, String>() {
-
-                            final Button btn = new Button("", imgView);
-
-                            @Override
-                            public void updateItem(String item, boolean empty) {
-                                super.updateItem(item, empty);
-                                if (empty) {
-                                    setGraphic(null);
-                                    setText(null);
-                                } else {
-                                    btn.setOnAction(event -> {
-                                        //TODO delete Antwort
-                                        Answer antwort = getTableView().getItems().get(getIndex());
-                                    });
-                                    setGraphic(btn);
-                                    setText(null);
-                                }
-                            }
-                        };
-                    }
-                };
-
-        delCol.setCellFactory(cellFactoryDel);
-        answerTable.getColumns().add(delCol);
+        deleteButtonColumn.setCellValueFactory(new PropertyValueFactory<>(Questionnaire.DELETE));
+        answerTable.getColumns().add(deleteButtonColumn);
 
         fillScene();
     }
 
+    public static Button initEditButton(Answer answer) {
+        ImageView imgView = new ImageView(GlobalVars.IMG_EDT);
+        imgView.setFitHeight(30);
+        imgView.setFitWidth(30);
+        Button button = new Button("", imgView);
+        button.setOnAction(event -> {
+            //TODO edit Antwort
+        });
+
+        return button;
+    }
+
+    public static Button initDeleteButton(Answer answer) {
+        ImageView imgView = new ImageView(GlobalVars.IMG_DEL);
+        imgView.setFitHeight(30);
+        imgView.setFitWidth(30);
+        Button button = new Button("", imgView);
+        button.setOnAction(event -> {
+            //TODO delete Antwort
+        });
+
+        return button;
+    }
+
     private void fillScene() {
-        String string;
         Pattern MY_PATTERN = Pattern.compile("#\\[[0-9]+]");
         Matcher m = MY_PATTERN.matcher(question.getQuestion());
         if (m.find()) {
-            string = question.getQuestion().substring(0, m.start());
-        } else {
-            string = question.getQuestion();
+            System.out.println("Old dataset pattern found.");
         }
-        questionTextField.setText(string);
+        questionTextField.setText(question.getQuestion());
         List<Integer> range = IntStream.range(1, QuestionService.getCountPosition(questionnaire.getId()) + 2).boxed()
                 .collect(Collectors.toList());
-        ObservableList<Integer> list = FXCollections.observableArrayList(range);
-        positionChoiceBox.setItems(list);
+        ObservableList<Integer> positionList = FXCollections.observableArrayList(range);
+        positionChoiceBox.setItems(positionList);
         positionChoiceBox.getSelectionModel().select(question.getPosition() - 1);
 
-        ObservableList<String> listKat = FXCollections.observableArrayList(QuestionService.getCategories());
-        categoryChoiceBox.setItems(listKat);
+        ObservableList<Category> categoryList = FXCollections.observableArrayList(QuestionService.getCategories());
+        categoryChoiceBox.setItems(categoryList);
         categoryChoiceBox.getSelectionModel().select(question.getCategory());
 
-        ObservableList<String> listArt = FXCollections.observableArrayList("Bewertungsfrage", "Multiple Choice",
-                "Freie Frage");
-        questionTypeChoiceBox.setItems(listArt);
-        questionTypeChoiceBox.getSelectionModel().select("Freie Frage");
+        List<Headline> headlineListArrays = new ArrayList<>();
+        headlineListArrays.add(null);
+        headlineListArrays.addAll(
+                QuestionListService.getHeadlines(questionnaire.getId()));
+        ObservableList<Headline> headlineObservableList = FXCollections.observableArrayList(headlineListArrays);
+        headlineChoiceBox.setItems(headlineObservableList);
+        if (question.getHeadline() != null) {
+            headlineChoiceBox.getSelectionModel().select(question.getHeadline());
+        } else {
+            headlineChoiceBox.getSelectionModel().selectFirst();
+        }
+
+
+        ObservableList<String> questionTypeList = FXCollections.observableArrayList(QuestionType.toList());
+        questionTypeChoiceBox.setItems(questionTypeList);
+        questionTypeChoiceBox.getSelectionModel().select(question.getQuestionType().getQuestionType());
         questionTypeChoiceBox.getSelectionModel().selectedIndexProperty().addListener((observable, oldValue, newValue) -> {
             questionTypeChoiceBox.getSelectionModel().select(newValue.intValue());
             updateCheckboxes();
         });
 
-        ObservableList<String> listZahl = FXCollections.observableArrayList("Genau wie die Zahl", "Kleiner gleich Zahl",
+        ObservableList<String> comparisonList = FXCollections.observableArrayList("Genau wie die Zahl", "Kleiner gleich Zahl",
                 "Größer gleich Zahl");
-        numberChoiceBox.setItems(listZahl);
+        numberChoiceBox.setItems(comparisonList);
 
         if (question.getQuestionType().equals(QuestionType.MULTIPLE_CHOICE)) {
-            if (question.getFlags().has(SymbolType.B)) {
-                questionTypeChoiceBox.getSelectionModel().select("Bewertungsfrage");
-            } else {
-                questionTypeChoiceBox.getSelectionModel().select("Multiple Choice");
-            }
+            questionTypeChoiceBox.getSelectionModel().select(MULTIPLE_CHOICE_STRING);
         } else {
-            questionTypeChoiceBox.getSelectionModel().select("Freie Frage");
+            questionTypeChoiceBox.getSelectionModel().select(SHORT_ANSWER_STRING);
+        }
+
+        if (question.getFlags().has(SymbolType.B)) {
+            evaluationQuestionCheckBox.setSelected(true);
+        } else {
+            evaluationQuestionCheckBox.setSelected(false);
         }
 
         if (question.getFlags().has(SymbolType.MC)) {
@@ -273,51 +253,28 @@ public class QuestionController {
 
         if (question.getFlags().has(SymbolType.JN)) {
             yesNoCheckBox.setSelected(true);
-            //imageView.setVisible(true);
             if (question.getFlags().has(SymbolType.JNExcel)) {
                 excelFormatCheckBox.setSelected(true);
-                // image.showQRImage();
             } else {
                 excelFormatCheckBox.setSelected(false);
-                // image.showImage();
             }
         } else {
-            //imageView.setVisible(false);
             yesNoCheckBox.setSelected(false);
         }
-		/*TODO was macht das?!
-		if (frage.getFlags().contains("A")) {
-			if (frage.getFlags().contains(" ")) {
-				int indexSpace = frage.getFlags().indexOf(" ");
-				flags = frage.getFlags().substring(0, indexSpace);
-				System.out.println(flags);
 
-			}
-		}*/
         if (question.getQuestionType().equals(QuestionType.MULTIPLE_CHOICE)) {
             if (question.getAnswerOptions().size() > 0) {
                 if (question.getAnswerOptions().get(0).equals("#####")) {
-                    headlineCheckBox.setSelected(true);
-                } else {
-                    headlineCheckBox.setSelected(false);
+                    System.out.println("Old dataset pattern found.");
                 }
-            } else {
-                headlineCheckBox.setSelected(false);
             }
         }
-
-        // anneSehrNeu
-        /*
-         * answers = new ArrayList<String>(); for (short i = 0; i <
-         * tableFE.getRowCount(); i++) { answers.add(tableFE.getValueAt(i,
-         * 1).toString()); }
-         */
 
         List<Number> numbers = question.getFlags().getAll(Number.class);
 
         if (numbers.size() > 0) {
             Number number = numbers.get(0);
-            numberTextField.setText(number.getDigits() + "");
+            numberTextField.setText(String.valueOf(number.getDigits()));
             numberCheckBox.setSelected(true);
             switch (number.getOperator()) {
                 case EQ:
@@ -338,17 +295,15 @@ public class QuestionController {
     }
 
     @FXML
-    private void exit() {
+    private void exit() throws IOException {
         ScreenController.activate(SceneName.QUESTION_LIST);
     }
 
     @FXML
-    private void save() {
+    private void save() throws IOException {
+        //TODO "real time" validation
         if (!checkQuestionData()) {
-            Notifications
-                    .create()
-                    .title("Antwort anlegen").text("\"Die Frage ist fehlerhaft und kann deswegen nicht gespeichert werden!")
-                    .showError();
+            NotificationController.createErrorMessage(MessageId.TITLE_SAVE_QUESTION, MessageId.MESSAGE_SAVE_QUESTION_ERROR);
             return;
         }
 
@@ -360,41 +315,21 @@ public class QuestionController {
         FlagList flags = question.getFlags();
 
         QuestionEditParam param = new QuestionEditParam(questionTypeChoiceBox, numberChoiceBox, numberTextField,
-                requiredQuestionCheckBox, multipleChoiceCheckBox, listCheckBox, textAreaCheckBox, yesNoCheckBox,
-                headlineCheckBox, excelFormatCheckBox, numberCheckBox);
+                requiredQuestionCheckBox, evaluationQuestionCheckBox, multipleChoiceCheckBox, listCheckBox, textAreaCheckBox,
+                yesNoCheckBox, excelFormatCheckBox, numberCheckBox);
 
-        questionToSave.setQuestionType(param.getType());
+        questionToSave.setQuestionType(param.getQuestionType());
 
-        String selectedKat = categoryChoiceBox.getSelectionModel().getSelectedItem();
-        if (selectedKat.equals("")) {
-            selectedKat = categoryChoiceBox.getItems().get(0);
+        Category selectedCategory = categoryChoiceBox.getSelectionModel().getSelectedItem();
+        if (selectedCategory == null) {
+            selectedCategory = categoryChoiceBox.getItems().get(0);
         }
-        questionToSave.setCategory(selectedKat);
+        questionToSave.setCategory(selectedCategory);
 
-        Integer questionId;
         if (!newQuestion.equals(oldQuestion)) {
-            if (questionToSave.getQuestionType().equals(QuestionType.MULTIPLE_CHOICE)) {
-                questionId = QuestionService.getMultipleChoiceId(newQuestion);
-                if (questionId != null) {
-                    if (QuestionService.getMultipleChoiceQuestionnaireRelationId(questionnaire.getId(), questionId) != null) {
-                        Notifications
-                                .create()
-                                .title("Frage anlegen/ bearbeiten").text("\"Eine gleiche Frage existiert bereits in diesem Fragebogen und kann deswegen nicht gespeichert werden!")
-                                .showError();
-                        return;
-                    }
-                }
-            } else {
-                questionId = QuestionService.getShortAnswerId(newQuestion);
-                if (questionId != null) {
-                    if (QuestionService.getShortAnswerQuestionnaireRelationId(questionnaire.getId(), questionId) != null) {
-                        Notifications
-                                .create()
-                                .title("Frage anlegen/ bearbeiten").text("\"Eine gleiche Frage existiert bereits in diesem Fragebogen und kann deswegen nicht gespeichert werden!")
-                                .showError();
-                        return;
-                    }
-                }
+            if (QuestionService.doQuestionExistsInQuestionnaire(newQuestion, questionnaire.getId(), questionToSave.getQuestionType())) {
+                NotificationController.createErrorMessage(MessageId.TITLE_SAVE_QUESTION, MessageId.MESSAGE_SAVE_QUESTION_ALREADY_EXISTS_ERROR);
+                return;
             }
         }
 
@@ -402,8 +337,8 @@ public class QuestionController {
 
         questionToSave.setPosition(positionChoiceBox.getValue());
 
-        List<React> mcList = flags.getAll(React.class);
-        for (React react : mcList) {
+        List<React> reactList = flags.getAll(React.class);
+        for (React react : reactList) {
             if (param.isRequired()) {
                 QuestionService.provideQuestionRequired(questionnaire.getId(), react.getQuestionType(), react.getQuestionId());
             }
@@ -412,8 +347,13 @@ public class QuestionController {
             }
         }
 
-        if (param.getType() == QuestionType.MULTIPLE_CHOICE) {
-            if (param.isValuationAsk()) {
+        Headline selectedHeadline = headlineChoiceBox.getSelectionModel().getSelectedItem();
+        if (selectedHeadline != null) {
+            questionToSave.setHeadline(selectedHeadline);
+        }
+
+        if (param.getQuestionType() == QuestionType.MULTIPLE_CHOICE) {
+            if (param.isEvaluationQuestion()) {
                 QuestionService.getPossibleFlags(flags, param);
                 questionToSave.setFlags(flags);
                 QuestionService.saveEvaluationQuestion(questionnaire.getId(), questionToSave);
@@ -457,7 +397,7 @@ public class QuestionController {
                 QuestionService.saveMultipleChoice(questionnaire.getId(), questionToSave, answers);
             }
         } else {
-            QuestionService.getPossibleFlags(flags, param);//floNeu
+            QuestionService.getPossibleFlags(flags, param);
             questionToSave.setFlags(flags);
             QuestionService.saveShortAnswerQuestion(questionnaire.getId(), questionToSave);
         }
@@ -467,7 +407,7 @@ public class QuestionController {
     }
 
     @FXML
-    private void setPreview() {
+    private void setPreview() throws IOException {
         StartController.makeQuestionnaire(Collections.singletonList(question), true);
         ScreenController.activate(SceneName.SURVEY_0);
     }
@@ -475,18 +415,18 @@ public class QuestionController {
     @FXML
     private void createAnswer() {
         TextInputDialog dialog = new TextInputDialog("");
-        dialog.setTitle("Antwort anlegen");
-        dialog.setContentText("Name:");
+        DialogMessageController.setMessage(dialog, DialogId.TITLE_CREATE_ANSWER, DialogId.CONTENT_TEXT_CREATE_ANSWER);
         DialogPane dialogPane = dialog.getDialogPane();
         dialogPane.getStylesheets().add(getURL(STYLESHEET).toExternalForm());
 
         Optional<String> result = dialog.showAndWait();
         result.ifPresent(name -> {
-            Answer antwort = new Answer();
-            antwort.setId(data.size() + 1);
-            antwort.setValue(name);
-            data.add(antwort);
-            Notifications.create().title("Antwort anlegen").text("Antwort \"" + name + "\" wurde erfolgreich angelegt.").show();
+            Answer answer = new Answer();
+            answer.setId(data.size() + 1);
+            answer.setValue(name);
+            data.add(answer);
+
+            NotificationController.createMessage(MessageId.TITLE_CREATE_ANSWER, MessageId.MESSAGE_CREATE_ANSWER, name);
         });
 
     }
@@ -494,17 +434,38 @@ public class QuestionController {
     @FXML
     private void createCategory() {
         TextInputDialog dialog = new TextInputDialog("");
-        dialog.setTitle("Kategorie anlegen");
-        dialog.setContentText("Name:");
+        DialogMessageController.setMessage(dialog, DialogId.TITLE_CREATE_CATEGORY, DialogId.CONTENT_TEXT_CREATE_CATEGORY);
         DialogPane dialogPane = dialog.getDialogPane();
         dialogPane.getStylesheets().add(getURL(STYLESHEET).toExternalForm());
 
         Optional<String> result = dialog.showAndWait();
         result.ifPresent(name -> {
-            QuestionService.provideCategory(name);
-            ObservableList<String> listKat = FXCollections.observableArrayList(QuestionService.getCategories());
-            categoryChoiceBox.setItems(listKat);
-            categoryChoiceBox.getSelectionModel().select(name);
+            QuestionService.createUniqueCategory(name);
+            Category category = QuestionService.getCategory(name);
+            ObservableList<Category> categoryList = FXCollections.observableArrayList(QuestionService.getCategories());
+            categoryChoiceBox.setItems(categoryList);
+            categoryChoiceBox.getSelectionModel().select(category);
+        });
+    }
+
+    @FXML
+    private void createHeadline() {
+        TextInputDialog dialog = new TextInputDialog("");
+        DialogMessageController.setMessage(dialog, DialogId.TITLE_CREATE_HEADLINE, DialogId.CONTENT_TEXT_CREATE_HEADLINE);
+        DialogPane dialogPane = dialog.getDialogPane();
+        dialogPane.getStylesheets().add(getURL(STYLESHEET).toExternalForm());
+
+        Optional<String> result = dialog.showAndWait();
+        result.ifPresent(name -> {
+            QuestionListService.createUniqueHeadline(name);
+            Headline headline = QuestionListService.getHeadlineByName(name);
+            List<Headline> headlineListArrays = new ArrayList<>();
+            headlineListArrays.add(null);
+            headlineListArrays.addAll(
+                    QuestionListService.getHeadlines(questionnaire.getId()));
+            ObservableList<Headline> headlineList = FXCollections.observableArrayList(headlineListArrays);
+            headlineChoiceBox.setItems(headlineList);
+            headlineChoiceBox.getSelectionModel().select(headline);
         });
     }
 
@@ -514,21 +475,15 @@ public class QuestionController {
         ReactController.questionnaire = questionnaire;
 
         try {
-            ScreenController.addScreen(SceneName.REACT, FXMLLoader.load(getURL(SceneName.REACT_PATH)));
+            ScreenController.addScreen(SceneName.REACT, getURL(SceneName.REACT_PATH));
             ScreenController.activate(SceneName.REACT);
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
     }
 
-    /**
-     * Ueberprueft ob alle Bedingungen zum Speichern gegeben sind.
-     */
     public boolean checkQuestionData() {
         boolean bool;
-        //System.out.println(textFieldFE.getText());
-        //System.out.println(artChoice.getSelectionModel().getSelectedItem());
         if (!questionTextField.getText().equals("")) {
             if (!questionTypeChoiceBox.getSelectionModel().getSelectedItem().equals("-- Art der Frage --")) {
                 bool = (answerTable.getItems().size() >= 1 && !yesNoCheckBox.isSelected()) || !questionTypeChoiceBox.getSelectionModel().getSelectedItem().equals("Multiple Choice");
@@ -544,10 +499,11 @@ public class QuestionController {
 
     @FXML
     private void updateCheckboxes() {
-        QuestionEditParam param = new QuestionEditParam(questionTypeChoiceBox, numberChoiceBox, numberTextField, requiredQuestionCheckBox, multipleChoiceCheckBox,
-                listCheckBox, textAreaCheckBox, yesNoCheckBox, headlineCheckBox, excelFormatCheckBox, numberCheckBox);
+        QuestionEditParam param = new QuestionEditParam(questionTypeChoiceBox, numberChoiceBox, numberTextField,
+                requiredQuestionCheckBox, evaluationQuestionCheckBox, multipleChoiceCheckBox,
+                listCheckBox, textAreaCheckBox, yesNoCheckBox, excelFormatCheckBox, numberCheckBox);
 
-        questionTypeChoiceBox.setDisable(!param.isTypeActivatable());
+        questionTypeChoiceBox.setDisable(!param.isQuestionTypeActivatable());
         if (questionTypeChoiceBox.isDisabled()) {
             questionTypeChoiceBox.getSelectionModel().select(1);
         }
@@ -600,5 +556,4 @@ public class QuestionController {
         answerTable.setDisable(!param.isAnswersListActivatable());
         newAnswerButton.setDisable(!param.isAnswersListActivatable());
     }
-
 }

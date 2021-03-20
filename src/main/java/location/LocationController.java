@@ -6,7 +6,6 @@ import application.ScreenController;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.control.ChoiceBox;
 import message.MessageId;
 import model.SceneName;
@@ -45,7 +44,7 @@ public class LocationController {
     private void next() {
         GlobalVars.location = choiceBox.getValue();
         try {
-            ScreenController.addScreen(SceneName.START, FXMLLoader.load(getURL(SceneName.START_PATH)));
+            ScreenController.addScreen(SceneName.START, getURL(SceneName.START_PATH));
             ScreenController.activate(SceneName.START);
         } catch (IOException e) {
             e.printStackTrace();

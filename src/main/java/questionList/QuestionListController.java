@@ -5,7 +5,6 @@ import application.ScreenController;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Button;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
@@ -96,8 +95,7 @@ public class QuestionListController {
                                         QuestionController.questionnaire = questionnaire;
                                         QuestionController.question = getTableView().getItems().get(getIndex());
                                         try {
-                                            ScreenController.addScreen(SceneName.QUESTION,
-                                                    FXMLLoader.load(getURL(SceneName.QUESTION_PATH)));
+                                            ScreenController.addScreen(SceneName.QUESTION, getURL(SceneName.QUESTION_PATH));
                                             ScreenController.activate(SceneName.QUESTION);
                                         } catch (IOException e) {
                                             // TODO Auto-generated catch block
@@ -156,7 +154,7 @@ public class QuestionListController {
     }
 
     @FXML
-    private void save() {
+    private void save() throws IOException {
         ScreenController.activate(SceneName.ADMIN);
     }
 
@@ -168,8 +166,7 @@ public class QuestionListController {
 
         QuestionController.question = new Question(questions.size());
         try {
-            ScreenController.addScreen(SceneName.QUESTION,
-                    FXMLLoader.load(getURL(SceneName.QUESTION_PATH)));
+            ScreenController.addScreen(SceneName.QUESTION, getURL(SceneName.QUESTION_PATH));
             ScreenController.activate(SceneName.QUESTION);
         } catch (IOException e) {
             // TODO Auto-generated catch block

@@ -26,6 +26,8 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.TextAlignment;
+import login.LoginController;
+import model.Category;
 import model.PanelInfo;
 import model.Question;
 import model.QuestionType;
@@ -46,314 +48,314 @@ import static model.SceneName.SURVEY_0;
 
 public class StartController {
 
-	@FXML
-	Label questionnaireLabel;
+    @FXML
+    Label questionnaireLabel;
 
-	@FXML
-	Label warningLabel;
-	
-	@FXML
-	Pane pane;
-	
-	@FXML
-	Button startButton;
+    @FXML
+    Label warningLabel;
 
-	private static StringProperty questionnaireText = new SimpleStringProperty();
-	private static StringProperty questionnaireWarn = new SimpleStringProperty();
+    @FXML
+    Pane pane;
 
-	/**
-	 * The constructor (is called before the initialize()-method).
-	 */
-	public StartController() {
-		GlobalVars.activeQuestionnaire = StartService.getActiveQuestionnaire();
-	}
+    @FXML
+    Button startButton;
 
-	/**
-	 * Initializes the controller class. This method is automatically called after
-	 * the fxml file has been loaded.
-	 */
-	@FXML
-	private void initialize() {
-		String value;
-		switch (GlobalVars.location) {
-		case "Rügen":
-			value = "images/img/logo_nezr.png";
-			break;
-		case "Bayerischer Wald":
-			value = "images/img/logo_bw.png";
-			break;
-		case "Saarschleife":
-			value = "images/img/logo_saar.png";
-			break;
-		case "Schwarzwald":
-			value = "images/img/logo_sw.png";
-			break;
-		case "Lipno":
-			value = "images/img/logo_lipno_de.png";
-			break;
+    private static StringProperty questionnaireText = new SimpleStringProperty();
+    private static StringProperty questionnaireWarn = new SimpleStringProperty();
 
-		default:
-			value = "images/img/logo_default.png";
-			break;
-		}
-		
-		String image = getURL(value).toExternalForm();
-		pane.setStyle("-fx-background-image: url('" + image + "');" +
-				"-fx-background-repeat: no-repeat;" +
-	  			"-fx-background-attachment: fixed;" +
-				"-fx-background-size: 10% auto;" +
-	  			"-fx-background-position: 98% 5%;");
-		
-		setStartText();
-		questionnaireLabel.textProperty().bind(questionnaireText);
-		warningLabel.textProperty().bind(questionnaireWarn);
-		warningLabel.setStyle("-fx-text-fill: #c90000;");
-	}
+    /**
+     * The constructor (is called before the initialize()-method).
+     */
+    public StartController() {
+        GlobalVars.activeQuestionnaire = StartService.getActiveQuestionnaire();
+    }
 
-	public static void setStartText() {
-		if(GlobalVars.activeQuestionnaire != null) {
-			questionnaireText.set(String.format("Fragebogen: %s", GlobalVars.activeQuestionnaire.getName()));
-			if(!GlobalVars.activeQuestionnaire.getLocation().equals(GlobalVars.location)) {
-				questionnaireWarn.set("Fragebogen ist nicht für diesen Standort optimiert");
-			} else {
-				questionnaireWarn.set("");
-			}
-		} else {
-			questionnaireText.set("");
-			questionnaireWarn.set("kein Fragebogen ausgewählt");
-		}
-	}
+    /**
+     * Initializes the controller class. This method is automatically called after
+     * the fxml file has been loaded.
+     */
+    @FXML
+    private void initialize() {
+        String value;
+        switch (GlobalVars.location) {
+            case "Rügen":
+                value = "images/img/logo_nezr.png";
+                break;
+            case "Bayerischer Wald":
+                value = "images/img/logo_bw.png";
+                break;
+            case "Saarschleife":
+                value = "images/img/logo_saar.png";
+                break;
+            case "Schwarzwald":
+                value = "images/img/logo_sw.png";
+                break;
+            case "Lipno":
+                value = "images/img/logo_lipno_de.png";
+                break;
 
-	public static void makeQuestionnaire(List<Question> questions, boolean isPreview) {
-		
-		SurveyController.setPreview(isPreview);
-		
-		Deque<Question> stack = new ArrayDeque<>();
+            default:
+                value = "images/img/logo_default.png";
+                break;
+        }
 
-		for (int v = questions.size() - 1; v >= 0; v--) {
-			stack.push(questions.get(v));
-		}
+        String image = getURL(value).toExternalForm();
+        pane.setStyle("-fx-background-image: url('" + image + "');" +
+                "-fx-background-repeat: no-repeat;" +
+                "-fx-background-attachment: fixed;" +
+                "-fx-background-size: 10% auto;" +
+                "-fx-background-position: 98% 5%;");
 
-		List<ArrayList<Question>> questionsPerPanel = new ArrayList<>();
-		List<Pane> allPanels = new ArrayList<>();
-		do {
-			int questionsOnPanel = 0;
-			String lastKat = "";
-			// create panel
-			Pane scene = null;
-			try {
-				scene = FXMLLoader.load(getURL(SceneName.SURVEY_PATH));
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-			if (scene == null) {
-				throw new NullPointerException();
-			}
-			PanelInfo info = new PanelInfo();
-			questionsPerPanel.add(new ArrayList<>());
-			do {
-				Question question = stack.peek();
-				if(lastKat.equals("") || lastKat.equals(question.getCategory())) {
-					question = stack.pop();
-					addQuestionToPanel(question, scene, info);
-					questionsPerPanel.get(allPanels.size()).add(info.getQuestion());
-					lastKat = question.getCategory();
-					if (stack.isEmpty())
-						break;
-					
-				} else {
-					break;
-				}
-			} while (++questionsOnPanel < GlobalVars.perColumn);
-			allPanels.add(scene);
-		} while (!stack.isEmpty());
+        setStartText();
+        questionnaireLabel.textProperty().bind(questionnaireText);
+        warningLabel.textProperty().bind(questionnaireWarn);
+        warningLabel.setStyle("-fx-text-fill: #c90000;");
+    }
 
-		for (int i = 0; i < allPanels.size(); ++i) {
-			ProgressBar progressBar = (ProgressBar) allPanels.get(i).lookup("#progressBar");
-			progressBar.setProgress((float) (i + 1) / (float) allPanels.size());
+    public static void setStartText() {
+        if (GlobalVars.activeQuestionnaire != null) {
+            questionnaireText.set(String.format("Fragebogen: %s", GlobalVars.activeQuestionnaire.getName()));
+            if (!GlobalVars.activeQuestionnaire.getLocation().equals(GlobalVars.location)) {
+                questionnaireWarn.set("Fragebogen ist nicht für diesen Standort optimiert");
+            } else {
+                questionnaireWarn.set("");
+            }
+        } else {
+            questionnaireText.set("");
+            questionnaireWarn.set("kein Fragebogen ausgewählt");
+        }
+    }
 
-			Label lbl_count = (Label) allPanels.get(i).lookup("#lbl_count");
-			lbl_count.setText("Frage " + (i + 1) + "/" + allPanels.size());
-					
-			ScreenController.addScreen("survey_" + i, allPanels.get(i));
-		}
-		
-		//add reaction listener
-		for (int y = 0; y < questions.size(); y++) {
+    public static void makeQuestionnaire(List<Question> questions, boolean isPreview) {
 
-			List<React> reacts = questions.get(y).getFlags().getAll(React.class);
-			List<Number> numbers = questions.get(y).getFlags().getAll(Number.class);
-			for (React react : reacts) {
-				questions.get(y).setTarget(
-						questions.get(getY(react.getQuestionId(), react.getQuestionType(), questions)));
-				questions.get(y).setListener(react.getAnswerPos(), react.getQuestionType());
-			}
-			for (Number number : numbers) {
-				questions.get(y).setListener(number);
-			}
-		}
+        SurveyController.setPreview(isPreview);
 
-		GlobalVars.questionsPerPanel = questionsPerPanel;
-		GlobalVars.countPanel = allPanels.size();
-	}
+        Deque<Question> stack = new ArrayDeque<>();
 
-	private static void addQuestionToPanel(Question question, Pane screen, PanelInfo info) {
-		VBox vBox = (VBox) screen.lookup("#vbox");
+        for (int v = questions.size() - 1; v >= 0; v--) {
+            stack.push(questions.get(v));
+        }
 
-		// set headline
-		if (question.getHeadline() != null && !info.hasHeadline()) {
-			Label lbl_headline = (Label) screen.lookup("#lbl_headline");
-			lbl_headline.setText(removeMark(question.getHeadline().getName()));
-			info.setHeadline(true);
-		}
+        List<ArrayList<Question>> questionsPerPanel = new ArrayList<>();
+        List<Pane> allPanels = new ArrayList<>();
+        do {
+            int questionsOnPanel = 0;
+            Category lastCategory = null;
+            // create panel
+            Pane scene = null;
+            try {
+                scene = FXMLLoader.load(getURL(SceneName.SURVEY_PATH));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            if (scene == null) {
+                throw new NullPointerException();
+            }
+            PanelInfo info = new PanelInfo();
+            questionsPerPanel.add(new ArrayList<>());
+            do {
+                Question question = stack.peek();
+                if (lastCategory == null || lastCategory.equals(question.getCategory())) {
+                    question = stack.pop();
+                    addQuestionToPanel(question, scene, info);
+                    questionsPerPanel.get(allPanels.size()).add(info.getQuestion());
+                    lastCategory = question.getCategory();
+                    if (stack.isEmpty())
+                        break;
 
-		//add question
-		vBox.getChildren().add(createQuestionLabel(screen, question));
+                } else {
+                    break;
+                }
+            } while (++questionsOnPanel < GlobalVars.perColumn);
+            allPanels.add(scene);
+        } while (!stack.isEmpty());
 
-		if (question.getQuestionType().equals(QuestionType.SHORT_ANSWER)) {
-			vBox.getChildren().add(createFFNode(question));
-		} else if (question.getQuestionType().equals(QuestionType.MULTIPLE_CHOICE)) {
-			if (question.getFlags().has(SymbolType.LIST)) {
-				vBox.getChildren().add(createMCListView(question));
-			} else {
-				vBox.getChildren().add(createMCCheckboxen(question, info));
-			}
+        for (int i = 0; i < allPanels.size(); ++i) {
+            ProgressBar progressBar = (ProgressBar) allPanels.get(i).lookup("#progressBar");
+            progressBar.setProgress((float) (i + 1) / (float) allPanels.size());
 
-		}
-		info.setQuestion(question);
-	}
+            Label lbl_count = (Label) allPanels.get(i).lookup("#lbl_count");
+            lbl_count.setText("Frage " + (i + 1) + "/" + allPanels.size());
 
-	private static Label createQuestionLabel(Pane screen, Question question) {
-		String questionTest = removeMark(question.getQuestion());
+            ScreenController.addScreen("survey_" + i, allPanels.get(i));
+        }
 
-		questionTest = addRequiredTag(questionTest, question.getFlags().has(SymbolType.REQUIRED));
+        //add reaction listener
+        for (int y = 0; y < questions.size(); y++) {
 
-		Label lblFrage = new Label(questionTest);
-		// System.out.println("frageObj.get(y).frageid = " +
-		// frageObj.get(y).getFrageID());
-		lblFrage.setId("lblFrage_" + question.getQuestionId());
+            List<React> reacts = questions.get(y).getFlags().getAll(React.class);
+            List<Number> numbers = questions.get(y).getFlags().getAll(Number.class);
+            for (React react : reacts) {
+                questions.get(y).setTarget(
+                        questions.get(getY(react.getQuestionId(), react.getQuestionType(), questions)));
+                questions.get(y).setListener(react.getAnswerPos(), react.getQuestionType());
+            }
+            for (Number number : numbers) {
+                questions.get(y).setListener(number);
+            }
+        }
 
-		if (question.getFlags().hasMCReact()) {
-			//lblFrage.setVisible(false);
-		}
+        GlobalVars.questionsPerPanel = questionsPerPanel;
+        GlobalVars.countPanel = allPanels.size();
+    }
 
-		// allePanel.get(z).add(lblFrage, "align center, span, wrap");
-		question.setScene(screen);
-		question.setQuestionLabel(lblFrage);
+    private static void addQuestionToPanel(Question question, Pane screen, PanelInfo info) {
+        VBox vBox = (VBox) screen.lookup("#vbox");
 
-		return lblFrage;
-	}
+        // set headline
+        if (question.getHeadline() != null && !info.hasHeadline()) {
+            Label lbl_headline = (Label) screen.lookup("#lbl_headline");
+            lbl_headline.setText(removeMark(question.getHeadline().getName()));
+            info.setHeadline(true);
+        }
 
-	@SuppressWarnings("unchecked")
-	private static <T extends Control> T createFFNode(Question question) {
-		if (question.getFlags().has(SymbolType.TEXT)) {
-			// F�gt eine Textarea ein
-			TextArea textArea = new TextArea(); // anneSuperNeu
-			// textArea.setPreferredSize(new Dimension(200, 50));
-			// allePanel.get(z).add(textArea, "span, center");
-			ArrayList<TextArea> textAreas = new ArrayList<>();
-			textAreas.add(textArea);
-			question.setAnswersTEXT(textAreas);
-			return (T) textArea;
-		} else {
-			if (question.getFlags().has(SymbolType.LIST)) {
-				// ErrorLog.fehlerBerichtB("ERROR",
-				// Datenbank.class + ": " +
-				// Thread.currentThread().getStackTrace()[1].getLineNumber(), "Fehler");
-			} else {
-				// F�gt ein Textfeld ein
-				TextField textField = new TextField();
-				// textField.setPreferredSize(new Dimension(200, 50));
+        //add question
+        vBox.getChildren().add(createQuestionLabel(screen, question));
 
-				if (question.getFlags().hasFFReact()) {
-					textField.setVisible(false);
-				}
+        if (question.getQuestionType().equals(QuestionType.SHORT_ANSWER)) {
+            vBox.getChildren().add(createFFNode(question));
+        } else if (question.getQuestionType().equals(QuestionType.MULTIPLE_CHOICE)) {
+            if (question.getFlags().has(SymbolType.LIST)) {
+                vBox.getChildren().add(createMCListView(question));
+            } else {
+                vBox.getChildren().add(createMCCheckboxen(question, info));
+            }
 
-				// allePanel.get(z).add(textField, "wrap, span, center");
-				ArrayList<TextField> textFields = new ArrayList<>();
-				textFields.add(textField);
-				question.setAnswersFF(textFields);
-				return (T) textField;
-			}
-		}
+        }
+        info.setQuestion(question);
+    }
 
-		return null;
-	}
+    private static Label createQuestionLabel(Pane screen, Question question) {
+        String questionTest = removeMark(question.getQuestion());
 
-	private static ListView<String> createMCListView(Question question) {
-		// Erstellt eine Liste
-		ArrayList<ListView<String>> antwortenLIST = new ArrayList<>();
-		// scrollPane.getVerticalScrollBar().setUI(new MyScrollBarUI());
-		// allePanel.get(z).add(scrollPane, "span, center");
-		ListView<String> liste = new ListView<>();
-		liste.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+        questionTest = addRequiredTag(questionTest, question.getFlags().has(SymbolType.REQUIRED));
 
-		liste.setCellFactory(lv -> {
-			ListCell<String> cell = new ListCell<String>() {
-				@Override
-				protected void updateItem(String item, boolean empty) {
-					super.updateItem(item, empty);
-					setText(empty ? null : item);
-				}
-			};
+        Label lblFrage = new Label(questionTest);
+        // System.out.println("frageObj.get(y).frageid = " +
+        // frageObj.get(y).getFrageID());
+        lblFrage.setId("lblFrage_" + question.getQuestionId());
 
-			cell.addEventFilter(MouseEvent.MOUSE_PRESSED, e -> {
-				if (cell.isEmpty()) {
-					return;
-				}
+        if (question.getFlags().hasMCReact()) {
+            //lblFrage.setVisible(false);
+        }
 
-				int index = cell.getIndex();
-				if (liste.getSelectionModel().getSelectedIndices().contains(index)) {
-					liste.getSelectionModel().clearSelection(index);
-				} else {
-					liste.getSelectionModel().select(index);
-				}
+        // allePanel.get(z).add(lblFrage, "align center, span, wrap");
+        question.setScene(screen);
+        question.setQuestionLabel(lblFrage);
 
-				liste.requestFocus();
+        return lblFrage;
+    }
 
-				e.consume();
-			});
+    @SuppressWarnings("unchecked")
+    private static <T extends Control> T createFFNode(Question question) {
+        if (question.getFlags().has(SymbolType.TEXT)) {
+            // F�gt eine Textarea ein
+            TextArea textArea = new TextArea(); // anneSuperNeu
+            // textArea.setPreferredSize(new Dimension(200, 50));
+            // allePanel.get(z).add(textArea, "span, center");
+            ArrayList<TextArea> textAreas = new ArrayList<>();
+            textAreas.add(textArea);
+            question.setAnswersTEXT(textAreas);
+            return (T) textArea;
+        } else {
+            if (question.getFlags().has(SymbolType.LIST)) {
+                // ErrorLog.fehlerBerichtB("ERROR",
+                // Datenbank.class + ": " +
+                // Thread.currentThread().getStackTrace()[1].getLineNumber(), "Fehler");
+            } else {
+                // F�gt ein Textfeld ein
+                TextField textField = new TextField();
+                // textField.setPreferredSize(new Dimension(200, 50));
 
-			return cell;
-		});
+                if (question.getFlags().hasFFReact()) {
+                    textField.setVisible(false);
+                }
 
-		liste.setItems(FXCollections.observableArrayList(question.getAnswerOptions()));
+                // allePanel.get(z).add(textField, "wrap, span, center");
+                ArrayList<TextField> textFields = new ArrayList<>();
+                textFields.add(textField);
+                question.setAnswersFF(textFields);
+                return (T) textField;
+            }
+        }
 
-		if (question.getFlags().hasMCReact()) {
-			//liste.setVisible(false);
-		}
+        return null;
+    }
 
-		antwortenLIST.add(liste);
-		question.setAnswersLIST(antwortenLIST);
-		return liste;	
-	}
-	
-	private static HBox createMCCheckboxen(Question question, PanelInfo info) {
-		List<CheckBox> checkBoxen = new ArrayList<>();
-		List<Integer> anzahlZeile = new ArrayList<>();
-		int intAntworten = question.getAnswerOptions().size();
-		do {
-			if (intAntworten > GlobalVars.perColumn) {
-				anzahlZeile.add(GlobalVars.perColumn);
-				intAntworten -= GlobalVars.perColumn;
-			}
-		} while (intAntworten > GlobalVars.perColumn);
-		anzahlZeile.add(intAntworten);
+    private static ListView<String> createMCListView(Question question) {
+        // Erstellt eine Liste
+        ArrayList<ListView<String>> antwortenLIST = new ArrayList<>();
+        // scrollPane.getVerticalScrollBar().setUI(new MyScrollBarUI());
+        // allePanel.get(z).add(scrollPane, "span, center");
+        ListView<String> liste = new ListView<>();
+        liste.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
-		HBox hBox = new HBox();
-		hBox.setAlignment(Pos.CENTER);
-		//hBox.setSpacing(32);
-		// Uebe die schleife aus, wenn count kleiner ist als die groesse der
-		// antwortmoeglichkeiten
-		ArrayList<CheckBox> checkBoxes = new ArrayList<>();
-		
-		for (int count3 = 0; count3 < question.getAnswerOptions().size(); count3++) {
+        liste.setCellFactory(lv -> {
+            ListCell<String> cell = new ListCell<String>() {
+                @Override
+                protected void updateItem(String item, boolean empty) {
+                    super.updateItem(item, empty);
+                    setText(empty ? null : item);
+                }
+            };
 
-			// Erstellt eine Checkbox
-			String antwort = question.getAnswerOptions().get(count3);
+            cell.addEventFilter(MouseEvent.MOUSE_PRESSED, e -> {
+                if (cell.isEmpty()) {
+                    return;
+                }
 
-			String antwortAnzeige = "";
-			if (antwort.length() >= 25) {
+                int index = cell.getIndex();
+                if (liste.getSelectionModel().getSelectedIndices().contains(index)) {
+                    liste.getSelectionModel().clearSelection(index);
+                } else {
+                    liste.getSelectionModel().select(index);
+                }
+
+                liste.requestFocus();
+
+                e.consume();
+            });
+
+            return cell;
+        });
+
+        liste.setItems(FXCollections.observableArrayList(question.getAnswerOptions()));
+
+        if (question.getFlags().hasMCReact()) {
+            //liste.setVisible(false);
+        }
+
+        antwortenLIST.add(liste);
+        question.setAnswersLIST(antwortenLIST);
+        return liste;
+    }
+
+    private static HBox createMCCheckboxen(Question question, PanelInfo info) {
+        List<CheckBox> checkBoxen = new ArrayList<>();
+        List<Integer> anzahlZeile = new ArrayList<>();
+        int intAntworten = question.getAnswerOptions().size();
+        do {
+            if (intAntworten > GlobalVars.perColumn) {
+                anzahlZeile.add(GlobalVars.perColumn);
+                intAntworten -= GlobalVars.perColumn;
+            }
+        } while (intAntworten > GlobalVars.perColumn);
+        anzahlZeile.add(intAntworten);
+
+        HBox hBox = new HBox();
+        hBox.setAlignment(Pos.CENTER);
+        //hBox.setSpacing(32);
+        // Uebe die schleife aus, wenn count kleiner ist als die groesse der
+        // antwortmoeglichkeiten
+        ArrayList<CheckBox> checkBoxes = new ArrayList<>();
+
+        for (int count3 = 0; count3 < question.getAnswerOptions().size(); count3++) {
+
+            // Erstellt eine Checkbox
+            String antwort = question.getAnswerOptions().get(count3);
+
+            String antwortAnzeige = "";
+            if (antwort.length() >= 25) {
 //				int index = antwort.indexOf(" ", 11);
 //				if (index != -1) {
 //					char[] string = antwort.toCharArray();
@@ -361,164 +363,165 @@ public class StartController {
 //					antwortAnzeige = new String(string);
 //					antwortAnzeige = antwort;
 //				}
-			} else {
-				antwortAnzeige = antwort;
-			}
+            } else {
+                antwortAnzeige = antwort;
+            }
 
-			CheckBox chckbxSda = new CheckBox(antwortAnzeige);
-			// chckbxSda.setFont(new Font("Tahoma", Font.PLAIN, 28));
-			// chckbxSda.setForeground(new Color(94, 56, 41));
+            CheckBox chckbxSda = new CheckBox(antwortAnzeige);
+            // chckbxSda.setFont(new Font("Tahoma", Font.PLAIN, 28));
+            // chckbxSda.setForeground(new Color(94, 56, 41));
 
-			if (question.getFlags().hasMCReact()) {
-				chckbxSda.setVisible(false);
-			}
-			checkBoxen.add(chckbxSda);
-			if (!question.getFlags().has(SymbolType.MC)) {
-				chckbxSda.selectedProperty().addListener((ov, old_val, new_val) -> {
-					// System.out.println("!isMC" + ov + " - " + old_val + " - " + new_val);
-					if (new_val) {
-						for (CheckBox checkBox : checkBoxen) {
-							if (!checkBox.getText().equals(chckbxSda.getText()))
-								checkBox.setSelected(false);
-						}
-					}
-				});
-				/*
-				 * chckbxSda.addActionListener(new ActionListener() {
-				 * 
-				 * @Override public void actionPerformed(ActionEvent e) { MyCheckbox jCheckBox =
-				 * (MyCheckbox) e.getSource(); boolean selected =
-				 * jCheckBox.getModel().isSelected(); for(int i = 0; i < checkBoxen.size(); i++)
-				 * { checkBoxen.get(i).setSelected(false); } jCheckBox.setSelected(selected);
-				 * //String text = jCheckBox.getText();
-				 * 
-				 * } });
-				 */
-			} else {
-				chckbxSda.selectedProperty().addListener((ov, old_val, new_val) -> {
-					// System.out.println(ov + " - " + old_val + " - " + new_val);
-				});
-			}
+            if (question.getFlags().hasMCReact()) {
+                chckbxSda.setVisible(false);
+            }
+            checkBoxen.add(chckbxSda);
+            if (!question.getFlags().has(SymbolType.MC)) {
+                chckbxSda.selectedProperty().addListener((ov, old_val, new_val) -> {
+                    // System.out.println("!isMC" + ov + " - " + old_val + " - " + new_val);
+                    if (new_val) {
+                        for (CheckBox checkBox : checkBoxen) {
+                            if (!checkBox.getText().equals(chckbxSda.getText()))
+                                checkBox.setSelected(false);
+                        }
+                    }
+                });
+                /*
+                 * chckbxSda.addActionListener(new ActionListener() {
+                 *
+                 * @Override public void actionPerformed(ActionEvent e) { MyCheckbox jCheckBox =
+                 * (MyCheckbox) e.getSource(); boolean selected =
+                 * jCheckBox.getModel().isSelected(); for(int i = 0; i < checkBoxen.size(); i++)
+                 * { checkBoxen.get(i).setSelected(false); } jCheckBox.setSelected(selected);
+                 * //String text = jCheckBox.getText();
+                 *
+                 * } });
+                 */
+            } else {
+                chckbxSda.selectedProperty().addListener((ov, old_val, new_val) -> {
+                    // System.out.println(ov + " - " + old_val + " - " + new_val);
+                });
+            }
 
-			// set headlines for choice lists
-			if (question.getFlags().has(SymbolType.B)) {
+            // set headlines for choice lists
+            if (question.getFlags().has(SymbolType.B)) {
 
-				if(!info.hasBHeadlines()) {
-					Label label = new Label();
-					String value = "D\nD";
-					switch (chckbxSda.getText()) {
-					case "0":
-						value = "keine\nAussage";
-						break;
-					case "1":
-						value = "sehr\nschlecht";
-						break;
-					case "10":
-						value = "sehr\ngut";
-						break;
-					default:
-						label.setVisible(false);
-					}
-					
-					label.setText(value);
-					label.setTextAlignment(TextAlignment.CENTER);
-					//label.setStyle("-fx-font-size: 14.0px;");
-					VBox vBox = new VBox(4);
-					vBox.getChildren().add(label);
-					vBox.getChildren().add(chckbxSda);
-					hBox.getChildren().add(vBox);
-				} else {
-					hBox.getChildren().add(chckbxSda);
-				}
-				
-			} else {
-				if ((count3 % (GlobalVars.perColumn)) == (GlobalVars.perColumn - 1)) {
-					// allePanel.get(z).add(chckbxSda, "");
-					hBox.getChildren().add(chckbxSda);
-					/*
-					 * JPanel empty = new JPanel(); empty.setVisible(false);
-					 * allePanel.get(z).add(empty, "wrap");
-					 */
-				} else {
-					// allePanel.get(z).add(chckbxSda, "");
-					hBox.getChildren().add(chckbxSda);
-				}
-			}
-			checkBoxes.add(chckbxSda);
+                if (!info.hasBHeadlines()) {
+                    Label label = new Label();
+                    String value = "D\nD";
+                    switch (chckbxSda.getText()) {
+                        case "0":
+                            value = "keine\nAussage";
+                            break;
+                        case "1":
+                            value = "sehr\nschlecht";
+                            break;
+                        case "10":
+                            value = "sehr\ngut";
+                            break;
+                        default:
+                            label.setVisible(false);
+                    }
 
-			/*
-			 * if(count3 == frageObj.get(y).getAntwort_moeglichkeit().size() - 1) { for(int
-			 * v = 0; v < anzahlZeile.size(); v++) { while(anzahlZeile.get(v) !=
-			 * (GlobalVars.proZeile)) { anzahlZeile.set(v, anzahlZeile.get(v) + 1); JPanel
-			 * empty = new JPanel(); empty.setVisible(false); if(anzahlZeile.get(v) ==
-			 * (GlobalVars.proZeile)) { allePanel.get(z).add(empty, "wrap"); } else {
-			 * allePanel.get(z).add(empty, ""); } } } }
-			 */
-		}
-		
-		info.setbHeadlines(true);
-		question.setAnswersMC(checkBoxes);
-		return hBox;
-	}
+                    label.setText(value);
+                    label.setTextAlignment(TextAlignment.CENTER);
+                    //label.setStyle("-fx-font-size: 14.0px;");
+                    VBox vBox = new VBox(4);
+                    vBox.getChildren().add(label);
+                    vBox.getChildren().add(chckbxSda);
+                    hBox.getChildren().add(vBox);
+                } else {
+                    hBox.getChildren().add(chckbxSda);
+                }
 
-	private static String removeMark(String text) {
-		Pattern MY_PATTERNs = Pattern.compile("#\\[[0-9]+\\]");
-		Matcher ms = MY_PATTERNs.matcher(text);
-		if (ms.find()) {
-			text = text.substring(0, ms.start());
-		}
+            } else {
+                if ((count3 % (GlobalVars.perColumn)) == (GlobalVars.perColumn - 1)) {
+                    // allePanel.get(z).add(chckbxSda, "");
+                    hBox.getChildren().add(chckbxSda);
+                    /*
+                     * JPanel empty = new JPanel(); empty.setVisible(false);
+                     * allePanel.get(z).add(empty, "wrap");
+                     */
+                } else {
+                    // allePanel.get(z).add(chckbxSda, "");
+                    hBox.getChildren().add(chckbxSda);
+                }
+            }
+            checkBoxes.add(chckbxSda);
 
-		return text;
-	}
+            /*
+             * if(count3 == frageObj.get(y).getAntwort_moeglichkeit().size() - 1) { for(int
+             * v = 0; v < anzahlZeile.size(); v++) { while(anzahlZeile.get(v) !=
+             * (GlobalVars.proZeile)) { anzahlZeile.set(v, anzahlZeile.get(v) + 1); JPanel
+             * empty = new JPanel(); empty.setVisible(false); if(anzahlZeile.get(v) ==
+             * (GlobalVars.proZeile)) { allePanel.get(z).add(empty, "wrap"); } else {
+             * allePanel.get(z).add(empty, ""); } } } }
+             */
+        }
 
-	private static String addRequiredTag(String text, boolean required) {
-		text = required ? text + " *" : text;
-		// if(text.length() >= 40) {
-		// int index = text.indexOf(" ", 15);
-		// char[] string = text.toCharArray();
-		// string[index] = '\n';
-		//
-		// return string.toString();
-		// }
-		return text;
-	}
+        info.setbHeadlines(true);
+        question.setAnswersMC(checkBoxes);
+        return hBox;
+    }
 
-	/**
-	 * Gibt die Position des "FrageErstellen" Objektes in dem ArrayList "questions" zurück
-	 * welche die entsprechende Fragen- ID und Fragenart hat. F�r die Vorschau!
-	 * <p>
-	 * 
-	 * @param x
-	 *            int: Fragen- ID
-	 * @param type
-	 *            String: Fragenart
-	 * @param questions
-	 *            ArrayList FrageErstellen: alle Fragen
-	 * @return Postition im ArrayList "questions" als int.
-	 */
-	private static int getY(int x, QuestionType type, List<Question> questions) {
-		// TODO
+    private static String removeMark(String text) {
+        Pattern MY_PATTERNs = Pattern.compile("#\\[[0-9]+\\]");
+        Matcher ms = MY_PATTERNs.matcher(text);
+        if (ms.find()) {
+            text = text.substring(0, ms.start());
+        }
 
-		for (int i = 0; i < questions.size(); i++) {
-			// System.out.println(questions.get(i).getFrageID()+ " == " + x + " && " +
-			// questions.get(i).getArt() + " == " + type);
-			if (x == questions.get(i).getQuestionId() && type.equals(questions.get(i).getQuestionType())) {
-				return i;
-			}
-		}
-		return -1;
-	}
+        return text;
+    }
 
-	@FXML
-	private void adminLogin() {
-		ScreenController.activate(SceneName.LOGIN);
-	}
+    private static String addRequiredTag(String text, boolean required) {
+        text = required ? text + " *" : text;
+        // if(text.length() >= 40) {
+        // int index = text.indexOf(" ", 15);
+        // char[] string = text.toCharArray();
+        // string[index] = '\n';
+        //
+        // return string.toString();
+        // }
+        return text;
+    }
 
-	@FXML
-	private void next() {
-		List<Question> questions = QuestionListService.getQuestions(GlobalVars.activeQuestionnaire.getId());
-		makeQuestionnaire(questions, false);
-		GlobalVars.page = 0;
-		ScreenController.activate(SURVEY_0);
-	}
+    /**
+     * Gibt die Position des "FrageErstellen" Objektes in dem ArrayList "questions" zurück
+     * welche die entsprechende Fragen- ID und Fragenart hat. F�r die Vorschau!
+     * <p>
+     *
+     * @param x         int: Fragen- ID
+     * @param type      String: Fragenart
+     * @param questions ArrayList FrageErstellen: alle Fragen
+     * @return Postition im ArrayList "questions" als int.
+     */
+    private static int getY(int x, QuestionType type, List<Question> questions) {
+        // TODO
+
+        for (int i = 0; i < questions.size(); i++) {
+            // System.out.println(questions.get(i).getFrageID()+ " == " + x + " && " +
+            // questions.get(i).getArt() + " == " + type);
+            if (x == questions.get(i).getQuestionId() && type.equals(questions.get(i).getQuestionType())) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    @FXML
+    private void adminLogin() throws IOException {
+        if (GlobalVars.DEV_MODE) {
+            LoginController.devLogin();
+        } else {
+            ScreenController.activate(SceneName.LOGIN);
+        }
+    }
+
+    @FXML
+    private void next() throws IOException {
+        List<Question> questions = QuestionListService.getQuestions(GlobalVars.activeQuestionnaire.getId());
+        makeQuestionnaire(questions, false);
+        GlobalVars.page = 0;
+        ScreenController.activate(SURVEY_0);
+    }
 }

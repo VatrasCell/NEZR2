@@ -5,24 +5,23 @@ import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.TextField;
 
 public class QuestionEditParam {
-    private final QuestionType type;
+    private final QuestionType questionType;
     private final boolean list;
     private final boolean multipleChoice;
     private final boolean textArea;
     private final boolean yesNoQuestion;
     private final boolean singleLine;
     private final boolean numeric;
-    private final boolean headline;
-    private final boolean valuationAsk;
+    private final boolean evaluationQuestion;
     private final String numberType;
     private final int countChars;
 
     private boolean required;
 
-    public QuestionEditParam(QuestionType type, boolean required, boolean list, boolean multipleChoice, boolean textArea,
-                             boolean yesNoQuestion, boolean singleLine, boolean numeric, boolean headline, boolean valuationAsk,
+    public QuestionEditParam(QuestionType questionType, boolean required, boolean list, boolean multipleChoice, boolean textArea,
+                             boolean yesNoQuestion, boolean singleLine, boolean numeric, boolean evaluationQuestion,
                              String numberType, int countChars) {
-        this.type = type;
+        this.questionType = questionType;
         this.required = required;
         this.list = list;
         this.multipleChoice = multipleChoice;
@@ -30,36 +29,29 @@ public class QuestionEditParam {
         this.yesNoQuestion = yesNoQuestion;
         this.singleLine = singleLine;
         this.numeric = numeric;
-        this.headline = headline;
-        this.valuationAsk = valuationAsk;
+        this.evaluationQuestion = evaluationQuestion;
         this.numberType = numberType;
         this.countChars = countChars;
     }
 
-    public QuestionEditParam(ChoiceBox<String> typeChoice, ChoiceBox<String> numberChoice, TextField txtCountChars,
-                             CheckBox chckbxRequired, CheckBox chckbxMultipleChoice, CheckBox chckbxList, CheckBox chckbxTextArea,
-                             CheckBox chckbxYesNoQuestion, CheckBox chckbxHeadline, CheckBox chckbxSingleLine, CheckBox chckbxNumeric) {
-        switch (typeChoice.getSelectionModel().getSelectedItem()) {
+    public QuestionEditParam(ChoiceBox<String> questionTypeChoiceBox, ChoiceBox<String> numberChoice, TextField txtCountChars,
+                             CheckBox chckbxRequired, CheckBox evaluationQuestionCheckBox, CheckBox chckbxMultipleChoice, CheckBox chckbxList, CheckBox chckbxTextArea,
+                             CheckBox chckbxYesNoQuestion, CheckBox chckbxSingleLine, CheckBox chckbxNumeric) {
+        switch (questionTypeChoiceBox.getSelectionModel().getSelectedItem()) {
             case "Multiple Choice":
-                type = QuestionType.MULTIPLE_CHOICE;
-                valuationAsk = false;
-                break;
-            case "Bewertungsfrage":
-                type = QuestionType.MULTIPLE_CHOICE;
-                valuationAsk = true;
+                questionType = QuestionType.MULTIPLE_CHOICE;
                 break;
             case "Freie Frage":
-                type = QuestionType.SHORT_ANSWER;
-                valuationAsk = false;
+                questionType = QuestionType.SHORT_ANSWER;
                 break;
             default:
-                type = null;
-                valuationAsk = false;
+                questionType = null;
         }
 
-        numberType =  numberChoice.getSelectionModel().getSelectedItem();
+        numberType = numberChoice.getSelectionModel().getSelectedItem();
         countChars = txtCountChars.getText().equals("") ? 0 : Integer.parseInt(txtCountChars.getText());
 
+        evaluationQuestion = evaluationQuestionCheckBox.isSelected();
         required = chckbxRequired.isSelected();
         multipleChoice = chckbxMultipleChoice.isSelected();
         list = chckbxList.isSelected();
@@ -67,39 +59,39 @@ public class QuestionEditParam {
         yesNoQuestion = chckbxYesNoQuestion.isSelected();
         singleLine = chckbxSingleLine.isSelected();
         numeric = chckbxNumeric.isSelected();
-        headline = chckbxHeadline.isSelected();
 
     }
 
-    public boolean isTypeActivatable() {
-        return !headline;
+    public boolean isQuestionTypeActivatable() {
+        return true;
     }
-    
+
     public boolean isRequiredActivatable() {
-        return !headline;
+        return true;
     }
-    
+
     public boolean isListActivatable() {
-        return !headline && type.equals(QuestionType.MULTIPLE_CHOICE);
+        return questionType.equals(QuestionType.MULTIPLE_CHOICE);
     }
+
     public boolean isMultipleChoiceActivatable() {
-        return !headline && !yesNoQuestion && !valuationAsk && !textArea && !singleLine && !numeric  && type.equals(QuestionType.MULTIPLE_CHOICE);
+        return !yesNoQuestion && !evaluationQuestion && !textArea && !singleLine && !numeric && questionType.equals(QuestionType.MULTIPLE_CHOICE);
     }
-    
+
     public boolean isTextareaActivatable() {
-        return !headline && !multipleChoice && !yesNoQuestion && !singleLine && !list && !numeric && type.equals(QuestionType.SHORT_ANSWER);
+        return !multipleChoice && !yesNoQuestion && !singleLine && !list && !numeric && questionType.equals(QuestionType.SHORT_ANSWER);
     }
 
     public boolean isYesNoQuestionActivatable() {
-        return !headline && !multipleChoice && !valuationAsk && !list && !numeric && !textArea && type.equals(QuestionType.MULTIPLE_CHOICE);
+        return !multipleChoice && !evaluationQuestion && !list && !numeric && !textArea && questionType.equals(QuestionType.MULTIPLE_CHOICE);
     }
 
     public boolean isSingleLineActivatable() {
-        return !headline && yesNoQuestion && isYesNoQuestionActivatable();
+        return yesNoQuestion && isYesNoQuestionActivatable();
     }
 
     public boolean isNumericActivatable() {
-        return !headline && !textArea && !multipleChoice && !list && !yesNoQuestion && !singleLine && type.equals(QuestionType.SHORT_ANSWER);
+        return !textArea && !multipleChoice && !list && !yesNoQuestion && !singleLine && questionType.equals(QuestionType.SHORT_ANSWER);
     }
 
     public boolean isNumberTypeActivatable() {
@@ -111,11 +103,11 @@ public class QuestionEditParam {
     }
 
     public boolean isAnswersListActivatable() {
-        return !headline && !valuationAsk && type.equals(QuestionType.MULTIPLE_CHOICE);
+        return !evaluationQuestion && questionType.equals(QuestionType.MULTIPLE_CHOICE);
     }
 
-    public QuestionType getType() {
-        return type;
+    public QuestionType getQuestionType() {
+        return questionType;
     }
 
     public boolean isRequired() {
@@ -158,11 +150,7 @@ public class QuestionEditParam {
         return countChars;
     }
 
-    public boolean isHeadline() {
-        return headline;
-    }
-
-    public boolean isValuationAsk() {
-        return valuationAsk;
+    public boolean isEvaluationQuestion() {
+        return evaluationQuestion;
     }
 }

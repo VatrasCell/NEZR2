@@ -1,5 +1,8 @@
 package model;
 
+import javafx.scene.control.Button;
+import question.QuestionController;
+
 import java.util.Objects;
 
 public class Answer {
@@ -9,8 +12,12 @@ public class Answer {
 
     private int id;
     private String value;
+    private Button edit;
+    private Button delete;
 
     public Answer() {
+        edit = QuestionController.initEditButton(this);
+        delete = QuestionController.initDeleteButton(this);
     }
 
     public Answer(String value) {
@@ -33,6 +40,26 @@ public class Answer {
         this.value = value;
     }
 
+    @SuppressWarnings("unused")
+    public Button getEdit() {
+        return edit;
+    }
+
+    @SuppressWarnings("unused")
+    public void setEdit(Button edit) {
+        this.edit = edit;
+    }
+
+    @SuppressWarnings("unused")
+    public Button getDelete() {
+        return delete;
+    }
+
+    @SuppressWarnings("unused")
+    public void setDelete(Button delete) {
+        this.delete = delete;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -45,5 +72,13 @@ public class Answer {
     @Override
     public int hashCode() {
         return Objects.hash(getId(), getValue());
+    }
+
+    @Override
+    public String toString() {
+        return "Answer{" +
+                "id=" + id +
+                ", value='" + value + '\'' +
+                '}';
     }
 }

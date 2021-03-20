@@ -24,7 +24,7 @@ public class Question implements Comparable<Question>, Comparator<Question> {
     private String question;
     private int questionId;
     private QuestionType questionType;
-    private String category;
+    private Category category;
     private String date;
     private FlagList flags;
     private int position;
@@ -99,14 +99,14 @@ public class Question implements Comparable<Question>, Comparator<Question> {
     /**
      * @return the category
      */
-    public String getCategory() {
+    public Category getCategory() {
         return category;
     }
 
     /**
      * @param category the category to set
      */
-    public void setCategory(String category) {
+    public void setCategory(Category category) {
         this.category = category;
     }
 
