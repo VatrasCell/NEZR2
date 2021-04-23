@@ -78,7 +78,7 @@ public class StartController {
     private void initialize() {
         String value;
         switch (GlobalVars.location) {
-            case "Rügen":
+            case "R\u00FCgen":
                 value = "images/img/logo_nezr.png";
                 break;
             case "Bayerischer Wald":
@@ -467,22 +467,14 @@ public class StartController {
         Pattern MY_PATTERNs = Pattern.compile("#\\[[0-9]+\\]");
         Matcher ms = MY_PATTERNs.matcher(text);
         if (ms.find()) {
-            text = text.substring(0, ms.start());
+            System.out.println("Old dataset pattern found.");
         }
 
         return text;
     }
 
     private static String addRequiredTag(String text, boolean required) {
-        text = required ? text + " *" : text;
-        // if(text.length() >= 40) {
-        // int index = text.indexOf(" ", 15);
-        // char[] string = text.toCharArray();
-        // string[index] = '\n';
-        //
-        // return string.toString();
-        // }
-        return text;
+        return required ? text + " *" : text;
     }
 
     /**

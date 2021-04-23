@@ -36,6 +36,8 @@ import message.DialogId;
 import message.MessageId;
 import model.Questionnaire;
 import model.SceneName;
+import org.controlsfx.validation.ValidationSupport;
+import org.controlsfx.validation.Validator;
 import questionList.QuestionListController;
 import start.StartController;
 
@@ -44,6 +46,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Predicate;
 
 import static application.DialogMessageController.getDialogMessage;
 import static application.GlobalFuncs.getURL;
@@ -124,6 +127,7 @@ public class AdminController {
                 if (newValue) {
                     AdminService.activateQuestionnaire(questionnaire.getId());
                     GlobalVars.activeQuestionnaire = questionnaire;
+                    deactivateAllOtherQuestionnaires(questionnaire);
                 } else {
                     AdminService.disableQuestionnaire(questionnaire.getId());
                     GlobalVars.activeQuestionnaire = null;
@@ -212,7 +216,7 @@ public class AdminController {
                             getData();
                             NotificationController.createMessage(
                                     MessageId.TITLE_COPY_QUESTIONNAIRE,
-                                    MessageId.MESSAGE_COPYED_QUESTIONNAIRE_SUCCESSFULLY,
+                                    MessageId.MESSAGE_COPY_QUESTIONNAIRE,
                                     questionnaire.getName(),
                                     ort);
                         } else {
@@ -229,6 +233,7 @@ public class AdminController {
     }
 
     public static Button initRenameButton(Questionnaire questionnaire) {
+        ValidationSupport validationSupport = new ValidationSupport();
         ImageView imgView = new ImageView(GlobalVars.IMG_REN);
         imgView.setFitHeight(30);
         imgView.setFitWidth(30);
@@ -241,6 +246,10 @@ public class AdminController {
             DialogPane dialogPane = dialog.getDialogPane();
             dialogPane.getStylesheets().add(
                     getURL(STYLESHEET).toExternalForm());
+
+            validationSupport.setErrorDecorationEnabled(false);
+            validationSupport.registerValidator(dialog.getEditor(), Validator.createEmptyValidator("FEHLER"));
+            dialog.getDialogPane().lookupButton(ButtonType.OK).disableProperty().bind(validationSupport.invalidProperty());
 
             Optional<String> result = dialog.showAndWait();
             result.ifPresent(questionnaire::setName);
@@ -259,7 +268,7 @@ public class AdminController {
         imgView.setFitWidth(30);
         Button button = new Button("", imgView);
         button.setOnAction(event -> {
-            //TODO
+            //TODO replace with backend sync
         });
 
         return button;
@@ -328,6 +337,8 @@ public class AdminController {
     }
 
     private static Optional<Pair<String, String>> getDatePickerDialog() {
+        ValidationSupport validationSupport = new ValidationSupport();
+
         // Create the custom dialog.
         Dialog<Pair<String, String>> dialog = new Dialog<>();
         DialogMessageController.setMessage(dialog, DialogId.TITLE_EXCEL_EXPORT);
@@ -348,7 +359,21 @@ public class AdminController {
         DatePicker datePickerFrom = new DatePicker(LocalDate.now());
         datePickerFrom.setPromptText(getDialogMessage(DialogId.DATEPICKER_EXPORT_FROM));
         DatePicker datePickerTo = new DatePicker(LocalDate.now());
-        datePickerFrom.setPromptText(getDialogMessage(DialogId.DATEPICKER_EXPORT_TO));
+        datePickerTo.setPromptText(getDialogMessage(DialogId.DATEPICKER_EXPORT_TO));
+
+        validationSupport.setErrorDecorationEnabled(false);
+        Predicate<LocalDate> predicate = (localDate) ->
+                datePickerFrom.getValue() != null &&
+                        datePickerFrom.getValue() != null &&
+                        (datePickerFrom.getValue().isBefore(datePickerTo.getValue()) || datePickerFrom.getValue().equals(datePickerTo.getValue())
+                        );
+        Platform.runLater(() -> {
+            validationSupport.registerValidator(datePickerFrom, Validator.createEmptyValidator("FEHLER"));
+            validationSupport.registerValidator(datePickerTo, Validator.createEmptyValidator("FEHLER2"));
+            validationSupport.registerValidator(datePickerFrom, Validator.createPredicateValidator(predicate, ""));
+            validationSupport.registerValidator(datePickerTo, Validator.createPredicateValidator(predicate, ""));
+        });
+        dialog.getDialogPane().lookupButton(okButtonType).disableProperty().bind(validationSupport.invalidProperty());
 
         grid.add(new Label(getDialogMessage(DialogId.DATEPICKER_EXPORT_FROM_LABEL)), 0, 0);
         grid.add(datePickerFrom, 1, 0);
@@ -369,8 +394,17 @@ public class AdminController {
         return dialog.showAndWait();
     }
 
+    private void deactivateAllOtherQuestionnaires(Questionnaire activeQuestionnaire) {
+        for (Questionnaire questionnaire : data) {
+            if (questionnaire.isActive().get() && questionnaire.getId() != activeQuestionnaire.getId()) {
+                AdminService.disableQuestionnaire(questionnaire.getId());
+            }
+        }
+    }
+
     @FXML
     private void newQuestionnaire() {
+        ValidationSupport validationSupport = new ValidationSupport();
         TextInputDialog dialog = new TextInputDialog("");
         DialogMessageController.setMessage(
                 dialog,
@@ -378,6 +412,10 @@ public class AdminController {
                 DialogId.CONTENT_TEXT_CREATE_QUESTIONNAIRE);
         DialogPane dialogPane = dialog.getDialogPane();
         dialogPane.getStylesheets().add(getURL(STYLESHEET).toExternalForm());
+
+        validationSupport.setErrorDecorationEnabled(false);
+        validationSupport.registerValidator(dialog.getEditor(), Validator.createEmptyValidator("FEHLER"));
+        dialog.getDialogPane().lookupButton(ButtonType.OK).disableProperty().bind(validationSupport.invalidProperty());
 
         Optional<String> result = dialog.showAndWait();
         result.ifPresent(name -> {

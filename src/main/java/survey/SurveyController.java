@@ -42,7 +42,7 @@ public class SurveyController {
     private void initialize() {
         String value;
         switch (GlobalVars.location) {
-            case "Rügen":
+            case "R\u00FCgen":
                 value = "images/img/logo_nezr.png";
                 break;
             case "Bayerischer Wald":

@@ -190,12 +190,7 @@ public class QuestionController {
         categoryChoiceBox.setItems(categoryList);
         categoryChoiceBox.getSelectionModel().select(question.getCategory());
 
-        List<Headline> headlineListArrays = new ArrayList<>();
-        headlineListArrays.add(null);
-        headlineListArrays.addAll(
-                QuestionListService.getHeadlines(questionnaire.getId()));
-        ObservableList<Headline> headlineObservableList = FXCollections.observableArrayList(headlineListArrays);
-        headlineChoiceBox.setItems(headlineObservableList);
+        headlineChoiceBox.setItems(createHeadlineList());
         if (question.getHeadline() != null) {
             headlineChoiceBox.getSelectionModel().select(question.getHeadline());
         } else {
@@ -459,17 +454,13 @@ public class QuestionController {
         result.ifPresent(name -> {
             QuestionListService.createUniqueHeadline(name);
             Headline headline = QuestionListService.getHeadlineByName(name);
-            List<Headline> headlineListArrays = new ArrayList<>();
-            headlineListArrays.add(null);
-            headlineListArrays.addAll(
-                    QuestionListService.getHeadlines(questionnaire.getId()));
-            ObservableList<Headline> headlineList = FXCollections.observableArrayList(headlineListArrays);
-            headlineChoiceBox.setItems(headlineList);
+            headlineChoiceBox.setItems(createHeadlineList());
             headlineChoiceBox.getSelectionModel().select(headline);
         });
     }
 
     @FXML
+    //TODO Folgefrage
     private void react() {
         ReactController.question = question;
         ReactController.questionnaire = questionnaire;
@@ -555,5 +546,18 @@ public class QuestionController {
 
         answerTable.setDisable(!param.isAnswersListActivatable());
         newAnswerButton.setDisable(!param.isAnswersListActivatable());
+    }
+
+    @FXML
+    private void validation() {
+
+    }
+
+    private ObservableList<Headline> createHeadlineList() {
+        List<Headline> headlineListArrays = new ArrayList<>();
+        headlineListArrays.add(null);
+        headlineListArrays.addAll(
+                QuestionListService.getHeadlines(questionnaire.getId()));
+        return FXCollections.observableArrayList(headlineListArrays);
     }
 }

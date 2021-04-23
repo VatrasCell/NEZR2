@@ -46,8 +46,6 @@ public class ScreenController {
             primaryStage.setScene(new Scene(root));
         }
 
-        FXMLLoader.load(screenUrlMap.get(name));
-
         root.getStylesheets().add(getURL(STYLESHEET).toExternalForm());
         primaryStage.getScene().setRoot(root);
         primaryStage.show();
