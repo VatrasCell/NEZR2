@@ -122,7 +122,7 @@ public class QuestionServiceTest extends DBTestUtil {
         addMultipleChoiceQuestionRequired();
 
         //act
-        FlagList result = FlagListService.getFlagList(1, QuestionType.MULTIPLE_CHOICE);
+        FlagList result = FlagListService.getFlagList(2, QuestionType.MULTIPLE_CHOICE);
 
         //assert
         FlagList flagList = new FlagList();

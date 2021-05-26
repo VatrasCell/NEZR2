@@ -150,6 +150,7 @@ public class SqlStatement {
     public static final String SQL_GET_HEADLINE_ID = "SELECT headline_id FROM headline WHERE name=?";
 
     public static final String SQL_COLUMN_HEADLINE_ID = "headline_id";
+    public static final String SQL_COLUMN_HEADLINE_ID2 = "headline_headline_id";
 
     //FlagList
     public static final String SQL_GET_FLAG_LIST_MC_BY_ID = "SELECT * FROM flag_list_mc WHERE flag_list_mc_id=?";
@@ -168,6 +169,8 @@ public class SqlStatement {
     public static final String SQL_GET_TARGET_QUESTION_FLAG_AND_ID_FOR_SHORT_ANSWER = "SELECT  flag_list_id, qhsa.short_answer_id, qhsa.q_sa_relation_id FROM q_has_sa qhsa JOIN q_has_react qhr ON qhsa.q_sa_relation_id = qhr.q_has_sa_id JOIN react r ON qhr.react_id = r.react_id WHERE r.short_answer_id = ? OR r.multiple_choice_id = ? AND  questionnaire_id = ?";
 
     public static final String SQL_COLUMN_FLAG_LIST_ID = "flag_list_id";
+    public static final String SQL_COLUMN_FLAG_LIST_MC_ID = "flag_list_mc_id";
+    public static final String SQL_COLUMN_FLAG_LIST_SA_ID = "flag_list_sa_id";
     public static final String SQL_COLUMN_IS_EVALUATION_QUESTION = "is_evaluation_question";
     public static final String SQL_COLUMN_IS_REQUIRED = "is_required";
     public static final String SQL_COLUMN_IS_MULTIPLE_CHOICE = "is_multiple_choice";
@@ -200,8 +203,8 @@ public class SqlStatement {
     public static final String SQL_COLUMN_LENGTH = "length";
 
     //React
-    public static final String SQL_GET_SHORT_ANSWER_REACTS = "SELECT r.react_id, r.short_answer_id, r.multiple_choice_id, r.answer_position FROM q_has_react qhr JOIN react r ON qhr.react_id = r.react_id WHERE q_has_sa_id = ?";
-    public static final String SQL_GET_MULTIPLE_CHOICE_REACTS = "SELECT r.react_id, r.short_answer_id, r.multiple_choice_id, r.answer_position FROM q_has_react qhr JOIN react r ON qhr.react_id = r.react_id WHERE q_has_mc_id = ?";
+    public static final String SQL_GET_SHORT_ANSWER_REACTS = "SELECT r.react_id, r.short_answer_id, r.multiple_choice_id, r.answer_position FROM react r JOIN sa_has_react sar ON r.react_id = sar.react_id WHERE sar.q_has_sa_id = ?";
+    public static final String SQL_GET_MULTIPLE_CHOICE_REACTS = "SELECT r.react_id, r.short_answer_id, r.multiple_choice_id, r.answer_position FROM react r JOIN mc_has_react mcr ON r.react_id = mcr.react_id WHERE mcr.q_has_mc_id = ?";
 
     public static final String SQL_COLUMN_REACT_ID = "react_id";
     public static final String SQL_COLUMN_ANSWER_POSITION = "answer_position";
@@ -210,6 +213,6 @@ public class SqlStatement {
     public static final String SQL_GET_MAX_MULTIPLE_CHOICE_POSITION = "SELECT MAX(q_has_mc.position) AS position FROM questionnaire JOIN q_has_mc ON questionnaire.questionnaire_id=q_has_mc.questionnaire_id WHERE questionnaire.questionnaire_id=?";
     public static final String SQL_GET_MAX_SHORT_ANSWER_POSITION = "SELECT MAX(q_has_sa.position) AS position FROM questionnaire JOIN q_has_sa ON questionnaire.questionnaire_id=q_has_sa.questionnaire_id WHERE questionnaire.questionnaire_id=?";
 
-    public static final String SQL_GET_MULTIPLE_CHOICE_QUESTION = "SELECT mc1.question, mc1.multiple_choice_id, questionnaire.creation_date, q_has_mc.position, q_has_mc.flag_list_id, category.name, mc1.headline_id, q_has_mc.q_mc_relation_id FROM questionnaire JOIN q_has_mc ON questionnaire.questionnaire_id=q_has_mc.questionnaire_id JOIN multiple_choice mc1 ON q_has_mc.multiple_choice_id=mc1.multiple_choice_id JOIN category ON mc1.category_id=category.category_id WHERE questionnaire.questionnaire_id=?";
-    public static final String SQL_GET_SHORT_ANSWER_QUESTION = "SELECT ff1.question, ff1.short_answer_id, questionnaire.creation_date, q_has_sa.position, q_has_sa.flag_list_id, category.name, ff1.headline_id, q_has_sa.q_has_sa_relation_id FROM questionnaire JOIN q_has_sa ON questionnaire.questionnaire_id=q_has_sa.questionnaire_id JOIN short_answer ff1 ON q_has_sa.short_answer_id=ff1.short_answer_id JOIN category ON ff1.category_id=category.category_id WHERE questionnaire.questionnaire_id=?";
+    public static final String SQL_GET_MULTIPLE_CHOICE_QUESTION = "SELECT mc1.question, mc1.multiple_choice_id, questionnaire.creation_date, q_has_mc.position, category.name, mc1.headline_id, q_has_mc.q_mc_relation_id FROM questionnaire JOIN q_has_mc ON questionnaire.questionnaire_id=q_has_mc.questionnaire_id JOIN multiple_choice mc1 ON q_has_mc.multiple_choice_id=mc1.multiple_choice_id JOIN category ON mc1.category_id=category.category_id WHERE questionnaire.questionnaire_id=?";
+    public static final String SQL_GET_SHORT_ANSWER_QUESTION = "SELECT ff1.question, ff1.short_answer_id, questionnaire.creation_date, q_has_sa.position, category.name, ff1.headline_headline_id, q_has_sa.q_sa_relation_id FROM questionnaire JOIN q_has_sa ON questionnaire.questionnaire_id=q_has_sa.questionnaire_id JOIN short_answer ff1 ON q_has_sa.short_answer_id=ff1.short_answer_id JOIN category ON ff1.category_id=category.category_id WHERE questionnaire.questionnaire_id=?";
 }
