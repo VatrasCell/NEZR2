@@ -2,6 +2,7 @@ package question;
 
 import application.NotificationController;
 import flag.FlagList;
+import flag.FlagListService;
 import message.MessageId;
 import model.Category;
 import model.QuestionEditParam;
@@ -14,6 +15,7 @@ import org.mockito.MockitoAnnotations;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
+import util.AssertFlagList;
 import util.DBTestUtil;
 
 import java.util.Arrays;
@@ -81,7 +83,7 @@ public class QuestionServiceTest extends DBTestUtil {
                 null, 0);
 
         //act
-        QuestionService.getPossibleFlags(flagList, param);
+        //QuestionService.getPossibleFlags(flagList, param);
 
         //assert
         assertEquals(flagList, flagList);
@@ -94,7 +96,7 @@ public class QuestionServiceTest extends DBTestUtil {
         addMultipleChoiceQuestion();
 
         //act
-        QuestionService.provideQuestionRequired(1, QuestionType.MULTIPLE_CHOICE, 1);
+        QuestionService.provideQuestionRequired(1, QuestionType.MULTIPLE_CHOICE);
 
         //assert
         assertTrue(QuestionService.isQuestionRequired(1, QuestionType.MULTIPLE_CHOICE, 1));
@@ -107,10 +109,10 @@ public class QuestionServiceTest extends DBTestUtil {
         addMultipleChoiceQuestion();
 
         //act
-        String result = QuestionService.getFlags(1, QuestionType.MULTIPLE_CHOICE, 1);
+        FlagList result = FlagListService.getFlagList(1, QuestionType.MULTIPLE_CHOICE);
 
         //assert
-        assertEquals("", result);
+        AssertFlagList.equals(new FlagList(), result);
     }
 
     @Test
@@ -120,10 +122,12 @@ public class QuestionServiceTest extends DBTestUtil {
         addMultipleChoiceQuestionRequired();
 
         //act
-        String result = QuestionService.getFlags(1, QuestionType.MULTIPLE_CHOICE, 1);
+        FlagList result = FlagListService.getFlagList(1, QuestionType.MULTIPLE_CHOICE);
 
         //assert
-        assertEquals("+", result);
+        FlagList flagList = new FlagList();
+        flagList.setRequired(true);
+        AssertFlagList.equals(flagList, result);
     }
 
     @Test

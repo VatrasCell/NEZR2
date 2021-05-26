@@ -13,8 +13,8 @@ public class QuestionEditParam {
     private final boolean singleLine;
     private final boolean numeric;
     private final boolean evaluationQuestion;
-    private final String numberType;
-    private final int countChars;
+    //private final String numberType;
+    //private final int countChars;
 
     private boolean required;
 
@@ -30,8 +30,8 @@ public class QuestionEditParam {
         this.singleLine = singleLine;
         this.numeric = numeric;
         this.evaluationQuestion = evaluationQuestion;
-        this.numberType = numberType;
-        this.countChars = countChars;
+        //this.numberType = numberType;
+        //this.countChars = countChars;
     }
 
     public QuestionEditParam(ChoiceBox<String> questionTypeChoiceBox, ChoiceBox<String> numberChoice, TextField txtCountChars,
@@ -48,9 +48,8 @@ public class QuestionEditParam {
                 questionType = null;
         }
 
-        numberType = numberChoice.getSelectionModel().getSelectedItem();
-        countChars = txtCountChars.getText().equals("") ? 0 : Integer.parseInt(txtCountChars.getText());
-
+        //numberType = numberChoice.getSelectionModel().getSelectedItem();
+        //countChars = txtCountChars.getText().equals("") ? 0 : Integer.parseInt(txtCountChars.getText());
         evaluationQuestion = evaluationQuestionCheckBox.isSelected();
         required = chckbxRequired.isSelected();
         multipleChoice = chckbxMultipleChoice.isSelected();
@@ -58,7 +57,7 @@ public class QuestionEditParam {
         textArea = chckbxTextArea.isSelected();
         yesNoQuestion = chckbxYesNoQuestion.isSelected();
         singleLine = chckbxSingleLine.isSelected();
-        numeric = chckbxNumeric.isSelected();
+        numeric = false;
 
     }
 
@@ -142,13 +141,13 @@ public class QuestionEditParam {
         return numeric;
     }
 
-    public String getNumberType() {
+    /*public String getNumberType() {
         return numberType;
     }
 
     public int getCountChars() {
         return countChars;
-    }
+    }*/
 
     public boolean isEvaluationQuestion() {
         return evaluationQuestion;

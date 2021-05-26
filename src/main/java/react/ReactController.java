@@ -1,7 +1,6 @@
 package react;
 
 import application.ScreenController;
-import flag.Flag;
 import flag.FlagList;
 import flag.React;
 import javafx.beans.binding.Bindings;
@@ -72,7 +71,7 @@ public class ReactController {
         FlagList flags = question.getFlags();
         questions = QuestionListService.getQuestions(questionnaire.getId());
 
-        for (React react : flags.getAll(React.class)) {
+        for (React react : flags.getReacts()) {
             Question question = questions.get(getY(react.getQuestionId(), react.getQuestionType(), questions));
             data.add(new ReactTableElement(question, react.getAnswerPos(), react));
         }
@@ -127,15 +126,9 @@ public class ReactController {
                                 } else {
                                     btn.setOnAction(event -> {
                                         ReactTableElement reactTableElement = getTableView().getItems().get(getIndex());
-
-                                        for (int i = 0; i < question.getFlags().getAll(React.class).size(); ++i) {
-                                            //System.out.println(question.getFlags().getAll(React.class).get(i).toString() + " - " + reactTableElement.getFlag().toString());
-                                            if (question.getFlags().getAll(React.class).get(i).equals(reactTableElement.getFlag())) {
-                                                List<React> reacts = question.getFlags().getAll(React.class);
-                                                reacts.remove(i);
-                                                question.getFlags().replaceAll(React.class, reacts);
-                                            }
-                                        }
+                                        List<React> reacts = question.getFlags().getReacts();
+                                        reacts.remove(reactTableElement.getFlag());
+                                        question.getFlags().setReacts(reacts);
 
                                         data.remove(reactTableElement);
                                     });
@@ -150,8 +143,8 @@ public class ReactController {
         delCol.setCellFactory(cellFactoryDel);
         tbl_react.getColumns().add(delCol);
 
-        ObservableList<Flag> flagData = FXCollections.observableArrayList();
-        flagData.setAll(question.getFlags().getAll(React.class));
+        ObservableList<React> flagData = FXCollections.observableArrayList();
+        flagData.setAll(question.getFlags().getReacts());
         BooleanBinding invalid = Bindings.size(flagData).greaterThanOrEqualTo(MAX_COUNT_REACTIONS);
 
         btn_new.disableProperty().bind(invalid);
@@ -219,7 +212,7 @@ public class ReactController {
 
         Optional<Pair<React, ReactTableElement>> result = dialog.showAndWait();
         result.ifPresent(pair -> {
-            ReactController.question.getFlags().add(pair.getKey());
+            ReactController.question.getFlags().getReacts().add(pair.getKey());
             data.add(pair.getValue());
         });
     }

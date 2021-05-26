@@ -2,9 +2,7 @@ package start;
 
 import application.GlobalVars;
 import application.ScreenController;
-import flag.Number;
 import flag.React;
-import flag.SymbolType;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
@@ -183,16 +181,18 @@ public class StartController {
         //add reaction listener
         for (int y = 0; y < questions.size(); y++) {
 
-            List<React> reacts = questions.get(y).getFlags().getAll(React.class);
-            List<Number> numbers = questions.get(y).getFlags().getAll(Number.class);
+            List<React> reacts = questions.get(y).getFlags().getReacts();
+
+            //TODO real time validation
+            //List<Number> numbers = questions.get(y).getFlags().getAll(Number.class);
             for (React react : reacts) {
                 questions.get(y).setTarget(
                         questions.get(getY(react.getQuestionId(), react.getQuestionType(), questions)));
                 questions.get(y).setListener(react.getAnswerPos(), react.getQuestionType());
             }
-            for (Number number : numbers) {
+            /*for (Number number : numbers) {
                 questions.get(y).setListener(number);
-            }
+            }*/
         }
 
         GlobalVars.questionsPerPanel = questionsPerPanel;
@@ -215,7 +215,7 @@ public class StartController {
         if (question.getQuestionType().equals(QuestionType.SHORT_ANSWER)) {
             vBox.getChildren().add(createFFNode(question));
         } else if (question.getQuestionType().equals(QuestionType.MULTIPLE_CHOICE)) {
-            if (question.getFlags().has(SymbolType.LIST)) {
+            if (question.getFlags().isList()) {
                 vBox.getChildren().add(createMCListView(question));
             } else {
                 vBox.getChildren().add(createMCCheckboxen(question, info));
@@ -228,14 +228,14 @@ public class StartController {
     private static Label createQuestionLabel(Pane screen, Question question) {
         String questionTest = removeMark(question.getQuestion());
 
-        questionTest = addRequiredTag(questionTest, question.getFlags().has(SymbolType.REQUIRED));
+        questionTest = addRequiredTag(questionTest, question.getFlags().isRequired());
 
         Label lblFrage = new Label(questionTest);
         // System.out.println("frageObj.get(y).frageid = " +
         // frageObj.get(y).getFrageID());
         lblFrage.setId("lblFrage_" + question.getQuestionId());
 
-        if (question.getFlags().hasMCReact()) {
+        if (question.getFlags().hasMultipleChoiceReact()) {
             //lblFrage.setVisible(false);
         }
 
@@ -248,7 +248,7 @@ public class StartController {
 
     @SuppressWarnings("unchecked")
     private static <T extends Control> T createFFNode(Question question) {
-        if (question.getFlags().has(SymbolType.TEXT)) {
+        if (question.getFlags().isTextArea()) {
             // F�gt eine Textarea ein
             TextArea textArea = new TextArea(); // anneSuperNeu
             // textArea.setPreferredSize(new Dimension(200, 50));
@@ -258,7 +258,7 @@ public class StartController {
             question.setAnswersTEXT(textAreas);
             return (T) textArea;
         } else {
-            if (question.getFlags().has(SymbolType.LIST)) {
+            if (question.getFlags().isList()) {
                 // ErrorLog.fehlerBerichtB("ERROR",
                 // Datenbank.class + ": " +
                 // Thread.currentThread().getStackTrace()[1].getLineNumber(), "Fehler");
@@ -267,7 +267,7 @@ public class StartController {
                 TextField textField = new TextField();
                 // textField.setPreferredSize(new Dimension(200, 50));
 
-                if (question.getFlags().hasFFReact()) {
+                if (question.getFlags().hasShortAnswerReact()) {
                     textField.setVisible(false);
                 }
 
@@ -321,7 +321,7 @@ public class StartController {
 
         liste.setItems(FXCollections.observableArrayList(question.getAnswerOptions()));
 
-        if (question.getFlags().hasMCReact()) {
+        if (question.getFlags().hasMultipleChoiceReact()) {
             //liste.setVisible(false);
         }
 
@@ -371,11 +371,11 @@ public class StartController {
             // chckbxSda.setFont(new Font("Tahoma", Font.PLAIN, 28));
             // chckbxSda.setForeground(new Color(94, 56, 41));
 
-            if (question.getFlags().hasMCReact()) {
+            if (question.getFlags().hasMultipleChoiceReact()) {
                 chckbxSda.setVisible(false);
             }
             checkBoxen.add(chckbxSda);
-            if (!question.getFlags().has(SymbolType.MC)) {
+            if (!question.getFlags().isMultipleChoice()) {
                 chckbxSda.selectedProperty().addListener((ov, old_val, new_val) -> {
                     // System.out.println("!isMC" + ov + " - " + old_val + " - " + new_val);
                     if (new_val) {
@@ -403,7 +403,7 @@ public class StartController {
             }
 
             // set headlines for choice lists
-            if (question.getFlags().has(SymbolType.B)) {
+            if (question.getFlags().isEvaluationQuestion()) {
 
                 if (!info.hasBHeadlines()) {
                     Label label = new Label();

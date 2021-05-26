@@ -79,9 +79,9 @@ public class ExportServiceImpl extends Database implements ExportService {
     }
 
     private static boolean isFlaggedMultipleChoiceQuestion(Question question) {
-        return ((question.getQuestionType().equals(QuestionType.MULTIPLE_CHOICE)) && (question.getFlags().has(SymbolType.B)))
-                || (question.getFlags().has(SymbolType.LIST))
-                || (question.getFlags().has(SymbolType.JN));
+        return ((question.getQuestionType().equals(QuestionType.MULTIPLE_CHOICE)) && (question.getFlags().isEvaluationQuestion()))
+                || (question.getFlags().isList())
+                || (question.getFlags().isYesNoQuestion());
     }
 
     private static List<ExcelCell> getMultipleChoiceAnswerCells(int questionnaireId, int questionId, String fromDate, String toDate) {

@@ -5,9 +5,7 @@ import application.GlobalVars;
 import application.NotificationController;
 import application.ScreenController;
 import flag.FlagList;
-import flag.Number;
 import flag.React;
-import flag.SymbolType;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -206,9 +204,9 @@ public class QuestionController {
             updateCheckboxes();
         });
 
-        ObservableList<String> comparisonList = FXCollections.observableArrayList("Genau wie die Zahl", "Kleiner gleich Zahl",
+        /*ObservableList<String> comparisonList = FXCollections.observableArrayList("Genau wie die Zahl", "Kleiner gleich Zahl",
                 "Größer gleich Zahl");
-        numberChoiceBox.setItems(comparisonList);
+        numberChoiceBox.setItems(comparisonList);*/
 
         if (question.getQuestionType().equals(QuestionType.MULTIPLE_CHOICE)) {
             questionTypeChoiceBox.getSelectionModel().select(MULTIPLE_CHOICE_STRING);
@@ -216,39 +214,39 @@ public class QuestionController {
             questionTypeChoiceBox.getSelectionModel().select(SHORT_ANSWER_STRING);
         }
 
-        if (question.getFlags().has(SymbolType.B)) {
+        if (question.getFlags().isEvaluationQuestion()) {
             evaluationQuestionCheckBox.setSelected(true);
         } else {
             evaluationQuestionCheckBox.setSelected(false);
         }
 
-        if (question.getFlags().has(SymbolType.MC)) {
+        if (question.getFlags().isMultipleChoice()) {
             multipleChoiceCheckBox.setSelected(true);
         } else {
             multipleChoiceCheckBox.setSelected(false);
         }
 
-        if (question.getFlags().has(SymbolType.LIST)) {
+        if (question.getFlags().isList()) {
             listCheckBox.setSelected(true);
         } else {
             listCheckBox.setSelected(false);
         }
 
-        if (question.getFlags().has(SymbolType.TEXT)) {
+        if (question.getFlags().isTextArea()) {
             textAreaCheckBox.setSelected(true);
         } else {
             textAreaCheckBox.setSelected(false);
         }
 
-        if (question.getFlags().has(SymbolType.REQUIRED)) {
+        if (question.getFlags().isRequired()) {
             requiredQuestionCheckBox.setSelected(true);
         } else {
             requiredQuestionCheckBox.setSelected(false);
         }
 
-        if (question.getFlags().has(SymbolType.JN)) {
+        if (question.getFlags().isYesNoQuestion()) {
             yesNoCheckBox.setSelected(true);
-            if (question.getFlags().has(SymbolType.JNExcel)) {
+            if (question.getFlags().isSingleLine()) {
                 excelFormatCheckBox.setSelected(true);
             } else {
                 excelFormatCheckBox.setSelected(false);
@@ -265,9 +263,9 @@ public class QuestionController {
             }
         }
 
-        List<Number> numbers = question.getFlags().getAll(Number.class);
+        //List<Number> numbers = question.getFlags().getAll(Number.class);
 
-        if (numbers.size() > 0) {
+        /*if (numbers.size() > 0) {
             Number number = numbers.get(0);
             numberTextField.setText(String.valueOf(number.getDigits()));
             numberCheckBox.setSelected(true);
@@ -284,7 +282,7 @@ public class QuestionController {
             }
         } else {
             numberCheckBox.setSelected(false);
-        }
+        }*/
 
         updateCheckboxes();
     }
@@ -332,10 +330,10 @@ public class QuestionController {
 
         questionToSave.setPosition(positionChoiceBox.getValue());
 
-        List<React> reactList = flags.getAll(React.class);
+        List<React> reactList = flags.getReacts();
         for (React react : reactList) {
             if (param.isRequired()) {
-                QuestionService.provideQuestionRequired(questionnaire.getId(), react.getQuestionType(), react.getQuestionId());
+                QuestionService.provideQuestionRequired(questionnaire.getId(), react.getQuestionType());
             }
             if (QuestionService.isQuestionRequired(questionnaire.getId(), react.getQuestionType(), react.getQuestionId())) {
                 param.setRequired(true);
@@ -349,7 +347,7 @@ public class QuestionController {
 
         if (param.getQuestionType() == QuestionType.MULTIPLE_CHOICE) {
             if (param.isEvaluationQuestion()) {
-                QuestionService.getPossibleFlags(flags, param);
+                //QuestionService.getPossibleFlags(flags, param);
                 questionToSave.setFlags(flags);
                 QuestionService.saveEvaluationQuestion(questionnaire.getId(), questionToSave);
             } else {
@@ -387,12 +385,12 @@ public class QuestionController {
                         answer.setId(Objects.requireNonNull(QuestionService.getAnswerId(answer.getValue())))
                 );
 
-                QuestionService.getPossibleFlags(flags, param);
+                //QuestionService.getPossibleFlags(flags, param);
                 questionToSave.setFlags(flags);
                 QuestionService.saveMultipleChoice(questionnaire.getId(), questionToSave, answers);
             }
         } else {
-            QuestionService.getPossibleFlags(flags, param);
+            //QuestionService.getPossibleFlags(flags, param);
             questionToSave.setFlags(flags);
             QuestionService.saveShortAnswerQuestion(questionnaire.getId(), questionToSave);
         }
@@ -499,7 +497,7 @@ public class QuestionController {
             questionTypeChoiceBox.getSelectionModel().select(1);
         }
 
-        numberChoiceBox.setDisable(!param.isNumberTypeActivatable());
+        /*numberChoiceBox.setDisable(!param.isNumberTypeActivatable());
         if (numberChoiceBox.isDisabled()) {
             numberChoiceBox.getSelectionModel().clearSelection();
         }
@@ -507,7 +505,7 @@ public class QuestionController {
         numberTextField.setDisable(!param.isCountCharsActivatable());
         if (numberTextField.isDisabled()) {
             numberTextField.clear();
-        }
+        }*/
 
         requiredQuestionCheckBox.setDisable(!param.isRequiredActivatable());
         if (requiredQuestionCheckBox.isDisabled()) {
@@ -539,10 +537,10 @@ public class QuestionController {
             excelFormatCheckBox.setSelected(false);
         }
 
-        numberCheckBox.setDisable(!param.isNumericActivatable());
+        /*numberCheckBox.setDisable(!param.isNumericActivatable());
         if (numberCheckBox.isDisabled()) {
             numberCheckBox.setSelected(false);
-        }
+        }*/
 
         answerTable.setDisable(!param.isAnswersListActivatable());
         newAnswerButton.setDisable(!param.isAnswersListActivatable());
@@ -550,7 +548,12 @@ public class QuestionController {
 
     @FXML
     private void validation() {
-
+        try {
+            ScreenController.addScreen(SceneName.VALIDATION, getURL(SceneName.VALIDATION_PATH));
+            ScreenController.activate(SceneName.VALIDATION);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private ObservableList<Headline> createHeadlineList() {

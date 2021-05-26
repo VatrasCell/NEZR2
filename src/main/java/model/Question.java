@@ -3,7 +3,6 @@ package model;
 import application.GlobalVars;
 import flag.FlagList;
 import flag.Number;
-import flag.SymbolType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
@@ -571,7 +570,7 @@ public class Question implements Comparable<Question>, Comparator<Question> {
                     answersMC.forEach(checkBox -> checkBox.setVisible(true));
                     answersLIST.forEach(stringListView -> stringListView.setVisible(true));
 
-                    if (getFlags().has(SymbolType.B)) {
+                    if (getFlags().isEvaluationQuestion()) {
                         scene.lookup("#lblNull").setVisible(true);
                         scene.lookup("#lblEins").setVisible(true);
                         scene.lookup("#lblZehn").setVisible(true);
@@ -583,7 +582,7 @@ public class Question implements Comparable<Question>, Comparator<Question> {
                     answersMC.forEach(checkBox -> checkBox.setVisible(false));
                     answersLIST.forEach(stringListView -> stringListView.setVisible(false));
 
-                    if (getFlags().has(SymbolType.B)) {
+                    if (getFlags().isEvaluationQuestion()) {
                         scene.lookup("#lblNull").setVisible(false);
                         scene.lookup("#lblEins").setVisible(false);
                         scene.lookup("#lblZehn").setVisible(false);

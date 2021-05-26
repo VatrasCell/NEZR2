@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/10.0.2-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="validation.ValidationController">
+   <top>
+      <Label text="Validierung anpassen" BorderPane.alignment="CENTER">
+         <BorderPane.margin>
+            <Insets top="8.0" />
+         </BorderPane.margin>
+      </Label>
+   </top>
+   <bottom>
+      <HBox prefHeight="51.0" prefWidth="600.0" spacing="8.0" BorderPane.alignment="CENTER">
+         <children>
+            <Button fx:id="btn_new" mnemonicParsing="false" onAction="#createNew" text="Neu">
+               <HBox.margin>
+                  <Insets />
+               </HBox.margin>
+            </Button>
+            <Button mnemonicParsing="false" onAction="#save" text="Speichern" />
+            <Button mnemonicParsing="false" onAction="#exit" text="Abbruch" />
+         </children>
+         <BorderPane.margin>
+            <Insets left="8.0" right="8.0" />
+         </BorderPane.margin>
+         <padding>
+            <Insets bottom="8.0" top="8.0" />
+         </padding>
+      </HBox>
+   </bottom>
+   <center>
+      <VBox prefHeight="200.0" prefWidth="100.0" BorderPane.alignment="CENTER">
+         <children>
+            <FlowPane hgap="8.0" prefHeight="49.0" prefWidth="600.0">
+               <children>
+                  <RadioButton mnemonicParsing="false" text="Zahl">
+                     <toggleGroup>
+                        <ToggleGroup fx:id="toggleGroup1" />
+                     </toggleGroup></RadioButton>
+                  <RadioButton mnemonicParsing="false" text="Buchstaben" toggleGroup="$toggleGroup1" />
+                  <RadioButton mnemonicParsing="false" text="alphanumerisch" toggleGroup="$toggleGroup1" />
+                  <RadioButton mnemonicParsing="false" text="alle Zeichen" toggleGroup="$toggleGroup1" />
+                  <RadioButton mnemonicParsing="false" text="RegEx" toggleGroup="$toggleGroup1" />
+               </children>
+               <VBox.margin>
+                  <Insets top="8.0" />
+               </VBox.margin>
+               <padding>
+                  <Insets left="8.0" right="8.0" />
+               </padding>
+               <opaqueInsets>
+                  <Insets />
+               </opaqueInsets>
+            </FlowPane>
+            <GridPane>
+              <columnConstraints>
+                <ColumnConstraints hgrow="SOMETIMES" maxWidth="287.0" minWidth="10.0" prefWidth="103.0" />
+                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="287.0" minWidth="10.0" prefWidth="62.0" />
+                <ColumnConstraints hgrow="SOMETIMES" maxWidth="499.0" minWidth="10.0" prefWidth="123.0" />
+                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="499.0" minWidth="10.0" prefWidth="59.0" />
+                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="499.0" minWidth="10.0" prefWidth="107.0" />
+                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="499.0" minWidth="10.0" prefWidth="45.0" />
+                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="499.0" minWidth="10.0" prefWidth="132.0" />
+              </columnConstraints>
+              <rowConstraints>
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+              </rowConstraints>
+               <children>
+                  <TextField GridPane.columnIndex="2" />
+                  <Label alignment="CENTER" maxWidth="1.7976931348623157E308" text="min" GridPane.columnIndex="1" />
+                  <Label alignment="CENTER" maxWidth="1.7976931348623157E308" text="max" GridPane.columnIndex="3" />
+                  <TextField GridPane.columnIndex="4" />
+                  <CheckBox mnemonicParsing="false" text="Länge" />
+                  <TextField maxWidth="1.7976931348623157E308" GridPane.columnIndex="1" GridPane.columnSpan="6" GridPane.rowIndex="2" />
+                  <Label text="RegEx" GridPane.rowIndex="2" />
+                  <Label alignment="CENTER" maxWidth="1.7976931348623157E308" text="genau" GridPane.columnIndex="5" />
+                  <TextField GridPane.columnIndex="6" />
+               </children>
+               <VBox.margin>
+                  <Insets left="8.0" right="8.0" />
+               </VBox.margin>
+            </GridPane>
+         </children>
+      </VBox>
+   </center>
+</BorderPane>

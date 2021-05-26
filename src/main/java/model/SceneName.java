@@ -11,6 +11,7 @@ public class SceneName {
 	public static final String QUESTION = "question";
 	public static final String GRATITUDE = "gratitude";
 	public static final String REACT = "react";
+	public static final String VALIDATION = "validation";
 
 	public static final String SURVEY_PATH = "view/SurveyView2.fxml";
 	public static final String LOCATION_PATH = "view/LocationView.fxml";
@@ -21,4 +22,5 @@ public class SceneName {
 	public static final String QUESTION_PATH = "view/QuestionView.fxml";
 	public static final String GRATITUDE_PATH = "view/GratitudeView.fxml";
 	public static final String REACT_PATH = "view/ReactView.fxml";
+	public static final String VALIDATION_PATH = "view/ValidationView.fxml";
 }

@@ -2,7 +2,7 @@ package questionList;
 
 import application.Database;
 import application.NotificationController;
-import flag.FlagList;
+import flag.FlagListService;
 import message.MessageId;
 import model.Answer;
 import model.Headline;
@@ -24,14 +24,17 @@ import static application.SqlStatement.SQL_COLUMN_ANSWER_ID;
 import static application.SqlStatement.SQL_COLUMN_ANSWER_NAME;
 import static application.SqlStatement.SQL_COLUMN_CATEGORY_NAME;
 import static application.SqlStatement.SQL_COLUMN_CREATION_DATE;
-import static application.SqlStatement.SQL_COLUMN_FLAGS;
+import static application.SqlStatement.SQL_COLUMN_FLAG_LIST_ID;
 import static application.SqlStatement.SQL_COLUMN_HEADLINE_ID;
 import static application.SqlStatement.SQL_COLUMN_MULTIPLE_CHOICE_ID;
+import static application.SqlStatement.SQL_COLUMN_MULTIPLE_CHOICE_QUESTIONNAIRE_RELATION_ID;
 import static application.SqlStatement.SQL_COLUMN_NAME;
 import static application.SqlStatement.SQL_COLUMN_POSITION;
 import static application.SqlStatement.SQL_COLUMN_QUESTION;
 import static application.SqlStatement.SQL_COLUMN_SHORT_ANSWER_ID;
 import static application.SqlStatement.SQL_CREATE_HEADLINE;
+import static application.SqlStatement.SQL_CREATE_MULTIPLE_CHOICE_QUESTIONNAIRE_RELATION;
+import static application.SqlStatement.SQL_CREATE_SHORT_ANSWER_QUESTIONNAIRE_RELATION;
 import static application.SqlStatement.SQL_DELETE_MULTIPLE_CHOICE;
 import static application.SqlStatement.SQL_DELETE_MULTIPLE_CHOICE_ANSWERS_RELATION_BY_QUESTION_ID;
 import static application.SqlStatement.SQL_DELETE_MULTIPLE_CHOICE_QUESTIONNAIRE_RELATION;
@@ -75,7 +78,10 @@ public class QuestionListService extends Database {
                 question.setQuestionId(myRS.getInt(SQL_COLUMN_MULTIPLE_CHOICE_ID));
                 question.setCategory(QuestionService.provideCategory(myRS.getString(SQL_COLUMN_CATEGORY_NAME)));
                 question.setDate(myRS.getString(SQL_COLUMN_CREATION_DATE));
-                question.setFlags(new FlagList(myRS.getString(SQL_COLUMN_FLAGS)));
+                question.setFlags(FlagListService.getFlagList(
+                        myRS.getInt(SQL_COLUMN_FLAG_LIST_ID),
+                        myRS.getInt(SQL_COLUMN_MULTIPLE_CHOICE_QUESTIONNAIRE_RELATION_ID),
+                        QuestionType.MULTIPLE_CHOICE));
                 question.setPosition(Integer.parseInt(myRS.getString(SQL_COLUMN_POSITION)));
                 question.setQuestionType(QuestionType.MULTIPLE_CHOICE);
                 question.setAnswerOptions(QuestionService.getAnswers(question));
@@ -108,7 +114,10 @@ public class QuestionListService extends Database {
                 question.setQuestionId(myRS.getInt(SQL_COLUMN_SHORT_ANSWER_ID));
                 question.setCategory(QuestionService.provideCategory(myRS.getString(SQL_COLUMN_CATEGORY_NAME)));
                 question.setDate(myRS.getString(SQL_COLUMN_CREATION_DATE));
-                question.setFlags(new FlagList(myRS.getString(SQL_COLUMN_FLAGS)));
+                question.setFlags(FlagListService.getFlagList(
+                        myRS.getInt(SQL_COLUMN_FLAG_LIST_ID),
+                        myRS.getInt(SQL_CREATE_SHORT_ANSWER_QUESTIONNAIRE_RELATION),
+                        QuestionType.SHORT_ANSWER));
                 question.setPosition(Integer.parseInt(myRS.getString(SQL_COLUMN_POSITION)));
                 question.setQuestionType(QuestionType.SHORT_ANSWER);
                 int headlineId = myRS.getInt(SQL_COLUMN_HEADLINE_ID);
