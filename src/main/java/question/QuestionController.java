@@ -214,43 +214,19 @@ public class QuestionController {
             questionTypeChoiceBox.getSelectionModel().select(SHORT_ANSWER_STRING);
         }
 
-        if (question.getFlags().isEvaluationQuestion()) {
-            evaluationQuestionCheckBox.setSelected(true);
-        } else {
-            evaluationQuestionCheckBox.setSelected(false);
-        }
+        evaluationQuestionCheckBox.setSelected(question.getFlags().isEvaluationQuestion());
 
-        if (question.getFlags().isMultipleChoice()) {
-            multipleChoiceCheckBox.setSelected(true);
-        } else {
-            multipleChoiceCheckBox.setSelected(false);
-        }
+        multipleChoiceCheckBox.setSelected(question.getFlags().isMultipleChoice());
 
-        if (question.getFlags().isList()) {
-            listCheckBox.setSelected(true);
-        } else {
-            listCheckBox.setSelected(false);
-        }
+        listCheckBox.setSelected(question.getFlags().isList());
 
-        if (question.getFlags().isTextArea()) {
-            textAreaCheckBox.setSelected(true);
-        } else {
-            textAreaCheckBox.setSelected(false);
-        }
+        textAreaCheckBox.setSelected(question.getFlags().isTextArea());
 
-        if (question.getFlags().isRequired()) {
-            requiredQuestionCheckBox.setSelected(true);
-        } else {
-            requiredQuestionCheckBox.setSelected(false);
-        }
+        requiredQuestionCheckBox.setSelected(question.getFlags().isRequired());
 
         if (question.getFlags().isYesNoQuestion()) {
             yesNoCheckBox.setSelected(true);
-            if (question.getFlags().isSingleLine()) {
-                excelFormatCheckBox.setSelected(true);
-            } else {
-                excelFormatCheckBox.setSelected(false);
-            }
+            excelFormatCheckBox.setSelected(question.getFlags().isSingleLine());
         } else {
             yesNoCheckBox.setSelected(false);
         }
@@ -294,6 +270,21 @@ public class QuestionController {
 
     @FXML
     private void save() throws IOException {
+        if(question.getQuestionId() == 0) {
+            System.out.println("new Question");
+            saveQuestion();
+            //createQuestion();
+        } else {
+            System.out.println("update Question");
+            saveQuestion();
+        }
+    }
+
+    private void createQuestion() throws IOException {
+
+    }
+
+    private void saveQuestion() throws IOException {
         //TODO "real time" validation
         if (!checkQuestionData()) {
             NotificationController.createErrorMessage(MessageId.TITLE_SAVE_QUESTION, MessageId.MESSAGE_SAVE_QUESTION_ERROR);
