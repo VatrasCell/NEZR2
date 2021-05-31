@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import static application.SqlStatement.SQL_COLUMN_ANSWER_ID;
 import static application.SqlStatement.SQL_COLUMN_ANSWER_NAME;
@@ -82,7 +83,10 @@ public class QuestionListService extends Database {
                         QuestionType.MULTIPLE_CHOICE));
                 question.setPosition(Integer.parseInt(myRS.getString(SQL_COLUMN_POSITION)));
                 question.setQuestionType(QuestionType.MULTIPLE_CHOICE);
-                question.setAnswerOptions(QuestionService.getAnswers(question));
+                question.setAnswerOptions(
+                        QuestionService.getAnswers(question)
+                                .stream().map(Answer::getValue).collect(Collectors.toList())
+                );
                 int headlineId = myRS.getInt(SQL_COLUMN_HEADLINE_ID);
                 if (headlineId > 0) {
                     question.setHeadline(getHeadline(headlineId));

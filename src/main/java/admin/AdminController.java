@@ -75,9 +75,11 @@ public class AdminController {
     @FXML
     private TableColumn<QuestionnaireTableObject, String> dateColumn;
     @FXML
-    private final TableColumn<QuestionnaireTableObject, Boolean> activeColumn = new TableColumn<>(getColumnName(ADMIN_ACTIVE));
+    @SuppressWarnings("FieldMayBeFinal")
+    private TableColumn<QuestionnaireTableObject, Boolean> activeColumn = new TableColumn<>(getColumnName(ADMIN_ACTIVE));
     @FXML
-    private final TableColumn<QuestionnaireTableObject, Boolean> finalColumn = new TableColumn<>(getColumnName(ADMIN_FINAL));
+    @SuppressWarnings("FieldMayBeFinal")
+    private TableColumn<QuestionnaireTableObject, Boolean> finalColumn = new TableColumn<>(getColumnName(ADMIN_FINAL));
     @FXML
     private final TableColumn<QuestionnaireTableObject, String> editButtonColumn = new TableColumn<>(getColumnName(EDIT));
     @FXML

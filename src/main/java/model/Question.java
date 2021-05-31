@@ -12,6 +12,7 @@ import javafx.scene.layout.Pane;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.List;
 
 public class Question implements Comparable<Question>, Comparator<Question> {
 
@@ -30,14 +31,14 @@ public class Question implements Comparable<Question>, Comparator<Question> {
     private FlagList flags;
     private int position;
     private Headline headline;
-    private ArrayList<String> answerOptions = new ArrayList<>();
-    private ArrayList<String> answer = new ArrayList<>();
+    private List<String> answerOptions = new ArrayList<>();
+    private List<String> answer = new ArrayList<>();
     private Label questionLabel;
     private Pane scene;
-    private ArrayList<CheckBox> answersMC = new ArrayList<>();
-    private ArrayList<TextField> answersFF = new ArrayList<>();
-    private ArrayList<ListView<String>> answersLIST = new ArrayList<>();
-    private ArrayList<TextArea> answersTEXT = new ArrayList<>();
+    private List<CheckBox> answersMC = new ArrayList<>();
+    private List<TextField> answersFF = new ArrayList<>();
+    private List<ListView<String>> answersLIST = new ArrayList<>();
+    private List<TextArea> answersTEXT = new ArrayList<>();
     private Question target;
     private int questionnaireId;
 
@@ -164,14 +165,14 @@ public class Question implements Comparable<Question>, Comparator<Question> {
     /**
      * @return the answerOptions
      */
-    public ArrayList<String> getAnswerOptions() {
+    public List<String> getAnswerOptions() {
         return answerOptions;
     }
 
     /**
      * @param answerOptions the answerOptions to set
      */
-    public void setAnswerOptions(ArrayList<String> answerOptions) {
+    public void setAnswerOptions(List<String> answerOptions) {
         this.answerOptions = answerOptions;
     }
 
@@ -182,70 +183,70 @@ public class Question implements Comparable<Question>, Comparator<Question> {
     /**
      * @return the answer
      */
-    public ArrayList<String> getAnswer() {
+    public List<String> getAnswer() {
         return answer;
     }
 
     /**
      * @param answer the answer to set
      */
-    public void setAnswer(ArrayList<String> answer) {
+    public void setAnswer(List<String> answer) {
         this.answer = answer;
     }
 
     /**
      * @return the answersMC
      */
-    public ArrayList<CheckBox> getAnswersMC() {
+    public List<CheckBox> getAnswersMC() {
         return answersMC;
     }
 
     /**
      * @param answersMC the answersMC to set
      */
-    public void setAnswersMC(ArrayList<CheckBox> answersMC) {
+    public void setAnswersMC(List<CheckBox> answersMC) {
         this.answersMC = answersMC;
     }
 
     /**
      * @return the answersFF
      */
-    public ArrayList<TextField> getAnswersFF() {
+    public List<TextField> getAnswersFF() {
         return answersFF;
     }
 
     /**
      * @param answersFF the answersFF to set
      */
-    public void setAnswersFF(ArrayList<TextField> answersFF) {
+    public void setAnswersFF(List<TextField> answersFF) {
         this.answersFF = answersFF;
     }
 
     /**
      * @return the answersLIST
      */
-    public ArrayList<ListView<String>> getAnswersLIST() {
+    public List<ListView<String>> getAnswersLIST() {
         return answersLIST;
     }
 
     /**
      * @param answersLIST the answersLIST to set
      */
-    public void setAnswersLIST(ArrayList<ListView<String>> answersLIST) {
+    public void setAnswersLIST(List<ListView<String>> answersLIST) {
         this.answersLIST = answersLIST;
     }
 
     /**
      * @return the answersTEXT
      */
-    public ArrayList<TextArea> getAnswersTEXT() {
+    public List<TextArea> getAnswersTEXT() {
         return answersTEXT;
     }
 
     /**
      * @param answersTEXT the answersTEXT to set
      */
-    public void setAnswersTEXT(ArrayList<TextArea> answersTEXT) {
+    public void setAnswersTEXT(List<TextArea> answersTEXT) {
         this.answersTEXT = answersTEXT;
     }
 
