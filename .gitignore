@@ -14,3 +14,6 @@ release.properties
 dependency-reduced-pom.xml
 buildNumber.properties
 .mvn/timing.properties
+create_db.log
+create_db_error.log
+**/nezr*.trace.db
