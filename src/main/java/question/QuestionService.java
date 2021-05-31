@@ -65,7 +65,7 @@ import static application.SqlStatement.SQL_SET_POSITION_ON_SHORT_ANSWER_QUESTION
 
 public class QuestionService extends Database {
 
-    public static ArrayList<String> getAnswers(Question question) {
+    public static List<Answer> getAnswers(Question question) {
         try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
             String text = question.getQuestion();
             PreparedStatement psSql = myCon.prepareStatement(SQL_GET_ANSWERS);
@@ -73,10 +73,13 @@ public class QuestionService extends Database {
             psSql.setString(2, text);
 
             ResultSet myRS = psSql.executeQuery();
-            ArrayList<String> answers = new ArrayList<>();
+            ArrayList<Answer> answers = new ArrayList<>();
 
             while (myRS.next()) {
-                answers.add(myRS.getString(SQL_COLUMN_NAME));
+                Answer answer = new Answer();
+                answer.setId(myRS.getInt(SQL_COLUMN_ANSWER_ID));
+                answer.setValue(myRS.getString(SQL_COLUMN_NAME));
+                answers.add(answer);
             }
             return answers;
         } catch (SQLException e) {

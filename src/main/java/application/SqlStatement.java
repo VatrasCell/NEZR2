@@ -103,13 +103,13 @@ public class SqlStatement {
             "AND NOT(name='5') AND NOT(name='6') AND NOT(name='7') AND NOT(name='8') AND NOT(name='9') AND NOT(name='10')";
     public static final String SQL_GET_ANSWER_ID = "SELECT answer_id FROM answer WHERE name=?";
     public static final String SQL_CREATE_ANSWER = "INSERT INTO answer VALUES(NULL, ?)";
-    public static final String SQL_GET_ANSWERS = "SELECT answer.name FROM questionnaire JOIN "
+    public static final String SQL_GET_ANSWERS = "SELECT answer_id, answer.name FROM questionnaire JOIN "
             + "q_has_mc ON questionnaire.questionnaire_id=q_has_mc.questionnaire_id JOIN "
             + "multiple_choice mc1 ON q_has_mc.multiple_choice_id=mc1.multiple_choice_id JOIN "
             + "category ON mc1.category_id=category.category_id JOIN "
             + "mc_has_a ON mc1.multiple_choice_id=mc_has_a.multiple_choice_id JOIN "
             + "answer ON mc_has_a.answer_id=answer.answer_id WHERE mc1.question=? "
-            + "UNION SELECT answer.name FROM questionnaire JOIN "
+            + "UNION SELECT answer_id, answer.name FROM questionnaire JOIN "
             + "q_has_sa ON questionnaire.questionnaire_id=q_has_sa.questionnaire_id JOIN "
             + "short_answer ff1 ON q_has_sa.short_answer_id=ff1.short_answer_id JOIN "
             + "category ON ff1.category_id=category.category_id JOIN short_answer "

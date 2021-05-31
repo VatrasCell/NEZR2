@@ -30,6 +30,8 @@ import model.QuestionEditParam;
 import model.QuestionType;
 import model.Questionnaire;
 import model.SceneName;
+import model.tableObject.AnswerTableObject;
+import model.tableObject.converter.AnswerTableObjectConverter;
 import questionList.QuestionListService;
 import react.ReactController;
 import start.StartController;
@@ -58,7 +60,7 @@ public class QuestionController {
     public static Question question;
     public Button saveButton;
     private ArrayList<String> answers;
-    private ObservableList<Answer> data = FXCollections.observableArrayList();
+    private final ObservableList<AnswerTableObject> data = FXCollections.observableArrayList();
 
     @FXML
     private Label questionLabel;
@@ -103,28 +105,25 @@ public class QuestionController {
     private Button newAnswerButton;
 
     @FXML
-    private TableView<Answer> answerTable;
+    private TableView<AnswerTableObject> answerTable;
     @FXML
-    private TableColumn<Answer, String> answerIdTableColumn;
+    private TableColumn<AnswerTableObject, String> answerIdTableColumn;
     @FXML
-    private TableColumn<Answer, String> answerValueTableColumn;
+    private TableColumn<AnswerTableObject, String> answerValueTableColumn;
     @FXML
-    private TableColumn<Answer, String> editButtonColumn = new TableColumn<>(getColumnName(EDIT));
+    private final TableColumn<AnswerTableObject, String> editButtonColumn = new TableColumn<>(getColumnName(EDIT));
     @FXML
-    private TableColumn<Answer, String> deleteButtonColumn = new TableColumn<>(getColumnName(DELETE));
+    private final TableColumn<AnswerTableObject, String> deleteButtonColumn = new TableColumn<>(getColumnName(DELETE));
 
     /**
      * The constructor (is called before the initialize()-method).
      */
     public QuestionController() {
         // fuer die Generierung der Antwortentabelle
-        answers = QuestionService.getAnswers(question);
-        for (int i = 0; i < Objects.requireNonNull(answers).size(); ++i) {
-            Answer answer = new Answer();
-            answer.setId(i + 1);
-            answer.setValue(answers.get(i));
-            data.add(answer);
-        }
+        data.clear();
+        List<AnswerTableObject> tableObjects =
+                AnswerTableObjectConverter.convert(Objects.requireNonNull(QuestionService.getAnswers(question)));
+        data.addAll(Objects.requireNonNull(tableObjects));
     }
 
     /**
@@ -270,7 +269,7 @@ public class QuestionController {
 
     @FXML
     private void save() throws IOException {
-        if(question.getQuestionId() == 0) {
+        if (question.getQuestionId() == 0) {
             System.out.println("new Question");
             saveQuestion();
             //createQuestion();
@@ -408,7 +407,7 @@ public class QuestionController {
             Answer answer = new Answer();
             answer.setId(data.size() + 1);
             answer.setValue(name);
-            data.add(answer);
+            data.add(AnswerTableObjectConverter.convert(answer));
 
             NotificationController.createMessage(MessageId.TITLE_CREATE_ANSWER, MessageId.MESSAGE_CREATE_ANSWER, name);
         });

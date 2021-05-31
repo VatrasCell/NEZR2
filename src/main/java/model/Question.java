@@ -19,6 +19,8 @@ public class Question implements Comparable<Question>, Comparator<Question> {
     public static final String CATEGORY = "category";
     public static final String POSITION = "position";
     public static final String QUESTION_TYPE = "questionType";
+    public static String EDIT = "edit";
+    public static String DELETE = "delete";
 
     private String question;
     private int questionId;

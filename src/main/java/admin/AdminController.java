@@ -36,6 +36,8 @@ import message.DialogId;
 import message.MessageId;
 import model.Questionnaire;
 import model.SceneName;
+import model.tableObject.QuestionnaireTableObject;
+import model.tableObject.converter.QuestionnaireTableObjectConverter;
 import org.controlsfx.validation.ValidationSupport;
 import org.controlsfx.validation.Validator;
 import questionList.QuestionListController;
@@ -43,7 +45,7 @@ import start.StartController;
 
 import java.io.IOException;
 import java.time.LocalDate;
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
@@ -63,38 +65,38 @@ import static message.TableColumnNameId.EDIT;
 
 public class AdminController {
 
-    private static ObservableList<Questionnaire> data = FXCollections.observableArrayList();
+    private static final ObservableList<QuestionnaireTableObject> data = FXCollections.observableArrayList();
 
     public Button btn_loc;
     @FXML
-    private TableView<Questionnaire> questionnaireTableView;
+    private TableView<QuestionnaireTableObject> questionnaireTableView;
     @FXML
-    private TableColumn<Questionnaire, String> nameColumn;
+    private TableColumn<QuestionnaireTableObject, String> nameColumn;
     @FXML
-    private TableColumn<Questionnaire, String> dateColumn;
+    private TableColumn<QuestionnaireTableObject, String> dateColumn;
     @FXML
-    private TableColumn<Questionnaire, Boolean> activeColumn = new TableColumn<>(getColumnName(ADMIN_ACTIVE));
+    private final TableColumn<QuestionnaireTableObject, Boolean> activeColumn = new TableColumn<>(getColumnName(ADMIN_ACTIVE));
     @FXML
-    private TableColumn<Questionnaire, Boolean> finalColumn = new TableColumn<>(getColumnName(ADMIN_FINAL));
+    private final TableColumn<QuestionnaireTableObject, Boolean> finalColumn = new TableColumn<>(getColumnName(ADMIN_FINAL));
     @FXML
-    private TableColumn<Questionnaire, String> editButtonColumn = new TableColumn<>(getColumnName(EDIT));
+    private final TableColumn<QuestionnaireTableObject, String> editButtonColumn = new TableColumn<>(getColumnName(EDIT));
     @FXML
-    private TableColumn<Questionnaire, String> copyButtonColumn = new TableColumn<>(getColumnName(ADMIN_COPY));
+    private final TableColumn<QuestionnaireTableObject, String> copyButtonColumn = new TableColumn<>(getColumnName(ADMIN_COPY));
     @FXML
-    private TableColumn<Questionnaire, String> renameButtonColumn = new TableColumn<>(getColumnName(ADMIN_RENAME));
+    private final TableColumn<QuestionnaireTableObject, String> renameButtonColumn = new TableColumn<>(getColumnName(ADMIN_RENAME));
     @FXML
-    private TableColumn<Questionnaire, String> sqlExportButtonColumn = new TableColumn<>(getColumnName(ADMIN_SQL_EXPORT));
+    private final TableColumn<QuestionnaireTableObject, String> sqlExportButtonColumn = new TableColumn<>(getColumnName(ADMIN_SQL_EXPORT));
     @FXML
-    private TableColumn<Questionnaire, String> xlsExportButtonColumn = new TableColumn<>(getColumnName(ADMIN_XLS_EXPORT));
+    private final TableColumn<QuestionnaireTableObject, String> xlsExportButtonColumn = new TableColumn<>(getColumnName(ADMIN_XLS_EXPORT));
     @FXML
-    private TableColumn<Questionnaire, String> deleteButtonColumn = new TableColumn<>(getColumnName(DELETE));
+    private final TableColumn<QuestionnaireTableObject, String> deleteButtonColumn = new TableColumn<>(getColumnName(DELETE));
 
     /**
      * The constructor (is called before the initialize()-method).
      */
     public AdminController() {
         getData();
-        data.addListener((ListChangeListener<Questionnaire>) change -> {
+        data.addListener((ListChangeListener<QuestionnaireTableObject>) change -> {
             change.next();
             if (questionnaireTableView != null) {
                 questionnaireTableView.refresh();
@@ -104,8 +106,9 @@ public class AdminController {
 
     private static void getData() {
         data.clear();
-        ArrayList<Questionnaire> questionnaires = AdminService.getQuestionnaires(GlobalVars.location);
-        data.addAll(Objects.requireNonNull(questionnaires));
+        List<QuestionnaireTableObject> tableObjects =
+                QuestionnaireTableObjectConverter.convert(Objects.requireNonNull(AdminService.getQuestionnaires(GlobalVars.location)));
+        data.addAll(Objects.requireNonNull(tableObjects));
     }
 
     /**

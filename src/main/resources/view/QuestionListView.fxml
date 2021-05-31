@@ -17,12 +17,12 @@
       </AnchorPane>
    </bottom>
    <center>
-      <TableView fx:id="tbl_fragen" prefHeight="200.0" prefWidth="417.0" BorderPane.alignment="CENTER">
+      <TableView fx:id="questionTable" prefHeight="200.0" prefWidth="417.0" BorderPane.alignment="CENTER">
         <columns>
-          <TableColumn fx:id="nameCol" prefWidth="100.0" text="Frage" />
-          <TableColumn fx:id="katCol" prefWidth="108.0" text="Kategorie" />
-            <TableColumn fx:id="posCol" prefWidth="95.0" text="Position" />
-            <TableColumn fx:id="artCol" prefWidth="82.0" text="Art" />
+          <TableColumn fx:id="nameColumn" prefWidth="100.0" text="Frage" />
+          <TableColumn fx:id="categoryColumn" prefWidth="108.0" text="Kategorie" />
+            <TableColumn fx:id="positionColumn" prefWidth="95.0" text="Position" />
+            <TableColumn fx:id="questionTypeColumn" prefWidth="82.0" text="Art" />
         </columns>
          <columnResizePolicy>
             <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
