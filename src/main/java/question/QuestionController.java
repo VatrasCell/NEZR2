@@ -20,6 +20,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.GridPane;
 import message.DialogId;
 import message.MessageId;
 import model.Answer;
@@ -67,8 +68,6 @@ public class QuestionController {
 
     @FXML
     private TextField questionTextField;
-    @FXML
-    private TextField numberTextField;
 
     @FXML
     private ChoiceBox<Integer> positionChoiceBox;
@@ -76,8 +75,6 @@ public class QuestionController {
     private ChoiceBox<Category> categoryChoiceBox;
     @FXML
     private ChoiceBox<String> questionTypeChoiceBox;
-    @FXML
-    private ChoiceBox<String> numberChoiceBox;
     @FXML
     private ChoiceBox<Headline> headlineChoiceBox;
 
@@ -97,17 +94,16 @@ public class QuestionController {
     @FXML
     private CheckBox excelFormatCheckBox;
     @FXML
-    private CheckBox numberCheckBox;
-    @FXML
     private CheckBox evaluationQuestionCheckBox;
+
+    @FXML
+    private GridPane formGridPane;
 
     @FXML
     private Button newAnswerButton;
 
     @FXML
     private TableView<AnswerTableObject> answerTable;
-    @FXML
-    private TableColumn<AnswerTableObject, String> answerIdTableColumn;
     @FXML
     private TableColumn<AnswerTableObject, String> answerValueTableColumn;
     @FXML
@@ -126,30 +122,10 @@ public class QuestionController {
         data.addAll(Objects.requireNonNull(tableObjects));
     }
 
-    /**
-     * Initializes the controller class. This method is automatically called after
-     * the fxml file has been loaded.
-     */
-    @FXML
-    private void initialize() {
-        answerTable.setItems(data);
-
-        answerIdTableColumn.setCellValueFactory(new PropertyValueFactory<>(Answer.ID));
-        answerValueTableColumn.setCellValueFactory(new PropertyValueFactory<>(Answer.VALUE));
-
-        editButtonColumn.setCellValueFactory(new PropertyValueFactory<>(Questionnaire.EDIT));
-        answerTable.getColumns().add(editButtonColumn);
-
-        deleteButtonColumn.setCellValueFactory(new PropertyValueFactory<>(Questionnaire.DELETE));
-        answerTable.getColumns().add(deleteButtonColumn);
-
-        fillScene();
-    }
-
     public static Button initEditButton(Answer answer) {
         ImageView imgView = new ImageView(GlobalVars.IMG_EDT);
-        imgView.setFitHeight(30);
-        imgView.setFitWidth(30);
+        imgView.setFitHeight(20);
+        imgView.setFitWidth(20);
         Button button = new Button("", imgView);
         button.setOnAction(event -> {
             //TODO edit Antwort
@@ -160,14 +136,38 @@ public class QuestionController {
 
     public static Button initDeleteButton(Answer answer) {
         ImageView imgView = new ImageView(GlobalVars.IMG_DEL);
-        imgView.setFitHeight(30);
-        imgView.setFitWidth(30);
+        imgView.setFitHeight(20);
+        imgView.setFitWidth(20);
         Button button = new Button("", imgView);
         button.setOnAction(event -> {
             //TODO delete Antwort
         });
 
         return button;
+    }
+
+    /**
+     * Initializes the controller class. This method is automatically called after
+     * the fxml file has been loaded.
+     */
+    @FXML
+    private void initialize() {
+
+        //TODO debug only
+        //formGridPane.setGridLinesVisible(true);
+
+        answerTable.setItems(data);
+
+        //answerIdTableColumn.setCellValueFactory(new PropertyValueFactory<>(Answer.ID));
+        answerValueTableColumn.setCellValueFactory(new PropertyValueFactory<>(Answer.VALUE));
+
+        editButtonColumn.setCellValueFactory(new PropertyValueFactory<>(Questionnaire.EDIT));
+        answerTable.getColumns().add(editButtonColumn);
+
+        deleteButtonColumn.setCellValueFactory(new PropertyValueFactory<>(Questionnaire.DELETE));
+        answerTable.getColumns().add(deleteButtonColumn);
+
+        fillScene();
     }
 
     private void fillScene() {
@@ -203,10 +203,6 @@ public class QuestionController {
             updateCheckboxes();
         });
 
-        /*ObservableList<String> comparisonList = FXCollections.observableArrayList("Genau wie die Zahl", "Kleiner gleich Zahl",
-                "Größer gleich Zahl");
-        numberChoiceBox.setItems(comparisonList);*/
-
         if (question.getQuestionType().equals(QuestionType.MULTIPLE_CHOICE)) {
             questionTypeChoiceBox.getSelectionModel().select(MULTIPLE_CHOICE_STRING);
         } else {
@@ -237,27 +233,6 @@ public class QuestionController {
                 }
             }
         }
-
-        //List<Number> numbers = question.getFlags().getAll(Number.class);
-
-        /*if (numbers.size() > 0) {
-            Number number = numbers.get(0);
-            numberTextField.setText(String.valueOf(number.getDigits()));
-            numberCheckBox.setSelected(true);
-            switch (number.getOperator()) {
-                case EQ:
-                    numberChoiceBox.getSelectionModel().select("Genau wie die Zahl");
-                    break;
-                case LTE:
-                    numberChoiceBox.getSelectionModel().select("Kleiner gleich Zahl");
-                    break;
-                case GTE:
-                    numberChoiceBox.getSelectionModel().select("Größer gleich Zahl");
-                    break;
-            }
-        } else {
-            numberCheckBox.setSelected(false);
-        }*/
 
         updateCheckboxes();
     }
@@ -297,9 +272,8 @@ public class QuestionController {
 
         FlagList flags = question.getFlags();
 
-        QuestionEditParam param = new QuestionEditParam(questionTypeChoiceBox, numberChoiceBox, numberTextField,
-                requiredQuestionCheckBox, evaluationQuestionCheckBox, multipleChoiceCheckBox, listCheckBox, textAreaCheckBox,
-                yesNoCheckBox, excelFormatCheckBox, numberCheckBox);
+        QuestionEditParam param = new QuestionEditParam(questionTypeChoiceBox, requiredQuestionCheckBox, evaluationQuestionCheckBox,
+                multipleChoiceCheckBox, listCheckBox, textAreaCheckBox, yesNoCheckBox, excelFormatCheckBox);
 
         questionToSave.setQuestionType(param.getQuestionType());
 
@@ -478,28 +452,23 @@ public class QuestionController {
 
     @FXML
     private void updateCheckboxes() {
-        QuestionEditParam param = new QuestionEditParam(questionTypeChoiceBox, numberChoiceBox, numberTextField,
+        QuestionEditParam param = new QuestionEditParam(questionTypeChoiceBox,
                 requiredQuestionCheckBox, evaluationQuestionCheckBox, multipleChoiceCheckBox,
-                listCheckBox, textAreaCheckBox, yesNoCheckBox, excelFormatCheckBox, numberCheckBox);
+                listCheckBox, textAreaCheckBox, yesNoCheckBox, excelFormatCheckBox);
 
         questionTypeChoiceBox.setDisable(!param.isQuestionTypeActivatable());
         if (questionTypeChoiceBox.isDisabled()) {
             questionTypeChoiceBox.getSelectionModel().select(1);
         }
 
-        /*numberChoiceBox.setDisable(!param.isNumberTypeActivatable());
-        if (numberChoiceBox.isDisabled()) {
-            numberChoiceBox.getSelectionModel().clearSelection();
-        }
-
-        numberTextField.setDisable(!param.isCountCharsActivatable());
-        if (numberTextField.isDisabled()) {
-            numberTextField.clear();
-        }*/
-
         requiredQuestionCheckBox.setDisable(!param.isRequiredActivatable());
         if (requiredQuestionCheckBox.isDisabled()) {
             requiredQuestionCheckBox.setSelected(false);
+        }
+
+        evaluationQuestionCheckBox.setDisable(!param.isEvaluationQuestionActivatable());
+        if (evaluationQuestionCheckBox.isDisabled()) {
+            evaluationQuestionCheckBox.setSelected(false);
         }
 
         multipleChoiceCheckBox.setDisable(!param.isMultipleChoiceActivatable());
@@ -526,11 +495,6 @@ public class QuestionController {
         if (excelFormatCheckBox.isDisabled()) {
             excelFormatCheckBox.setSelected(false);
         }
-
-        /*numberCheckBox.setDisable(!param.isNumericActivatable());
-        if (numberCheckBox.isDisabled()) {
-            numberCheckBox.setSelected(false);
-        }*/
 
         answerTable.setDisable(!param.isAnswersListActivatable());
         newAnswerButton.setDisable(!param.isAnswersListActivatable());

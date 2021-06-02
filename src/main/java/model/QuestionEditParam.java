@@ -2,7 +2,6 @@ package model;
 
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.TextField;
 
 public class QuestionEditParam {
     private final QuestionType questionType;
@@ -13,8 +12,6 @@ public class QuestionEditParam {
     private final boolean singleLine;
     private final boolean numeric;
     private final boolean evaluationQuestion;
-    //private final String numberType;
-    //private final int countChars;
 
     private boolean required;
 
@@ -30,13 +27,11 @@ public class QuestionEditParam {
         this.singleLine = singleLine;
         this.numeric = numeric;
         this.evaluationQuestion = evaluationQuestion;
-        //this.numberType = numberType;
-        //this.countChars = countChars;
     }
 
-    public QuestionEditParam(ChoiceBox<String> questionTypeChoiceBox, ChoiceBox<String> numberChoice, TextField txtCountChars,
-                             CheckBox chckbxRequired, CheckBox evaluationQuestionCheckBox, CheckBox chckbxMultipleChoice, CheckBox chckbxList, CheckBox chckbxTextArea,
-                             CheckBox chckbxYesNoQuestion, CheckBox chckbxSingleLine, CheckBox chckbxNumeric) {
+    public QuestionEditParam(ChoiceBox<String> questionTypeChoiceBox, CheckBox chckbxRequired, CheckBox evaluationQuestionCheckBox,
+                             CheckBox chckbxMultipleChoice, CheckBox chckbxList, CheckBox chckbxTextArea,
+                             CheckBox chckbxYesNoQuestion, CheckBox chckbxSingleLine) {
         switch (questionTypeChoiceBox.getSelectionModel().getSelectedItem()) {
             case "Multiple Choice":
                 questionType = QuestionType.MULTIPLE_CHOICE;
@@ -48,8 +43,6 @@ public class QuestionEditParam {
                 questionType = null;
         }
 
-        //numberType = numberChoice.getSelectionModel().getSelectedItem();
-        //countChars = txtCountChars.getText().equals("") ? 0 : Integer.parseInt(txtCountChars.getText());
         evaluationQuestion = evaluationQuestionCheckBox.isSelected();
         required = chckbxRequired.isSelected();
         multipleChoice = chckbxMultipleChoice.isSelected();
@@ -58,7 +51,6 @@ public class QuestionEditParam {
         yesNoQuestion = chckbxYesNoQuestion.isSelected();
         singleLine = chckbxSingleLine.isSelected();
         numeric = false;
-
     }
 
     public boolean isQuestionTypeActivatable() {
@@ -71,6 +63,10 @@ public class QuestionEditParam {
 
     public boolean isListActivatable() {
         return questionType.equals(QuestionType.MULTIPLE_CHOICE);
+    }
+
+    public boolean isEvaluationQuestionActivatable() {
+        return !yesNoQuestion && !multipleChoice && !textArea && !singleLine && !numeric && questionType.equals(QuestionType.MULTIPLE_CHOICE);
     }
 
     public boolean isMultipleChoiceActivatable() {
@@ -87,18 +83,6 @@ public class QuestionEditParam {
 
     public boolean isSingleLineActivatable() {
         return yesNoQuestion && isYesNoQuestionActivatable();
-    }
-
-    public boolean isNumericActivatable() {
-        return !textArea && !multipleChoice && !list && !yesNoQuestion && !singleLine && questionType.equals(QuestionType.SHORT_ANSWER);
-    }
-
-    public boolean isNumberTypeActivatable() {
-        return isNumericActivatable();
-    }
-
-    public boolean isCountCharsActivatable() {
-        return isNumericActivatable();
     }
 
     public boolean isAnswersListActivatable() {
@@ -121,33 +105,9 @@ public class QuestionEditParam {
         return list;
     }
 
-    public boolean isMultipleChoice() {
-        return multipleChoice;
-    }
-
-    public boolean isTextArea() {
-        return textArea;
-    }
-
     public boolean isYesNoQuestion() {
         return yesNoQuestion;
     }
-
-    public boolean isSingleLine() {
-        return singleLine;
-    }
-
-    public boolean isNumeric() {
-        return numeric;
-    }
-
-    /*public String getNumberType() {
-        return numberType;
-    }
-
-    public int getCountChars() {
-        return countChars;
-    }*/
 
     public boolean isEvaluationQuestion() {
         return evaluationQuestion;
