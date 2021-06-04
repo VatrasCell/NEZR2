@@ -76,8 +76,8 @@ public class ScriptRunner {
         this.connection = connection;
         this.autoCommit = autoCommit;
         this.stopOnError = stopOnError;
-        File logFile = new File("create_db.log");
-        File errorLogFile = new File("create_db_error.log");
+        File logFile = new File("src/test/resources/db/log/create_db.log");
+        File errorLogFile = new File("src/test/resources/db/log/create_db_error.log");
         try {
             if (logFile.exists()) {
                 logWriter = new PrintWriter(new FileWriter(logFile, true));
@@ -96,7 +96,7 @@ public class ScriptRunner {
         } catch (IOException e) {
             System.err.println("Unable to access or create the db_create error log");
         }
-        String timeStamp = new SimpleDateFormat("dd/mm/yyyy HH:mm:ss").format(new java.util.Date());
+        String timeStamp = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new java.util.Date());
         println("\n-------\n" + timeStamp + "\n-------\n");
         printlnError("\n-------\n" + timeStamp + "\n-------\n");
     }

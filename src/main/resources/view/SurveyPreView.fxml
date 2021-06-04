@@ -9,17 +9,24 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
-<StackPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="survey.SurveyController">
+<StackPane xmlns:fx="http://javafx.com/fxml/1" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
+           minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/11.0.1"
+           fx:controller="survey.SurveyController">
    <children>
       <AnchorPane prefHeight="200.0" prefWidth="200.0">
          <children>
-            <ImageView fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true" smooth="false" AnchorPane.rightAnchor="15.0" AnchorPane.topAnchor="15.0">
+            <ImageView fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true" smooth="false"
+                       AnchorPane.rightAnchor="15.0" AnchorPane.topAnchor="15.0">
                <image>
-                  <Image url="@../images/img/logo_default.png" />
+                  <Image url="@../images/img/logo_default.png"/>
                </image>
             </ImageView>
-            <ProgressBar fx:id="progressBar" layoutX="100.0" layoutY="15.0" prefHeight="25.0" prefWidth="159.0" progress="0.0" AnchorPane.leftAnchor="100.0" AnchorPane.rightAnchor="100.0" AnchorPane.topAnchor="15.0" />
-            <Label fx:id="lbl_count" alignment="CENTER" layoutX="270.0" layoutY="48.0" text="Frage xx/xx" textAlignment="CENTER" AnchorPane.leftAnchor="270.0" AnchorPane.rightAnchor="270.0" AnchorPane.topAnchor="48.0" />
+            <ProgressBar fx:id="progressBar" layoutX="100.0" layoutY="15.0" prefHeight="25.0" prefWidth="159.0"
+                         progress="0.0" AnchorPane.leftAnchor="100.0" AnchorPane.rightAnchor="100.0"
+                         AnchorPane.topAnchor="15.0"/>
+            <Label fx:id="lbl_count" alignment="CENTER" layoutX="270.0" layoutY="48.0" text="Frage xx/xx"
+                   textAlignment="CENTER" AnchorPane.leftAnchor="270.0" AnchorPane.rightAnchor="270.0"
+                   AnchorPane.topAnchor="48.0"/>
             <Label fx:id="lbl_headline" alignment="CENTER" layoutX="228.0" layoutY="73.0" prefHeight="17.0" prefWidth="144.0" textAlignment="CENTER" AnchorPane.leftAnchor="228.0" AnchorPane.rightAnchor="228.0" AnchorPane.topAnchor="73.0">
                <font>
                   <Font name="System Bold" size="12.0" />

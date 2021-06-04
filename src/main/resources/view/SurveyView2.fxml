@@ -10,17 +10,20 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
-<StackPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="survey.SurveyController">
+<StackPane xmlns:fx="http://javafx.com/fxml/1" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
+           minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/11.0.1"
+           fx:controller="survey.SurveyController">
    <children>
-      <Pane fx:id="pane" prefHeight="200.0" prefWidth="200.0" />
+      <Pane fx:id="pane" prefHeight="200.0" prefWidth="200.0"/>
       <BorderPane prefHeight="200.0" prefWidth="200.0">
          <center>
-            <VBox fx:id="vbox" alignment="TOP_CENTER" BorderPane.alignment="CENTER" />
+            <VBox fx:id="vbox" alignment="TOP_CENTER" BorderPane.alignment="CENTER"/>
          </center>
          <bottom>
             <AnchorPane prefHeight="70.0" prefWidth="600.0" BorderPane.alignment="CENTER">
                <children>
-                  <Button layoutX="14.0" layoutY="361.0" mnemonicParsing="false" onAction="#exit" text="X" textAlignment="CENTER" AnchorPane.bottomAnchor="15.0" AnchorPane.leftAnchor="15.0" />
+                  <Button layoutX="14.0" layoutY="361.0" mnemonicParsing="false" onAction="#exit" text="X"
+                          textAlignment="CENTER" AnchorPane.bottomAnchor="15.0" AnchorPane.leftAnchor="15.0"/>
                   <Button layoutX="527.0" layoutY="356.0" mnemonicParsing="false" onAction="#next" text="&gt;" textAlignment="CENTER" AnchorPane.bottomAnchor="15.0" AnchorPane.rightAnchor="15.0" />
                   <Button layoutX="537.0" layoutY="366.0" mnemonicParsing="false" onAction="#pre" text="&lt;" textAlignment="CENTER" AnchorPane.bottomAnchor="15.0" AnchorPane.rightAnchor="80.0" />
                </children>
