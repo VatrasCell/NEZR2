@@ -1,15 +1,15 @@
 package model.tableObject;
 
 import javafx.scene.control.Button;
-import model.Answer;
+import model.AnswerOption;
 import question.QuestionController;
 
-public class AnswerTableObject extends Answer {
+public class AnswerOptionTableObject extends AnswerOption {
 
     private Button edit;
     private Button delete;
 
-    public AnswerTableObject() {
+    public AnswerOptionTableObject() {
         edit = QuestionController.initEditButton(this);
         delete = QuestionController.initDeleteButton(this);
     }

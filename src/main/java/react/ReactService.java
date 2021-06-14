@@ -33,7 +33,8 @@ public class ReactService extends Database {
             while (myRS.next()) {
                 React react = new React(
                         myRS.getInt(SQL_COLUMN_REACT_ID),
-                        questionType,
+                        myRS.getInt(SQL_COLUMN_SHORT_ANSWER_ID) != 0 ?
+                                QuestionType.SHORT_ANSWER : QuestionType.MULTIPLE_CHOICE,
                         myRS.getInt(SQL_COLUMN_SHORT_ANSWER_ID) != 0 ?
                                 myRS.getInt(SQL_COLUMN_SHORT_ANSWER_ID) : myRS.getInt(SQL_COLUMN_MULTIPLE_CHOICE_ID),
                         myRS.getInt(SQL_COLUMN_ANSWER_POSITION));

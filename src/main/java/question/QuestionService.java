@@ -5,7 +5,7 @@ import application.NotificationController;
 import flag.FlagList;
 import flag.FlagListService;
 import message.MessageId;
-import model.Answer;
+import model.AnswerOption;
 import model.Category;
 import model.Headline;
 import model.Question;
@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import static application.SqlStatement.SQL_COLUMN_ANSWER_ID;
+import static application.SqlStatement.SQL_COLUMN_ANSWER_OPTION_ID;
 import static application.SqlStatement.SQL_COLUMN_CATEGORY_ID;
 import static application.SqlStatement.SQL_COLUMN_CATEGORY_NAME;
 import static application.SqlStatement.SQL_COLUMN_MULTIPLE_CHOICE_ANSWER_RELATION_ID;
@@ -39,11 +39,12 @@ import static application.SqlStatement.SQL_CREATE_MULTIPLE_CHOICE_ANSWERS_RELATI
 import static application.SqlStatement.SQL_CREATE_MULTIPLE_CHOICE_QUESTIONNAIRE_RELATION;
 import static application.SqlStatement.SQL_CREATE_SHORT_ANSWER;
 import static application.SqlStatement.SQL_CREATE_SHORT_ANSWER_QUESTIONNAIRE_RELATION;
-import static application.SqlStatement.SQL_DELETE_ANSWERS;
 import static application.SqlStatement.SQL_DELETE_MULTIPLE_CHOICE_ANSWERS_RELATION;
 import static application.SqlStatement.SQL_DELETE_MULTIPLE_CHOICE_ANSWERS_RELATION_BY_ID;
-import static application.SqlStatement.SQL_GET_ANSWERS;
+import static application.SqlStatement.SQL_DELETE_UNBINDED_ANSWERS;
 import static application.SqlStatement.SQL_GET_ANSWER_ID;
+import static application.SqlStatement.SQL_GET_ANSWER_OPTION;
+import static application.SqlStatement.SQL_GET_ANSWER_OPTIONS;
 import static application.SqlStatement.SQL_GET_CATEGORIES;
 import static application.SqlStatement.SQL_GET_CATEGORY_BY_NAME;
 import static application.SqlStatement.SQL_GET_MAX_MULTIPLE_CHOICE_POSITION;
@@ -65,54 +66,58 @@ import static application.SqlStatement.SQL_SET_POSITION_ON_SHORT_ANSWER_QUESTION
 
 public class QuestionService extends Database {
 
-    public static List<Answer> getAnswers(Question question) {
+    public static List<AnswerOption> getAnswerOptions(int questionId) {
         try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
-            String text = question.getQuestion();
-            PreparedStatement psSql = myCon.prepareStatement(SQL_GET_ANSWERS);
-            psSql.setString(1, text);
-            psSql.setString(2, text);
+            PreparedStatement psSql = myCon.prepareStatement(SQL_GET_ANSWER_OPTIONS);
+            psSql.setInt(1, questionId);
 
             ResultSet myRS = psSql.executeQuery();
-            ArrayList<Answer> answers = new ArrayList<>();
+            ArrayList<AnswerOption> answerOptions = new ArrayList<>();
 
             while (myRS.next()) {
-                Answer answer = new Answer();
-                answer.setId(myRS.getInt(SQL_COLUMN_ANSWER_ID));
-                answer.setValue(myRS.getString(SQL_COLUMN_NAME));
-                answers.add(answer);
+                AnswerOption answerOption = new AnswerOption();
+                answerOption.setId(myRS.getInt(SQL_COLUMN_ANSWER_OPTION_ID));
+                answerOption.setValue(myRS.getString(SQL_COLUMN_NAME));
+                answerOptions.add(answerOption);
             }
-            return answers;
+            return answerOptions;
         } catch (SQLException e) {
             e.printStackTrace();
         }
         return null;
     }
 
+    public static AnswerOption getAnswerOption(String name) {
+        try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
+            PreparedStatement psSql = myCon.prepareStatement(SQL_GET_ANSWER_OPTION);
+            psSql.setString(1, name);
+
+            ResultSet myRS = psSql.executeQuery();
+
+            if (myRS.next()) {
+                AnswerOption answerOption = new AnswerOption();
+                answerOption.setId(myRS.getInt(SQL_COLUMN_ANSWER_OPTION_ID));
+                answerOption.setValue(myRS.getString(SQL_COLUMN_NAME));
+                return answerOption;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+
     public static int getCountPosition(int questionnaireId) {
-        int maxPosMc = Objects.requireNonNull(getMaxMultipleChoicePosition(questionnaireId));
-        int maxPosFf = Objects.requireNonNull(getMaxShortAnswerPosition(questionnaireId));
+        int maxPosMc = Objects.requireNonNull(getMaxPosition(questionnaireId, QuestionType.MULTIPLE_CHOICE));
+        int maxPosFf = Objects.requireNonNull(getMaxPosition(questionnaireId, QuestionType.SHORT_ANSWER));
 
         return Math.max(maxPosFf, maxPosMc);
     }
 
-    private static Integer getMaxMultipleChoicePosition(int questionnaireId) {
+    private static Integer getMaxPosition(int questionnaireId, QuestionType questionType) {
         try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
-            PreparedStatement psSql = myCon.prepareStatement(SQL_GET_MAX_MULTIPLE_CHOICE_POSITION);
-            psSql.setInt(1, questionnaireId);
-            ResultSet myRS = psSql.executeQuery();
-
-            if (myRS.next()) {
-                return myRS.getInt(SQL_COLUMN_POSITION);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    private static Integer getMaxShortAnswerPosition(int questionnaireId) {
-        try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
-            PreparedStatement psSql = myCon.prepareStatement(SQL_GET_MAX_SHORT_ANSWER_POSITION);
+            PreparedStatement psSql = myCon.prepareStatement(questionType.equals(QuestionType.MULTIPLE_CHOICE) ?
+                    SQL_GET_MAX_MULTIPLE_CHOICE_POSITION : SQL_GET_MAX_SHORT_ANSWER_POSITION);
             psSql.setInt(1, questionnaireId);
             ResultSet myRS = psSql.executeQuery();
 
@@ -286,7 +291,7 @@ public class QuestionService extends Database {
         }
     }
 
-    public static void saveMultipleChoice(int questionnaireId, Question question, ArrayList<Answer> answers) {
+    public static void saveMultipleChoice(int questionnaireId, Question question, ArrayList<AnswerOption> answerOptions) {
 
         // category
         Category category = provideCategory(question.getCategory().getName());
@@ -306,12 +311,12 @@ public class QuestionService extends Database {
         List<Integer> oldRelationIds = getMultipleChoiceAnswersRelationIds(Objects.requireNonNull(multipleChoiceId));
         List<Integer> newRelationIds = new ArrayList<>();
 
-        for (Answer answer : answers) {
-            Integer relationId = getMultipleChoiceAnswersRelationId(multipleChoiceId, answer.getId());
+        for (AnswerOption answerOption : answerOptions) {
+            Integer relationId = getMultipleChoiceAnswersRelationId(multipleChoiceId, answerOption.getId());
             if (relationId != null) {
                 newRelationIds.add(relationId);
             } else {
-                createMultipleChoiceAnswersRelation(multipleChoiceId, answer.getId());
+                createMultipleChoiceAnswersRelation(multipleChoiceId, answerOption.getId());
             }
         }
 
@@ -390,7 +395,7 @@ public class QuestionService extends Database {
             deleteMultipleChoiceAnswersRelation(answerId, multipleChoiceId);
         }
 
-        deleteAnswers();
+        deleteUnbindedAnswers();
     }
 
     public static void createUniqueCategory(String category) {
@@ -725,10 +730,10 @@ public class QuestionService extends Database {
         }
     }
 
-    public static void deleteAnswers() {
+    public static void deleteUnbindedAnswers() {
         try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
             Statement mySQL = myCon.createStatement();
-            mySQL.execute(SQL_DELETE_ANSWERS);
+            mySQL.execute(SQL_DELETE_UNBINDED_ANSWERS);
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -741,7 +746,7 @@ public class QuestionService extends Database {
             ResultSet myRS = psSql.executeQuery();
 
             if (myRS.next()) {
-                return myRS.getInt(SQL_COLUMN_ANSWER_ID);
+                return myRS.getInt(SQL_COLUMN_ANSWER_OPTION_ID);
             }
         } catch (SQLException e) {
             e.printStackTrace();

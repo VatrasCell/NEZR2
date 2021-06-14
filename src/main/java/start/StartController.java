@@ -25,6 +25,7 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.TextAlignment;
 import login.LoginController;
+import model.AnswerOption;
 import model.Category;
 import model.PanelInfo;
 import model.Question;
@@ -253,9 +254,7 @@ public class StartController {
             TextArea textArea = new TextArea(); // anneSuperNeu
             // textArea.setPreferredSize(new Dimension(200, 50));
             // allePanel.get(z).add(textArea, "span, center");
-            ArrayList<TextArea> textAreas = new ArrayList<>();
-            textAreas.add(textArea);
-            question.setAnswersTEXT(textAreas);
+            question.setAnswerTextArea(textArea);
             return (T) textArea;
         } else {
             if (question.getFlags().isList()) {
@@ -272,9 +271,7 @@ public class StartController {
                 }
 
                 // allePanel.get(z).add(textField, "wrap, span, center");
-                ArrayList<TextField> textFields = new ArrayList<>();
-                textFields.add(textField);
-                question.setAnswersFF(textFields);
+                question.setAnswerTextField(textField);
                 return (T) textField;
             }
         }
@@ -282,20 +279,19 @@ public class StartController {
         return null;
     }
 
-    private static ListView<String> createMCListView(Question question) {
+    private static ListView<AnswerOption> createMCListView(Question question) {
         // Erstellt eine Liste
-        ArrayList<ListView<String>> antwortenLIST = new ArrayList<>();
         // scrollPane.getVerticalScrollBar().setUI(new MyScrollBarUI());
         // allePanel.get(z).add(scrollPane, "span, center");
-        ListView<String> liste = new ListView<>();
-        liste.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+        ListView<AnswerOption> answerOptionListView = new ListView<>();
+        answerOptionListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
-        liste.setCellFactory(lv -> {
-            ListCell<String> cell = new ListCell<String>() {
+        answerOptionListView.setCellFactory(lv -> {
+            ListCell<AnswerOption> cell = new ListCell<>() {
                 @Override
-                protected void updateItem(String item, boolean empty) {
+                protected void updateItem(AnswerOption item, boolean empty) {
                     super.updateItem(item, empty);
-                    setText(empty ? null : item);
+                    setText(empty ? null : item.getValue());
                 }
             };
 
@@ -305,13 +301,13 @@ public class StartController {
                 }
 
                 int index = cell.getIndex();
-                if (liste.getSelectionModel().getSelectedIndices().contains(index)) {
-                    liste.getSelectionModel().clearSelection(index);
+                if (answerOptionListView.getSelectionModel().getSelectedIndices().contains(index)) {
+                    answerOptionListView.getSelectionModel().clearSelection(index);
                 } else {
-                    liste.getSelectionModel().select(index);
+                    answerOptionListView.getSelectionModel().select(index);
                 }
 
-                liste.requestFocus();
+                answerOptionListView.requestFocus();
 
                 e.consume();
             });
@@ -319,15 +315,14 @@ public class StartController {
             return cell;
         });
 
-        liste.setItems(FXCollections.observableArrayList(question.getAnswerOptions()));
+        answerOptionListView.setItems(FXCollections.observableArrayList(question.getAnswerOptions()));
 
         if (question.getFlags().hasMultipleChoiceReact()) {
-            //liste.setVisible(false);
+            //answerOptionListView.setVisible(false);
         }
 
-        antwortenLIST.add(liste);
-        question.setAnswersLIST(antwortenLIST);
-        return liste;
+        question.setAnswerOptionListView(answerOptionListView);
+        return answerOptionListView;
     }
 
     private static HBox createMCCheckboxen(Question question, PanelInfo info) {
@@ -352,10 +347,10 @@ public class StartController {
         for (int count3 = 0; count3 < question.getAnswerOptions().size(); count3++) {
 
             // Erstellt eine Checkbox
-            String antwort = question.getAnswerOptions().get(count3);
+            AnswerOption answerOption = question.getAnswerOptions().get(count3);
 
-            String antwortAnzeige = "";
-            if (antwort.length() >= 25) {
+            String answerString = "";
+            if (answerOption.getValue().length() >= 25) {
 //				int index = antwort.indexOf(" ", 11);
 //				if (index != -1) {
 //					char[] string = antwort.toCharArray();
@@ -364,10 +359,11 @@ public class StartController {
 //					antwortAnzeige = antwort;
 //				}
             } else {
-                antwortAnzeige = antwort;
+                answerString = answerOption.getValue();
             }
 
-            CheckBox chckbxSda = new CheckBox(antwortAnzeige);
+            CheckBox chckbxSda = new CheckBox(answerString);
+            chckbxSda.setUserData(answerOption);
             // chckbxSda.setFont(new Font("Tahoma", Font.PLAIN, 28));
             // chckbxSda.setForeground(new Color(94, 56, 41));
 
@@ -459,7 +455,7 @@ public class StartController {
         }
 
         info.setbHeadlines(true);
-        question.setAnswersMC(checkBoxes);
+        question.setAnswerCheckBoxes(checkBoxes);
         return hBox;
     }
 

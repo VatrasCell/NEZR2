@@ -5,9 +5,9 @@ import java.io.IOException;
 
 public class Database {
 
-    protected final static String DB_NAME = "nezr_v7"; // Datenbankname
-    protected final static String DB_TEST_NAME = "nezr_v7_test"; // Datenbankname
-    protected final static String RESET_DB_SCRIPT = "datenbank_v7.2.sql"; // Datenbankname
+    protected final static String DB_NAME = "nezr_v8"; // Datenbankname
+    protected final static String DB_TEST_NAME = "nezr_v8_test"; // Datenbankname
+    protected final static String RESET_DB_SCRIPT = "datenbank_v8.sql"; // Datenbankname
     protected final static String LOCATIONS = "locations.sql";
     protected final static String CATEGORIES = "categories.sql";
     protected final static String QUESTIONNAIRE_1 = "questionnaire_1.sql";

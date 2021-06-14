@@ -2,7 +2,7 @@ package model;
 
 import java.util.Objects;
 
-public class Answer {
+public class AnswerOption {
 
     public static final String ID = "id";
     public static final String VALUE = "value";
@@ -10,10 +10,10 @@ public class Answer {
     private int id;
     private String value;
 
-    public Answer() {
+    public AnswerOption() {
     }
 
-    public Answer(String value) {
+    public AnswerOption(String value) {
         this.value = value;
     }
 
@@ -37,9 +37,8 @@ public class Answer {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Answer answer = (Answer) o;
-        return getId() == answer.getId() &&
-                Objects.equals(getValue(), answer.getValue());
+        AnswerOption answerOption = (AnswerOption) o;
+        return getId() == answerOption.getId() && Objects.equals(getValue(), answerOption.getValue());
     }
 
     @Override
@@ -49,7 +48,7 @@ public class Answer {
 
     @Override
     public String toString() {
-        return "Answer{" +
+        return "AnswerOption{" +
                 "id=" + id +
                 ", value='" + value + '\'' +
                 '}';

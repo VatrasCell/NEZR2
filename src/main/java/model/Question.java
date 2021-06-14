@@ -31,14 +31,14 @@ public class Question implements Comparable<Question>, Comparator<Question> {
     private FlagList flags;
     private int position;
     private Headline headline;
-    private List<String> answerOptions = new ArrayList<>();
-    private List<String> answer = new ArrayList<>();
+    SubmittedAnswer submittedAnswer;
+    private List<AnswerOption> answerOptions = new ArrayList<>();
     private Label questionLabel;
     private Pane scene;
-    private List<CheckBox> answersMC = new ArrayList<>();
-    private List<TextField> answersFF = new ArrayList<>();
-    private List<ListView<String>> answersLIST = new ArrayList<>();
-    private List<TextArea> answersTEXT = new ArrayList<>();
+    private List<CheckBox> answerCheckBoxes = new ArrayList<>();
+    private TextField answerTextField;
+    private ListView<AnswerOption> answerOptionListView;
+    private TextArea answerTextArea;
     private Question target;
     private int questionnaireId;
 
@@ -165,89 +165,89 @@ public class Question implements Comparable<Question>, Comparator<Question> {
     /**
      * @return the answerOptions
      */
-    public List<String> getAnswerOptions() {
+    public List<AnswerOption> getAnswerOptions() {
         return answerOptions;
     }
 
     /**
      * @param answerOptions the answerOptions to set
      */
-    public void setAnswerOptions(List<String> answerOptions) {
+    public void setAnswerOptions(List<AnswerOption> answerOptions) {
         this.answerOptions = answerOptions;
     }
 
-    public void addAnswerOption(String answerOption) {
+    public void addAnswerOption(AnswerOption answerOption) {
         this.answerOptions.add(answerOption);
     }
 
     /**
      * @return the answer
      */
-    public List<String> getAnswer() {
-        return answer;
+    public SubmittedAnswer getSubmittedAnswer() {
+        return submittedAnswer;
     }
 
     /**
-     * @param answer the answer to set
+     * @param submittedAnswer the answer to set
      */
-    public void setAnswer(List<String> answer) {
-        this.answer = answer;
+    public void setSubmittedAnswer(SubmittedAnswer submittedAnswer) {
+        this.submittedAnswer = submittedAnswer;
     }
 
     /**
      * @return the answersMC
      */
-    public List<CheckBox> getAnswersMC() {
-        return answersMC;
+    public List<CheckBox> getAnswerCheckBoxes() {
+        return answerCheckBoxes;
     }
 
     /**
-     * @param answersMC the answersMC to set
+     * @param answerCheckBoxes the answersMC to set
      */
-    public void setAnswersMC(List<CheckBox> answersMC) {
-        this.answersMC = answersMC;
+    public void setAnswerCheckBoxes(List<CheckBox> answerCheckBoxes) {
+        this.answerCheckBoxes = answerCheckBoxes;
     }
 
     /**
      * @return the answersFF
      */
-    public List<TextField> getAnswersFF() {
-        return answersFF;
+    public TextField getAnswerTextField() {
+        return answerTextField;
     }
 
     /**
-     * @param answersFF the answersFF to set
+     * @param answerTextField the answersFF to set
      */
-    public void setAnswersFF(List<TextField> answersFF) {
-        this.answersFF = answersFF;
+    public void setAnswerTextField(TextField answerTextField) {
+        this.answerTextField = answerTextField;
     }
 
     /**
      * @return the answersLIST
      */
-    public List<ListView<String>> getAnswersLIST() {
-        return answersLIST;
+    public ListView<AnswerOption> getAnswerOptionListView() {
+        return answerOptionListView;
     }
 
     /**
-     * @param answersLIST the answersLIST to set
+     * @param answerOptionListView the answersLIST to set
      */
-    public void setAnswersLIST(List<ListView<String>> answersLIST) {
-        this.answersLIST = answersLIST;
+    public void setAnswerOptionListView(ListView<AnswerOption> answerOptionListView) {
+        this.answerOptionListView = answerOptionListView;
     }
 
     /**
      * @return the answersTEXT
      */
-    public List<TextArea> getAnswersTEXT() {
-        return answersTEXT;
+    public TextArea getAnswerTextArea() {
+        return answerTextArea;
     }
 
     /**
-     * @param answersTEXT the answersTEXT to set
+     * @param answerTextArea the answersTEXT to set
      */
-    public void setAnswersTEXT(List<TextArea> answersTEXT) {
-        this.answersTEXT = answersTEXT;
+    public void setAnswerTextArea(TextArea answerTextArea) {
+        this.answerTextArea = answerTextArea;
     }
 
     /**
@@ -331,12 +331,12 @@ public class Question implements Comparable<Question>, Comparator<Question> {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + ((answer == null) ? 0 : answer.hashCode());
+        result = prime * result + ((submittedAnswer == null) ? 0 : submittedAnswer.hashCode());
         result = prime * result + ((answerOptions == null) ? 0 : answerOptions.hashCode());
-        result = prime * result + ((answersFF == null) ? 0 : answersFF.hashCode());
-        result = prime * result + ((answersLIST == null) ? 0 : answersLIST.hashCode());
-        result = prime * result + ((answersMC == null) ? 0 : answersMC.hashCode());
-        result = prime * result + ((answersTEXT == null) ? 0 : answersTEXT.hashCode());
+        result = prime * result + ((answerTextField == null) ? 0 : answerTextField.hashCode());
+        result = prime * result + ((answerOptionListView == null) ? 0 : answerOptionListView.hashCode());
+        result = prime * result + ((answerCheckBoxes == null) ? 0 : answerCheckBoxes.hashCode());
+        result = prime * result + ((answerTextArea == null) ? 0 : answerTextArea.hashCode());
         result = prime * result + ((questionType == null) ? 0 : questionType.hashCode());
         result = prime * result + ((date == null) ? 0 : date.hashCode());
         result = prime * result + ((flags == null) ? 0 : flags.hashCode());
@@ -364,35 +364,35 @@ public class Question implements Comparable<Question>, Comparator<Question> {
         if (getClass() != obj.getClass())
             return false;
         Question other = (Question) obj;
-        if (answer == null) {
-            if (other.answer != null)
+        if (submittedAnswer == null) {
+            if (other.submittedAnswer != null)
                 return false;
-        } else if (!answer.equals(other.answer))
+        } else if (!submittedAnswer.equals(other.submittedAnswer))
             return false;
         if (answerOptions == null) {
             if (other.answerOptions != null)
                 return false;
         } else if (!answerOptions.equals(other.answerOptions))
             return false;
-        if (answersFF == null) {
-            if (other.answersFF != null)
+        if (answerTextField == null) {
+            if (other.answerTextField != null)
                 return false;
-        } else if (!answersFF.equals(other.answersFF))
+        } else if (!answerTextField.equals(other.answerTextField))
             return false;
-        if (answersLIST == null) {
-            if (other.answersLIST != null)
+        if (answerOptionListView == null) {
+            if (other.answerOptionListView != null)
                 return false;
-        } else if (!answersLIST.equals(other.answersLIST))
+        } else if (!answerOptionListView.equals(other.answerOptionListView))
             return false;
-        if (answersMC == null) {
-            if (other.answersMC != null)
+        if (answerCheckBoxes == null) {
+            if (other.answerCheckBoxes != null)
                 return false;
-        } else if (!answersMC.equals(other.answersMC))
+        } else if (!answerCheckBoxes.equals(other.answerCheckBoxes))
             return false;
-        if (answersTEXT == null) {
-            if (other.answersTEXT != null)
+        if (answerTextArea == null) {
+            if (other.answerTextArea != null)
                 return false;
-        } else if (!answersTEXT.equals(other.answersTEXT))
+        } else if (!answerTextArea.equals(other.answerTextArea))
             return false;
         if (questionType == null) {
             if (other.questionType != null)
@@ -453,34 +453,33 @@ public class Question implements Comparable<Question>, Comparator<Question> {
 
     public void setListener(Number number) {
 
-        TextField textField = answersFF.get(0);
-        textField.textProperty().addListener((observable, oldValue, newValue) -> {
+        answerTextField.textProperty().addListener((observable, oldValue, newValue) -> {
             System.out.println("textfield changed from " + oldValue + " to " + newValue);
-            if (textField.getText().equals("")) {
+            if (answerTextField.getText().equals("")) {
                 GlobalVars.everythingIsAwesome = true;
             } else {
                 int i = number.getDigits();
                 switch (number.getOperator()) {
                     case EQ:
                         try {
-                            Integer.parseInt(textField.getText());
-                            GlobalVars.everythingIsAwesome = textField.getText().length() == i;
+                            Integer.parseInt(answerTextField.getText());
+                            GlobalVars.everythingIsAwesome = answerTextField.getText().length() == i;
                         } catch (NumberFormatException e) {
                             GlobalVars.everythingIsAwesome = false;
                         }
                         break;
                     case LTE:
                         try {
-                            Integer.parseInt(textField.getText());
-                            GlobalVars.everythingIsAwesome = textField.getText().length() <= i;
+                            Integer.parseInt(answerTextField.getText());
+                            GlobalVars.everythingIsAwesome = answerTextField.getText().length() <= i;
                         } catch (NumberFormatException e) {
                             GlobalVars.everythingIsAwesome = false;
                         }
                         break;
                     case GTE:
                         try {
-                            Integer.parseInt(textField.getText());
-                            GlobalVars.everythingIsAwesome = textField.getText().length() >= i;
+                            Integer.parseInt(answerTextField.getText());
+                            GlobalVars.everythingIsAwesome = answerTextField.getText().length() >= i;
                         } catch (NumberFormatException e) {
                             GlobalVars.everythingIsAwesome = false;
                         }
@@ -564,14 +563,14 @@ public class Question implements Comparable<Question>, Comparator<Question> {
      */
     public void setListener(int index, QuestionType type) {
         if (type.equals(QuestionType.MULTIPLE_CHOICE)) {
-            CheckBox checkbox = target.answersMC.get(index);
+            CheckBox checkbox = target.answerCheckBoxes.get(index);
             checkbox.selectedProperty().addListener((ov, old_val, new_val) -> {
                 if (checkbox.isSelected()) {
                     scene.lookup("#lblFrage_" + getQuestionId()).setVisible(true);
 
-                    answersFF.forEach(textField -> textField.setVisible(true));
-                    answersMC.forEach(checkBox -> checkBox.setVisible(true));
-                    answersLIST.forEach(stringListView -> stringListView.setVisible(true));
+                    answerTextField.setVisible(true);
+                    answerCheckBoxes.forEach(checkBox -> checkBox.setVisible(true));
+                    answerOptionListView.setVisible(true);
 
                     if (getFlags().isEvaluationQuestion()) {
                         scene.lookup("#lblNull").setVisible(true);
@@ -581,9 +580,9 @@ public class Question implements Comparable<Question>, Comparator<Question> {
                 } else {
                     scene.lookup("#lblFrage_" + getQuestionId()).setVisible(false);
 
-                    answersFF.forEach(textField -> textField.setVisible(false));
-                    answersMC.forEach(checkBox -> checkBox.setVisible(false));
-                    answersLIST.forEach(stringListView -> stringListView.setVisible(false));
+                    answerTextField.setVisible(false);
+                    answerCheckBoxes.forEach(checkBox -> checkBox.setVisible(false));
+                    answerOptionListView.setVisible(false);
 
                     if (getFlags().isEvaluationQuestion()) {
                         scene.lookup("#lblNull").setVisible(false);
@@ -594,23 +593,23 @@ public class Question implements Comparable<Question>, Comparator<Question> {
             });
         } else if (type.equals(QuestionType.SHORT_ANSWER)) {
 
-            TextField targetTextField = target.answersFF.get(index);
+            TextField targetTextField = target.answerTextField;
             targetTextField.textProperty().addListener((observable, oldValue, newValue) -> {
                 // System.out.println("textfield changed from " + oldValue + " to " + newValue);
                 if (targetTextField.getText().equals("")) {
                     scene.lookup("#lblFrage_" + getQuestionId()).setVisible(true);
 
-                    answersFF.forEach(textField -> textField.setVisible(true));
-                    answersMC.forEach(checkBox -> checkBox.setVisible(true));
-                    answersLIST.forEach(stringListView -> stringListView.setVisible(true));
+                    answerTextField.setVisible(true);
+                    answerCheckBoxes.forEach(checkBox -> checkBox.setVisible(true));
+                    answerOptionListView.setVisible(true);
 
                 } else {
                     // System.out.println(getFrageID() + " " + target.getFrageID());
                     scene.lookup("#lblFrage_" + getQuestionId()).setVisible(false);
 
-                    answersFF.forEach(textField -> textField.setVisible(false));
-                    answersMC.forEach(checkBox -> checkBox.setVisible(false));
-                    answersLIST.forEach(stringListView -> stringListView.setVisible(false));
+                    answerTextField.setVisible(false);
+                    answerCheckBoxes.forEach(checkBox -> checkBox.setVisible(false));
+                    answerOptionListView.setVisible(false);
                 }
             });
 			/*

@@ -19,13 +19,13 @@ public class QuestionTableObjectConverter {
         tableObject.setPosition(question.getPosition());
         tableObject.setHeadline(question.getHeadline());
         tableObject.setAnswerOptions(question.getAnswerOptions());
-        tableObject.setAnswer(question.getAnswer());
+        tableObject.setSubmittedAnswer(question.getSubmittedAnswer());
         tableObject.setQuestionLabel(question.getQuestionLabel());
         tableObject.setScene(question.getScene());
-        tableObject.setAnswersMC(question.getAnswersMC());
-        tableObject.setAnswersFF(question.getAnswersFF());
-        tableObject.setAnswersLIST(question.getAnswersLIST());
-        tableObject.setAnswersTEXT(question.getAnswersTEXT());
+        tableObject.setAnswerCheckBoxes(question.getAnswerCheckBoxes());
+        tableObject.setAnswerTextField(question.getAnswerTextField());
+        tableObject.setAnswerOptionListView(question.getAnswerOptionListView());
+        tableObject.setAnswerTextArea(question.getAnswerTextArea());
         tableObject.setTarget(question.getTarget());
         tableObject.setQuestionnaireId(question.getQuestionnaireId());
 

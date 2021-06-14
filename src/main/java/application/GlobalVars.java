@@ -19,6 +19,7 @@ public class GlobalVars {
     public static int page = 0;
     public static int countPanel;
     public static List<ArrayList<Question>> questionsPerPanel = new ArrayList<>();
+    //TODO real time validation
     public static boolean everythingIsAwesome = true;
     public static List<String> locations;
 

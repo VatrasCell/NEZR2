@@ -3,7 +3,7 @@ package export.impl;
 import application.Database;
 import export.ExcelCell;
 import export.ExportService;
-import flag.SymbolType;
+import model.AnswerOption;
 import model.Question;
 import model.QuestionType;
 
@@ -15,6 +15,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static application.SqlStatement.SQL_COLUMN_ANSWER;
 import static application.SqlStatement.SQL_COLUMN_NAME;
 import static application.SqlStatement.SQL_COLUMN_SURVEY_ID;
 import static application.SqlStatement.SQL_COLUMN_SURVEY_ID_COUNT;
@@ -48,13 +49,13 @@ public class ExportServiceImpl extends Database implements ExportService {
         return excelCells;
     }
 
-    public static ArrayList<ExcelCell> getAnswerPositions(Question question, String answer, String fromDate, String toDate) {
+    public static ArrayList<ExcelCell> getAnswerPositions(Question question, AnswerOption answerOption, String fromDate, String toDate) {
         ArrayList<ExcelCell> excelCells = new ArrayList<>();
         try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
             PreparedStatement psSql = myCon.prepareStatement(SQL_GET_MULTIPLE_CHOICE_SURVEY_ID_BY_ANSWER);
             psSql.setInt(1, question.getQuestionnaireId());
             psSql.setInt(2, question.getQuestionId());
-            psSql.setString(3, answer);
+            psSql.setInt(3, answerOption.getId());
             psSql.setString(4, fromDate);
             psSql.setString(5, toDate);
             ResultSet myRS = psSql.executeQuery();
@@ -127,7 +128,7 @@ public class ExportServiceImpl extends Database implements ExportService {
             ArrayList<String> answers = new ArrayList<>();
             while (myRS.next()) {
                 int newId = myRS.getInt(SQL_COLUMN_SURVEY_ID);
-                answers.add(myRS.getString(SQL_COLUMN_NAME));
+                answers.add(myRS.getString(SQL_COLUMN_ANSWER));
                 if (oldId != newId) {
                     answers = new ArrayList<>();
                     excelCells.add(new ExcelCell(newId, answers));

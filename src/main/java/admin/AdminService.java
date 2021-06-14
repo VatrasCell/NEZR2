@@ -3,8 +3,7 @@ package admin;
 import application.Database;
 import application.GlobalFuncs;
 import application.GlobalVars;
-import flag.SymbolType;
-import model.Answer;
+import model.AnswerOption;
 import model.Question;
 import model.QuestionType;
 import model.Questionnaire;
@@ -103,15 +102,9 @@ public class AdminService extends Database {
                 if (question.getFlags().isEvaluationQuestion()) {
                     QuestionService.saveEvaluationQuestion(questionnaire.getId(), question);
                 } else {
-                    ArrayList<Answer> answers = new ArrayList<>();
-                    for (String answerValue : question.getAnswerOptions()) {
-                        Answer answer = new Answer();
-                        answer.setId(QuestionService.provideAnswerId(answerValue));
-                        answer.setValue(answerValue);
-                        answers.add(answer);
-
-                    }
-                    QuestionService.saveMultipleChoice(questionnaire.getId(), question, answers);
+                    ArrayList<AnswerOption> answerOptions = new ArrayList<>();
+                    answerOptions.addAll(question.getAnswerOptions());
+                    QuestionService.saveMultipleChoice(questionnaire.getId(), question, answerOptions);
                 }
             }
         }

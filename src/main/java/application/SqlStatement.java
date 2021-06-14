@@ -87,39 +87,30 @@ public class SqlStatement {
     public static final String SQL_CREATE_SURVEY = "INSERT INTO survey VALUES(NULL, CURDATE(), ?)";
     public static final String SQL_GET_MAX_SURVEY_ID = "SELECT MAX(survey_id) FROM survey";
     public static final String SQL_GET_SURVEY_COUNT = "SELECT COUNT(survey_id) FROM survey";
-    public static final String SQL_GET_MULTIPLE_CHOICE_SURVEY_ID_AND_ANSWER = "SELECT s.survey_id, a.name FROM answer a JOIN s_has_mc rel ON a.answer_id = rel.answer_id JOIN survey s ON rel.survey_id = s.survey_id WHERE questionnaire_id=? AND multiple_choice_id=? AND (s.creation_date BETWEEN ? AND ?)";
-    public static final String SQL_GET_SHORT_ANSWER_SURVEY_ID_AND_ANSWER = "SELECT s.survey_id, a.name FROM answer a JOIN s_has_sa rel ON a.answer_id = rel.answer_id JOIN survey s ON rel.survey_id = s.survey_id WHERE questionnaire_id=? AND short_answer_id=? AND (s.creation_date BETWEEN ? AND ?)";
-    public static final String SQL_GET_MULTIPLE_CHOICE_SURVEY_ID_BY_ANSWER = "SELECT s.survey_id FROM answer a JOIN s_has_mc rel ON a.answer_id = rel.answer_id JOIN survey s ON rel.survey_id = s.survey_id WHERE questionnaire_id=? AND multiple_choice_id=? AND a.name=? AND (s.creation_date BETWEEN ? AND ?)";
+    public static final String SQL_GET_MULTIPLE_CHOICE_SURVEY_ID_AND_ANSWER = "SELECT s.survey_id AS survey_id, ao.name AS name FROM survey s JOIN s_has_mc smc ON s.survey_id = smc.survey_id JOIN s_has_ao sao ON smc.s_mc_relation_id = sao.s_has_mc_id JOIN answer_option ao ON sao.answer_option_id = ao.answer_option_id WHERE s.questionnaire_id=? AND smc.multiple_choice_id=? AND (s.creation_date BETWEEN ? AND ?)";
+    public static final String SQL_GET_SHORT_ANSWER_SURVEY_ID_AND_ANSWER = "SELECT s.survey_id AS survey_id, ssa.answer AS answer FROM survey s JOIN s_has_sa ssa ON s.survey_id = ssa.survey_id WHERE s.questionnaire_id=? AND ssa.short_answer_id=? AND (s.creation_date BETWEEN ? AND ?)";
+    public static final String SQL_GET_MULTIPLE_CHOICE_SURVEY_ID_BY_ANSWER = "SELECT s.survey_id AS survey_id FROM survey s JOIN s_has_mc smc ON s.survey_id = smc.survey_id JOIN s_has_ao sao ON smc.s_mc_relation_id = sao.s_has_mc_id WHERE s.questionnaire_id=? AND smc.multiple_choice_id=? AND sao.answer_option_id=? AND (s.creation_date BETWEEN ? AND ?)";
 
     public static final String SQL_COLUMN_SURVEY_ID = "survey_id";
+    public static final String SQL_COLUMN_ANSWER = "answer";
     public static final String SQL_COLUMN_SURVEY_ID_COUNT = String.format(SQL_COUNT, SQL_COLUMN_SURVEY_ID);
     public static final String SQL_COLUMN_SURVEY_ID_MAX = String.format(SQL_MAX, SQL_COLUMN_SURVEY_ID);
 
     //Table answer
-    public static final String SQL_DELETE_ANSWERS = "DELETE FROM answer WHERE answer_id NOT IN (SELECT answer_id FROM mc_has_a) " +
+    public static final String SQL_DELETE_UNBINDED_ANSWERS = "DELETE FROM answer WHERE answer_id NOT IN (SELECT answer_id FROM mc_has_a) " +
             "AND NOT IN (SELECT answer_id FROM sa_has_a) " +
             "AND NOT(name='ja') AND NOT(name='nein') " +
             "AND NOT(name='#####') AND NOT(name='0') AND NOT(name='1') AND NOT(name='2') AND NOT(name='3') AND NOT(name='4') " +
             "AND NOT(name='5') AND NOT(name='6') AND NOT(name='7') AND NOT(name='8') AND NOT(name='9') AND NOT(name='10')";
     public static final String SQL_GET_ANSWER_ID = "SELECT answer_id FROM answer WHERE name=?";
     public static final String SQL_CREATE_ANSWER = "INSERT INTO answer VALUES(NULL, ?)";
-    public static final String SQL_GET_ANSWERS = "SELECT answer.answer_id, answer.name FROM questionnaire JOIN "
-            + "q_has_mc ON questionnaire.questionnaire_id=q_has_mc.questionnaire_id JOIN "
-            + "multiple_choice mc1 ON q_has_mc.multiple_choice_id=mc1.multiple_choice_id JOIN "
-            + "category ON mc1.category_id=category.category_id JOIN "
-            + "mc_has_a ON mc1.multiple_choice_id=mc_has_a.multiple_choice_id JOIN "
-            + "answer ON mc_has_a.answer_id=answer.answer_id WHERE mc1.question=? "
-            + "UNION SELECT answer.answer_id, answer.name FROM questionnaire JOIN "
-            + "q_has_sa ON questionnaire.questionnaire_id=q_has_sa.questionnaire_id JOIN "
-            + "short_answer ff1 ON q_has_sa.short_answer_id=ff1.short_answer_id JOIN "
-            + "category ON ff1.category_id=category.category_id JOIN short_answer "
-            + "JOIN sa_has_a ON ff1.short_answer_id=sa_has_a.short_answer_id JOIN "
-            + "answer ON sa_has_a.answer_id=answer.answer_id WHERE ff1.question=?";
+    public static final String SQL_GET_ANSWER_OPTIONS = "SELECT ao.answer_option_id AS answer_option_id, ao.name FROM answer_option ao JOIN mc_has_ao rel ON ao.answer_option_id = rel.answer_option_id WHERE multiple_choice_id = ?";
+    public static final String SQL_GET_ANSWER_OPTION = "SELECT * FROM answer_option WHERE name = ?";
     public static final String SQL_GET_MULTIPLE_CHOICE_QUESTION_ANSWERS = "SELECT answer.answer_id, answer.name FROM q_has_mc JOIN multiple_choice mc ON q_has_mc.multiple_choice_id=mc.multiple_choice_id JOIN mc_has_a ON mc.multiple_choice_id=mc_has_a.multiple_choice_id JOIN answer "
             + "ON mc_has_a.answer_id=answer.answer_id WHERE mc.multiple_choice_id=? AND q_has_mc.questionnaire_id=?";
 
-    public static final String SQL_COLUMN_ANSWER_ID = "answer_id";
-    public static final String SQL_COLUMN_ANSWER_NAME = "answer.name";
+    public static final String SQL_COLUMN_ANSWER_OPTION_ID = "answer_option_id";
+    public static final String SQL_COLUMN_ANSWER_OPTION_NAME = "ao.name";
 
     //Table mc_has_a
     public static final String SQL_GET_MULTIPLE_CHOICE_ANSWERS_RELATION_IDS = "SELECT mc_a_relation_id FROM mc_has_a WHERE multiple_choice_id=?";
@@ -135,11 +126,19 @@ public class SqlStatement {
     public static final String SQL_DELETE_SHORT_ANSWER_HAS_ANSWERS_RELATION_BY_QUESTION_ID = "DELETE FROM sa_has_a WHERE short_answer_id=?";
 
     //Table s_has_mc
-    public static final String SQL_GET_SURVEY_HAS_MULTIPLE_CHOICE_RELATION_ID = "SELECT s_mc_relation_id FROM s_has_mc WHERE survey_id=? AND multiple_choice_id=? AND answer_id=?";
-    public static final String SQL_CREATE_SURVEY_HAS_MULTIPLE_CHOICE_RELATION = "INSERT INTO s_has_mc VALUES(NULL,?, ?, ?)";
+    public static final String SQL_GET_SURVEY_HAS_MULTIPLE_CHOICE_RELATION_ID = "SELECT s_mc_relation_id FROM s_has_mc WHERE survey_id=? AND multiple_choice_id=?";
+    public static final String SQL_CREATE_SURVEY_HAS_MULTIPLE_CHOICE_RELATION = "INSERT INTO s_has_mc VALUES(NULL, ?, ?)";
+
+    public static final String SQL_COLUMN_SURVEY_HAS_MULTIPLE_CHOICE_RELATION_ID = "s_mc_relation_id";
+
+    //Table s_has_ao
+    public static final String SQL_GET_SURVEY_HAS_ANSWER_OPTION_RELATION_ID = "SELECT s_has_ao_id FROM s_has_ao WHERE answer_option_id=? AND s_has_mc_id=?";
+    public static final String SQL_CREATE_SURVEY_HAS_ANSWER_OPTION_RELATION = "INSERT INTO s_has_ao VALUES(NULL, ?, ?)";
+
+    public static final String SQL_COLUMN_SURVEY_HAS_ANSWER_OPTION_RELATION_ID = "s_has_ao_id";
 
     //Table s_has_sa
-    public static final String SQL_GET_SURVEY_HAS_SHORT_ANSWER_RELATION_ID = "SELECT s_sa_relation_id FROM s_has_sa WHERE survey_id=? AND short_answer_id=? AND answer_id=?";
+    public static final String SQL_GET_SURVEY_HAS_SHORT_ANSWER_RELATION_ID = "SELECT s_sa_relation_id FROM s_has_sa WHERE survey_id=? AND short_answer_id=?";
     public static final String SQL_CREATE_SURVEY_HAS_SHORT_ANSWER_RELATION = "INSERT INTO s_has_sa VALUES(NULL,?, ?, ?)";
 
     //Table headline

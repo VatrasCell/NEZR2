@@ -6,6 +6,7 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.text.Font?>
 <BorderPane xmlns:fx="http://javafx.com/fxml/1" prefHeight="500.0" prefWidth="900.0"
             xmlns="http://javafx.com/javafx/11.0.1" fx:controller="location.LocationController">
    <center>
@@ -21,8 +22,11 @@
    <top>
       <Label text="Standort" BorderPane.alignment="CENTER">
          <BorderPane.margin>
-            <Insets top="15.0" />
+            <Insets top="15.0"/>
          </BorderPane.margin>
+         <font>
+            <Font size="36.0"/>
+         </font>
       </Label>
    </top>
 </BorderPane>

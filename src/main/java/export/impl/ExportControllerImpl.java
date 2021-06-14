@@ -2,7 +2,7 @@ package export.impl;
 
 import export.ExcelCell;
 import export.ExportController;
-import flag.SymbolType;
+import model.AnswerOption;
 import model.Question;
 import model.QuestionType;
 import model.Questionnaire;
@@ -20,6 +20,7 @@ import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.ss.util.RegionUtil;
 import org.apache.poi.ss.util.WorkbookUtil;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import question.QuestionService;
 import questionList.QuestionListService;
 
 import java.io.File;
@@ -105,7 +106,7 @@ public class ExportControllerImpl implements ExportController {
 			if (question.getQuestionType().equals(QuestionType.SHORT_ANSWER)) {
 				faRow.createCell(over).setCellValue(this.crHelper.createRichTextString(question.getQuestion()));
 				faRow.getCell(over).setCellStyle(formatTableHead);
-				makeAnswersToExcel(question, "", over, von, bis);
+				makeAnswersToExcel(question, null, over, von, bis);
 			} else if (/*(question.getFlags().indexOf("B") >= 0) || */(question.getFlags().isSingleLine()) && (question.getFlags().isYesNoQuestion())
 					|| (question.getFlags().isList())) {
 				/*if (question.getKategorie().equals(question.getFrage())false) {
@@ -125,11 +126,12 @@ public class ExportControllerImpl implements ExportController {
 				} else*/ if ((question.getFlags().isSingleLine()) && (question.getFlags().isYesNoQuestion())) {
 					faRow.createCell(over).setCellValue(this.crHelper.createRichTextString(question.getQuestion()));
 					faRow.getCell(over).setCellStyle(formatTableHead);
-					makeAnswersToExcel(question, "ja", over, von, bis);
+					AnswerOption answerOption = QuestionService.getAnswerOption("ja");
+					makeAnswersToExcel(question, answerOption, over, von, bis);
 				} else {
 					faRow.createCell(over).setCellValue(this.crHelper.createRichTextString(question.getQuestion()));
 					faRow.getCell(over).setCellStyle(formatTableHead);
-					makeAnswersToExcel(question, "", over, von, bis);
+					makeAnswersToExcel(question, null, over, von, bis);
 				}
 			} else/* if (/*question.getKategorie().equals(question.getFrage()) false) {
 				faRow.createCell(over).setCellValue(this.crHelper.createRichTextString(question.getFrage()));
@@ -138,9 +140,9 @@ public class ExportControllerImpl implements ExportController {
 			} else*/ {
 				for (int j = 0; j < question.getAnswerOptions().size(); j++) {
 					faRow.createCell(over + j).setCellValue(
-							this.crHelper.createRichTextString((String) question.getAnswerOptions().get(j)));
+							this.crHelper.createRichTextString((String) question.getAnswerOptions().get(j).getValue()));
 					faRow.getCell(over + j).setCellStyle(formatTableHead);
-					makeAnswersToExcel(question, (String) question.getAnswerOptions().get(j), over + j, von, bis);
+					makeAnswersToExcel(question, question.getAnswerOptions().get(j), over + j, von, bis);
 				}
 
 				over += question.getAnswerOptions().size() - 1;
@@ -234,16 +236,17 @@ public class ExportControllerImpl implements ExportController {
 
 	/**
 	 * Tr�gt die gegebenen Antworten in die Excel Tabelle ein.
-	 * @param question FrageErstellen: Fragenobjekt
-	 * @param answer String
-	 * @param pos int: Position in Tabelle
+	 *
+	 * @param question     FrageErstellen: Fragenobjekt
+	 * @param answerOption String
+	 * @param pos          int: Position in Tabelle
 	 */
-	private void makeAnswersToExcel(Question question, String answer, int pos, String von, String bis) {
+	private void makeAnswersToExcel(Question question, AnswerOption answerOption, int pos, String von, String bis) {
 		ArrayList<ExcelCell> antPos;
-		if (answer.equals("")) {
+		if (answerOption == null) {
 			antPos = ExportServiceImpl.getAnswerPositions(question, von, bis);
 		} else {
-			antPos = ExportServiceImpl.getAnswerPositions(question, answer, von, bis);
+			antPos = ExportServiceImpl.getAnswerPositions(question, answerOption, von, bis);
 		}
 
 		if (antPos.size() > 0) {

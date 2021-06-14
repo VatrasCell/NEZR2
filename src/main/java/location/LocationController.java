@@ -14,6 +14,7 @@ import java.io.IOException;
 
 import static application.GlobalFuncs.getURL;
 
+//TODO add map with locations
 public class LocationController {
 
     @FXML

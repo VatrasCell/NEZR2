@@ -2,8 +2,6 @@ package survey;
 
 import application.GlobalVars;
 import application.ScreenController;
-import flag.Number;
-import flag.SymbolType;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
@@ -14,9 +12,11 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.Pane;
+import model.AnswerOption;
 import model.Question;
 import model.QuestionType;
 import model.SceneName;
+import model.SubmittedAnswer;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -154,41 +154,46 @@ public class SurveyController {
             for (Question question : GlobalVars.questionsPerPanel.get(GlobalVars.page)) {
                 if (question.getQuestionType().equals(QuestionType.MULTIPLE_CHOICE)) {
                     if (question.getFlags().isList()) {
-                        ArrayList<String> antwort = new ArrayList<>();
-                        for (ListView<String> listView : question.getAnswersLIST()) {
-                            if (listView.isVisible()) {
-                                antwort.addAll(listView.getSelectionModel().getSelectedItems());
-                            }
+                        List<AnswerOption> submittedAnswerOptions = new ArrayList<>();
+                        ListView<AnswerOption> listView = question.getAnswerOptionListView();
+
+                        if (listView.isVisible()) {
+                            submittedAnswerOptions.addAll(listView.getSelectionModel().getSelectedItems());
                         }
-                        question.setAnswer(antwort);
+
+                        SubmittedAnswer submittedAnswer = new SubmittedAnswer(submittedAnswerOptions);
+                        question.setSubmittedAnswer(submittedAnswer);
+
                     } else {
-                        ArrayList<String> antwort = new ArrayList<>();
-                        for (CheckBox checkbox : question.getAnswersMC()) {
+
+                        ArrayList<AnswerOption> submittedAnswerOptions = new ArrayList<>();
+                        for (CheckBox checkbox : question.getAnswerCheckBoxes()) {
                             if (checkbox.isSelected() && checkbox.isVisible()) {
-                                antwort.add(checkbox.getText());
+                                submittedAnswerOptions.add((AnswerOption) checkbox.getUserData());
                             }
                         }
-                        question.setAnswer(antwort);
+
+                        SubmittedAnswer submittedAnswer = new SubmittedAnswer(submittedAnswerOptions);
+                        question.setSubmittedAnswer(submittedAnswer);
                     }
                 } else {
+
                     if (question.getFlags().isTextArea()) {
-                        ArrayList<String> antwort = new ArrayList<>();
-                        for (TextArea textArea : question.getAnswersTEXT()) {
-                            if (!textArea.getText().equals("") && textArea.isVisible()) {
-                                String string = textArea.getText();
-                                antwort.add(string);
-                            }
+                        TextArea textArea = question.getAnswerTextArea();
+                        SubmittedAnswer submittedAnswer = new SubmittedAnswer();
+                        if (!textArea.getText().isBlank() && textArea.isVisible()) {
+                            submittedAnswer.setSubmittedAnswerText(textArea.getText());
                         }
-                        question.setAnswer(antwort);
+
+                        question.setSubmittedAnswer(submittedAnswer);
+
                     } else {
-                        ArrayList<String> antwort = new ArrayList<>();
-                        for (TextField textField : question.getAnswersFF()) {
-                            if (!textField.getText().equals("") && textField.isVisible()) {
-                                String string = textField.getText();
-                                antwort.add(string);
-                            }
+                        SubmittedAnswer submittedAnswer = new SubmittedAnswer();
+                        TextField textField = question.getAnswerTextField();
+                        if (!textField.getText().isBlank() && textField.isVisible()) {
+                            submittedAnswer.setSubmittedAnswerText(textField.getText());
                         }
-                        question.setAnswer(antwort);
+                        question.setSubmittedAnswer(submittedAnswer);
                     }
                 }
             }
@@ -367,7 +372,7 @@ public class SurveyController {
         if (question.getFlags().isRequired() && question.getQuestionLabel().isVisible()) {
             if (question.getQuestionType().equals(QuestionType.MULTIPLE_CHOICE)) {
                 boolean selected = false;
-                for (CheckBox checkbox : question.getAnswersMC()) {
+                for (CheckBox checkbox : question.getAnswerCheckBoxes()) {
                     if (checkbox.isSelected()) {
                         selected = true;
                         break;
@@ -384,37 +389,33 @@ public class SurveyController {
                 }
             } else {
                 if (question.getFlags().isList()) {
-                    for (ListView<String> listView : question.getAnswersLIST()) {
-                        if (listView.getSelectionModel().isEmpty()) {
+                    ListView<AnswerOption> listView = question.getAnswerOptionListView();
+                    if (listView.getSelectionModel().isEmpty()) {
 //							BalloonTip fehler = new BalloonTip(button, "Das ist eine Pflichtfrage!");
 //							fehler.setCloseButton(null);
 //							TimingUtils.showTimedBalloon(fehler, 2000);
 //							fehler.setVisible(true);
-                            return false;
-                        } else {
-                            return true;
-                        }
+                        return false;
+                    } else {
+                        return true;
                     }
 
                 } else if (question.getFlags().isTextArea()) {
-                    for (TextArea myText : question.getAnswersTEXT()) {
-                        if (myText.getText().isEmpty()) {
+                    TextArea myText = question.getAnswerTextArea();
+                    if (myText.getText().isEmpty()) {
 //							BalloonTip fehler = new BalloonTip(button, "Das ist eine Pflichtfrage!");
 //							fehler.setCloseButton(null);
 //							TimingUtils.showTimedBalloon(fehler, 2000);
 //							fehler.setVisible(true);
-                            return false;
-                        } else {
-                            return true;
-                        }
+                        return false;
+                    } else {
+                        return true;
                     }
                 } else {
                     boolean selected = false;
-                    for (TextField textField : question.getAnswersFF()) {
-                        if (!textField.getText().equals("")) {
-                            selected = true;
-                            break;
-                        }
+                    TextField textField = question.getAnswerTextField();
+                    if (!textField.getText().equals("")) {
+                        selected = true;
                     }
 
                     if (selected) {
@@ -427,7 +428,6 @@ public class SurveyController {
                         return false;
                     }
                 }
-                return true;
             }
         } else {
             return true;

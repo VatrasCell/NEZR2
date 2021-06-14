@@ -4,7 +4,7 @@ import application.Database;
 import application.NotificationController;
 import flag.FlagListService;
 import message.MessageId;
-import model.Answer;
+import model.AnswerOption;
 import model.Headline;
 import model.Question;
 import model.QuestionType;
@@ -19,10 +19,9 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
-import static application.SqlStatement.SQL_COLUMN_ANSWER_ID;
-import static application.SqlStatement.SQL_COLUMN_ANSWER_NAME;
+import static application.SqlStatement.SQL_COLUMN_ANSWER_OPTION_ID;
+import static application.SqlStatement.SQL_COLUMN_ANSWER_OPTION_NAME;
 import static application.SqlStatement.SQL_COLUMN_CATEGORY_NAME;
 import static application.SqlStatement.SQL_COLUMN_CREATION_DATE;
 import static application.SqlStatement.SQL_COLUMN_HEADLINE_ID;
@@ -83,10 +82,7 @@ public class QuestionListService extends Database {
                         QuestionType.MULTIPLE_CHOICE));
                 question.setPosition(Integer.parseInt(myRS.getString(SQL_COLUMN_POSITION)));
                 question.setQuestionType(QuestionType.MULTIPLE_CHOICE);
-                question.setAnswerOptions(
-                        QuestionService.getAnswers(question)
-                                .stream().map(Answer::getValue).collect(Collectors.toList())
-                );
+                question.setAnswerOptions(QuestionService.getAnswerOptions(question.getQuestionId()));
                 int headlineId = myRS.getInt(SQL_COLUMN_HEADLINE_ID);
                 if (headlineId > 0) {
                     question.setHeadline(getHeadline(headlineId));
@@ -263,7 +259,7 @@ public class QuestionListService extends Database {
             }
         }
 
-        QuestionService.deleteAnswers();
+        QuestionService.deleteUnbindedAnswers();
     }
 
     public static void deleteShortAnswerQuestion(int questionId) {
@@ -358,8 +354,8 @@ public class QuestionListService extends Database {
         }
     }
 
-    public static List<Answer> getMultipleChoiceQuestionAnswers(int questionnaireId, int questionId) {
-        List<Answer> answers = new ArrayList<>();
+    public static List<AnswerOption> getMultipleChoiceQuestionAnswers(int questionnaireId, int questionId) {
+        List<AnswerOption> answerOptions = new ArrayList<>();
         try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
             PreparedStatement psSql = myCon.prepareStatement(SQL_GET_MULTIPLE_CHOICE_QUESTION_ANSWERS);
             psSql.setInt(1, questionId);
@@ -367,19 +363,19 @@ public class QuestionListService extends Database {
             ResultSet myRS = psSql.executeQuery();
 
             while (myRS.next()) {
-                Answer answer = new Answer();
-                answer.setId(myRS.getInt(SQL_COLUMN_ANSWER_ID));
-                answer.setValue(myRS.getString(SQL_COLUMN_ANSWER_NAME));
+                AnswerOption answerOption = new AnswerOption();
+                answerOption.setId(myRS.getInt(SQL_COLUMN_ANSWER_OPTION_ID));
+                answerOption.setValue(myRS.getString(SQL_COLUMN_ANSWER_OPTION_NAME));
 
-                if (!answers.contains(answer)) {
-                    answers.add(answer);
+                if (!answerOptions.contains(answerOption)) {
+                    answerOptions.add(answerOption);
                 }
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
 
-        return answers;
+        return answerOptions;
     }
 
     public static List<Integer> getMultipleChoiceQuestionsByQuestionnaireId(int questionnaireId) {

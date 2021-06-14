@@ -23,7 +23,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import message.DialogId;
 import message.MessageId;
-import model.Answer;
+import model.AnswerOption;
 import model.Category;
 import model.Headline;
 import model.Question;
@@ -31,7 +31,7 @@ import model.QuestionEditParam;
 import model.QuestionType;
 import model.Questionnaire;
 import model.SceneName;
-import model.tableObject.AnswerTableObject;
+import model.tableObject.AnswerOptionTableObject;
 import model.tableObject.converter.AnswerTableObjectConverter;
 import questionList.QuestionListService;
 import react.ReactController;
@@ -61,7 +61,7 @@ public class QuestionController {
     public static Question question;
     public Button saveButton;
     private ArrayList<String> answers;
-    private final ObservableList<AnswerTableObject> data = FXCollections.observableArrayList();
+    private final ObservableList<AnswerOptionTableObject> data = FXCollections.observableArrayList();
 
     @FXML
     private Label questionLabel;
@@ -101,15 +101,14 @@ public class QuestionController {
 
     @FXML
     private Button newAnswerButton;
-
     @FXML
-    private TableView<AnswerTableObject> answerTable;
+    private final TableColumn<AnswerOptionTableObject, String> editButtonColumn = new TableColumn<>(getColumnName(EDIT));
     @FXML
-    private TableColumn<AnswerTableObject, String> answerValueTableColumn;
+    private final TableColumn<AnswerOptionTableObject, String> deleteButtonColumn = new TableColumn<>(getColumnName(DELETE));
     @FXML
-    private final TableColumn<AnswerTableObject, String> editButtonColumn = new TableColumn<>(getColumnName(EDIT));
+    private TableView<AnswerOptionTableObject> answerTable;
     @FXML
-    private final TableColumn<AnswerTableObject, String> deleteButtonColumn = new TableColumn<>(getColumnName(DELETE));
+    private TableColumn<AnswerOptionTableObject, String> answerValueTableColumn;
 
     /**
      * The constructor (is called before the initialize()-method).
@@ -117,12 +116,12 @@ public class QuestionController {
     public QuestionController() {
         // fuer die Generierung der Antwortentabelle
         data.clear();
-        List<AnswerTableObject> tableObjects =
-                AnswerTableObjectConverter.convert(Objects.requireNonNull(QuestionService.getAnswers(question)));
+        List<AnswerOptionTableObject> tableObjects =
+                AnswerTableObjectConverter.convert(Objects.requireNonNull(QuestionService.getAnswerOptions(question.getQuestionId())));
         data.addAll(Objects.requireNonNull(tableObjects));
     }
 
-    public static Button initEditButton(Answer answer) {
+    public static Button initEditButton(AnswerOption answerOption) {
         ImageView imgView = new ImageView(GlobalVars.IMG_EDT);
         imgView.setFitHeight(20);
         imgView.setFitWidth(20);
@@ -134,7 +133,7 @@ public class QuestionController {
         return button;
     }
 
-    public static Button initDeleteButton(Answer answer) {
+    public static Button initDeleteButton(AnswerOption answerOption) {
         ImageView imgView = new ImageView(GlobalVars.IMG_DEL);
         imgView.setFitHeight(20);
         imgView.setFitWidth(20);
@@ -159,7 +158,7 @@ public class QuestionController {
         answerTable.setItems(data);
 
         //answerIdTableColumn.setCellValueFactory(new PropertyValueFactory<>(Answer.ID));
-        answerValueTableColumn.setCellValueFactory(new PropertyValueFactory<>(Answer.VALUE));
+        answerValueTableColumn.setCellValueFactory(new PropertyValueFactory<>(AnswerOption.VALUE));
 
         editButtonColumn.setCellValueFactory(new PropertyValueFactory<>(Questionnaire.EDIT));
         answerTable.getColumns().add(editButtonColumn);
@@ -228,7 +227,7 @@ public class QuestionController {
 
         if (question.getQuestionType().equals(QuestionType.MULTIPLE_CHOICE)) {
             if (question.getAnswerOptions().size() > 0) {
-                if (question.getAnswerOptions().get(0).equals("#####")) {
+                if (question.getAnswerOptions().get(0).getValue().equals("#####")) {
                     System.out.println("Old dataset pattern found.");
                 }
             }
@@ -315,20 +314,20 @@ public class QuestionController {
                 questionToSave.setFlags(flags);
                 QuestionService.saveEvaluationQuestion(questionnaire.getId(), questionToSave);
             } else {
-                ArrayList<Answer> answers = new ArrayList<>();
+                ArrayList<AnswerOption> answerOptions = new ArrayList<>();
                 ArrayList<Integer> answerIdsToDelete = new ArrayList<>();
 
                 if (param.isYesNoQuestion()) {
-                    answers.add(new Answer("Ja"));
-                    answers.add(new Answer("Nein"));
+                    answerOptions.add(new AnswerOption("Ja"));
+                    answerOptions.add(new AnswerOption("Nein"));
                 } else {
-                    answers.addAll(answerTable.getItems());
+                    answerOptions.addAll(answerTable.getItems());
                 }
 
                 if (questionLabel.getText().equals("Frage Bearbeiten")) {
                     for (int i = 0; i < this.answers.size(); i++) {
-                        for (Answer answer : answers) {
-                            if (!this.answers.isEmpty() && this.answers.get(i).equals(answer.getValue())) {
+                        for (AnswerOption answerOption : answerOptions) {
+                            if (!this.answers.isEmpty() && this.answers.get(i).equals(answerOption.getValue())) {
                                 this.answers.remove(i);
                             }
                         }
@@ -345,13 +344,13 @@ public class QuestionController {
                     QuestionService.deleteAnswers(answerIdsToDelete, questionToSave.getQuestionId());
                 }
 
-                answers.forEach(answer ->
+                answerOptions.forEach(answer ->
                         answer.setId(Objects.requireNonNull(QuestionService.getAnswerId(answer.getValue())))
                 );
 
                 //QuestionService.getPossibleFlags(flags, param);
                 questionToSave.setFlags(flags);
-                QuestionService.saveMultipleChoice(questionnaire.getId(), questionToSave, answers);
+                QuestionService.saveMultipleChoice(questionnaire.getId(), questionToSave, answerOptions);
             }
         } else {
             //QuestionService.getPossibleFlags(flags, param);
@@ -378,10 +377,10 @@ public class QuestionController {
 
         Optional<String> result = dialog.showAndWait();
         result.ifPresent(name -> {
-            Answer answer = new Answer();
-            answer.setId(data.size() + 1);
-            answer.setValue(name);
-            data.add(AnswerTableObjectConverter.convert(answer));
+            AnswerOption answerOption = new AnswerOption();
+            answerOption.setId(data.size() + 1);
+            answerOption.setValue(name);
+            data.add(AnswerTableObjectConverter.convert(answerOption));
 
             NotificationController.createMessage(MessageId.TITLE_CREATE_ANSWER, MessageId.MESSAGE_CREATE_ANSWER, name);
         });

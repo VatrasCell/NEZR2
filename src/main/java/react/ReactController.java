@@ -23,6 +23,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.text.Text;
 import javafx.util.Callback;
 import javafx.util.Pair;
+import model.AnswerOption;
 import model.Question;
 import model.QuestionType;
 import model.Questionnaire;
@@ -170,7 +171,8 @@ public class ReactController {
                 hasQuestion = true;
                 okButton.setDisable(!(hasQuestion && hasAnswer));
                 answerData.clear();
-                for (String answer : newQuestion.getAnswerOptions()) {
+                for (AnswerOption answerOption : newQuestion.getAnswerOptions()) {
+                    String answer = answerOption.getValue();
                     if (answer.equals("")) {
                         answer = "<Textfeld>";
                     }
