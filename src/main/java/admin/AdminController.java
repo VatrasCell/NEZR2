@@ -288,8 +288,7 @@ public class AdminController {
             ExportController exportController = new ExportControllerImpl();
             Optional<Pair<String, String>> result = getDatePickerDialog();
             result.ifPresent(dates -> {
-                if (exportController.excelNeu(
-                        String.format("%s_%s_%s.xlsx", questionnaire.getId(), questionnaire.getLocation(), questionnaire.getName()),
+                if (exportController.createExcelFile(
                         questionnaire,
                         dates.getKey(),
                         dates.getValue())) {

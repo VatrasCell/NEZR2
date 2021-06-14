@@ -31,7 +31,7 @@ public class Question implements Comparable<Question>, Comparator<Question> {
     private FlagList flags;
     private int position;
     private Headline headline;
-    SubmittedAnswer submittedAnswer;
+    private SubmittedAnswer submittedAnswer;
     private List<AnswerOption> answerOptions = new ArrayList<>();
     private Label questionLabel;
     private Pane scene;
