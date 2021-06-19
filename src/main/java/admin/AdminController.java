@@ -5,7 +5,6 @@ import application.GlobalVars;
 import application.NotificationController;
 import application.ScreenController;
 import export.ExportController;
-import export.impl.ExportControllerImpl;
 import javafx.application.Platform;
 import javafx.beans.value.ObservableBooleanValue;
 import javafx.collections.FXCollections;
@@ -285,7 +284,7 @@ public class AdminController {
         imgView.setFitWidth(30);
         Button button = new Button("", imgView);
         button.setOnAction(event -> {
-            ExportController exportController = new ExportControllerImpl();
+            ExportController exportController = new ExportController();
             Optional<Pair<String, String>> result = getDatePickerDialog();
             result.ifPresent(dates -> {
                 exportController.createExcelFile(
@@ -296,9 +295,7 @@ public class AdminController {
                         questionnaire,
                         dates.getKey(),
                         dates.getValue())) {
-                    NotificationController.createMessage(
-                            MessageId.TITLE_EXCEL_EXPORT,
-                            MessageId.MESSAGE_EXPORTED_SUCCESSFULLY);
+
                 } else {
                     NotificationController.createErrorMessage(
                             MessageId.TITLE_EXCEL_EXPORT,

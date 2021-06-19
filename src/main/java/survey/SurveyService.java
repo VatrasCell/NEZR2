@@ -59,7 +59,7 @@ public class SurveyService extends Database {
                 for (AnswerOption answerOption : submittedAnswerOptions) {
                     Integer relId = getSurveyAnswerOptionRelationId(answerOption.getId(), surveyMultipleChoiceRelationId);
                     if (relId == null) {
-                        createSurveyAnswerOptionRelation(surveyId, surveyMultipleChoiceRelationId);
+                        createSurveyAnswerOptionRelation(answerOption.getId(), surveyMultipleChoiceRelationId);
                     }
                 }
 
@@ -238,13 +238,14 @@ public class SurveyService extends Database {
     }
 
     private static SubmittedAnswer getShortAnswerSubmittedAnswer(int surveyId, int questionId) {
+        SubmittedAnswer submittedAnswer = new SubmittedAnswer();
         try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
             PreparedStatement psSql = myCon.prepareStatement(SQL_GET_SHORT_ANSWER_OF_SURVEY);
             psSql.setInt(1, surveyId);
             psSql.setInt(2, questionId);
             ResultSet myRS = psSql.executeQuery();
             if (myRS.next()) {
-                SubmittedAnswer submittedAnswer = new SubmittedAnswer();
+                submittedAnswer = new SubmittedAnswer();
                 submittedAnswer.setSubmittedAnswerText(myRS.getString(SQL_COLUMN_ANSWER));
                 return submittedAnswer;
             }
@@ -252,7 +253,7 @@ public class SurveyService extends Database {
             e.printStackTrace();
         }
 
-        return null;
+        return submittedAnswer;
     }
 
     private static SubmittedAnswer getMultipleChoiceSubmittedAnswer(int surveyId, int questionId) {
@@ -276,6 +277,6 @@ public class SurveyService extends Database {
             e.printStackTrace();
         }
 
-        return null;
+        return submittedAnswer;
     }
 }

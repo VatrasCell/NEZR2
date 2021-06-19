@@ -1,6 +1,5 @@
 package export;
 
-import export.impl.ExportControllerImpl;
 import model.Question;
 import model.Questionnaire;
 import org.junit.Before;
@@ -36,7 +35,7 @@ public class ExportControllerTest extends DBTestUtil {
     public Questionnaire questionnaire;
 
     @InjectMocks
-    public ExportController exportController = new ExportControllerImpl();
+    public ExportController exportController = new ExportController();
 
     @Before
     public void init() {

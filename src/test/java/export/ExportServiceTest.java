@@ -1,20 +1,19 @@
 package export;
 
-import export.impl.ExportServiceImpl;
 import org.junit.Test;
 import util.DBTestUtil;
 
 import static org.junit.Assert.assertEquals;
 
 /**
- * {@link ExportServiceImpl}
+ * {@link ExportService}
  */
 public class ExportServiceTest extends DBTestUtil {
 
     @Test
     public void testGetSurveyCount() {
         //act
-        int result = ExportServiceImpl.getSurveyCount();
+        int result = ExportService.getSurveyCount();
 
         //assert
         assertEquals(0, result);
