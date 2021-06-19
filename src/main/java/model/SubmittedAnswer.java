@@ -36,6 +36,11 @@ public class SubmittedAnswer {
     }
 
     public void setSubmittedAnswerText(String submittedAnswerText) {
-        this.submittedAnswerText = submittedAnswerText.replaceAll("<.*>", "");
+        if (submittedAnswerText != null) {
+            this.submittedAnswerText = submittedAnswerText.replaceAll("<.*>", "");
+        } else {
+            this.submittedAnswerText = null;
+        }
+
     }
 }

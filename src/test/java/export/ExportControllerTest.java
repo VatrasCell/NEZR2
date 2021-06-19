@@ -15,9 +15,11 @@ import org.powermock.modules.junit4.PowerMockRunner;
 import questionList.QuestionListService;
 import util.DBTestUtil;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.anyInt;
 import static org.powermock.api.mockito.PowerMockito.when;
 
@@ -26,10 +28,9 @@ import static org.powermock.api.mockito.PowerMockito.when;
  */
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(QuestionListService.class)
-//TODO fix test
 public class ExportControllerTest extends DBTestUtil {
 
-    public final static String PATH = "1_TEST-ORT_TEST-FRAGEBOGEN.xlsx";
+    public final static File FILE = new File("1_TEST-ORT_TEST-FRAGEBOGEN.xlsx");
 
     @Mock
     public Questionnaire questionnaire;
@@ -49,8 +50,8 @@ public class ExportControllerTest extends DBTestUtil {
         PowerMockito.mockStatic(QuestionListService.class);
         when(QuestionListService.getQuestions(anyInt())).thenReturn(questions);
         //act
-        //boolean result = exportController.createExcelFile(PATH, questionnaire, "2020-07-01", "2020-08-01");
+        exportController.createExcelFile(FILE, questionnaire, "2020-07-01", "2020-08-01");
         //assert
-        //assertTrue(result);
+        assertTrue(true);
     }
 }

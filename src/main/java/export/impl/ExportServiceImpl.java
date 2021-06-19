@@ -1,8 +1,8 @@
 package export.impl;
 
 import application.Database;
-import export.ExcelCell;
 import export.ExportService;
+import export.model.ExcelCell;
 import model.AnswerOption;
 import model.Question;
 import model.QuestionType;

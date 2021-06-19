@@ -1,4 +1,4 @@
-package export;
+package export.model;
 
 import java.util.ArrayList;
 

@@ -288,18 +288,22 @@ public class AdminController {
             ExportController exportController = new ExportControllerImpl();
             Optional<Pair<String, String>> result = getDatePickerDialog();
             result.ifPresent(dates -> {
-                if (exportController.createExcelFile(
+                exportController.createExcelFile(
+                        questionnaire,
+                        dates.getKey(),
+                        dates.getValue());
+                /*if (exportController.createExcelFile(
                         questionnaire,
                         dates.getKey(),
                         dates.getValue())) {
                     NotificationController.createMessage(
                             MessageId.TITLE_EXCEL_EXPORT,
-                            MessageId.MESSAGE_EXPORTED_QUESTIONNAIRE_SUCCESSFULLY);
+                            MessageId.MESSAGE_EXPORTED_SUCCESSFULLY);
                 } else {
                     NotificationController.createErrorMessage(
                             MessageId.TITLE_EXCEL_EXPORT,
                             MessageId.MESSAGE_UNDEFINED_ERROR);
-                }
+                }*/
             });
         });
 

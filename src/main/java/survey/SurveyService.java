@@ -9,6 +9,8 @@ import javafx.scene.control.TextField;
 import model.AnswerOption;
 import model.Question;
 import model.QuestionType;
+import model.SubmittedAnswer;
+import model.Survey;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -19,14 +21,22 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import static application.SqlStatement.SQL_COLUMN_ANSWER;
+import static application.SqlStatement.SQL_COLUMN_ANSWER_OPTION_ID;
+import static application.SqlStatement.SQL_COLUMN_CREATION_DATE;
+import static application.SqlStatement.SQL_COLUMN_NAME;
 import static application.SqlStatement.SQL_COLUMN_SURVEY_HAS_ANSWER_OPTION_RELATION_ID;
 import static application.SqlStatement.SQL_COLUMN_SURVEY_HAS_MULTIPLE_CHOICE_RELATION_ID;
+import static application.SqlStatement.SQL_COLUMN_SURVEY_ID;
 import static application.SqlStatement.SQL_COLUMN_SURVEY_ID_MAX;
 import static application.SqlStatement.SQL_CREATE_SURVEY;
 import static application.SqlStatement.SQL_CREATE_SURVEY_HAS_ANSWER_OPTION_RELATION;
 import static application.SqlStatement.SQL_CREATE_SURVEY_HAS_MULTIPLE_CHOICE_RELATION;
 import static application.SqlStatement.SQL_CREATE_SURVEY_HAS_SHORT_ANSWER_RELATION;
 import static application.SqlStatement.SQL_GET_MAX_SURVEY_ID;
+import static application.SqlStatement.SQL_GET_MULTIPLE_CHOICE_ANSWERS;
+import static application.SqlStatement.SQL_GET_SHORT_ANSWER_OF_SURVEY;
+import static application.SqlStatement.SQL_GET_SURVEYS_BY_QUESTIONNAIRE_ID;
 import static application.SqlStatement.SQL_GET_SURVEY_HAS_ANSWER_OPTION_RELATION_ID;
 import static application.SqlStatement.SQL_GET_SURVEY_HAS_MULTIPLE_CHOICE_RELATION_ID;
 import static application.SqlStatement.SQL_GET_SURVEY_HAS_SHORT_ANSWER_RELATION_ID;
@@ -48,7 +58,7 @@ public class SurveyService extends Database {
                 for (AnswerOption answerOption : submittedAnswerOptions) {
                     Integer relId = getSurveyAnswerOptionRelationId(answerOption.getId(), surveyMultipleChoiceRelationId);
                     if (relId == null) {
-                        createSurveyAnswerOptionRelation(surveyId, question.getQuestionId());
+                        createSurveyAnswerOptionRelation(surveyId, surveyMultipleChoiceRelationId);
                     }
                 }
 
@@ -194,5 +204,76 @@ public class SurveyService extends Database {
         questionsLists.forEach(results::addAll);
 
         return results;
+    }
+
+    public static List<Survey> getSurveys(int questionnaireId, String fromDate, String toDate) {
+        List<Survey> surveys = new ArrayList<>();
+        try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
+            PreparedStatement psSql = myCon.prepareStatement(SQL_GET_SURVEYS_BY_QUESTIONNAIRE_ID);
+            psSql.setString(1, fromDate);
+            psSql.setString(2, toDate);
+            psSql.setInt(3, questionnaireId);
+            ResultSet myRS = psSql.executeQuery();
+            while (myRS.next()) {
+                Survey survey = new Survey();
+                survey.setSurveyId(myRS.getInt(SQL_COLUMN_SURVEY_ID));
+                survey.setCreationDate(myRS.getString(SQL_COLUMN_CREATION_DATE));
+                surveys.add(survey);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return surveys;
+    }
+
+    public static SubmittedAnswer getAnswer(int surveyId, Question question) {
+        if (question.getQuestionType().equals(QuestionType.SHORT_ANSWER)) {
+            return getShortAnswerSubmittedAnswer(surveyId, question.getQuestionId());
+        } else {
+            return getMultipleChoiceSubmittedAnswer(surveyId, question.getQuestionId());
+        }
+    }
+
+    private static SubmittedAnswer getShortAnswerSubmittedAnswer(int surveyId, int questionId) {
+        try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
+            PreparedStatement psSql = myCon.prepareStatement(SQL_GET_SHORT_ANSWER_OF_SURVEY);
+            psSql.setInt(1, surveyId);
+            psSql.setInt(2, questionId);
+            ResultSet myRS = psSql.executeQuery();
+            if (myRS.next()) {
+                SubmittedAnswer submittedAnswer = new SubmittedAnswer();
+                submittedAnswer.setSubmittedAnswerText(myRS.getString(SQL_COLUMN_ANSWER));
+                return submittedAnswer;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    private static SubmittedAnswer getMultipleChoiceSubmittedAnswer(int surveyId, int questionId) {
+        SubmittedAnswer submittedAnswer = new SubmittedAnswer();
+        List<AnswerOption> answerOptions = new ArrayList<>();
+        try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
+            PreparedStatement psSql = myCon.prepareStatement(SQL_GET_MULTIPLE_CHOICE_ANSWERS);
+            psSql.setInt(1, surveyId);
+            psSql.setInt(2, questionId);
+            ResultSet myRS = psSql.executeQuery();
+            while (myRS.next()) {
+                AnswerOption answerOption = new AnswerOption();
+                answerOption.setId(myRS.getInt(SQL_COLUMN_ANSWER_OPTION_ID));
+                answerOption.setValue(myRS.getString(SQL_COLUMN_NAME));
+                answerOptions.add(answerOption);
+            }
+
+            submittedAnswer.setSubmittedAnswerOptions(answerOptions);
+            return submittedAnswer;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return null;
     }
 }

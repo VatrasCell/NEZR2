@@ -90,6 +90,9 @@ public class SqlStatement {
     public static final String SQL_GET_MULTIPLE_CHOICE_SURVEY_ID_AND_ANSWER = "SELECT s.survey_id AS survey_id, ao.name AS name FROM survey s JOIN s_has_mc smc ON s.survey_id = smc.survey_id JOIN s_has_ao sao ON smc.s_mc_relation_id = sao.s_has_mc_id JOIN answer_option ao ON sao.answer_option_id = ao.answer_option_id WHERE s.questionnaire_id=? AND smc.multiple_choice_id=? AND (s.creation_date BETWEEN ? AND ?)";
     public static final String SQL_GET_SHORT_ANSWER_SURVEY_ID_AND_ANSWER = "SELECT s.survey_id AS survey_id, ssa.answer AS answer FROM survey s JOIN s_has_sa ssa ON s.survey_id = ssa.survey_id WHERE s.questionnaire_id=? AND ssa.short_answer_id=? AND (s.creation_date BETWEEN ? AND ?)";
     public static final String SQL_GET_MULTIPLE_CHOICE_SURVEY_ID_BY_ANSWER = "SELECT s.survey_id AS survey_id FROM survey s JOIN s_has_mc smc ON s.survey_id = smc.survey_id JOIN s_has_ao sao ON smc.s_mc_relation_id = sao.s_has_mc_id WHERE s.questionnaire_id=? AND smc.multiple_choice_id=? AND sao.answer_option_id=? AND (s.creation_date BETWEEN ? AND ?)";
+    public static final String SQL_GET_SURVEYS_BY_QUESTIONNAIRE_ID = "SELECT survey_id, creation_date FROM survey WHERE (creation_date BETWEEN ? AND ?) AND questionnaire_id = ?";
+    public static final String SQL_GET_SHORT_ANSWER_OF_SURVEY = "SELECT answer FROM s_has_sa WHERE survey_id = ? AND short_answer_id = ?";
+    public static final String SQL_GET_MULTIPLE_CHOICE_ANSWERS = "SELECT ao.answer_option_id, ao.name FROM s_has_mc smc JOIN s_has_ao sao ON smc.s_mc_relation_id = sao.s_has_mc_id JOIN answer_option ao ON sao.answer_option_id = ao.answer_option_id WHERE smc.survey_id = ? AND smc.multiple_choice_id = ?";
 
     public static final String SQL_COLUMN_SURVEY_ID = "survey_id";
     public static final String SQL_COLUMN_ANSWER = "answer";
