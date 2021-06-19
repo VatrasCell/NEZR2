@@ -25,6 +25,7 @@ import static application.SqlStatement.SQL_COLUMN_ANSWER;
 import static application.SqlStatement.SQL_COLUMN_ANSWER_OPTION_ID;
 import static application.SqlStatement.SQL_COLUMN_CREATION_DATE;
 import static application.SqlStatement.SQL_COLUMN_NAME;
+import static application.SqlStatement.SQL_COLUMN_QUESTIONNAIRE_ID;
 import static application.SqlStatement.SQL_COLUMN_SURVEY_HAS_ANSWER_OPTION_RELATION_ID;
 import static application.SqlStatement.SQL_COLUMN_SURVEY_HAS_MULTIPLE_CHOICE_RELATION_ID;
 import static application.SqlStatement.SQL_COLUMN_SURVEY_ID;
@@ -218,6 +219,7 @@ public class SurveyService extends Database {
                 Survey survey = new Survey();
                 survey.setSurveyId(myRS.getInt(SQL_COLUMN_SURVEY_ID));
                 survey.setCreationDate(myRS.getString(SQL_COLUMN_CREATION_DATE));
+                survey.setQuestionnaireId(myRS.getInt(SQL_COLUMN_QUESTIONNAIRE_ID));
                 surveys.add(survey);
             }
         } catch (SQLException e) {

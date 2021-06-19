@@ -17,10 +17,8 @@ public class DBTestUtil extends Database {
     @Before
     public void setUp() throws ClassNotFoundException {
         Class.forName("org.h2.Driver");
-        String path = String.format("%s%s.mv.db", DB_PATH, DB_TEST_NAME);
 
-        String absPath = getURL(path).getPath().replace(".mv.db", "");
-        Database.url = String.format("jdbc:h2:%s;MODE=MySQL", absPath);
+        Database.url = createDatabaseURL(DB_TEST_NAME);
         Database.user = "tester";
         Database.pwd = "EZ4.6emdwsu)9!TA";
 

@@ -55,13 +55,35 @@ public class ExportControllerImpl implements ExportController {
     }
 
     private void createAnswerRows(List<ExcelQuestionModel> excelQuestionModels, int questionnaireId, String fromDate, String toDate) {
+        final String SELECTED = "1";
+        final String NOT_SELECTED = "";
         int rowIndex = 4;
         List<Survey> surveys = SurveyService.getSurveys(questionnaireId, fromDate, toDate);
         for (Survey survey : surveys) {
             Row row = this.sheet.createRow(rowIndex);
             row.createCell(0).setCellValue(this.crHelper.createRichTextString(survey.getCreationDate()));
             List<ExcelQuestionModel> excelQuestionModelsInSurvey = getAnswersForSurvey(survey.getSurveyId(), excelQuestionModels);
-
+            for (ExcelQuestionModel model : excelQuestionModelsInSurvey) {
+                Question question = model.getQuestion();
+                for (int i = 0; i < model.getAnswerOptions().size(); ++i) {
+                    if (question.getQuestionType().equals(QuestionType.SHORT_ANSWER)) {
+                        row.createCell(model.getFistCellPosition() + i)
+                                .setCellValue(this.crHelper.createRichTextString(question.getSubmittedAnswer().getSubmittedAnswerText()));
+                    } else {
+                        if (question.getFlags().isSingleLine()) {
+                            String value = question.getSubmittedAnswer().getSubmittedAnswerOptions().isEmpty() ?
+                                    NOT_SELECTED : question.getSubmittedAnswer().getSubmittedAnswerOptions().get(0).getValue();
+                            row.createCell(model.getFistCellPosition() + i)
+                                    .setCellValue(this.crHelper.createRichTextString(value));
+                        } else {
+                            String value = question.getSubmittedAnswer().getSubmittedAnswerOptions().contains(question.getAnswerOptions().get(i)) ?
+                                    SELECTED : NOT_SELECTED;
+                            row.createCell(model.getFistCellPosition() + i)
+                                    .setCellValue(value);
+                        }
+                    }
+                }
+            }
             rowIndex++;
         }
     }
