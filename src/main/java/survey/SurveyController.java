@@ -11,7 +11,6 @@ import javafx.scene.control.DialogPane;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.Pane;
 import model.AnswerOption;
 import model.Question;
 import model.QuestionType;
@@ -30,9 +29,15 @@ import static application.ScreenController.STYLESHEET;
 public class SurveyController {
 
     private static boolean isPreview;
+    private static int pageCount;
+    private static int pageNumber = 1;
 
-    @FXML
-    Pane pane;
+    //@FXML
+    //Pane pane;
+
+    public static void setPageCount(int pageCount) {
+        SurveyController.pageCount = pageCount;
+    }
 
     /**
      * Initializes the controller class. This method is automatically called after
@@ -64,40 +69,31 @@ public class SurveyController {
         }
 
         String image = getURL(value).toExternalForm();
-        pane.setStyle("-fx-background-image: url('" + image + "');" +
+        /*pane.setStyle("-fx-background-image: url('" + image + "');" +
                 "-fx-background-repeat: no-repeat;" +
                 "-fx-background-attachment: fixed;" +
                 "-fx-background-size: 10% auto;" +
-                "-fx-background-position: 98% 5%;");
+                "-fx-background-position: 98% 5%;");*/
     }
 
     @FXML
     private void next() throws IOException {
-        if (check()) {
-            if (GlobalVars.page < GlobalVars.countPanel - 1) {
-                GlobalVars.page++;
-                ScreenController.activate(SceneName.SURVEY + GlobalVars.page);
+        if (true /*check()*/) {
+            if (pageNumber < pageCount) {
+                pageNumber++;
+                ScreenController.activate(SceneName.SURVEY + pageNumber);
             } else {
                 if (!isPreview) {
-                    SurveyService.saveSurvey(GlobalVars.activeQuestionnaire.getId(), GlobalVars.questionsPerPanel);
+                    //SurveyService.saveSurvey(GlobalVars.activeQuestionnaire.getId(), GlobalVars.questionsPerPanel);
+                    System.out.println("save is disabled");
                     ScreenController.addScreen(SceneName.GRATITUDE, getURL(SceneName.GRATITUDE_PATH));
                     ScreenController.activate(SceneName.GRATITUDE);
                 } else {
-                    System.out.println("still page " + GlobalVars.page);
+                    System.out.println("still page " + pageNumber);
                 }
             }
         } else {
             System.out.println("everythingIsNOTAwesome");
-        }
-    }
-
-    @FXML
-    private void pre() throws IOException {
-        if (GlobalVars.page > 0) {
-            GlobalVars.page--;
-            ScreenController.activate("survey_" + GlobalVars.page);
-        } else {
-            System.out.println("still page 1");
         }
     }
 
@@ -123,20 +119,13 @@ public class SurveyController {
     }
 
     @FXML
-    private void exitPreVeiw() throws IOException {
-        Alert alert = new Alert(AlertType.CONFIRMATION);
-        alert.setTitle("Vorschau abbrechen");
-        alert.setHeaderText("Wollen Sie die Vorschau wirklich verlassen?");
-        alert.setContentText("Fortfahren?");
-
-        DialogPane dialogPane = alert.getDialogPane();
-        dialogPane.getStylesheets().add(getURL(STYLESHEET).toExternalForm());
-
-        Optional<ButtonType> result = alert.showAndWait();
-        if (result.isPresent() && result.get() == ButtonType.OK) {
-            ScreenController.activate(SceneName.QUESTION);
+    private void pre() throws IOException {
+        if (pageNumber > 1) {
+            pageNumber--;
+            ScreenController.activate("survey_" + pageNumber);
+        } else {
+            System.out.println("still page 1");
         }
-
     }
 
     private boolean check() {
@@ -434,17 +423,28 @@ public class SurveyController {
         }
     }
 
-    /**
-     * @return the isPreview
-     */
     public static boolean isPreview() {
         return isPreview;
     }
 
-    /**
-     * @param isPreview the isPreview to set
-     */
     public static void setPreview(boolean isPreview) {
         SurveyController.isPreview = isPreview;
+    }
+
+    @FXML
+    private void exitPreView() throws IOException {
+        Alert alert = new Alert(AlertType.CONFIRMATION);
+        alert.setTitle("Vorschau abbrechen");
+        alert.setHeaderText("Wollen Sie die Vorschau wirklich verlassen?");
+        alert.setContentText("Fortfahren?");
+
+        DialogPane dialogPane = alert.getDialogPane();
+        dialogPane.getStylesheets().add(getURL(STYLESHEET).toExternalForm());
+
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.isPresent() && result.get() == ButtonType.OK) {
+            ScreenController.activate(SceneName.QUESTION);
+        }
+
     }
 }

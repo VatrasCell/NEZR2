@@ -101,4 +101,21 @@ public class Validation {
     public void setLength(int length) {
         this.length = length;
     }
+
+    @Override
+    public String toString() {
+        return "Validation{" +
+                "id=" + id +
+                ", isNumbers=" + isNumbers +
+                ", isLetters=" + isLetters +
+                ", isAlphanumeric=" + isAlphanumeric +
+                ", isAllChars=" + isAllChars +
+                ", isRegex=" + isRegex +
+                ", hasLength=" + hasLength +
+                ", regex='" + regex + '\'' +
+                ", minLength=" + minLength +
+                ", maxLength=" + maxLength +
+                ", length=" + length +
+                '}';
+    }
 }

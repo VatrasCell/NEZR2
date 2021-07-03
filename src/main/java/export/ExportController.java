@@ -36,6 +36,11 @@ public class ExportController {
     private final CreationHelper crHelper = this.wb.getCreationHelper();
     private Sheet sheet;
 
+    public void createExcelFile(Questionnaire questionnaire, String fromDate, String toDate) {
+        createExcelFile(createFileName(questionnaire),
+                questionnaire, fromDate, toDate);
+    }
+
     public void createExcelFile(File file, Questionnaire questionnaire, String fromDate, String toDate) {
         sheet = this.wb.createSheet(WorkbookUtil.createSafeSheetName(String.format("%s-%s", questionnaire.getName(), questionnaire.getDate())));
         List<Question> questions = QuestionListService.getQuestions(questionnaire.getId());
@@ -181,11 +186,6 @@ public class ExportController {
         cellStyle.setFont(font);
 
         return cellStyle;
-    }
-
-    public void createExcelFile(Questionnaire questionnaire, String fromDate, String toDate) {
-        createExcelFile(createFileName(questionnaire),
-                questionnaire, fromDate, toDate);
     }
 
     private File createFileName(Questionnaire questionnaire) {

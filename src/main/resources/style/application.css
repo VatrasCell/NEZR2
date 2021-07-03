@@ -432,8 +432,8 @@
  *                                                                             *
  ******************************************************************************/
 .list-view:focused .list-cell:filled:focused:selected {
-	-fx-background-color: rgb(245.0, 245.0, 245.0);
-	-fx-text-fill: -COLOR-BROWN;
+	-fx-background-color: -swatch-400;
+	-fx-text-fill: -COLOR-WHITE;
 }
 
 .list-view:hover .list-cell:hover {
@@ -442,7 +442,7 @@
 }
 
 .list-cell {
-	-fx-cell-size: 40;
+	-fx-cell-size: 50;
 }
 
 /*******************************************************************************

@@ -48,9 +48,6 @@ public class AnswerOption {
 
     @Override
     public String toString() {
-        return "AnswerOption{" +
-                "id=" + id +
-                ", value='" + value + '\'' +
-                '}';
+        return this.value;
     }
 }

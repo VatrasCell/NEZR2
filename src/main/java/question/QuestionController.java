@@ -365,7 +365,7 @@ public class QuestionController {
     @FXML
     private void setPreview() throws IOException {
         StartController.makeQuestionnaire(Collections.singletonList(question), true);
-        ScreenController.activate(SceneName.SURVEY_0);
+        ScreenController.activate(SceneName.SURVEY_1);
     }
 
     @FXML

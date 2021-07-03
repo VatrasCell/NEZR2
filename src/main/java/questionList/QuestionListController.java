@@ -18,6 +18,7 @@ import model.tableObject.converter.QuestionTableObjectConverter;
 import question.QuestionController;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -28,7 +29,7 @@ import static message.TableColumnNameId.EDIT;
 
 public class QuestionListController {
     public static Questionnaire questionnaire;
-    private static List<Question> questions;
+    private static List<Question> questions = new ArrayList<>();
     private static final ObservableList<QuestionTableObject> data = FXCollections.observableArrayList();
 
     @FXML
@@ -125,8 +126,6 @@ public class QuestionListController {
     @FXML
     private void newQuestion() {
         QuestionController.questionnaire = questionnaire;
-        System.out.println(questions);
-        System.out.println(questions.size());
 
         QuestionController.question = new Question(questions.size());
         try {

@@ -13,7 +13,7 @@ public class GlobalVars {
     public static final boolean DEV_MODE = true;
     public static final boolean IGNORE_CHECK = false;
     public static int questions = 3;
-    public static final int perColumn = 3;
+    public static final int PER_COLUMN = 3;
     public static String location;
     public static Questionnaire activeQuestionnaire = null;
     public static int page = 0;
