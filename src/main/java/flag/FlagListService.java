@@ -20,6 +20,7 @@ import static application.SqlStatement.SQL_COLUMN_IS_REQUIRED;
 import static application.SqlStatement.SQL_COLUMN_IS_SINGLE_LINE;
 import static application.SqlStatement.SQL_COLUMN_IS_TEXT_AREA;
 import static application.SqlStatement.SQL_COLUMN_IS_YES_NO_QUESTION;
+import static application.SqlStatement.SQL_CREATE_FLAG_LIST_MC;
 import static application.SqlStatement.SQL_GET_FLAG_LIST_ID_ON_MULTIPLE_CHOICE;
 import static application.SqlStatement.SQL_GET_FLAG_LIST_ID_ON_SHORT_ANSWER;
 import static application.SqlStatement.SQL_GET_FLAG_LIST_MC_BY_ID;
@@ -134,6 +135,22 @@ public class FlagListService extends Database {
             psSql.setBoolean(1, flagList.isRequired());
             psSql.setBoolean(2, flagList.isTextArea());
             psSql.setInt(3, relationId);
+            psSql.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void createMultipleChoiceFlagList(int relationId, FlagList flagList) {
+        try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
+            PreparedStatement psSql = myCon.prepareStatement(SQL_CREATE_FLAG_LIST_MC);
+            psSql.setInt(1, relationId);
+            psSql.setBoolean(2, flagList.isEvaluationQuestion());
+            psSql.setBoolean(3, flagList.isRequired());
+            psSql.setBoolean(4, flagList.isMultipleChoice());
+            psSql.setBoolean(5, flagList.isList());
+            psSql.setBoolean(6, flagList.isYesNoQuestion());
+            psSql.setBoolean(7, flagList.isSingleLine());
             psSql.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();

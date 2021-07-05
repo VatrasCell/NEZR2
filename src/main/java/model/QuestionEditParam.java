@@ -10,7 +10,9 @@ public class QuestionEditParam {
     private final boolean textArea;
     private final boolean yesNoQuestion;
     private final boolean singleLine;
+    @Deprecated
     private final boolean numeric;
+
     private final boolean evaluationQuestion;
 
     private boolean required;
@@ -62,7 +64,7 @@ public class QuestionEditParam {
     }
 
     public boolean isListActivatable() {
-        return questionType.equals(QuestionType.MULTIPLE_CHOICE);
+        return !yesNoQuestion && questionType.equals(QuestionType.MULTIPLE_CHOICE);
     }
 
     public boolean isEvaluationQuestionActivatable() {
@@ -86,7 +88,7 @@ public class QuestionEditParam {
     }
 
     public boolean isAnswersListActivatable() {
-        return !evaluationQuestion && questionType.equals(QuestionType.MULTIPLE_CHOICE);
+        return !evaluationQuestion && !yesNoQuestion && questionType.equals(QuestionType.MULTIPLE_CHOICE);
     }
 
     public QuestionType getQuestionType() {
@@ -111,5 +113,17 @@ public class QuestionEditParam {
 
     public boolean isEvaluationQuestion() {
         return evaluationQuestion;
+    }
+
+    public boolean isMultipleChoice() {
+        return multipleChoice;
+    }
+
+    public boolean isTextArea() {
+        return textArea;
+    }
+
+    public boolean isSingleLine() {
+        return singleLine;
     }
 }

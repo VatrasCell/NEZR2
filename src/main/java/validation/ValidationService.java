@@ -19,7 +19,9 @@ import static application.SqlStatement.SQL_COLUMN_MAX_LENGTH;
 import static application.SqlStatement.SQL_COLUMN_MIN_LENGTH;
 import static application.SqlStatement.SQL_COLUMN_REGEX;
 import static application.SqlStatement.SQL_COLUMN_VALIDATION_ID;
+import static application.SqlStatement.SQL_CREATE_VALIDATION;
 import static application.SqlStatement.SQL_GET_VALIDATION_BY_SA_REL_ID;
+import static application.SqlStatement.SQL_LAST_VALIDATION_ID;
 
 public class ValidationService extends Database {
 
@@ -46,6 +48,43 @@ public class ValidationService extends Database {
                 validation.setMaxLength(myRS.getInt(SQL_COLUMN_MAX_LENGTH));
                 validation.setLength(myRS.getInt(SQL_COLUMN_LENGTH));
                 return validation;
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    public static void createValidation(Validation validation) {
+        try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
+            PreparedStatement psSql = myCon.prepareStatement(SQL_CREATE_VALIDATION);
+            psSql.setBoolean(1, validation.isNumbers());
+            psSql.setBoolean(2, validation.isLetters());
+            psSql.setBoolean(3, validation.isAlphanumeric());
+            psSql.setBoolean(4, validation.isAllChars());
+            psSql.setBoolean(5, validation.isRegex());
+            psSql.setBoolean(6, validation.isHasLength());
+            psSql.setString(7, validation.getRegex());
+            psSql.setInt(8, validation.getMinLength());
+            psSql.setInt(9, validation.getMaxLength());
+            psSql.setInt(10, validation.getLength());
+            psSql.execute();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static Integer getLastValidationId() {
+        try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
+            PreparedStatement psSql = myCon.prepareStatement(SQL_LAST_VALIDATION_ID);
+
+            ResultSet myRS = psSql.executeQuery();
+
+            if (myRS.next()) {
+                return myRS.getInt(SQL_COLUMN_VALIDATION_ID);
             }
 
         } catch (SQLException e) {

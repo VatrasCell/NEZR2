@@ -428,7 +428,7 @@ public class QuestionServiceTest extends DBTestUtil {
     public void testGetMultipleChoiceAnswersRelationIdsEmpty() {
 
         //act
-        List<Integer> result = QuestionService.getMultipleChoiceAnswersRelationIds(1);
+        List<Integer> result = QuestionService.getMultipleChoiceAnswerOptionsRelationIds(1);
 
         //assert
         assertTrue(result.isEmpty());

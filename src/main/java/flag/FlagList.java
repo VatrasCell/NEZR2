@@ -1,5 +1,6 @@
 package flag;
 
+import model.QuestionEditParam;
 import model.QuestionType;
 import validation.Validation;
 
@@ -24,6 +25,16 @@ public class FlagList {
     public FlagList() {
         super();
         //possibleFlags = getPossibleFlags();
+    }
+
+    public void setFlagListByParam(QuestionEditParam param) {
+        this.isList = param.isList();
+        this.isMultipleChoice = param.isMultipleChoice();
+        this.isTextArea = param.isTextArea();
+        this.isYesNoQuestion = param.isYesNoQuestion();
+        this.isSingleLine = param.isSingleLine();
+        this.isRequired = param.isRequired();
+        this.isEvaluationQuestion = param.isEvaluationQuestion();
     }
 
     public int getId() {

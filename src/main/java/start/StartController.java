@@ -1,6 +1,7 @@
 package start;
 
 import application.GlobalVars;
+import application.NotificationController;
 import application.ScreenController;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -28,6 +29,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import login.LoginController;
+import message.MessageId;
 import model.AnswerOption;
 import model.Headline;
 import model.Question;
@@ -463,6 +465,10 @@ public class StartController {
     @FXML
     private void next() throws IOException {
         List<Question> questions = QuestionListService.getQuestions(GlobalVars.activeQuestionnaire.getId());
+        if (questions.isEmpty()) {
+            NotificationController.createErrorMessage(MessageId.TITLE_QUESTIONNAIRE, MessageId.MESSAGE_QUESTIONNAIRE_IS_EMPTY);
+            return;
+        }
         makeQuestionnaire(questions, false);
         ScreenController.activate(SURVEY_1);
     }

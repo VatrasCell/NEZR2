@@ -13,6 +13,7 @@ import javafx.scene.layout.Pane;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 
 public class Question implements Comparable<Question>, Comparator<Question> {
 
@@ -24,7 +25,7 @@ public class Question implements Comparable<Question>, Comparator<Question> {
     public static String DELETE = "delete";
 
     private String question;
-    private int questionId;
+    private Integer questionId;
     private QuestionType questionType;
     private Category category;
     private String date;
@@ -73,14 +74,14 @@ public class Question implements Comparable<Question>, Comparator<Question> {
     /**
      * @return the questionID
      */
-    public int getQuestionId() {
+    public Integer getQuestionId() {
         return questionId;
     }
 
     /**
      * @param questionId the questionID to set
      */
-    public void setQuestionId(int questionId) {
+    public void setQuestionId(Integer questionId) {
         this.questionId = questionId;
     }
 
@@ -316,133 +317,43 @@ public class Question implements Comparable<Question>, Comparator<Question> {
         return o1.compareTo(o2);
     }
 
-    /* (non-Javadoc)
-     * @see java.lang.Object#toString()
-     */
     @Override
     public String toString() {
         return question;
     }
 
-    /* (non-Javadoc)
-     * @see java.lang.Object#hashCode()
-     */
     @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((submittedAnswer == null) ? 0 : submittedAnswer.hashCode());
-        result = prime * result + ((answerOptions == null) ? 0 : answerOptions.hashCode());
-        result = prime * result + ((answerTextField == null) ? 0 : answerTextField.hashCode());
-        result = prime * result + ((answerOptionListView == null) ? 0 : answerOptionListView.hashCode());
-        result = prime * result + ((answerCheckBoxes == null) ? 0 : answerCheckBoxes.hashCode());
-        result = prime * result + ((answerTextArea == null) ? 0 : answerTextArea.hashCode());
-        result = prime * result + ((questionType == null) ? 0 : questionType.hashCode());
-        result = prime * result + ((date == null) ? 0 : date.hashCode());
-        result = prime * result + ((flags == null) ? 0 : flags.hashCode());
-        result = prime * result + ((question == null) ? 0 : question.hashCode());
-        result = prime * result + questionId;
-        result = prime * result + ((questionLabel == null) ? 0 : questionLabel.hashCode());
-        result = prime * result + questionnaireId;
-        result = prime * result + ((category == null) ? 0 : category.hashCode());
-        result = prime * result + position;
-        result = prime * result + ((scene == null) ? 0 : scene.hashCode());
-        result = prime * result + ((target == null) ? 0 : target.hashCode());
-        result = prime * result + ((headline == null) ? 0 : headline.hashCode());
-        return result;
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Question question1 = (Question) o;
+        return getPosition() == question1.getPosition() &&
+                getQuestionnaireId() == question1.getQuestionnaireId() &&
+                Objects.equals(getQuestion(), question1.getQuestion()) &&
+                Objects.equals(getQuestionId(), question1.getQuestionId()) &&
+                getQuestionType() == question1.getQuestionType() &&
+                Objects.equals(getCategory(), question1.getCategory()) &&
+                Objects.equals(getDate(), question1.getDate()) &&
+                Objects.equals(getFlags(), question1.getFlags()) &&
+                Objects.equals(getHeadline(), question1.getHeadline()) &&
+                Objects.equals(getSubmittedAnswer(), question1.getSubmittedAnswer()) &&
+                Objects.equals(getAnswerOptions(), question1.getAnswerOptions()) &&
+                Objects.equals(getQuestionLabel(), question1.getQuestionLabel()) &&
+                Objects.equals(getScene(), question1.getScene()) &&
+                Objects.equals(getAnswerCheckBoxes(), question1.getAnswerCheckBoxes()) &&
+                Objects.equals(getAnswerTextField(), question1.getAnswerTextField()) &&
+                Objects.equals(getAnswerOptionListView(), question1.getAnswerOptionListView()) &&
+                Objects.equals(getAnswerTextArea(), question1.getAnswerTextArea()) &&
+                Objects.equals(getTarget(), question1.getTarget());
     }
 
-    /* (non-Javadoc)
-     * @see java.lang.Object#equals(java.lang.Object)
-     */
     @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
-        Question other = (Question) obj;
-        if (submittedAnswer == null) {
-            if (other.submittedAnswer != null)
-                return false;
-        } else if (!submittedAnswer.equals(other.submittedAnswer))
-            return false;
-        if (answerOptions == null) {
-            if (other.answerOptions != null)
-                return false;
-        } else if (!answerOptions.equals(other.answerOptions))
-            return false;
-        if (answerTextField == null) {
-            if (other.answerTextField != null)
-                return false;
-        } else if (!answerTextField.equals(other.answerTextField))
-            return false;
-        if (answerOptionListView == null) {
-            if (other.answerOptionListView != null)
-                return false;
-        } else if (!answerOptionListView.equals(other.answerOptionListView))
-            return false;
-        if (answerCheckBoxes == null) {
-            if (other.answerCheckBoxes != null)
-                return false;
-        } else if (!answerCheckBoxes.equals(other.answerCheckBoxes))
-            return false;
-        if (answerTextArea == null) {
-            if (other.answerTextArea != null)
-                return false;
-        } else if (!answerTextArea.equals(other.answerTextArea))
-            return false;
-        if (questionType == null) {
-            if (other.questionType != null)
-                return false;
-        } else if (!questionType.equals(other.questionType))
-            return false;
-        if (date == null) {
-            if (other.date != null)
-                return false;
-        } else if (!date.equals(other.date))
-            return false;
-        if (flags == null) {
-            if (other.flags != null)
-                return false;
-        } else if (!flags.equals(other.flags))
-            return false;
-        if (question == null) {
-            if (other.question != null)
-                return false;
-        } else if (!question.equals(other.question))
-            return false;
-        if (questionId != other.questionId)
-            return false;
-        if (questionLabel == null) {
-            if (other.questionLabel != null)
-                return false;
-        } else if (!questionLabel.equals(other.questionLabel))
-            return false;
-        if (questionnaireId != other.questionnaireId)
-            return false;
-        if (category == null) {
-            if (other.category != null)
-                return false;
-        } else if (!category.equals(other.category))
-            return false;
-        if (position != other.position)
-            return false;
-        if (scene == null) {
-            if (other.scene != null)
-                return false;
-        } else if (!scene.equals(other.scene))
-            return false;
-        if (target == null) {
-            if (other.target != null)
-                return false;
-        } else if (!target.equals(other.target))
-            return false;
-        if (headline == null) {
-            return other.headline == null;
-        } else return headline.equals(other.headline);
+    public int hashCode() {
+        return Objects.hash(getQuestion(), getQuestionId(), getQuestionType(), getCategory(),
+                getDate(), getFlags(), getPosition(), getHeadline(), getSubmittedAnswer(),
+                getAnswerOptions(), getQuestionLabel(), getScene(), getAnswerCheckBoxes(),
+                getAnswerTextField(), getAnswerOptionListView(), getAnswerTextArea(),
+                getTarget(), getQuestionnaireId());
     }
 
     public String toDebugString() {

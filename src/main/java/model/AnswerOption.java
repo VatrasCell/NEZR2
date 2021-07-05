@@ -7,7 +7,7 @@ public class AnswerOption {
     public static final String ID = "id";
     public static final String VALUE = "value";
 
-    private int id;
+    private Integer id;
     private String value;
 
     public AnswerOption() {
@@ -17,11 +17,11 @@ public class AnswerOption {
         this.value = value;
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
@@ -37,8 +37,8 @@ public class AnswerOption {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        AnswerOption answerOption = (AnswerOption) o;
-        return getId() == answerOption.getId() && Objects.equals(getValue(), answerOption.getValue());
+        AnswerOption that = (AnswerOption) o;
+        return Objects.equals(getId(), that.getId()) && Objects.equals(getValue(), that.getValue());
     }
 
     @Override

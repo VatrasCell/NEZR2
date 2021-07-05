@@ -60,7 +60,6 @@ public class QuestionController {
     public static Questionnaire questionnaire;
     public static Question question;
     public Button saveButton;
-    private ArrayList<String> answers;
     private final ObservableList<AnswerOptionTableObject> data = FXCollections.observableArrayList();
 
     @FXML
@@ -116,8 +115,9 @@ public class QuestionController {
     public QuestionController() {
         // fuer die Generierung der Antwortentabelle
         data.clear();
-        List<AnswerOptionTableObject> tableObjects =
-                AnswerTableObjectConverter.convert(Objects.requireNonNull(QuestionService.getAnswerOptions(question.getQuestionId())));
+        List<AnswerOptionTableObject> tableObjects = question.getQuestionId() == null ?
+                new ArrayList<>() :
+                AnswerTableObjectConverter.convert(Objects.requireNonNull(AnswerOptionService.getAnswerOptions(question.getQuestionId())));
         data.addAll(Objects.requireNonNull(tableObjects));
     }
 
@@ -243,7 +243,7 @@ public class QuestionController {
 
     @FXML
     private void save() throws IOException {
-        if (question.getQuestionId() == 0) {
+        if (question.getQuestionId() == null) {
             System.out.println("new Question");
             saveQuestion();
             //createQuestion();
@@ -269,10 +269,11 @@ public class QuestionController {
         String oldQuestion = question.getQuestion();
         String newQuestion = questionTextField.getText();
 
-        FlagList flags = question.getFlags();
-
         QuestionEditParam param = new QuestionEditParam(questionTypeChoiceBox, requiredQuestionCheckBox, evaluationQuestionCheckBox,
                 multipleChoiceCheckBox, listCheckBox, textAreaCheckBox, yesNoCheckBox, excelFormatCheckBox);
+
+        FlagList flags = question.getFlags();
+        flags.setFlagListByParam(param);
 
         questionToSave.setQuestionType(param.getQuestionType());
 
@@ -315,16 +316,20 @@ public class QuestionController {
                 QuestionService.saveEvaluationQuestion(questionnaire.getId(), questionToSave);
             } else {
                 ArrayList<AnswerOption> answerOptions = new ArrayList<>();
-                ArrayList<Integer> answerIdsToDelete = new ArrayList<>();
 
                 if (param.isYesNoQuestion()) {
-                    answerOptions.add(new AnswerOption("Ja"));
-                    answerOptions.add(new AnswerOption("Nein"));
+                    answerOptions.add(Objects.requireNonNull(AnswerOptionService.getAnswerOption("ja")));
+                    answerOptions.add(Objects.requireNonNull(AnswerOptionService.getAnswerOption("nein")));
                 } else {
                     answerOptions.addAll(answerTable.getItems());
                 }
 
-                if (questionLabel.getText().equals("Frage Bearbeiten")) {
+                answerOptions.stream()
+                        .filter(answerOption -> answerOption.getId() == null)
+                        .forEach(answerOption -> answerOption.setId(AnswerOptionService.provideAnswerOptionId(answerOption.getValue())));
+
+                //TODO what is this?!
+                /*if (questionLabel.getText().equals("Frage Bearbeiten")) {
                     for (int i = 0; i < this.answers.size(); i++) {
                         for (AnswerOption answerOption : answerOptions) {
                             if (!this.answers.isEmpty() && this.answers.get(i).equals(answerOption.getValue())) {
@@ -342,11 +347,7 @@ public class QuestionController {
                 if (!answerIdsToDelete.isEmpty()) {
                     QuestionService.deleteFlagsFromTargetQuestion(questionnaire.getId(), questionToSave.getQuestionId());
                     QuestionService.deleteAnswers(answerIdsToDelete, questionToSave.getQuestionId());
-                }
-
-                answerOptions.forEach(answer ->
-                        answer.setId(Objects.requireNonNull(QuestionService.getAnswerId(answer.getValue())))
-                );
+                }*/
 
                 //QuestionService.getPossibleFlags(flags, param);
                 questionToSave.setFlags(flags);
@@ -378,7 +379,6 @@ public class QuestionController {
         Optional<String> result = dialog.showAndWait();
         result.ifPresent(name -> {
             AnswerOption answerOption = new AnswerOption();
-            answerOption.setId(data.size() + 1);
             answerOption.setValue(name);
             data.add(AnswerTableObjectConverter.convert(answerOption));
 
@@ -438,7 +438,7 @@ public class QuestionController {
         boolean bool;
         if (!questionTextField.getText().equals("")) {
             if (!questionTypeChoiceBox.getSelectionModel().getSelectedItem().equals("-- Art der Frage --")) {
-                bool = (answerTable.getItems().size() >= 1 && !yesNoCheckBox.isSelected()) || !questionTypeChoiceBox.getSelectionModel().getSelectedItem().equals("Multiple Choice");
+                bool = answerTable.getItems().size() >= 1 || !questionTypeChoiceBox.getSelectionModel().getSelectedItem().equals("Multiple Choice") || yesNoCheckBox.isSelected();
             } else {
                 bool = false;
             }

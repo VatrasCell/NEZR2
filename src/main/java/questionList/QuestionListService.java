@@ -8,6 +8,7 @@ import model.AnswerOption;
 import model.Headline;
 import model.Question;
 import model.QuestionType;
+import question.AnswerOptionService;
 import question.QuestionService;
 
 import java.sql.Connection;
@@ -35,10 +36,9 @@ import static application.SqlStatement.SQL_COLUMN_SHORT_ANSWER_ID;
 import static application.SqlStatement.SQL_COLUMN_SHORT_ANSWER_QUESTIONNAIRE_RELATION_ID;
 import static application.SqlStatement.SQL_CREATE_HEADLINE;
 import static application.SqlStatement.SQL_DELETE_MULTIPLE_CHOICE;
-import static application.SqlStatement.SQL_DELETE_MULTIPLE_CHOICE_ANSWERS_RELATION_BY_QUESTION_ID;
+import static application.SqlStatement.SQL_DELETE_MULTIPLE_CHOICE_ANSWER_OPTIONS_RELATION_BY_QUESTION_ID;
 import static application.SqlStatement.SQL_DELETE_MULTIPLE_CHOICE_QUESTIONNAIRE_RELATION;
 import static application.SqlStatement.SQL_DELETE_SHORT_ANSWER;
-import static application.SqlStatement.SQL_DELETE_SHORT_ANSWER_HAS_ANSWERS_RELATION_BY_QUESTION_ID;
 import static application.SqlStatement.SQL_DELETE_SHORT_ANSWER_QUESTIONNAIRE_RELATION;
 import static application.SqlStatement.SQL_GET_HEADLINES;
 import static application.SqlStatement.SQL_GET_HEADLINE_BY_ID;
@@ -82,7 +82,7 @@ public class QuestionListService extends Database {
                         QuestionType.MULTIPLE_CHOICE));
                 question.setPosition(Integer.parseInt(myRS.getString(SQL_COLUMN_POSITION)));
                 question.setQuestionType(QuestionType.MULTIPLE_CHOICE);
-                question.setAnswerOptions(QuestionService.getAnswerOptions(question.getQuestionId()));
+                question.setAnswerOptions(AnswerOptionService.getAnswerOptions(question.getQuestionId()));
                 int headlineId = myRS.getInt(SQL_COLUMN_HEADLINE_ID);
                 if (headlineId > 0) {
                     question.setHeadline(getHeadline(headlineId));
@@ -238,7 +238,8 @@ public class QuestionListService extends Database {
     }
 
     public static void deleteQuestion(int questionnaireId, int questionId, QuestionType questionType) {
-        QuestionService.deleteFlagsFromTargetQuestion(questionnaireId, questionId);
+        //TODO refactor
+        //QuestionService.deleteFlagsFromTargetQuestion(questionnaireId, questionId);
 
         if (questionType.equals(QuestionType.MULTIPLE_CHOICE)) {
 
@@ -254,28 +255,16 @@ public class QuestionListService extends Database {
 
             if (!doesShortAnswerQuestionExistsInOtherQuestionnaire(questionnaireId, questionId)) {
 
-                deleteShortAnswerHasAnswerRelation(questionId);
                 deleteShortAnswerQuestion(questionId);
             }
         }
 
-        QuestionService.deleteUnbindedAnswers();
+        AnswerOptionService.deleteUnbindedAnswerOptions();
     }
 
     public static void deleteShortAnswerQuestion(int questionId) {
         try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
             PreparedStatement psSql = myCon.prepareStatement(SQL_DELETE_SHORT_ANSWER);
-            psSql.setInt(1, questionId);
-
-            psSql.execute();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public static void deleteShortAnswerHasAnswerRelation(int questionId) {
-        try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
-            PreparedStatement psSql = myCon.prepareStatement(SQL_DELETE_SHORT_ANSWER_HAS_ANSWERS_RELATION_BY_QUESTION_ID);
             psSql.setInt(1, questionId);
 
             psSql.execute();
@@ -297,7 +286,7 @@ public class QuestionListService extends Database {
 
     public static void deleteMultipleChoiceHasAnswerRelation(int questionId) {
         try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
-            PreparedStatement psSql = myCon.prepareStatement(SQL_DELETE_MULTIPLE_CHOICE_ANSWERS_RELATION_BY_QUESTION_ID);
+            PreparedStatement psSql = myCon.prepareStatement(SQL_DELETE_MULTIPLE_CHOICE_ANSWER_OPTIONS_RELATION_BY_QUESTION_ID);
             psSql.setInt(1, questionId);
 
             psSql.execute();
@@ -339,6 +328,8 @@ public class QuestionListService extends Database {
             PreparedStatement psSql = myCon.prepareStatement(SQL_DELETE_SHORT_ANSWER_QUESTIONNAIRE_RELATION);
             psSql.setInt(1, questionId);
             psSql.setInt(2, questionnaireId);
+
+            psSql.execute();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -349,6 +340,8 @@ public class QuestionListService extends Database {
             PreparedStatement psSql = myCon.prepareStatement(SQL_DELETE_MULTIPLE_CHOICE_QUESTIONNAIRE_RELATION);
             psSql.setInt(1, questionId);
             psSql.setInt(2, questionnaireId);
+
+            psSql.execute();
         } catch (SQLException e) {
             e.printStackTrace();
         }
