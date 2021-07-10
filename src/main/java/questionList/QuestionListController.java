@@ -16,9 +16,9 @@ import model.SceneName;
 import model.tableObject.QuestionTableObject;
 import model.tableObject.converter.QuestionTableObjectConverter;
 import question.QuestionController;
+import question.QuestionService;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -29,7 +29,6 @@ import static message.TableColumnNameId.EDIT;
 
 public class QuestionListController {
     public static Questionnaire questionnaire;
-    private static List<Question> questions = new ArrayList<>();
     private static final ObservableList<QuestionTableObject> data = FXCollections.observableArrayList();
 
     @FXML
@@ -127,7 +126,7 @@ public class QuestionListController {
     private void newQuestion() {
         QuestionController.questionnaire = questionnaire;
 
-        QuestionController.question = new Question(questions.size());
+        QuestionController.question = new Question(QuestionService.getCountPosition(questionnaire.getId()));
         try {
             ScreenController.addScreen(SceneName.QUESTION, getURL(SceneName.QUESTION_PATH));
             ScreenController.activate(SceneName.QUESTION);

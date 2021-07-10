@@ -577,10 +577,10 @@ public class QuestionService extends Database {
         }
     }
 
-    public static void setHeadlineOnShortAnswer(int headline, int shortAnswerId) {
+    public static void setHeadlineOnShortAnswer(int headlineId, int shortAnswerId) {
         try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
             PreparedStatement psSql = myCon.prepareStatement(SQL_SET_HEADLINE_ON_SHORT_ANSWER);
-            psSql.setInt(1, headline);
+            psSql.setInt(1, headlineId);
             psSql.setInt(2, shortAnswerId);
             psSql.executeUpdate();
         } catch (SQLException e) {

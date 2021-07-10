@@ -161,6 +161,7 @@ public class StartController {
 
         //add last page
         page.setPageNumber(pages.size() + 1);
+        page.setHeadline(currentHeadline);
         pages.add(page);
 
         return pages;

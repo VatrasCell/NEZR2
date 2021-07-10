@@ -69,7 +69,7 @@ public class SqlStatement {
     public static final String SQL_CREATE_SHORT_ANSWER = "INSERT INTO short_answer VALUES(NULL, ? , ?, NULL)";
     public static final String SQL_DELETE_SHORT_ANSWER = "DELETE FROM short_answer WHERE short_answer_id=?";
     public static final String SQL_SET_CATEGORY_ON_SHORT_ANSWER = "UPDATE short_answer SET category_id=? WHERE short_answer_id=?";
-    public static final String SQL_SET_HEADLINE_ON_SHORT_ANSWER = "UPDATE short_answer SET headline_id=? WHERE short_answer_id=?";
+    public static final String SQL_SET_HEADLINE_ON_SHORT_ANSWER = "UPDATE short_answer SET headline_headline_id=? WHERE short_answer_id=?";
 
     public static final String SQL_COLUMN_SHORT_ANSWER_ID = "short_answer_id";
 
