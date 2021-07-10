@@ -34,9 +34,9 @@ public class FlagListService extends Database {
 
     public static FlagList getFlagList(int questionnaireId, int questionId, QuestionType questionType) {
         if (questionType.equals(QuestionType.MULTIPLE_CHOICE)) {
-            return getFlagList(QuestionService.getMultipleChoiceQuestionnaireRelationId(questionnaireId, questionId), questionType);
+            return getFlagList(QuestionService.getQuestionQuestionnaireRelationId(questionnaireId, questionId, questionType), questionType);
         } else {
-            return getFlagList(QuestionService.getShortAnswerQuestionnaireRelationId(questionnaireId, questionId), questionType);
+            return getFlagList(QuestionService.getQuestionQuestionnaireRelationId(questionnaireId, questionId, questionType), questionType);
         }
     }
 
@@ -74,23 +74,19 @@ public class FlagListService extends Database {
         return null;
     }
 
-    public static void setQuestionRequired(int questionnaireId, int questionId, QuestionType questionType) {
-        if (questionType.equals(QuestionType.MULTIPLE_CHOICE)) {
-            setQuestionRequired(QuestionService.getMultipleChoiceQuestionnaireRelationId(questionnaireId, questionId), questionType);
-        } else {
-            setQuestionRequired(QuestionService.getShortAnswerQuestionnaireRelationId(questionnaireId, questionId), questionType);
-        }
+    public static void setQuestionRequired(Connection connection, int questionnaireId, int questionId, QuestionType questionType) throws SQLException {
+        setQuestionRequired(connection, QuestionService.getQuestionQuestionnaireRelationId(questionnaireId, questionId, questionType), questionType);
     }
 
-    public static void setQuestionRequired(int flagListId, QuestionType questionType) {
-
-        try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
-            PreparedStatement psSql = myCon.prepareStatement(questionType.equals(QuestionType.MULTIPLE_CHOICE) ?
+    public static void setQuestionRequired(Connection connection, int flagListId, QuestionType questionType) throws SQLException {
+        try {
+            PreparedStatement psSql = connection.prepareStatement(questionType.equals(QuestionType.MULTIPLE_CHOICE) ?
                     SQL_SET_FLAG_LIST_MC_REQUIRED : SQL_SET_FLAG_LIST_SA_REQUIRED);
             psSql.setInt(1, flagListId);
             psSql.execute();
 
         } catch (SQLException e) {
+            connection.rollback();
             e.printStackTrace();
         }
     }
@@ -113,9 +109,9 @@ public class FlagListService extends Database {
         return null;
     }
 
-    public static void updateMultipleChoiceFlagList(int relationId, FlagList flagList) {
-        try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
-            PreparedStatement psSql = myCon.prepareStatement(SQL_UPDATE_FLAG_LIST_MC);
+    public static void updateMultipleChoiceFlagList(Connection connection, int relationId, FlagList flagList) throws SQLException {
+        try {
+            PreparedStatement psSql = connection.prepareStatement(SQL_UPDATE_FLAG_LIST_MC);
             psSql.setBoolean(1, flagList.isEvaluationQuestion());
             psSql.setBoolean(2, flagList.isRequired());
             psSql.setBoolean(3, flagList.isMultipleChoice());
@@ -125,25 +121,27 @@ public class FlagListService extends Database {
             psSql.setInt(7, relationId);
             psSql.executeUpdate();
         } catch (SQLException e) {
+            connection.rollback();
             e.printStackTrace();
         }
     }
 
-    public static void updateShortAnswerFlagList(int relationId, FlagList flagList) {
-        try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
-            PreparedStatement psSql = myCon.prepareStatement(SQL_UPDATE_FLAG_LIST_SA);
+    public static void updateShortAnswerFlagList(Connection connection, int relationId, FlagList flagList) throws SQLException {
+        try {
+            PreparedStatement psSql = connection.prepareStatement(SQL_UPDATE_FLAG_LIST_SA);
             psSql.setBoolean(1, flagList.isRequired());
             psSql.setBoolean(2, flagList.isTextArea());
             psSql.setInt(3, relationId);
             psSql.executeUpdate();
         } catch (SQLException e) {
+            connection.rollback();
             e.printStackTrace();
         }
     }
 
-    public static void createMultipleChoiceFlagList(int relationId, FlagList flagList) {
-        try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
-            PreparedStatement psSql = myCon.prepareStatement(SQL_CREATE_FLAG_LIST_MC);
+    public static void createMultipleChoiceFlagList(Connection connection, int relationId, FlagList flagList) throws SQLException {
+        try {
+            PreparedStatement psSql = connection.prepareStatement(SQL_CREATE_FLAG_LIST_MC);
             psSql.setInt(1, relationId);
             psSql.setBoolean(2, flagList.isEvaluationQuestion());
             psSql.setBoolean(3, flagList.isRequired());
@@ -153,6 +151,7 @@ public class FlagListService extends Database {
             psSql.setBoolean(7, flagList.isSingleLine());
             psSql.executeUpdate();
         } catch (SQLException e) {
+            connection.rollback();
             e.printStackTrace();
         }
     }

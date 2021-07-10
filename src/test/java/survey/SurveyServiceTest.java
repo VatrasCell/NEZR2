@@ -1,11 +1,9 @@
 package survey;
 
-import org.junit.Test;
 import util.DBTestUtil;
 
-import static org.junit.Assert.*;
-
 public class SurveyServiceTest extends DBTestUtil {
+    /*
 
     @Test
     public void saveSurvey() {
@@ -29,5 +27,5 @@ public class SurveyServiceTest extends DBTestUtil {
 
     @Test
     public void resetQuestionnaire() {
-    }
+    }*/
 }

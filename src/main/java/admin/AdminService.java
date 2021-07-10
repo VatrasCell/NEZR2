@@ -3,11 +3,8 @@ package admin;
 import application.Database;
 import application.GlobalFuncs;
 import application.GlobalVars;
-import model.AnswerOption;
-import model.Question;
 import model.QuestionType;
 import model.Questionnaire;
-import question.QuestionService;
 import questionList.QuestionListService;
 
 import java.sql.Connection;
@@ -17,7 +14,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 import static application.SqlStatement.SQL_ACTIVATE_QUESTIONNAIRE;
 import static application.SqlStatement.SQL_COLUMN_CREATION_DATE;
@@ -92,49 +88,64 @@ public class AdminService extends Database {
         }
     }
 
+    //TODO refactor
     public static boolean copyQuestionnaire(Questionnaire questionnaire, String location) {
-        questionnaire.setId(createQuestionnaire(questionnaire.getName(), location));
+        return false;
+        /*questionnaire.setId(createQuestionnaire(questionnaire.getName(), location));
         List<Question> questions = QuestionListService.getQuestions(questionnaire.getId());
         for (Question question : Objects.requireNonNull(questions)) {
             if (question.getQuestionType().equals(QuestionType.SHORT_ANSWER)) {
                 QuestionService.saveShortAnswerQuestion(questionnaire.getId(), question);
             } else {
-                if (question.getFlags().isEvaluationQuestion()) {
-                    QuestionService.saveEvaluationQuestion(questionnaire.getId(), question);
-                } else {
-                    ArrayList<AnswerOption> answerOptions = new ArrayList<>();
-                    answerOptions.addAll(question.getAnswerOptions());
-                    QuestionService.saveMultipleChoice(questionnaire.getId(), question, answerOptions);
-                }
+                QuestionService.saveMultipleChoice(questionnaire.getId(), question);
             }
         }
-        return true;
+        return true;*/
     }
 
     public static boolean deleteQuestionnaire(int questionnaireId) {
-        List<Integer> multipleChoiceIds = QuestionListService.getMultipleChoiceQuestionsByQuestionnaireId(questionnaireId);
-
-        if (multipleChoiceIds != null) {
-            multipleChoiceIds.forEach(questionId -> QuestionListService.deleteQuestion(questionnaireId, questionId, QuestionType.MULTIPLE_CHOICE));
-        }
-
-        List<Integer> shortAnswerIds = QuestionListService.getShortAnswerQuestionsByQuestionnaireId(questionnaireId);
-
-        if (shortAnswerIds != null) {
-            shortAnswerIds.forEach(questionId -> QuestionListService.deleteQuestion(questionnaireId, questionId, QuestionType.SHORT_ANSWER));
-        }
-
         try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
-            PreparedStatement psSql = myCon.prepareStatement(SQL_DELETE_QUESTIONNAIRE);
-            psSql.setInt(1, questionnaireId);
-            psSql.execute();
+            myCon.setAutoCommit(false);
 
+            List<Integer> multipleChoiceIds = QuestionListService.getQuestionsByQuestionnaireId(questionnaireId, QuestionType.MULTIPLE_CHOICE);
+
+            if (multipleChoiceIds != null) {
+                multipleChoiceIds.forEach(questionId -> {
+                    try {
+                        QuestionListService.deleteQuestion(myCon, questionnaireId, questionId, QuestionType.MULTIPLE_CHOICE);
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                });
+            }
+
+            List<Integer> shortAnswerIds = QuestionListService.getQuestionsByQuestionnaireId(questionnaireId, QuestionType.SHORT_ANSWER);
+
+            if (shortAnswerIds != null) {
+                shortAnswerIds.forEach(questionId -> {
+                    try {
+                        QuestionListService.deleteQuestion(myCon, questionnaireId, questionId, QuestionType.SHORT_ANSWER);
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                });
+            }
+
+            deleteQuestionnaire(myCon, questionnaireId);
+
+            myCon.commit();
             return true;
         } catch (SQLException e) {
             e.printStackTrace();
         }
 
         return false;
+    }
+
+    private static void deleteQuestionnaire(Connection connection, int questionnaireId) throws SQLException {
+        PreparedStatement psSql = connection.prepareStatement(SQL_DELETE_QUESTIONNAIRE);
+        psSql.setInt(1, questionnaireId);
+        psSql.execute();
     }
 
     public static boolean renameQuestionnaire(Questionnaire questionnaire) {

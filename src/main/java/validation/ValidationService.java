@@ -57,9 +57,9 @@ public class ValidationService extends Database {
         return null;
     }
 
-    public static void createValidation(Validation validation) {
-        try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
-            PreparedStatement psSql = myCon.prepareStatement(SQL_CREATE_VALIDATION);
+    public static void createValidation(Connection connection, Validation validation) throws SQLException {
+        try {
+            PreparedStatement psSql = connection.prepareStatement(SQL_CREATE_VALIDATION);
             psSql.setBoolean(1, validation.isNumbers());
             psSql.setBoolean(2, validation.isLetters());
             psSql.setBoolean(3, validation.isAlphanumeric());
@@ -73,6 +73,7 @@ public class ValidationService extends Database {
             psSql.execute();
 
         } catch (SQLException e) {
+            connection.rollback();
             e.printStackTrace();
         }
     }

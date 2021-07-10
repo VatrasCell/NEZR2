@@ -1,15 +1,13 @@
 package questionList;
 
 import application.Database;
-import application.NotificationController;
 import flag.FlagListService;
-import message.MessageId;
 import model.AnswerOption;
-import model.Headline;
 import model.Question;
 import model.QuestionType;
 import question.AnswerOptionService;
-import question.QuestionService;
+import question.CategoryService;
+import question.HeadlineService;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -29,21 +27,15 @@ import static application.SqlStatement.SQL_COLUMN_HEADLINE_ID;
 import static application.SqlStatement.SQL_COLUMN_HEADLINE_ID2;
 import static application.SqlStatement.SQL_COLUMN_MULTIPLE_CHOICE_ID;
 import static application.SqlStatement.SQL_COLUMN_MULTIPLE_CHOICE_QUESTIONNAIRE_RELATION_ID;
-import static application.SqlStatement.SQL_COLUMN_NAME;
 import static application.SqlStatement.SQL_COLUMN_POSITION;
 import static application.SqlStatement.SQL_COLUMN_QUESTION;
 import static application.SqlStatement.SQL_COLUMN_SHORT_ANSWER_ID;
 import static application.SqlStatement.SQL_COLUMN_SHORT_ANSWER_QUESTIONNAIRE_RELATION_ID;
-import static application.SqlStatement.SQL_CREATE_HEADLINE;
 import static application.SqlStatement.SQL_DELETE_MULTIPLE_CHOICE;
 import static application.SqlStatement.SQL_DELETE_MULTIPLE_CHOICE_ANSWER_OPTIONS_RELATION_BY_QUESTION_ID;
 import static application.SqlStatement.SQL_DELETE_MULTIPLE_CHOICE_QUESTIONNAIRE_RELATION;
 import static application.SqlStatement.SQL_DELETE_SHORT_ANSWER;
 import static application.SqlStatement.SQL_DELETE_SHORT_ANSWER_QUESTIONNAIRE_RELATION;
-import static application.SqlStatement.SQL_GET_HEADLINES;
-import static application.SqlStatement.SQL_GET_HEADLINE_BY_ID;
-import static application.SqlStatement.SQL_GET_HEADLINE_BY_NAME;
-import static application.SqlStatement.SQL_GET_HEADLINE_ID;
 import static application.SqlStatement.SQL_GET_MULTIPLE_CHOICE_IDS_BY_QUESTIONNAIRE_ID;
 import static application.SqlStatement.SQL_GET_MULTIPLE_CHOICE_QUESTION;
 import static application.SqlStatement.SQL_GET_MULTIPLE_CHOICE_QUESTION_ANSWERS;
@@ -75,7 +67,7 @@ public class QuestionListService extends Database {
                 Question question = new Question();
                 question.setQuestion(myRS.getString(SQL_COLUMN_QUESTION));
                 question.setQuestionId(myRS.getInt(SQL_COLUMN_MULTIPLE_CHOICE_ID));
-                question.setCategory(QuestionService.provideCategory(myRS.getString(SQL_COLUMN_CATEGORY_NAME)));
+                question.setCategory(CategoryService.getCategory(myRS.getString(SQL_COLUMN_CATEGORY_NAME)));
                 question.setDate(myRS.getString(SQL_COLUMN_CREATION_DATE));
                 question.setFlags(FlagListService.getFlagList(
                         myRS.getInt(SQL_COLUMN_MULTIPLE_CHOICE_QUESTIONNAIRE_RELATION_ID),
@@ -85,7 +77,7 @@ public class QuestionListService extends Database {
                 question.setAnswerOptions(AnswerOptionService.getAnswerOptions(question.getQuestionId()));
                 int headlineId = myRS.getInt(SQL_COLUMN_HEADLINE_ID);
                 if (headlineId > 0) {
-                    question.setHeadline(getHeadline(headlineId));
+                    question.setHeadline(HeadlineService.getHeadline(headlineId));
                 }
                 question.setQuestionnaireId(questionnaireId);
                 questions.add(question);
@@ -110,7 +102,7 @@ public class QuestionListService extends Database {
                 Question question = new Question();
                 question.setQuestion(myRS.getString(SQL_COLUMN_QUESTION));
                 question.setQuestionId(myRS.getInt(SQL_COLUMN_SHORT_ANSWER_ID));
-                question.setCategory(QuestionService.provideCategory(myRS.getString(SQL_COLUMN_CATEGORY_NAME)));
+                question.setCategory(CategoryService.getCategory(myRS.getString(SQL_COLUMN_CATEGORY_NAME)));
                 question.setDate(myRS.getString(SQL_COLUMN_CREATION_DATE));
                 question.setFlags(FlagListService.getFlagList(
                         myRS.getInt(SQL_COLUMN_SHORT_ANSWER_QUESTIONNAIRE_RELATION_ID),
@@ -119,7 +111,7 @@ public class QuestionListService extends Database {
                 question.setQuestionType(QuestionType.SHORT_ANSWER);
                 int headlineId = myRS.getInt(SQL_COLUMN_HEADLINE_ID2);
                 if (headlineId > 0) {
-                    question.setHeadline(getHeadline(headlineId));
+                    question.setHeadline(HeadlineService.getHeadline(headlineId));
                 }
                 question.setQuestionnaireId(questionnaireId);
                 questions.add(question);
@@ -131,220 +123,6 @@ public class QuestionListService extends Database {
         }
 
         return null;
-    }
-
-    public static List<Headline> getHeadlines(int questionnaireId) {
-        List<Headline> headlines = new ArrayList<>();
-        try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
-            PreparedStatement psSql = myCon.prepareStatement(SQL_GET_HEADLINES);
-            ResultSet myRS = psSql.executeQuery();
-            while (myRS.next()) {
-                int id = myRS.getInt(SQL_COLUMN_HEADLINE_ID);
-                String name = myRS.getString(SQL_COLUMN_NAME);
-                headlines.add(new Headline(id, name));
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return headlines;
-    }
-
-    public static Headline getHeadline(int headlineId) {
-        try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
-            PreparedStatement psSql = myCon.prepareStatement(SQL_GET_HEADLINE_BY_ID);
-            psSql.setInt(1, headlineId);
-            ResultSet myRS = psSql.executeQuery();
-            if (myRS.next()) {
-                int id = myRS.getInt(SQL_COLUMN_HEADLINE_ID);
-                String name = myRS.getString(SQL_COLUMN_NAME);
-                return new Headline(id, name);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    public static Headline getHeadlineByName(String name) {
-        try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
-            PreparedStatement psSql = myCon.prepareStatement(SQL_GET_HEADLINE_BY_NAME);
-            psSql.setString(1, name);
-            ResultSet myRS = psSql.executeQuery();
-            if (myRS.next()) {
-                return new Headline(
-                        myRS.getInt(SQL_COLUMN_HEADLINE_ID),
-                        myRS.getString(SQL_COLUMN_NAME)
-                );
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    public static void createHeadline(String name) {
-        try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
-            PreparedStatement psSql = myCon.prepareStatement(SQL_CREATE_HEADLINE);
-            psSql.setString(1, name);
-            psSql.execute();
-
-            NotificationController
-                    .createMessage(MessageId.TITLE_CREATE_HEADLINE, MessageId.MESSAGE_CREATE_HEADLINE, name);
-        } catch (SQLException e) {
-            e.printStackTrace();
-            NotificationController
-                    .createErrorMessage(MessageId.TITLE_CREATE_HEADLINE, MessageId.MESSAGE_UNDEFINED_ERROR);
-        }
-    }
-
-    public static boolean checkHeadline(String name) {
-        try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
-            PreparedStatement psSql = myCon.prepareStatement(SQL_GET_HEADLINE_ID);
-            psSql.setString(1, name);
-            ResultSet myRS = psSql.executeQuery();
-
-            if (myRS.next()) {
-                return true;
-            }
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return false;
-    }
-
-    public static void createUniqueHeadline(String name) {
-        if (checkHeadline(name)) {
-            NotificationController
-                    .createErrorMessage(MessageId.TITLE_CREATE_HEADLINE, MessageId.MESSAGE_CATEGORY_HEADLINE_EXISTS);
-        } else {
-            createHeadline(name);
-        }
-    }
-
-    public static Headline provideHeadline(String name) {
-        Headline headline = getHeadlineByName(name);
-
-        if (headline == null) {
-            createUniqueHeadline(name);
-            headline = getHeadlineByName(name);
-        }
-
-        return headline;
-    }
-
-    public static void deleteQuestion(int questionnaireId, Question question) {
-        deleteQuestion(questionnaireId, question.getQuestionId(), question.getQuestionType());
-    }
-
-    public static void deleteQuestion(int questionnaireId, int questionId, QuestionType questionType) {
-        //TODO refactor
-        //QuestionService.deleteFlagsFromTargetQuestion(questionnaireId, questionId);
-
-        if (questionType.equals(QuestionType.MULTIPLE_CHOICE)) {
-
-            deleteMultipleChoiceQuestionnaireRelation(questionnaireId, questionId);
-
-            if (!doesMultipleChoiceQuestionExistsInOtherQuestionnaire(questionnaireId, questionId)) {
-
-                deleteMultipleChoiceHasAnswerRelation(questionId);
-                deleteMultipleChoiceQuestion(questionId);
-            }
-        } else if (questionType.equals(QuestionType.SHORT_ANSWER)) {
-            deleteShortAnswerQuestionnaireRelation(questionnaireId, questionId);
-
-            if (!doesShortAnswerQuestionExistsInOtherQuestionnaire(questionnaireId, questionId)) {
-
-                deleteShortAnswerQuestion(questionId);
-            }
-        }
-
-        AnswerOptionService.deleteUnbindedAnswerOptions();
-    }
-
-    public static void deleteShortAnswerQuestion(int questionId) {
-        try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
-            PreparedStatement psSql = myCon.prepareStatement(SQL_DELETE_SHORT_ANSWER);
-            psSql.setInt(1, questionId);
-
-            psSql.execute();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public static void deleteMultipleChoiceQuestion(int questionId) {
-        try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
-            PreparedStatement psSql = myCon.prepareStatement(SQL_DELETE_MULTIPLE_CHOICE);
-            psSql.setInt(1, questionId);
-
-            psSql.execute();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public static void deleteMultipleChoiceHasAnswerRelation(int questionId) {
-        try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
-            PreparedStatement psSql = myCon.prepareStatement(SQL_DELETE_MULTIPLE_CHOICE_ANSWER_OPTIONS_RELATION_BY_QUESTION_ID);
-            psSql.setInt(1, questionId);
-
-            psSql.execute();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public static boolean doesMultipleChoiceQuestionExistsInOtherQuestionnaire(int questionnaireId, int questionId) {
-        try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
-            PreparedStatement psSql = myCon.prepareStatement(SQL_GET_OTHER_MULTIPLE_CHOICE_QUESTIONNAIRE_RELATION_IDS);
-            psSql.setInt(1, questionnaireId);
-            psSql.setInt(2, questionId);
-
-            return psSql.executeQuery().next();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        return true;
-    }
-
-    public static boolean doesShortAnswerQuestionExistsInOtherQuestionnaire(int questionnaireId, int questionId) {
-        try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
-            PreparedStatement psSql = myCon.prepareStatement(SQL_GET_OTHER_SHORT_ANSWER_QUESTIONNAIRE_RELATION_IDS);
-            psSql.setInt(1, questionnaireId);
-            psSql.setInt(2, questionId);
-
-            return psSql.executeQuery().next();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        return true;
-    }
-
-    public static void deleteShortAnswerQuestionnaireRelation(int questionnaireId, int questionId) {
-        try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
-            PreparedStatement psSql = myCon.prepareStatement(SQL_DELETE_SHORT_ANSWER_QUESTIONNAIRE_RELATION);
-            psSql.setInt(1, questionId);
-            psSql.setInt(2, questionnaireId);
-
-            psSql.execute();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public static void deleteMultipleChoiceQuestionnaireRelation(int questionnaireId, int questionId) {
-        try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
-            PreparedStatement psSql = myCon.prepareStatement(SQL_DELETE_MULTIPLE_CHOICE_QUESTIONNAIRE_RELATION);
-            psSql.setInt(1, questionId);
-            psSql.setInt(2, questionnaireId);
-
-            psSql.execute();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
     }
 
     public static List<AnswerOption> getMultipleChoiceQuestionAnswers(int questionnaireId, int questionId) {
@@ -371,15 +149,17 @@ public class QuestionListService extends Database {
         return answerOptions;
     }
 
-    public static List<Integer> getMultipleChoiceQuestionsByQuestionnaireId(int questionnaireId) {
+    public static List<Integer> getQuestionsByQuestionnaireId(int questionnaireId, QuestionType questionType) {
         try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
             List<Integer> results = new ArrayList<>();
-            PreparedStatement psSql = myCon.prepareStatement(SQL_GET_MULTIPLE_CHOICE_IDS_BY_QUESTIONNAIRE_ID);
+            PreparedStatement psSql = myCon.prepareStatement(questionType.equals(QuestionType.MULTIPLE_CHOICE) ?
+                    SQL_GET_MULTIPLE_CHOICE_IDS_BY_QUESTIONNAIRE_ID : SQL_GET_SHORT_ANSWER_IDS_BY_QUESTIONNAIRE_ID);
             psSql.setInt(1, questionnaireId);
             ResultSet myRS = psSql.executeQuery();
 
             while (myRS.next()) {
-                results.add(myRS.getInt(SQL_COLUMN_MULTIPLE_CHOICE_ID));
+                results.add(myRS.getInt(questionType.equals(QuestionType.MULTIPLE_CHOICE) ?
+                        SQL_COLUMN_MULTIPLE_CHOICE_ID : SQL_COLUMN_SHORT_ANSWER_ID));
             }
 
             return results;
@@ -390,22 +170,117 @@ public class QuestionListService extends Database {
         return null;
     }
 
-    public static List<Integer> getShortAnswerQuestionsByQuestionnaireId(int questionnaireId) {
+    public static boolean doesQuestionExistsInOtherQuestionnaire(int questionnaireId, int questionId, QuestionType questionType) {
         try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
-            List<Integer> results = new ArrayList<>();
-            PreparedStatement psSql = myCon.prepareStatement(SQL_GET_SHORT_ANSWER_IDS_BY_QUESTIONNAIRE_ID);
+            PreparedStatement psSql = myCon.prepareStatement(questionType.equals(QuestionType.MULTIPLE_CHOICE) ?
+                    SQL_GET_OTHER_MULTIPLE_CHOICE_QUESTIONNAIRE_RELATION_IDS : SQL_GET_OTHER_SHORT_ANSWER_QUESTIONNAIRE_RELATION_IDS);
             psSql.setInt(1, questionnaireId);
-            ResultSet myRS = psSql.executeQuery();
+            psSql.setInt(2, questionId);
 
-            while (myRS.next()) {
-                results.add(myRS.getInt(SQL_COLUMN_SHORT_ANSWER_ID));
-            }
-
-            return results;
+            return psSql.executeQuery().next();
         } catch (SQLException e) {
             e.printStackTrace();
         }
 
-        return null;
+        return true;
+    }
+
+    public static void deleteQuestion(int questionnaireId, Question question) {
+        try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
+            myCon.setAutoCommit(false);
+
+            deleteQuestion(myCon, questionnaireId, question.getQuestionId(), question.getQuestionType());
+
+            myCon.commit();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void deleteQuestion(Connection connection, int questionnaireId, int questionId, QuestionType questionType) throws SQLException {
+        //TODO refactor
+        //QuestionService.deleteFlagsFromTargetQuestion(myCon, questionnaireId, questionId);
+
+        if (questionType.equals(QuestionType.MULTIPLE_CHOICE)) {
+
+            deleteMultipleChoiceQuestionnaireRelation(connection, questionnaireId, questionId);
+
+            if (!doesQuestionExistsInOtherQuestionnaire(questionnaireId, questionId, questionType)) {
+
+                deleteMultipleChoiceHasAnswerRelation(connection, questionId);
+                deleteMultipleChoiceQuestion(connection, questionId);
+            }
+        } else if (questionType.equals(QuestionType.SHORT_ANSWER)) {
+            deleteShortAnswerQuestionnaireRelation(connection, questionnaireId, questionId);
+
+            if (!doesQuestionExistsInOtherQuestionnaire(questionnaireId, questionId, questionType)) {
+
+                deleteShortAnswerQuestion(connection, questionId);
+            }
+        }
+
+        AnswerOptionService.deleteUnbindedAnswerOptions(connection);
+    }
+
+    private static void deleteShortAnswerQuestion(Connection connection, int questionId) throws SQLException {
+        try {
+            PreparedStatement psSql = connection.prepareStatement(SQL_DELETE_SHORT_ANSWER);
+            psSql.setInt(1, questionId);
+
+            psSql.execute();
+        } catch (SQLException e) {
+            connection.rollback();
+            e.printStackTrace();
+        }
+    }
+
+    private static void deleteMultipleChoiceQuestion(Connection connection, int questionId) throws SQLException {
+        try {
+            PreparedStatement psSql = connection.prepareStatement(SQL_DELETE_MULTIPLE_CHOICE);
+            psSql.setInt(1, questionId);
+
+            psSql.execute();
+        } catch (SQLException e) {
+            connection.rollback();
+            e.printStackTrace();
+        }
+    }
+
+    private static void deleteMultipleChoiceHasAnswerRelation(Connection connection, int questionId) throws SQLException {
+        try {
+            PreparedStatement psSql = connection.prepareStatement(SQL_DELETE_MULTIPLE_CHOICE_ANSWER_OPTIONS_RELATION_BY_QUESTION_ID);
+            psSql.setInt(1, questionId);
+
+            psSql.execute();
+        } catch (SQLException e) {
+            connection.rollback();
+            e.printStackTrace();
+        }
+    }
+
+    private static void deleteShortAnswerQuestionnaireRelation(Connection connection, int questionnaireId, int questionId) throws SQLException {
+        try {
+            PreparedStatement psSql = connection.prepareStatement(SQL_DELETE_SHORT_ANSWER_QUESTIONNAIRE_RELATION);
+            psSql.setInt(1, questionId);
+            psSql.setInt(2, questionnaireId);
+
+            psSql.execute();
+        } catch (SQLException e) {
+            connection.rollback();
+            e.printStackTrace();
+        }
+    }
+
+    private static void deleteMultipleChoiceQuestionnaireRelation(Connection connection, int questionnaireId, int questionId) throws SQLException {
+        try {
+            PreparedStatement psSql = connection.prepareStatement(SQL_DELETE_MULTIPLE_CHOICE_QUESTIONNAIRE_RELATION);
+            psSql.setInt(1, questionId);
+            psSql.setInt(2, questionnaireId);
+
+            psSql.execute();
+        } catch (SQLException e) {
+            connection.rollback();
+            e.printStackTrace();
+        }
     }
 }

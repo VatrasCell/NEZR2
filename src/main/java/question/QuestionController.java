@@ -33,7 +33,6 @@ import model.Questionnaire;
 import model.SceneName;
 import model.tableObject.AnswerOptionTableObject;
 import model.tableObject.converter.AnswerTableObjectConverter;
-import questionList.QuestionListService;
 import react.ReactController;
 import start.StartController;
 
@@ -182,7 +181,7 @@ public class QuestionController {
         positionChoiceBox.setItems(positionList);
         positionChoiceBox.getSelectionModel().select(question.getPosition() - 1);
 
-        ObservableList<Category> categoryList = FXCollections.observableArrayList(QuestionService.getCategories());
+        ObservableList<Category> categoryList = FXCollections.observableArrayList(CategoryService.getCategories());
         categoryChoiceBox.setItems(categoryList);
         categoryChoiceBox.getSelectionModel().select(question.getCategory());
 
@@ -310,12 +309,19 @@ public class QuestionController {
         }
 
         if (param.getQuestionType() == QuestionType.MULTIPLE_CHOICE) {
+            ArrayList<AnswerOption> answerOptions = new ArrayList<>();
+
             if (param.isEvaluationQuestion()) {
+                for (int i = 0; i < 10; ++i) {
+                    answerOptions.add(Objects.requireNonNull(AnswerOptionService.getAnswerOption(String.valueOf(i))));
+                }
+
                 //QuestionService.getPossibleFlags(flags, param);
                 questionToSave.setFlags(flags);
-                QuestionService.saveEvaluationQuestion(questionnaire.getId(), questionToSave);
+                questionToSave.setAnswerOptions(answerOptions);
+                QuestionService.saveMultipleChoice(questionnaire.getId(), questionToSave);
             } else {
-                ArrayList<AnswerOption> answerOptions = new ArrayList<>();
+                answerOptions = new ArrayList<>();
 
                 if (param.isYesNoQuestion()) {
                     answerOptions.add(Objects.requireNonNull(AnswerOptionService.getAnswerOption("ja")));
@@ -323,10 +329,6 @@ public class QuestionController {
                 } else {
                     answerOptions.addAll(answerTable.getItems());
                 }
-
-                answerOptions.stream()
-                        .filter(answerOption -> answerOption.getId() == null)
-                        .forEach(answerOption -> answerOption.setId(AnswerOptionService.provideAnswerOptionId(answerOption.getValue())));
 
                 //TODO what is this?!
                 /*if (questionLabel.getText().equals("Frage Bearbeiten")) {
@@ -351,7 +353,8 @@ public class QuestionController {
 
                 //QuestionService.getPossibleFlags(flags, param);
                 questionToSave.setFlags(flags);
-                QuestionService.saveMultipleChoice(questionnaire.getId(), questionToSave, answerOptions);
+                questionToSave.setAnswerOptions(answerOptions);
+                QuestionService.saveMultipleChoice(questionnaire.getId(), questionToSave);
             }
         } else {
             //QuestionService.getPossibleFlags(flags, param);
@@ -396,9 +399,9 @@ public class QuestionController {
 
         Optional<String> result = dialog.showAndWait();
         result.ifPresent(name -> {
-            QuestionService.createUniqueCategory(name);
-            Category category = QuestionService.getCategory(name);
-            ObservableList<Category> categoryList = FXCollections.observableArrayList(QuestionService.getCategories());
+            CategoryService.createUniqueCategory(name);
+            Category category = CategoryService.getCategory(name);
+            ObservableList<Category> categoryList = FXCollections.observableArrayList(CategoryService.getCategories());
             categoryChoiceBox.setItems(categoryList);
             categoryChoiceBox.getSelectionModel().select(category);
         });
@@ -413,8 +416,8 @@ public class QuestionController {
 
         Optional<String> result = dialog.showAndWait();
         result.ifPresent(name -> {
-            QuestionListService.createUniqueHeadline(name);
-            Headline headline = QuestionListService.getHeadlineByName(name);
+            HeadlineService.createUniqueHeadline(name);
+            Headline headline = HeadlineService.getHeadlineByName(name);
             headlineChoiceBox.setItems(createHeadlineList());
             headlineChoiceBox.getSelectionModel().select(headline);
         });
@@ -513,7 +516,7 @@ public class QuestionController {
         List<Headline> headlineListArrays = new ArrayList<>();
         headlineListArrays.add(null);
         headlineListArrays.addAll(
-                QuestionListService.getHeadlines(questionnaire.getId()));
+                HeadlineService.getHeadlines(questionnaire.getId()));
         return FXCollections.observableArrayList(headlineListArrays);
     }
 }
