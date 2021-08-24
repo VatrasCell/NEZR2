@@ -3,6 +3,7 @@ package export;
 import model.Question;
 import model.Questionnaire;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -27,6 +28,7 @@ import static org.powermock.api.mockito.PowerMockito.when;
  */
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(QuestionListService.class)
+@Ignore
 public class ExportControllerTest extends DBTestUtil {
 
     public final static File FILE = new File("1_TEST-ORT_TEST-FRAGEBOGEN.xlsx");

@@ -126,7 +126,7 @@ public class QuestionListController {
     private void newQuestion() {
         QuestionController.questionnaire = questionnaire;
 
-        QuestionController.question = new Question(QuestionService.getCountPosition(questionnaire.getId()));
+        QuestionController.question = new Question(QuestionService.getMaxQuestionPosition(questionnaire.getId()));
         try {
             ScreenController.addScreen(SceneName.QUESTION, getURL(SceneName.QUESTION_PATH));
             ScreenController.activate(SceneName.QUESTION);

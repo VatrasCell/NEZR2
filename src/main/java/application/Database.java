@@ -14,7 +14,7 @@ public class Database {
     protected final static String QUESTION_MC_2 = "question_mc_2.sql";
     protected final static String QUESTION_SA_1 = "question_sa_1.sql";
     protected final static String DB_PATH = "db"; // Datenbank Datei Pfad
-    protected final static String SCRIPT_PATH = "script/";
+    protected final static String SCRIPT_PATH = "script";
     protected static String url = ""; // URL der Datenbank useSSL=false
     protected static String user = ""; // Login-ID
     protected static String pwd = ""; // Passwort

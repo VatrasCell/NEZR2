@@ -1,16 +1,10 @@
 package question;
 
-import application.NotificationController;
-import org.junit.runner.RunWith;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
 import util.DBTestUtil;
 
 /**
  * {@link QuestionService}
  */
-@RunWith(PowerMockRunner.class)
-@PrepareForTest(NotificationController.class)
 public class QuestionServiceTest extends DBTestUtil {
     /*
 

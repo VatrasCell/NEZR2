@@ -5,7 +5,6 @@ import application.GlobalVars;
 import application.NotificationController;
 import application.ScreenController;
 import flag.FlagList;
-import flag.React;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -175,7 +174,7 @@ public class QuestionController {
             System.out.println("Old dataset pattern found.");
         }
         questionTextField.setText(question.getQuestion());
-        List<Integer> range = IntStream.range(1, QuestionService.getCountPosition(questionnaire.getId()) + 2).boxed()
+        List<Integer> range = IntStream.range(1, QuestionService.getMaxQuestionPosition(questionnaire.getId()) + 2).boxed()
                 .collect(Collectors.toList());
         ObservableList<Integer> positionList = FXCollections.observableArrayList(range);
         positionChoiceBox.setItems(positionList);
@@ -292,16 +291,6 @@ public class QuestionController {
         questionToSave.setQuestion(newQuestion);
 
         questionToSave.setPosition(positionChoiceBox.getValue());
-
-        List<React> reactList = flags.getReacts();
-        for (React react : reactList) {
-            if (param.isRequired()) {
-                QuestionService.provideQuestionRequired(questionnaire.getId(), react.getQuestionType());
-            }
-            if (QuestionService.isQuestionRequired(questionnaire.getId(), react.getQuestionType(), react.getQuestionId())) {
-                param.setRequired(true);
-            }
-        }
 
         Headline selectedHeadline = headlineChoiceBox.getSelectionModel().getSelectedItem();
         if (selectedHeadline != null) {

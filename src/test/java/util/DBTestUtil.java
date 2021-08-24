@@ -90,7 +90,7 @@ public class DBTestUtil extends Database {
 
     private void runSqlScript(Connection connection, String name) throws IOException, SQLException {
         ScriptRunner runner = new ScriptRunner(connection, false, false);
-        String path = String.format("%s%s%s", DB_PATH, SCRIPT_PATH, name);
+        String path = String.format("%s/%s/%s", DB_PATH, SCRIPT_PATH, name);
         String absPath = getURL(path).getPath();
         runner.runScript(new BufferedReader(new FileReader(absPath)));
     }
