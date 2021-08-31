@@ -11,7 +11,7 @@
 <?import javafx.scene.layout.RowConstraints?>
 <BorderPane xmlns:fx="http://javafx.com/fxml/1" id="sc_login" maxHeight="-Infinity" maxWidth="-Infinity"
             minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0"
-            xmlns="http://javafx.com/javafx/11.0.1" fx:controller="login.LoginController">
+            xmlns="http://javafx.com/javafx/11.0.1" fx:controller="de.vatrascell.nezr.login.LoginController">
     <center>
         <GridPane prefHeight="210.0" prefWidth="600.0" BorderPane.alignment="CENTER">
             <columnConstraints>

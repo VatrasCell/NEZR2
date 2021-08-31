@@ -12,7 +12,7 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.text.Font?>
 <StackPane xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/11.0.1"
-           fx:controller="start.StartController">
+           fx:controller="de.vatrascell.nezr.start.StartController">
     <children>
         <Pane fx:id="pane" prefHeight="200.0" prefWidth="200.0"/>
         <BorderPane prefHeight="400.0" prefWidth="600.0">

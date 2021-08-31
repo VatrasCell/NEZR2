@@ -19,7 +19,7 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 <BorderPane xmlns:fx="http://javafx.com/fxml/1" prefHeight="600.0" prefWidth="800.0"
-            xmlns="http://javafx.com/javafx/11.0.1" fx:controller="question.QuestionController">
+            xmlns="http://javafx.com/javafx/11.0.1" fx:controller="de.vatrascell.nezr.question.QuestionController">
    <bottom>
       <AnchorPane prefHeight="48.0" prefWidth="600.0" BorderPane.alignment="CENTER">
          <children>
