@@ -3,12 +3,24 @@ package de.vatrascell.nezr.start;
 import de.vatrascell.nezr.application.GlobalVars;
 import de.vatrascell.nezr.application.NotificationController;
 import de.vatrascell.nezr.application.ScreenController;
+import de.vatrascell.nezr.application.svg.SvgImageLoader;
+import de.vatrascell.nezr.login.LoginController;
+import de.vatrascell.nezr.message.MessageId;
+import de.vatrascell.nezr.model.AnswerOption;
+import de.vatrascell.nezr.model.Headline;
+import de.vatrascell.nezr.model.Question;
+import de.vatrascell.nezr.model.QuestionType;
+import de.vatrascell.nezr.model.SceneName;
+import de.vatrascell.nezr.model.SurveyPage;
+import de.vatrascell.nezr.questionList.QuestionListService;
+import de.vatrascell.nezr.survey.SurveyController;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.beans.value.ObservableBooleanValue;
 import javafx.collections.FXCollections;
+import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
@@ -24,24 +36,17 @@ import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
-import de.vatrascell.nezr.login.LoginController;
-import de.vatrascell.nezr.message.MessageId;
-import de.vatrascell.nezr.model.AnswerOption;
-import de.vatrascell.nezr.model.Headline;
-import de.vatrascell.nezr.model.Question;
-import de.vatrascell.nezr.model.QuestionType;
-import de.vatrascell.nezr.model.SceneName;
-import de.vatrascell.nezr.model.SurveyPage;
 import org.controlsfx.validation.Severity;
 import org.controlsfx.validation.ValidationSupport;
 import org.controlsfx.validation.Validator;
-import de.vatrascell.nezr.questionList.QuestionListService;
-import de.vatrascell.nezr.survey.SurveyController;
 
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -66,8 +71,12 @@ public class StartController {
     @FXML
     Button startButton;
 
-    private static StringProperty questionnaireText = new SimpleStringProperty();
-    private static StringProperty questionnaireWarn = new SimpleStringProperty();
+    private static final StringProperty questionnaireText = new SimpleStringProperty();
+    private static final StringProperty questionnaireWarn = new SimpleStringProperty();
+    @FXML
+    GridPane gridPane;
+    @FXML
+    ImageView imageView;
 
     /**
      * The constructor (is called before the initialize()-method).
@@ -82,35 +91,48 @@ public class StartController {
      */
     @FXML
     private void initialize() {
+        System.out.println("initialize StartController");
         String value;
         switch (GlobalVars.location) {
             case "R\u00FCgen":
-                value = "images/img/logo_nezr.png";
+                value = "images/svg/logo-naturerbe-zentrum-ruegen.svg";
                 break;
             case "Bayerischer Wald":
-                value = "images/img/logo_bw.png";
+                value = "images/svg/logo-baumwipfelpfad-bayerische-wald.svg";
                 break;
             case "Saarschleife":
-                value = "images/img/logo_saar.png";
+                value = "images/svg/logo-baumwipfelpfad-saarschleife.svg";
                 break;
             case "Schwarzwald":
-                value = "images/img/logo_sw.png";
+                value = "images/svg/logo-baumwipfelpfad-schwarzwald.svg";
                 break;
-            case "Lipno":
-                value = "images/img/logo_lipno_de.png";
+            case "Usedom":
+                value = "images/svg/logo-baumwipfelpfad-usedom.svg";
                 break;
-
-            default:
-                value = "images/img/logo_default.png";
+            case "Elsass":
+                value = "images/svg/logo-baumwipfelpfad-elsass.svg";
+                break;
+            case "Salzkammergut":
+                value = "images/svg/logo-baumwipfelpfad-salzkammergut.svg";
+                break;
+            default: //Bachledka, Krkonoše, Lipno, Pohorje
+                value = "images/svg/baumwipfelpfade-logo.svg";
                 break;
         }
 
-        String image = getURL(value).toExternalForm();
-        pane.setStyle("-fx-background-image: url('" + image + "');" +
-                "-fx-background-repeat: no-repeat;" +
+        try {
+            imageView.fitHeightProperty().bind(gridPane.heightProperty().multiply(0.55));
+            imageView.fitWidthProperty().bind(gridPane.widthProperty().multiply(0.7));
+            BufferedImage image = SvgImageLoader.loadSvg(getURL(value), 500);
+            imageView.setImage(SwingFXUtils.toFXImage(image, null));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        pane.setStyle("-fx-background-repeat: no-repeat;" +
                 "-fx-background-attachment: fixed;" +
-                "-fx-background-size: 10% auto;" +
-                "-fx-background-position: 98% 5%;");
+                "-fx-background-size: 20% auto;" +
+                "-fx-background-position: 103% 5%;");
 
         setStartText();
         questionnaireLabel.textProperty().bind(questionnaireText);

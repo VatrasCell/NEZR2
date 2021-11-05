@@ -3,12 +3,12 @@ package de.vatrascell.nezr.location;
 import de.vatrascell.nezr.application.GlobalVars;
 import de.vatrascell.nezr.application.NotificationController;
 import de.vatrascell.nezr.application.ScreenController;
+import de.vatrascell.nezr.message.MessageId;
+import de.vatrascell.nezr.model.SceneName;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.ChoiceBox;
-import de.vatrascell.nezr.message.MessageId;
-import de.vatrascell.nezr.model.SceneName;
 
 import java.io.IOException;
 

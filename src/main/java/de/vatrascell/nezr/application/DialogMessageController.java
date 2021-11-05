@@ -1,7 +1,7 @@
 package de.vatrascell.nezr.application;
 
-import javafx.scene.control.Dialog;
 import de.vatrascell.nezr.message.DialogId;
+import javafx.scene.control.Dialog;
 
 public class DialogMessageController {
 

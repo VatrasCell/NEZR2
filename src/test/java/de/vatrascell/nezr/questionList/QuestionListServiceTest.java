@@ -1,9 +1,9 @@
 package de.vatrascell.nezr.questionList;
 
 import de.vatrascell.nezr.model.Question;
+import de.vatrascell.nezr.util.DBTestUtil;
 import org.junit.Ignore;
 import org.junit.Test;
-import de.vatrascell.nezr.util.DBTestUtil;
 
 import java.util.List;
 

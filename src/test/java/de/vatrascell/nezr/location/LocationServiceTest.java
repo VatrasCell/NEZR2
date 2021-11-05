@@ -1,8 +1,8 @@
 package de.vatrascell.nezr.location;
 
+import de.vatrascell.nezr.util.DBTestUtil;
 import org.junit.Ignore;
 import org.junit.Test;
-import de.vatrascell.nezr.util.DBTestUtil;
 
 import java.util.Arrays;
 import java.util.List;

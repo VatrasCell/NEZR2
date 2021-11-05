@@ -1,10 +1,10 @@
 package de.vatrascell.nezr.application;
 
+import de.vatrascell.nezr.message.MessageId;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
-import de.vatrascell.nezr.message.MessageId;
 
 import java.io.IOException;
 import java.net.URL;

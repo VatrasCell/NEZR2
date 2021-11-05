@@ -1,8 +1,8 @@
 package de.vatrascell.nezr.model.tableObject;
 
 import de.vatrascell.nezr.admin.AdminController;
-import javafx.scene.control.Button;
 import de.vatrascell.nezr.model.Questionnaire;
+import javafx.scene.control.Button;
 
 public class QuestionnaireTableObject extends Questionnaire {
 

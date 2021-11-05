@@ -3,11 +3,11 @@ package de.vatrascell.nezr.login;
 import de.vatrascell.nezr.application.GlobalVars;
 import de.vatrascell.nezr.application.NotificationController;
 import de.vatrascell.nezr.application.ScreenController;
+import de.vatrascell.nezr.message.MessageId;
+import de.vatrascell.nezr.model.SceneName;
 import javafx.fxml.FXML;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
-import de.vatrascell.nezr.message.MessageId;
-import de.vatrascell.nezr.model.SceneName;
 
 import java.io.IOException;
 

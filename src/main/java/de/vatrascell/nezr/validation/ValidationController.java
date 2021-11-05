@@ -1,9 +1,9 @@
 package de.vatrascell.nezr.validation;
 
 import de.vatrascell.nezr.application.ScreenController;
+import de.vatrascell.nezr.model.SceneName;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
-import de.vatrascell.nezr.model.SceneName;
 
 import java.io.IOException;
 

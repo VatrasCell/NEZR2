@@ -1,8 +1,8 @@
 package de.vatrascell.nezr.application;
 
-import javafx.scene.image.Image;
 import de.vatrascell.nezr.model.Question;
 import de.vatrascell.nezr.model.Questionnaire;
+import javafx.scene.image.Image;
 
 import java.util.ArrayList;
 import java.util.List;

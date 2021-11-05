@@ -2,6 +2,11 @@ package de.vatrascell.nezr.survey;
 
 import de.vatrascell.nezr.application.GlobalVars;
 import de.vatrascell.nezr.application.ScreenController;
+import de.vatrascell.nezr.model.AnswerOption;
+import de.vatrascell.nezr.model.Question;
+import de.vatrascell.nezr.model.QuestionType;
+import de.vatrascell.nezr.model.SceneName;
+import de.vatrascell.nezr.model.SubmittedAnswer;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
@@ -11,11 +16,6 @@ import javafx.scene.control.DialogPane;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
-import de.vatrascell.nezr.model.AnswerOption;
-import de.vatrascell.nezr.model.Question;
-import de.vatrascell.nezr.model.QuestionType;
-import de.vatrascell.nezr.model.SceneName;
-import de.vatrascell.nezr.model.SubmittedAnswer;
 
 import java.io.IOException;
 import java.util.ArrayList;

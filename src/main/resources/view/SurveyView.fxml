@@ -10,7 +10,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 <StackPane xmlns:fx="http://javafx.com/fxml/1" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
-           minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/11.0.1"
+           minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/11.0.2"
            fx:controller="de.vatrascell.nezr.survey.SurveyController">
    <children>
       <AnchorPane prefHeight="200.0" prefWidth="200.0">
@@ -27,15 +27,25 @@
             <Label fx:id="lbl_count" alignment="CENTER" layoutX="270.0" layoutY="48.0" text="Frage xx/xx"
                    textAlignment="CENTER" AnchorPane.leftAnchor="270.0" AnchorPane.rightAnchor="270.0"
                    AnchorPane.topAnchor="48.0"/>
-            <Label fx:id="lbl_headline" alignment="CENTER" layoutX="228.0" layoutY="73.0" prefHeight="17.0" prefWidth="144.0" textAlignment="CENTER" AnchorPane.leftAnchor="228.0" AnchorPane.rightAnchor="228.0" AnchorPane.topAnchor="73.0">
+            <Label fx:id="lbl_headline" alignment="CENTER" layoutX="228.0" layoutY="73.0" prefHeight="17.0"
+                   prefWidth="144.0" textAlignment="CENTER" AnchorPane.leftAnchor="228.0" AnchorPane.rightAnchor="228.0"
+                   AnchorPane.topAnchor="73.0">
                <font>
-                  <Font name="System Bold" size="12.0" />
+                  <Font name="System Bold" size="12.0"/>
                </font>
             </Label>
-            <Button layoutX="14.0" layoutY="361.0" minHeight="40.0" minWidth="40.0" mnemonicParsing="false" onAction="#exit" prefHeight="50.0" prefWidth="50.0" text="X" textAlignment="CENTER" AnchorPane.bottomAnchor="15.0" AnchorPane.leftAnchor="15.0" />
-            <Button layoutX="527.0" layoutY="356.0" minHeight="40.0" minWidth="40.0" mnemonicParsing="false" onAction="#next" prefHeight="50.0" prefWidth="50.0" text="&gt;" textAlignment="CENTER" AnchorPane.bottomAnchor="15.0" AnchorPane.rightAnchor="15.0" />
-            <Button layoutX="537.0" layoutY="366.0" minHeight="40.0" minWidth="40.0" mnemonicParsing="false" onAction="#pre" prefHeight="50.0" prefWidth="50.0" text="&lt;" textAlignment="CENTER" AnchorPane.bottomAnchor="15.0" AnchorPane.rightAnchor="80.0" />
-            <VBox fx:id="vbox" alignment="TOP_CENTER" prefHeight="200.0" prefWidth="100.0" AnchorPane.bottomAnchor="80.0" AnchorPane.leftAnchor="15.0" AnchorPane.rightAnchor="75.0" AnchorPane.topAnchor="100.0" />
+            <Button layoutX="14.0" layoutY="361.0" minHeight="40.0" minWidth="40.0" mnemonicParsing="false"
+                    onAction="#exit" prefHeight="50.0" prefWidth="50.0" text="X" textAlignment="CENTER"
+                    AnchorPane.bottomAnchor="15.0" AnchorPane.leftAnchor="15.0"/>
+            <Button fx:id="btn_next" layoutX="527.0" layoutY="356.0" minHeight="40.0" minWidth="40.0"
+                    mnemonicParsing="false" onAction="#next" prefHeight="50.0" prefWidth="50.0" text="&gt;"
+                    textAlignment="CENTER" AnchorPane.bottomAnchor="15.0" AnchorPane.rightAnchor="15.0"/>
+            <Button layoutX="537.0" layoutY="366.0" minHeight="40.0" minWidth="40.0" mnemonicParsing="false"
+                    onAction="#pre" prefHeight="50.0" prefWidth="50.0" text="&lt;" textAlignment="CENTER"
+                    AnchorPane.bottomAnchor="15.0" AnchorPane.rightAnchor="80.0"/>
+            <VBox fx:id="vbox" alignment="TOP_CENTER" prefHeight="200.0" prefWidth="100.0"
+                  AnchorPane.bottomAnchor="80.0" AnchorPane.leftAnchor="15.0" AnchorPane.rightAnchor="75.0"
+                  AnchorPane.topAnchor="100.0"/>
          </children>
       </AnchorPane>
    </children>

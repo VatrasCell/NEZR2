@@ -1,10 +1,10 @@
 package de.vatrascell.nezr.application;
 
-import javafx.application.Application;
-import javafx.stage.Stage;
 import de.vatrascell.nezr.location.LocationService;
 import de.vatrascell.nezr.login.LoginService;
 import de.vatrascell.nezr.model.SceneName;
+import javafx.application.Application;
+import javafx.stage.Stage;
 
 import java.io.IOException;
 

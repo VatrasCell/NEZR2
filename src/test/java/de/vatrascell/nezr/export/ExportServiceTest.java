@@ -1,7 +1,7 @@
 package de.vatrascell.nezr.export;
 
-import org.junit.Test;
 import de.vatrascell.nezr.util.DBTestUtil;
+import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 

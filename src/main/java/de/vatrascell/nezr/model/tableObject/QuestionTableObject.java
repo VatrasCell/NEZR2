@@ -1,8 +1,8 @@
 package de.vatrascell.nezr.model.tableObject;
 
-import javafx.scene.control.Button;
 import de.vatrascell.nezr.model.Question;
 import de.vatrascell.nezr.questionList.QuestionListController;
+import javafx.scene.control.Button;
 
 public class QuestionTableObject extends Question {
 

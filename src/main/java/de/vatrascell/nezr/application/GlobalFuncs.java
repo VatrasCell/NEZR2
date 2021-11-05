@@ -1,6 +1,7 @@
 package de.vatrascell.nezr.application;
 
-import java.awt.*;
+import java.awt.Dimension;
+import java.awt.Toolkit;
 import java.io.InputStream;
 import java.net.URL;
 import java.time.LocalDate;
