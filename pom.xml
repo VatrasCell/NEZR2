@@ -12,64 +12,72 @@
         <java-fx-version>11.0.2</java-fx-version>
         <maven.compiler.release>11</maven.compiler.release>
         <javafx.maven.plugin.version>0.0.6</javafx.maven.plugin.version>
+        <poi.version>5.0.0</poi.version>
+        <ooxml-schemas.version>1.4</ooxml-schemas.version>
+        <h2.version>1.4.196</h2.version>
+        <junit.version>4.13.2</junit.version>
+        <mockito-all.version>1.10.19</mockito-all.version>
+        <powermock-module-junit4.version>2.0.9</powermock-module-junit4.version>
+        <powermock-api-mockito.version>1.7.4</powermock-api-mockito.version>
+        <powermock-core.version>2.0.9</powermock-core.version>
     </properties>
     <dependencies>
         <!-- https://mvnrepository.com/artifact/org.apache.poi/poi-ooxml -->
         <dependency>
             <groupId>org.apache.poi</groupId>
             <artifactId>poi-ooxml</artifactId>
-            <version>4.1.2</version>
+            <version>${poi.version}</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.apache.poi/ooxml-schemas -->
         <dependency>
             <groupId>org.apache.poi</groupId>
             <artifactId>ooxml-schemas</artifactId>
-            <version>1.4</version>
+            <version>${ooxml-schemas.version}</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.apache.poi/poi -->
         <dependency>
             <groupId>org.apache.poi</groupId>
             <artifactId>poi</artifactId>
-            <version>4.1.2</version>
+            <version>${poi.version}</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/com.h2database/h2 -->
         <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
-            <version>1.4.196</version>
+            <version>${h2.version}</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/junit/junit -->
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.12</version>
+            <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.mockito/mockito-all -->
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-all</artifactId>
-            <version>1.10.19</version>
+            <version>${mockito-all.version}</version>
             <scope>test</scope>
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.powermock/powermock-module-junit4 -->
         <dependency>
             <groupId>org.powermock</groupId>
             <artifactId>powermock-module-junit4</artifactId>
-            <version>2.0.7</version>
+            <version>${powermock-module-junit4.version}</version>
             <scope>test</scope>
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.powermock/powermock-api-mockito -->
         <dependency>
             <groupId>org.powermock</groupId>
             <artifactId>powermock-api-mockito</artifactId>
-            <version>1.7.4</version>
+            <version>${powermock-api-mockito.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.powermock</groupId>
             <artifactId>powermock-core</artifactId>
-            <version>1.7.0</version>
+            <version>${powermock-core.version}</version>
             <scope>test</scope>
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.controlsfx/controlsfx -->
@@ -141,6 +149,11 @@
             <id>central</id>
             <name>jcenter</name>
             <url>https://jcenter.bintray.com</url>
+        </repository>
+        <repository>
+            <id>maven_central</id>
+            <name>Maven Central</name>
+            <url>https://repo.maven.apache.org/maven2/</url>
         </repository>
     </repositories>
 
