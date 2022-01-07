@@ -6,7 +6,6 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import net.rgielen.fxweaver.core.FxmlView;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 import static de.vatrascell.nezr.model.SceneName.VALIDATION_PATH;
@@ -21,7 +20,6 @@ public class ValidationController {
     private final ScreenController screenController;
 
     @Autowired
-    @Lazy
     public ValidationController(ScreenController screenController) {
         this.screenController = screenController;
     }

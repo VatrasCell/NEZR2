@@ -48,7 +48,6 @@ import org.controlsfx.validation.Severity;
 import org.controlsfx.validation.ValidationSupport;
 import org.controlsfx.validation.Validator;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 import java.awt.image.BufferedImage;
@@ -91,7 +90,6 @@ public class StartController {
      * The constructor (is called before the initialize()-method).
      */
     @Autowired
-    @Lazy
     public StartController(StartService startService, QuestionListService questionListService,
                            LoginService loginService, ScreenController screenController, LoginController loginController) {
         this.questionListService = questionListService;

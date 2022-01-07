@@ -11,7 +11,6 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import net.rgielen.fxweaver.core.FxmlView;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 import static de.vatrascell.nezr.model.SceneName.LOGIN_PATH;
@@ -30,7 +29,6 @@ public class LoginController {
     private final ScreenController screenController;
 
     @Autowired
-    @Lazy
     public LoginController(LoginService loginService, ScreenController screenController) {
         this.loginService = loginService;
         this.screenController = screenController;

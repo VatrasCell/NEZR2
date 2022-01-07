@@ -19,7 +19,6 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -40,7 +39,6 @@ public class SurveyController {
     private final ScreenController screenController;
 
     @Autowired
-    @Lazy
     public SurveyController(ScreenController screenController) {
         this.screenController = screenController;
     }

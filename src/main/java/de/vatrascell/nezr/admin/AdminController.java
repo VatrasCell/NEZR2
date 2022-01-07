@@ -43,7 +43,6 @@ import net.rgielen.fxweaver.core.FxmlView;
 import org.controlsfx.validation.ValidationSupport;
 import org.controlsfx.validation.Validator;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
@@ -108,7 +107,6 @@ public class AdminController {
      * The constructor (is called before the initialize()-method).
      */
     @Autowired
-    @Lazy
     public AdminController(AdminService adminService, LoginService loginService, StartController startController, ExportController exportController,
                            ScreenController screenController) {
         this.adminService = adminService;

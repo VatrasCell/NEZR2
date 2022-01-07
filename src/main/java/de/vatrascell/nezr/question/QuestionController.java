@@ -37,7 +37,6 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import net.rgielen.fxweaver.core.FxmlView;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -126,7 +125,6 @@ public class QuestionController {
      * The constructor (is called before the initialize()-method).
      */
     @Autowired
-    @Lazy
     public QuestionController(AnswerOptionService answerOptionService, CategoryService categoryService,
                               HeadlineService headlineService, QuestionService questionService,
                               StartController startController, ScreenController screenController) {

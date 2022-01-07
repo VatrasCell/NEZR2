@@ -32,7 +32,6 @@ import javafx.util.Callback;
 import javafx.util.Pair;
 import net.rgielen.fxweaver.core.FxmlView;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -77,7 +76,6 @@ public class ReactController {
      * The constructor (is called before the initialize()-method).
      */
     @Autowired
-    @Lazy
     public ReactController(QuestionListService questionListService, ScreenController screenController) {
         this.screenController = screenController;
         questions = questionListService.getQuestions(questionnaire.getId());

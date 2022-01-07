@@ -19,7 +19,6 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.ImageView;
 import net.rgielen.fxweaver.core.FxmlView;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -61,7 +60,6 @@ public class QuestionListController {
      * The constructor (is called before the initialize()-method).
      */
     @Autowired
-    @Lazy
     public QuestionListController(QuestionListService questionListService, QuestionService questionService,
                                   ScreenController screenController) {
         this.questionListService = questionListService;

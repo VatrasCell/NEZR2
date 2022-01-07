@@ -10,7 +10,6 @@ import javafx.fxml.FXML;
 import javafx.scene.control.ChoiceBox;
 import net.rgielen.fxweaver.core.FxmlView;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 import java.util.stream.Collectors;
@@ -34,7 +33,6 @@ public class LocationController {
      * The constructor (is called before the initialize()-method).
      */
     @Autowired
-    @Lazy
     public LocationController(LocationService locationService, LoginService loginService, ScreenController screenController) {
         this.locationService = locationService;
         this.loginService = loginService;
