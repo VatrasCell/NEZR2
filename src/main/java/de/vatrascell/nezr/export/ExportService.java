@@ -5,6 +5,7 @@ import de.vatrascell.nezr.export.model.ExcelCell;
 import de.vatrascell.nezr.model.AnswerOption;
 import de.vatrascell.nezr.model.Question;
 import de.vatrascell.nezr.model.QuestionType;
+import org.springframework.stereotype.Service;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -23,9 +24,10 @@ import static de.vatrascell.nezr.application.SqlStatement.SQL_GET_MULTIPLE_CHOIC
 import static de.vatrascell.nezr.application.SqlStatement.SQL_GET_SHORT_ANSWER_SURVEY_ID_AND_ANSWER;
 import static de.vatrascell.nezr.application.SqlStatement.SQL_GET_SURVEY_COUNT;
 
+@Service
 public class ExportService extends Database {
 
-    public static int getSurveyCount() {
+    public int getSurveyCount() {
         try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
             PreparedStatement psSql = myCon.prepareStatement(SQL_GET_SURVEY_COUNT);
             ResultSet myRS = psSql.executeQuery();
@@ -38,7 +40,7 @@ public class ExportService extends Database {
         return -1;
     }
 
-    public static ArrayList<ExcelCell> getAnswerPositions(Question question, String fromDate, String toDate) {
+    public ArrayList<ExcelCell> getAnswerPositions(Question question, String fromDate, String toDate) {
         ArrayList<ExcelCell> excelCells = new ArrayList<>();
         if (isFlaggedMultipleChoiceQuestion(question)) {
             excelCells.addAll(getMultipleChoiceAnswerCells(question.getQuestionnaireId(), question.getQuestionId(), fromDate, toDate));
@@ -48,7 +50,7 @@ public class ExportService extends Database {
         return excelCells;
     }
 
-    public static ArrayList<ExcelCell> getAnswerPositions(Question question, AnswerOption answerOption, String fromDate, String toDate) {
+    public ArrayList<ExcelCell> getAnswerPositions(Question question, AnswerOption answerOption, String fromDate, String toDate) {
         ArrayList<ExcelCell> excelCells = new ArrayList<>();
         try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
             PreparedStatement psSql = myCon.prepareStatement(SQL_GET_MULTIPLE_CHOICE_SURVEY_ID_BY_ANSWER);
@@ -78,13 +80,13 @@ public class ExportService extends Database {
         return excelCells;
     }
 
-    private static boolean isFlaggedMultipleChoiceQuestion(Question question) {
+    private boolean isFlaggedMultipleChoiceQuestion(Question question) {
         return ((question.getQuestionType().equals(QuestionType.MULTIPLE_CHOICE)) && (question.getFlags().isEvaluationQuestion()))
                 || (question.getFlags().isList())
                 || (question.getFlags().isYesNoQuestion());
     }
 
-    private static List<ExcelCell> getMultipleChoiceAnswerCells(int questionnaireId, int questionId, String fromDate, String toDate) {
+    private List<ExcelCell> getMultipleChoiceAnswerCells(int questionnaireId, int questionId, String fromDate, String toDate) {
         List<ExcelCell> excelCells = new ArrayList<>();
         try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
             PreparedStatement psSql = myCon.prepareStatement(SQL_GET_MULTIPLE_CHOICE_SURVEY_ID_AND_ANSWER);
@@ -113,7 +115,7 @@ public class ExportService extends Database {
         return excelCells;
     }
 
-    private static List<ExcelCell> getShortAnswerAnswerCells(int questionnaireId, int questionId, String fromDate, String toDate) {
+    private List<ExcelCell> getShortAnswerAnswerCells(int questionnaireId, int questionId, String fromDate, String toDate) {
         List<ExcelCell> excelCells = new ArrayList<>();
         try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
             PreparedStatement psSql = myCon.prepareStatement(SQL_GET_SHORT_ANSWER_SURVEY_ID_AND_ANSWER);

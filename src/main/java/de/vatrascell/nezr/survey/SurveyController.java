@@ -1,12 +1,14 @@
 package de.vatrascell.nezr.survey;
 
 import de.vatrascell.nezr.application.GlobalVars;
-import de.vatrascell.nezr.application.ScreenController;
+import de.vatrascell.nezr.application.controller.ScreenController;
+import de.vatrascell.nezr.gratitude.GratitudeController;
 import de.vatrascell.nezr.model.AnswerOption;
 import de.vatrascell.nezr.model.Question;
 import de.vatrascell.nezr.model.QuestionType;
-import de.vatrascell.nezr.model.SceneName;
 import de.vatrascell.nezr.model.SubmittedAnswer;
+import de.vatrascell.nezr.question.QuestionController;
+import de.vatrascell.nezr.start.StartController;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
@@ -16,21 +18,32 @@ import javafx.scene.control.DialogPane;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.stereotype.Component;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import static de.vatrascell.nezr.application.GlobalFuncs.getURL;
-import static de.vatrascell.nezr.application.ScreenController.STYLESHEET;
+import static de.vatrascell.nezr.application.controller.ScreenController.STYLESHEET;
 
-
+@Component
+//@FxmlView(SURVEY_PATH)
 public class SurveyController {
 
     private static boolean isPreview;
     private static int pageCount;
     private static int pageNumber = 1;
+
+    private final ScreenController screenController;
+
+    @Autowired
+    @Lazy
+    public SurveyController(ScreenController screenController) {
+        this.screenController = screenController;
+    }
 
     //@FXML
     //Pane pane;
@@ -77,17 +90,16 @@ public class SurveyController {
     }
 
     @FXML
-    private void next() throws IOException {
+    private void next() {
         if (true /*check()*/) {
             if (pageNumber < pageCount) {
                 pageNumber++;
-                ScreenController.activate(SceneName.SURVEY + pageNumber);
+                //screenController.activate(SceneName.SURVEY + pageNumber);
             } else {
                 if (!isPreview) {
                     //SurveyService.saveSurvey(GlobalVars.activeQuestionnaire.getId(), GlobalVars.questionsPerPanel);
                     System.out.println("save is disabled");
-                    ScreenController.addScreen(SceneName.GRATITUDE, getURL(SceneName.GRATITUDE_PATH));
-                    ScreenController.activate(SceneName.GRATITUDE);
+                    screenController.activate(GratitudeController.class);
                 } else {
                     System.out.println("still page " + pageNumber);
                 }
@@ -98,9 +110,9 @@ public class SurveyController {
     }
 
     @FXML
-    private void exit() throws IOException {
+    private void exit() {
         if (isPreview) {
-            ScreenController.activate(SceneName.QUESTION);
+            screenController.activate(QuestionController.class);
         } else {
             Alert alert = new Alert(AlertType.CONFIRMATION);
             alert.setTitle("Befragung abbrechen");
@@ -113,16 +125,16 @@ public class SurveyController {
 
             Optional<ButtonType> result = alert.showAndWait();
             if (result.isPresent() && result.get() == ButtonType.OK) {
-                ScreenController.activate(SceneName.START);
+                screenController.activate(StartController.class);
             }
         }
     }
 
     @FXML
-    private void pre() throws IOException {
+    private void pre() {
         if (pageNumber > 1) {
             pageNumber--;
-            ScreenController.activate("survey_" + pageNumber);
+            //screenController.activate("survey_" + pageNumber);
         } else {
             System.out.println("still page 1");
         }
@@ -432,7 +444,7 @@ public class SurveyController {
     }
 
     @FXML
-    private void exitPreView() throws IOException {
+    private void exitPreView() {
         Alert alert = new Alert(AlertType.CONFIRMATION);
         alert.setTitle("Vorschau abbrechen");
         alert.setHeaderText("Wollen Sie die Vorschau wirklich verlassen?");
@@ -443,7 +455,7 @@ public class SurveyController {
 
         Optional<ButtonType> result = alert.showAndWait();
         if (result.isPresent() && result.get() == ButtonType.OK) {
-            ScreenController.activate(SceneName.QUESTION);
+            screenController.activate(QuestionController.class);
         }
 
     }

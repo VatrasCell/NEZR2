@@ -1,5 +1,6 @@
-package de.vatrascell.nezr.application;
+package de.vatrascell.nezr.application.controller;
 
+import de.vatrascell.nezr.application.PropertyLoader;
 import de.vatrascell.nezr.message.MessageId;
 import org.controlsfx.control.Notifications;
 

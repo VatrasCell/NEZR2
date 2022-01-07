@@ -1,15 +1,15 @@
 package de.vatrascell.nezr.admin;
 
-import de.vatrascell.nezr.application.DialogMessageController;
 import de.vatrascell.nezr.application.GlobalVars;
-import de.vatrascell.nezr.application.NotificationController;
-import de.vatrascell.nezr.application.ScreenController;
+import de.vatrascell.nezr.application.controller.DialogMessageController;
+import de.vatrascell.nezr.application.controller.NotificationController;
+import de.vatrascell.nezr.application.controller.ScreenController;
 import de.vatrascell.nezr.export.ExportController;
+import de.vatrascell.nezr.location.LocationController;
 import de.vatrascell.nezr.login.LoginService;
 import de.vatrascell.nezr.message.DialogId;
 import de.vatrascell.nezr.message.MessageId;
 import de.vatrascell.nezr.model.Questionnaire;
-import de.vatrascell.nezr.model.SceneName;
 import de.vatrascell.nezr.model.tableObject.QuestionnaireTableObject;
 import de.vatrascell.nezr.model.tableObject.converter.QuestionnaireTableObjectConverter;
 import de.vatrascell.nezr.questionList.QuestionListController;
@@ -39,20 +39,23 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.util.Pair;
+import net.rgielen.fxweaver.core.FxmlView;
 import org.controlsfx.validation.ValidationSupport;
 import org.controlsfx.validation.Validator;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.stereotype.Component;
 
-import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
 
-import static de.vatrascell.nezr.application.DialogMessageController.getDialogMessage;
 import static de.vatrascell.nezr.application.GlobalFuncs.getURL;
-import static de.vatrascell.nezr.application.ScreenController.STYLESHEET;
-import static de.vatrascell.nezr.application.TableColumnNameController.getColumnName;
+import static de.vatrascell.nezr.application.controller.DialogMessageController.getDialogMessage;
+import static de.vatrascell.nezr.application.controller.ScreenController.STYLESHEET;
+import static de.vatrascell.nezr.application.controller.TableColumnNameController.getColumnName;
 import static de.vatrascell.nezr.message.TableColumnNameId.ADMIN_ACTIVE;
 import static de.vatrascell.nezr.message.TableColumnNameId.ADMIN_COPY;
 import static de.vatrascell.nezr.message.TableColumnNameId.ADMIN_FINAL;
@@ -61,10 +64,19 @@ import static de.vatrascell.nezr.message.TableColumnNameId.ADMIN_SQL_EXPORT;
 import static de.vatrascell.nezr.message.TableColumnNameId.ADMIN_XLS_EXPORT;
 import static de.vatrascell.nezr.message.TableColumnNameId.DELETE;
 import static de.vatrascell.nezr.message.TableColumnNameId.EDIT;
+import static de.vatrascell.nezr.model.SceneName.ADMIN_PATH;
 
+@Component
+@FxmlView(ADMIN_PATH)
 public class AdminController {
 
     private static final ObservableList<QuestionnaireTableObject> data = FXCollections.observableArrayList();
+
+    private final AdminService adminService;
+    private final LoginService loginService;
+    private final StartController startController;
+    private final ExportController exportController;
+    private final ScreenController screenController;
 
     public Button btn_loc;
     @FXML
@@ -95,20 +107,21 @@ public class AdminController {
     /**
      * The constructor (is called before the initialize()-method).
      */
-    public AdminController() {
-        getData();
-        data.addListener((ListChangeListener<QuestionnaireTableObject>) change -> {
-            change.next();
-            if (questionnaireTableView != null) {
-                questionnaireTableView.refresh();
-            }
-        });
+    @Autowired
+    @Lazy
+    public AdminController(AdminService adminService, LoginService loginService, StartController startController, ExportController exportController,
+                           ScreenController screenController) {
+        this.adminService = adminService;
+        this.loginService = loginService;
+        this.startController = startController;
+        this.exportController = exportController;
+        this.screenController = screenController;
     }
 
-    private static void getData() {
+    private void getData() {
         data.clear();
         List<QuestionnaireTableObject> tableObjects =
-                QuestionnaireTableObjectConverter.convert(Objects.requireNonNull(AdminService.getQuestionnaires(GlobalVars.location)));
+                QuestionnaireTableObjectConverter.convert(Objects.requireNonNull(adminService.getQuestionnaires(GlobalVars.location)), this);
         data.addAll(Objects.requireNonNull(tableObjects));
     }
 
@@ -118,6 +131,13 @@ public class AdminController {
      */
     @FXML
     private void initialize() {
+        getData();
+        data.addListener((ListChangeListener<QuestionnaireTableObject>) change -> {
+            change.next();
+            if (questionnaireTableView != null) {
+                questionnaireTableView.refresh();
+            }
+        });
         questionnaireTableView.setItems(data);
 
         nameColumn.setCellValueFactory(new PropertyValueFactory<>(Questionnaire.NAME));
@@ -129,14 +149,14 @@ public class AdminController {
             property.addListener((observable, oldValue, newValue) -> {
                 questionnaire.setActive(newValue);
                 if (newValue) {
-                    AdminService.activateQuestionnaire(questionnaire.getId());
+                    adminService.activateQuestionnaire(questionnaire.getId());
                     GlobalVars.activeQuestionnaire = questionnaire;
                     deactivateAllOtherQuestionnaires(questionnaire);
                 } else {
-                    AdminService.disableQuestionnaire(questionnaire.getId());
+                    adminService.disableQuestionnaire(questionnaire.getId());
                     GlobalVars.activeQuestionnaire = null;
                 }
-                StartController.setStartText();
+                startController.setStartText();
                 getData();
                 questionnaireTableView.refresh();
             });
@@ -151,9 +171,9 @@ public class AdminController {
 
             property.addListener((observable, oldValue, newValue) -> {
                 if (newValue) {
-                    AdminService.setFinal(cellValue);
+                    adminService.setFinal(cellValue);
                 } else {
-                    AdminService.setUnFinal(cellValue);
+                    adminService.setUnFinal(cellValue);
                 }
                 cellValue.setFinal(newValue);
             });
@@ -182,26 +202,20 @@ public class AdminController {
 
     }
 
-    public static Button initEditButton(Questionnaire questionnaire) {
+    public Button initEditButton(Questionnaire questionnaire) {
         ImageView imgView = new ImageView(GlobalVars.IMG_EDT);
         imgView.setFitHeight(30);
         imgView.setFitWidth(30);
         Button button = new Button("", imgView);
         button.setOnAction(event -> {
-            try {
-                QuestionListController.questionnaire = questionnaire;
-                ScreenController.addScreen(SceneName.QUESTION_LIST,
-                        getURL(SceneName.QUESTION_LIST_PATH));
-                ScreenController.activate(SceneName.QUESTION_LIST);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            QuestionListController.questionnaire = questionnaire;
+            screenController.activate(QuestionListController.class);
         });
 
         return button;
     }
 
-    public static Button initCopyButton(Questionnaire questionnaire) {
+    public Button initCopyButton(Questionnaire questionnaire) {
         ImageView imgView = new ImageView(GlobalVars.IMG_COP);
         imgView.setFitHeight(30);
         imgView.setFitWidth(30);
@@ -216,7 +230,7 @@ public class AdminController {
 
             Optional<String> result = dialog.showAndWait();
             result.ifPresent(ort -> {
-                        if (AdminService.copyQuestionnaire(questionnaire, ort)) {
+                        if (adminService.copyQuestionnaire(questionnaire, ort)) {
                             getData();
                             NotificationController.createMessage(
                                     MessageId.TITLE_COPY_QUESTIONNAIRE,
@@ -236,7 +250,7 @@ public class AdminController {
         return button;
     }
 
-    public static Button initRenameButton(Questionnaire questionnaire) {
+    public Button initRenameButton(Questionnaire questionnaire) {
         ValidationSupport validationSupport = new ValidationSupport();
         ImageView imgView = new ImageView(GlobalVars.IMG_REN);
         imgView.setFitHeight(30);
@@ -258,7 +272,7 @@ public class AdminController {
             Optional<String> result = dialog.showAndWait();
             result.ifPresent(questionnaire::setName);
 
-            if (AdminService.renameQuestionnaire(questionnaire)) {
+            if (adminService.renameQuestionnaire(questionnaire)) {
                 getData();
             }
         });
@@ -266,7 +280,7 @@ public class AdminController {
         return button;
     }
 
-    public static Button initSqlExportButton(Questionnaire questionnaire) {
+    public Button initSqlExportButton(Questionnaire questionnaire) {
         ImageView imgView = new ImageView(GlobalVars.IMG_SQL);
         imgView.setFitHeight(30);
         imgView.setFitWidth(30);
@@ -278,13 +292,12 @@ public class AdminController {
         return button;
     }
 
-    public static Button initXlsExportButton(Questionnaire questionnaire) {
+    public Button initXlsExportButton(Questionnaire questionnaire) {
         ImageView imgView = new ImageView(GlobalVars.IMG_XLS);
         imgView.setFitHeight(30);
         imgView.setFitWidth(30);
         Button button = new Button("", imgView);
         button.setOnAction(event -> {
-            ExportController exportController = new ExportController();
             Optional<Pair<String, String>> result = getDatePickerDialog();
             result.ifPresent(dates -> {
                 exportController.createExcelFile(
@@ -307,7 +320,7 @@ public class AdminController {
         return button;
     }
 
-    public static Button initDeleteButton(Questionnaire questionnaire) {
+    public Button initDeleteButton(Questionnaire questionnaire) {
         ImageView imgView = new ImageView(GlobalVars.IMG_DEL);
         imgView.setFitHeight(30);
         imgView.setFitWidth(30);
@@ -324,7 +337,7 @@ public class AdminController {
 
             Optional<ButtonType> result = alert.showAndWait();
             if (result.isPresent() && result.get() == ButtonType.OK) {
-                if (AdminService.deleteQuestionnaire(questionnaire.getId())) {
+                if (adminService.deleteQuestionnaire(questionnaire.getId())) {
                     getData();
                     NotificationController.createErrorMessage(
                             MessageId.TITLE_REMOVE_QUESTIONNAIRE,
@@ -341,7 +354,7 @@ public class AdminController {
         return button;
     }
 
-    private static Optional<Pair<String, String>> getDatePickerDialog() {
+    private Optional<Pair<String, String>> getDatePickerDialog() {
         ValidationSupport validationSupport = new ValidationSupport();
 
         // Create the custom dialog.
@@ -402,7 +415,7 @@ public class AdminController {
     private void deactivateAllOtherQuestionnaires(Questionnaire activeQuestionnaire) {
         for (Questionnaire questionnaire : data) {
             if (questionnaire.isActive().get() && questionnaire.getId() != activeQuestionnaire.getId()) {
-                AdminService.disableQuestionnaire(questionnaire.getId());
+                adminService.disableQuestionnaire(questionnaire.getId());
             }
         }
     }
@@ -424,7 +437,7 @@ public class AdminController {
 
         Optional<String> result = dialog.showAndWait();
         result.ifPresent(name -> {
-            if (AdminService.createQuestionnaire(name) != -1) {
+            if (adminService.createQuestionnaire(name) != -1) {
                 getData();
                 questionnaireTableView.refresh();
             }
@@ -432,14 +445,14 @@ public class AdminController {
     }
 
     @FXML
-    private void logout() throws IOException {
-        LoginService.login("usr", "Q#DQ8Ka&9Vq6`;)s");
-        ScreenController.activate(SceneName.START);
+    private void logout() {
+        loginService.login("usr", "Q#DQ8Ka&9Vq6`;)s");
+        screenController.activate(StartController.class);
     }
 
     @FXML
-    private void changeLocation() throws IOException {
-        ScreenController.activate(SceneName.LOCATION);
+    private void changeLocation() {
+        screenController.activate(LocationController.class);
     }
 
     @FXML

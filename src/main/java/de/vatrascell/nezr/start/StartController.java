@@ -1,10 +1,11 @@
 package de.vatrascell.nezr.start;
 
 import de.vatrascell.nezr.application.GlobalVars;
-import de.vatrascell.nezr.application.NotificationController;
-import de.vatrascell.nezr.application.ScreenController;
+import de.vatrascell.nezr.application.controller.NotificationController;
+import de.vatrascell.nezr.application.controller.ScreenController;
 import de.vatrascell.nezr.application.svg.SvgImageLoader;
 import de.vatrascell.nezr.login.LoginController;
+import de.vatrascell.nezr.login.LoginService;
 import de.vatrascell.nezr.message.MessageId;
 import de.vatrascell.nezr.model.AnswerOption;
 import de.vatrascell.nezr.model.Headline;
@@ -42,9 +43,13 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
+import net.rgielen.fxweaver.core.FxmlView;
 import org.controlsfx.validation.Severity;
 import org.controlsfx.validation.ValidationSupport;
 import org.controlsfx.validation.Validator;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.stereotype.Component;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -55,34 +60,45 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static de.vatrascell.nezr.application.GlobalFuncs.getURL;
-import static de.vatrascell.nezr.model.SceneName.SURVEY_1;
+import static de.vatrascell.nezr.model.SceneName.START_PATH;
 
+@Component
+@FxmlView(START_PATH)
 public class StartController {
 
     @FXML
     Label questionnaireLabel;
-
     @FXML
     Label warningLabel;
-
     @FXML
     Pane pane;
-
     @FXML
     Button startButton;
-
-    private static final StringProperty questionnaireText = new SimpleStringProperty();
-    private static final StringProperty questionnaireWarn = new SimpleStringProperty();
     @FXML
     GridPane gridPane;
     @FXML
     ImageView imageView;
 
+    private static final StringProperty questionnaireText = new SimpleStringProperty();
+    private static final StringProperty questionnaireWarn = new SimpleStringProperty();
+
+    private final QuestionListService questionListService;
+    private final LoginService loginService;
+    private final ScreenController screenController;
+    private final LoginController loginController;
+
     /**
      * The constructor (is called before the initialize()-method).
      */
-    public StartController() {
-        GlobalVars.activeQuestionnaire = StartService.getActiveQuestionnaire();
+    @Autowired
+    @Lazy
+    public StartController(StartService startService, QuestionListService questionListService,
+                           LoginService loginService, ScreenController screenController, LoginController loginController) {
+        this.questionListService = questionListService;
+        this.loginService = loginService;
+        this.screenController = screenController;
+        this.loginController = loginController;
+        GlobalVars.activeQuestionnaire = startService.getActiveQuestionnaire();
     }
 
     /**
@@ -140,7 +156,7 @@ public class StartController {
         warningLabel.setStyle("-fx-text-fill: #c90000;");
     }
 
-    public static void setStartText() {
+    public void setStartText() {
         if (GlobalVars.activeQuestionnaire != null) {
             questionnaireText.set(String.format("Fragebogen: %s", GlobalVars.activeQuestionnaire.getName()));
             if (!GlobalVars.activeQuestionnaire.getLocation().equals(GlobalVars.location)) {
@@ -154,14 +170,14 @@ public class StartController {
         }
     }
 
-    public static void makeQuestionnaire(List<Question> questions, boolean isPreview) throws IOException {
+    public void makeQuestionnaire(List<Question> questions, boolean isPreview) throws IOException {
         SurveyController.setPreview(isPreview);
         List<SurveyPage> pages = getSurveyPages(questions);
         SurveyController.setPageCount(pages.size());
         createPanels(pages);
     }
 
-    private static List<SurveyPage> getSurveyPages(List<Question> questions) {
+    private List<SurveyPage> getSurveyPages(List<Question> questions) {
         List<SurveyPage> pages = new ArrayList<>();
         int oldPosition = 1;
         Headline currentHeadline = questions.get(0).getHeadline();
@@ -189,7 +205,7 @@ public class StartController {
         return pages;
     }
 
-    public static void createPanels(List<SurveyPage> pages) throws IOException {
+    public void createPanels(List<SurveyPage> pages) throws IOException {
         for (SurveyPage page : pages) {
 
             Pane scene = FXMLLoader.load(getURL(SceneName.SURVEY_PATH));
@@ -203,15 +219,15 @@ public class StartController {
             }
 
 
-            ScreenController.addScreen("survey_" + page.getPageNumber(), scene);
+            //screenController.addScreen("survey_" + page.getPageNumber(), scene);
         }
     }
 
-    private static boolean needsEvaluationQuestionFooter(List<Question> questions) {
+    private boolean needsEvaluationQuestionFooter(List<Question> questions) {
         return questions.stream().anyMatch(question -> question.getFlags().isEvaluationQuestion());
     }
 
-    private static void setHeaderFields(Pane scene, int pageNumber, int pageCount, Headline headline) {
+    private void setHeaderFields(Pane scene, int pageNumber, int pageCount, Headline headline) {
         ProgressBar progressBar = (ProgressBar) scene.lookup("#progressBar");
         progressBar.setProgress((float) (pageNumber) / (float) pageCount);
 
@@ -225,7 +241,7 @@ public class StartController {
 
     }
 
-    private static void setQuestions(Pane scene, List<Question> questions) {
+    private void setQuestions(Pane scene, List<Question> questions) {
         ValidationSupport validationSupport = new ValidationSupport();
         VBox outerVBox = (VBox) scene.lookup("#vbox");
 
@@ -249,14 +265,14 @@ public class StartController {
         scene.lookup("#btn_next").disableProperty().bind(validationSupport.invalidProperty().isEqualTo(checkRequiredValue));
     }
 
-    private static void createEvaluationQuestionFooter(Pane scene) {
+    private void createEvaluationQuestionFooter(Pane scene) {
         HBox hBox = (HBox) scene.lookup("#footer_hBox");
         hBox.getChildren().add(new Label("0: keine Aussage"));
         hBox.getChildren().add(new Label("1: sehr schlecht"));
         hBox.getChildren().add(new Label("10: sehr gut"));
     }
 
-    private static void createMultipleChoiceQuestion(VBox innerVBox, Question question, HashMap<Integer, List<BooleanProperty>> booleanPropertyHashMap, BooleanProperty checkRequiredValue) {
+    private void createMultipleChoiceQuestion(VBox innerVBox, Question question, HashMap<Integer, List<BooleanProperty>> booleanPropertyHashMap, BooleanProperty checkRequiredValue) {
         if (question.getFlags().isList()) {
             innerVBox.getChildren().add(createListViewHBox(question, booleanPropertyHashMap, checkRequiredValue));
         } else {
@@ -264,7 +280,7 @@ public class StartController {
         }
     }
 
-    private static void createShortAnswerQuestion(VBox innerVBox, Question question, ValidationSupport validationSupport) {
+    private void createShortAnswerQuestion(VBox innerVBox, Question question, ValidationSupport validationSupport) {
         if (question.getFlags().isTextArea()) {
             innerVBox.getChildren().add(createTextAreaHBox(question, validationSupport));
         } else {
@@ -272,7 +288,7 @@ public class StartController {
         }
     }
 
-    private static HBox createTextFieldHBox(Question question, ValidationSupport validationSupport) {
+    private HBox createTextFieldHBox(Question question, ValidationSupport validationSupport) {
         HBox hBox = new HBox();
         hBox.setAlignment(Pos.CENTER);
         TextField textField = new TextField();
@@ -290,7 +306,7 @@ public class StartController {
         return hBox;
     }
 
-    private static HBox createTextAreaHBox(Question question, ValidationSupport validationSupport) {
+    private HBox createTextAreaHBox(Question question, ValidationSupport validationSupport) {
         HBox hBox = new HBox();
         hBox.setAlignment(Pos.CENTER);
         TextArea textArea = new TextArea();
@@ -308,11 +324,11 @@ public class StartController {
         return hBox;
     }
 
-    private static String regexOrEmpty(String regex) {
+    private String regexOrEmpty(String regex) {
         return String.format("(^$|%s)", regex);
     }
 
-    private static HBox createListViewHBox(Question question, HashMap<Integer, List<BooleanProperty>> booleanPropertyHashMap, BooleanProperty checkRequiredValue) {
+    private HBox createListViewHBox(Question question, HashMap<Integer, List<BooleanProperty>> booleanPropertyHashMap, BooleanProperty checkRequiredValue) {
         HBox hBox = new HBox();
         hBox.setAlignment(Pos.CENTER);
 
@@ -373,7 +389,7 @@ public class StartController {
         return hBox;
     }
 
-    private static HBox createCheckboxHBox(Question question, HashMap<Integer, List<BooleanProperty>> booleanPropertyHashMap, BooleanProperty checkRequiredValue) {
+    private HBox createCheckboxHBox(Question question, HashMap<Integer, List<BooleanProperty>> booleanPropertyHashMap, BooleanProperty checkRequiredValue) {
         ToggleGroup group = new ToggleGroup();
         HBox hBox = new HBox();
         hBox.setAlignment(Pos.CENTER);
@@ -423,7 +439,7 @@ public class StartController {
         return hBox;
     }
 
-    private static void checkObservableValues(BooleanProperty checkRequiredValue, HashMap<Integer, List<BooleanProperty>> booleanPropertyHashMap) {
+    private void checkObservableValues(BooleanProperty checkRequiredValue, HashMap<Integer, List<BooleanProperty>> booleanPropertyHashMap) {
         List<Boolean> booleans = new ArrayList<>();
 
         for (List<BooleanProperty> booleanProperties : booleanPropertyHashMap.values()) {
@@ -433,7 +449,7 @@ public class StartController {
     }
 
 
-    private static boolean isNewHeadline(Headline currentHeadline, Headline headline) {
+    private boolean isNewHeadline(Headline currentHeadline, Headline headline) {
         if (currentHeadline != null && headline != null) {
             return !currentHeadline.equals(headline);
         } else {
@@ -441,7 +457,7 @@ public class StartController {
         }
     }
 
-    private static Label createQuestionLabel(Pane screen, Question question) {
+    private Label createQuestionLabel(Pane screen, Question question) {
         String questionTest = removeMark(question.getQuestion());
 
         questionTest = addRequiredTag(questionTest, question.getFlags().isRequired());
@@ -462,7 +478,7 @@ public class StartController {
         return questionLabel;
     }
 
-    private static String removeMark(String text) {
+    private String removeMark(String text) {
         Pattern MY_PATTERNs = Pattern.compile("#\\[[0-9]+\\]");
         Matcher ms = MY_PATTERNs.matcher(text);
         if (ms.find()) {
@@ -472,27 +488,27 @@ public class StartController {
         return text;
     }
 
-    private static String addRequiredTag(String text, boolean required) {
+    private String addRequiredTag(String text, boolean required) {
         return required ? text + " *" : text;
     }
 
     @FXML
-    private void adminLogin() throws IOException {
+    private void adminLogin() {
         if (GlobalVars.DEV_MODE) {
-            LoginController.devLogin();
+            loginController.devLogin();
         } else {
-            ScreenController.activate(SceneName.LOGIN);
+            screenController.activate(LoginController.class);
         }
     }
 
     @FXML
     private void next() throws IOException {
-        List<Question> questions = QuestionListService.getQuestions(GlobalVars.activeQuestionnaire.getId());
+        List<Question> questions = questionListService.getQuestions(GlobalVars.activeQuestionnaire.getId());
         if (questions.isEmpty()) {
             NotificationController.createErrorMessage(MessageId.TITLE_QUESTIONNAIRE, MessageId.MESSAGE_QUESTIONNAIRE_IS_EMPTY);
             return;
         }
         makeQuestionnaire(questions, false);
-        ScreenController.activate(SURVEY_1);
+        screenController.activate(SurveyController.class);
     }
 }

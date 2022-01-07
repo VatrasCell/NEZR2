@@ -1,10 +1,10 @@
 package de.vatrascell.nezr.questionList;
 
+import de.vatrascell.nezr.admin.AdminController;
 import de.vatrascell.nezr.application.GlobalVars;
-import de.vatrascell.nezr.application.ScreenController;
+import de.vatrascell.nezr.application.controller.ScreenController;
 import de.vatrascell.nezr.model.Question;
 import de.vatrascell.nezr.model.Questionnaire;
-import de.vatrascell.nezr.model.SceneName;
 import de.vatrascell.nezr.model.tableObject.QuestionTableObject;
 import de.vatrascell.nezr.model.tableObject.converter.QuestionTableObjectConverter;
 import de.vatrascell.nezr.question.QuestionController;
@@ -17,19 +17,28 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.ImageView;
+import net.rgielen.fxweaver.core.FxmlView;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.stereotype.Component;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
 
-import static de.vatrascell.nezr.application.GlobalFuncs.getURL;
-import static de.vatrascell.nezr.application.TableColumnNameController.getColumnName;
+import static de.vatrascell.nezr.application.controller.TableColumnNameController.getColumnName;
 import static de.vatrascell.nezr.message.TableColumnNameId.DELETE;
 import static de.vatrascell.nezr.message.TableColumnNameId.EDIT;
+import static de.vatrascell.nezr.model.SceneName.QUESTION_LIST_PATH;
 
+@Component
+@FxmlView(QUESTION_LIST_PATH)
 public class QuestionListController {
     public static Questionnaire questionnaire;
     private static final ObservableList<QuestionTableObject> data = FXCollections.observableArrayList();
+
+    private final QuestionListService questionListService;
+    private final QuestionService questionService;
+    private final ScreenController screenController;
 
     @FXML
     private TableView<QuestionTableObject> questionTable;
@@ -51,14 +60,19 @@ public class QuestionListController {
     /**
      * The constructor (is called before the initialize()-method).
      */
-    public QuestionListController() {
-        getData();
+    @Autowired
+    @Lazy
+    public QuestionListController(QuestionListService questionListService, QuestionService questionService,
+                                  ScreenController screenController) {
+        this.questionListService = questionListService;
+        this.questionService = questionService;
+        this.screenController = screenController;
     }
 
-    private static void getData() {
+    private void getData() {
         data.clear();
         List<QuestionTableObject> tableObjects =
-                QuestionTableObjectConverter.convert(Objects.requireNonNull(QuestionListService.getQuestions(questionnaire.getId())));
+                QuestionTableObjectConverter.convert(Objects.requireNonNull(questionListService.getQuestions(questionnaire.getId())), this);
         data.addAll(Objects.requireNonNull(tableObjects));
     }
 
@@ -68,6 +82,7 @@ public class QuestionListController {
      */
     @FXML
     private void initialize() {
+        getData();
         questionTable.setItems(data);
 
         nameColumn.setCellValueFactory(new PropertyValueFactory<>(Question.QUESTION));
@@ -84,7 +99,7 @@ public class QuestionListController {
         questionTable.getColumns().add(deleteButtonColumn);
     }
 
-    public static Button initEditButton(Question question) {
+    public Button initEditButton(Question question) {
         ImageView imgView = new ImageView(GlobalVars.IMG_EDT);
         imgView.setFitHeight(30);
         imgView.setFitWidth(30);
@@ -92,25 +107,19 @@ public class QuestionListController {
         button.setOnAction(event -> {
             QuestionController.questionnaire = questionnaire;
             QuestionController.question = question;
-            try {
-                ScreenController.addScreen(SceneName.QUESTION, getURL(SceneName.QUESTION_PATH));
-                ScreenController.activate(SceneName.QUESTION);
-            } catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
+            screenController.activate(QuestionController.class);
         });
 
         return button;
     }
 
-    public static Button initDeleteButton(Question question) {
+    public Button initDeleteButton(Question question) {
         ImageView imgView = new ImageView(GlobalVars.IMG_DEL);
         imgView.setFitHeight(30);
         imgView.setFitWidth(30);
         Button button = new Button("", imgView);
         button.setOnAction(event -> {
-            QuestionListService.deleteQuestion(questionnaire.getId(), question);
+            questionListService.deleteQuestion(questionnaire.getId(), question);
             getData();
         });
 
@@ -118,21 +127,15 @@ public class QuestionListController {
     }
 
     @FXML
-    private void save() throws IOException {
-        ScreenController.activate(SceneName.ADMIN);
+    private void save() {
+        screenController.activate(AdminController.class);
     }
 
     @FXML
     private void newQuestion() {
         QuestionController.questionnaire = questionnaire;
 
-        QuestionController.question = new Question(QuestionService.getMaxQuestionPosition(questionnaire.getId()));
-        try {
-            ScreenController.addScreen(SceneName.QUESTION, getURL(SceneName.QUESTION_PATH));
-            ScreenController.activate(SceneName.QUESTION);
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+        QuestionController.question = new Question(questionService.getMaxQuestionPosition(questionnaire.getId()));
+        screenController.activate(QuestionController.class);
     }
 }

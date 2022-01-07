@@ -1,18 +1,11 @@
 package de.vatrascell.nezr.questionList;
 
-import de.vatrascell.nezr.model.Question;
 import de.vatrascell.nezr.util.DBTestUtil;
 import org.junit.Ignore;
-import org.junit.Test;
-
-import java.util.List;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 
 @Ignore
 public class QuestionListServiceTest extends DBTestUtil {
-
+/*
     @Test
     public void testGetMultipleChoiceQuestions() {
 
@@ -115,5 +108,5 @@ public class QuestionListServiceTest extends DBTestUtil {
 
     @Test
     public void getShortAnswerQuestionsByQuestionnaireId() {
-    }
+    }*/
 }

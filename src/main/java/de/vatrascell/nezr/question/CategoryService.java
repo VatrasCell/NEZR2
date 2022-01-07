@@ -1,10 +1,11 @@
 package de.vatrascell.nezr.question;
 
 import de.vatrascell.nezr.application.Database;
-import de.vatrascell.nezr.application.NotificationController;
+import de.vatrascell.nezr.application.controller.NotificationController;
 import de.vatrascell.nezr.message.MessageId;
 import de.vatrascell.nezr.model.Category;
 import de.vatrascell.nezr.model.QuestionType;
+import org.springframework.stereotype.Service;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -23,8 +24,9 @@ import static de.vatrascell.nezr.application.SqlStatement.SQL_GET_CATEGORY_BY_NA
 import static de.vatrascell.nezr.application.SqlStatement.SQL_SET_CATEGORY_ON_MULTIPLE_CHOICE;
 import static de.vatrascell.nezr.application.SqlStatement.SQL_SET_CATEGORY_ON_SHORT_ANSWER;
 
+@Service
 public class CategoryService extends Database {
-    public static List<Category> getCategories() {
+    public List<Category> getCategories() {
         try (Connection myCon = DriverManager.getConnection(Database.url, Database.user, Database.pwd)) {
             Statement mySQL = myCon.createStatement();
             ResultSet myRS = mySQL.executeQuery(SQL_GET_CATEGORIES);
@@ -45,7 +47,7 @@ public class CategoryService extends Database {
         return null;
     }
 
-    public static void createUniqueCategory(String category) {
+    public void createUniqueCategory(String category) {
         try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
             myCon.setAutoCommit(false);
 
@@ -61,7 +63,7 @@ public class CategoryService extends Database {
         }
     }
 
-    public static void createUniqueCategory(Connection connection, String category) throws SQLException {
+    public void createUniqueCategory(Connection connection, String category) throws SQLException {
         if (checkCategory(category)) {
             NotificationController
                     .createErrorMessage(MessageId.TITLE_CREATE_CATEGORY, MessageId.MESSAGE_CATEGORY_ALREADY_EXISTS);
@@ -70,7 +72,7 @@ public class CategoryService extends Database {
         }
     }
 
-    private static void createCategory(Connection connection, String category) throws SQLException {
+    private void createCategory(Connection connection, String category) throws SQLException {
         try {
             PreparedStatement psSql = connection.prepareStatement(SQL_CREATE_CATEGORY);
             psSql.setString(1, category);
@@ -86,7 +88,7 @@ public class CategoryService extends Database {
         }
     }
 
-    public static boolean checkCategory(String category) {
+    public boolean checkCategory(String category) {
         try (Connection myCon = DriverManager.getConnection(Database.url, Database.user, Database.pwd)) {
             PreparedStatement psSql = myCon.prepareStatement(SQL_GET_CATEGORY_BY_NAME);
             psSql.setString(1, category);
@@ -102,7 +104,7 @@ public class CategoryService extends Database {
         return false;
     }
 
-    public static Category getCategory(String name) {
+    public Category getCategory(String name) {
         try (Connection myCon = DriverManager.getConnection(Database.url, Database.user, Database.pwd)) {
             PreparedStatement psSql = myCon.prepareStatement(SQL_GET_CATEGORY_BY_NAME);
             psSql.setString(1, name);
@@ -120,7 +122,7 @@ public class CategoryService extends Database {
         return null;
     }
 
-    public static Category provideCategory(Connection connection, String name) throws SQLException {
+    public Category provideCategory(Connection connection, String name) throws SQLException {
         Category category = getCategory(name);
 
         if (category == null) {
@@ -131,7 +133,7 @@ public class CategoryService extends Database {
         return category;
     }
 
-    public static void setCategoryOnQuestion(Connection connection, int categoryId, int questionId, QuestionType questionType) throws SQLException {
+    public void setCategoryOnQuestion(Connection connection, int categoryId, int questionId, QuestionType questionType) throws SQLException {
         try {
             PreparedStatement psSql = connection.prepareStatement(questionType.equals(QuestionType.MULTIPLE_CHOICE) ?
                     SQL_SET_CATEGORY_ON_MULTIPLE_CHOICE : SQL_SET_CATEGORY_ON_SHORT_ANSWER);

@@ -1,21 +1,30 @@
 package de.vatrascell.nezr.location;
 
 import de.vatrascell.nezr.application.GlobalVars;
-import de.vatrascell.nezr.application.NotificationController;
-import de.vatrascell.nezr.application.ScreenController;
-import de.vatrascell.nezr.message.MessageId;
-import de.vatrascell.nezr.model.SceneName;
+import de.vatrascell.nezr.application.controller.ScreenController;
+import de.vatrascell.nezr.login.LoginService;
+import de.vatrascell.nezr.start.StartController;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.ChoiceBox;
+import net.rgielen.fxweaver.core.FxmlView;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.stereotype.Component;
 
-import java.io.IOException;
+import java.util.stream.Collectors;
 
-import static de.vatrascell.nezr.application.GlobalFuncs.getURL;
+import static de.vatrascell.nezr.model.SceneName.LOCATION_PATH;
 
 //TODO add map with locations
+@Component
+@FxmlView(LOCATION_PATH)
 public class LocationController {
+
+    private final LocationService locationService;
+    private final LoginService loginService;
+    private final ScreenController screenController;
 
     @FXML
     private ChoiceBox<String> choiceBox;
@@ -24,9 +33,12 @@ public class LocationController {
     /**
      * The constructor (is called before the initialize()-method).
      */
-    public LocationController() {
-        // Create some sample data for the ComboBox and ListView.
-        choiceBoxData.addAll(GlobalVars.locations);
+    @Autowired
+    @Lazy
+    public LocationController(LocationService locationService, LoginService loginService, ScreenController screenController) {
+        this.locationService = locationService;
+        this.loginService = loginService;
+        this.screenController = screenController;
     }
 
     /**
@@ -35,7 +47,9 @@ public class LocationController {
      */
     @FXML
     private void initialize() {
-
+        loginService.login("usr", "Q#DQ8Ka&9Vq6`;)s");
+        choiceBoxData.addAll(locationService.getLocations());
+        choiceBoxData = choiceBoxData.stream().distinct().collect(Collectors.toCollection(FXCollections::observableArrayList));
         // Init ComboBox items.
         choiceBox.setItems(choiceBoxData);
         choiceBox.getSelectionModel().selectFirst();
@@ -44,14 +58,6 @@ public class LocationController {
     @FXML
     private void next() {
         GlobalVars.location = choiceBox.getValue();
-        try {
-            ScreenController.addScreen(SceneName.START, getURL(SceneName.START_PATH));
-            ScreenController.activate(SceneName.START);
-        } catch (IOException e) {
-            e.printStackTrace();
-            NotificationController.createErrorMessage(MessageId.TITLE_UNDEFINED, MessageId.MESSAGE_UNDEFINED_ERROR);
-        } catch (NullPointerException e) {
-            NotificationController.createErrorMessage(MessageId.TITLE_UNDEFINED, MessageId.MESSAGE_UNDEFINED_ERROR);
-        }
+        screenController.activate(StartController.class);
     }
 }

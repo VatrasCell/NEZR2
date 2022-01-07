@@ -1,23 +1,29 @@
 package de.vatrascell.nezr.validation;
 
-import de.vatrascell.nezr.application.ScreenController;
-import de.vatrascell.nezr.model.SceneName;
+import de.vatrascell.nezr.application.controller.ScreenController;
+import de.vatrascell.nezr.question.QuestionController;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import net.rgielen.fxweaver.core.FxmlView;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.stereotype.Component;
 
-import java.io.IOException;
+import static de.vatrascell.nezr.model.SceneName.VALIDATION_PATH;
 
+@Component
+@FxmlView(VALIDATION_PATH)
 public class ValidationController {
-
 
     @FXML
     private Button btn_new;
 
-    /**
-     * The constructor (is called before the initialize()-method).
-     */
-    public ValidationController() {
+    private final ScreenController screenController;
 
+    @Autowired
+    @Lazy
+    public ValidationController(ScreenController screenController) {
+        this.screenController = screenController;
     }
 
     /**
@@ -35,12 +41,12 @@ public class ValidationController {
     }
 
     @FXML
-    private void save() throws IOException {
+    private void save() {
 
     }
 
     @FXML
-    private void exit() throws IOException {
-        ScreenController.activate(SceneName.QUESTION);
+    private void exit() {
+        screenController.activate(QuestionController.class);
     }
 }

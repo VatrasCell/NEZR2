@@ -1,10 +1,11 @@
 package de.vatrascell.nezr.question;
 
 import de.vatrascell.nezr.application.Database;
-import de.vatrascell.nezr.application.NotificationController;
+import de.vatrascell.nezr.application.controller.NotificationController;
 import de.vatrascell.nezr.message.MessageId;
 import de.vatrascell.nezr.model.Headline;
 import de.vatrascell.nezr.model.QuestionType;
+import org.springframework.stereotype.Service;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -24,8 +25,9 @@ import static de.vatrascell.nezr.application.SqlStatement.SQL_GET_HEADLINE_ID;
 import static de.vatrascell.nezr.application.SqlStatement.SQL_SET_HEADLINE_ON_MULTIPLE_CHOICE;
 import static de.vatrascell.nezr.application.SqlStatement.SQL_SET_HEADLINE_ON_SHORT_ANSWER;
 
+@Service
 public class HeadlineService extends Database {
-    public static List<Headline> getHeadlines(int questionnaireId) {
+    public List<Headline> getHeadlines(int questionnaireId) {
         List<Headline> headlines = new ArrayList<>();
         try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
             PreparedStatement psSql = myCon.prepareStatement(SQL_GET_HEADLINES);
@@ -41,7 +43,7 @@ public class HeadlineService extends Database {
         return headlines;
     }
 
-    public static Headline getHeadline(int headlineId) {
+    public Headline getHeadline(int headlineId) {
         try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
             PreparedStatement psSql = myCon.prepareStatement(SQL_GET_HEADLINE_BY_ID);
             psSql.setInt(1, headlineId);
@@ -57,7 +59,7 @@ public class HeadlineService extends Database {
         return null;
     }
 
-    public static Headline getHeadlineByName(String name) {
+    public Headline getHeadlineByName(String name) {
         try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
             PreparedStatement psSql = myCon.prepareStatement(SQL_GET_HEADLINE_BY_NAME);
             psSql.setString(1, name);
@@ -74,7 +76,7 @@ public class HeadlineService extends Database {
         return null;
     }
 
-    public static void createHeadline(Connection connection, String name) throws SQLException {
+    public void createHeadline(Connection connection, String name) throws SQLException {
         try {
             PreparedStatement psSql = connection.prepareStatement(SQL_CREATE_HEADLINE);
             psSql.setString(1, name);
@@ -90,7 +92,7 @@ public class HeadlineService extends Database {
         }
     }
 
-    public static boolean checkHeadline(String name) {
+    public boolean checkHeadline(String name) {
         try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
             PreparedStatement psSql = myCon.prepareStatement(SQL_GET_HEADLINE_ID);
             psSql.setString(1, name);
@@ -106,7 +108,7 @@ public class HeadlineService extends Database {
         return false;
     }
 
-    public static void createUniqueHeadline(String name) {
+    public void createUniqueHeadline(String name) {
         try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
             myCon.setAutoCommit(false);
 
@@ -125,7 +127,7 @@ public class HeadlineService extends Database {
     }
 
 
-    public static void createUniqueHeadline(Connection connection, String name) throws SQLException {
+    public void createUniqueHeadline(Connection connection, String name) throws SQLException {
         if (checkHeadline(name)) {
             NotificationController
                     .createErrorMessage(MessageId.TITLE_CREATE_HEADLINE, MessageId.MESSAGE_CATEGORY_HEADLINE_EXISTS);
@@ -134,7 +136,7 @@ public class HeadlineService extends Database {
         }
     }
 
-    public static Headline provideHeadline(Connection connection, String name) throws SQLException {
+    public Headline provideHeadline(Connection connection, String name) throws SQLException {
         Headline headline = getHeadlineByName(name);
 
         if (headline == null) {
@@ -145,7 +147,7 @@ public class HeadlineService extends Database {
         return headline;
     }
 
-    public static void setHeadlineOnQuestion(Connection connection, int headline, int multipleChoiceId, QuestionType questionType) throws SQLException {
+    public void setHeadlineOnQuestion(Connection connection, int headline, int multipleChoiceId, QuestionType questionType) throws SQLException {
         try {
             PreparedStatement psSql = connection.prepareStatement(questionType.equals(QuestionType.MULTIPLE_CHOICE) ?
                     SQL_SET_HEADLINE_ON_MULTIPLE_CHOICE : SQL_SET_HEADLINE_ON_SHORT_ANSWER);

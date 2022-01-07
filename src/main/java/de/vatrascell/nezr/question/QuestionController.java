@@ -1,9 +1,9 @@
 package de.vatrascell.nezr.question;
 
-import de.vatrascell.nezr.application.DialogMessageController;
 import de.vatrascell.nezr.application.GlobalVars;
-import de.vatrascell.nezr.application.NotificationController;
-import de.vatrascell.nezr.application.ScreenController;
+import de.vatrascell.nezr.application.controller.DialogMessageController;
+import de.vatrascell.nezr.application.controller.NotificationController;
+import de.vatrascell.nezr.application.controller.ScreenController;
 import de.vatrascell.nezr.flag.FlagList;
 import de.vatrascell.nezr.message.DialogId;
 import de.vatrascell.nezr.message.MessageId;
@@ -14,11 +14,12 @@ import de.vatrascell.nezr.model.Question;
 import de.vatrascell.nezr.model.QuestionEditParam;
 import de.vatrascell.nezr.model.QuestionType;
 import de.vatrascell.nezr.model.Questionnaire;
-import de.vatrascell.nezr.model.SceneName;
 import de.vatrascell.nezr.model.tableObject.AnswerOptionTableObject;
 import de.vatrascell.nezr.model.tableObject.converter.AnswerTableObjectConverter;
+import de.vatrascell.nezr.questionList.QuestionListController;
 import de.vatrascell.nezr.react.ReactController;
 import de.vatrascell.nezr.start.StartController;
+import de.vatrascell.nezr.validation.ValidationController;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -34,6 +35,10 @@ import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
+import net.rgielen.fxweaver.core.FxmlView;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -47,18 +52,28 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static de.vatrascell.nezr.application.GlobalFuncs.getURL;
-import static de.vatrascell.nezr.application.ScreenController.STYLESHEET;
-import static de.vatrascell.nezr.application.TableColumnNameController.getColumnName;
+import static de.vatrascell.nezr.application.controller.ScreenController.STYLESHEET;
+import static de.vatrascell.nezr.application.controller.TableColumnNameController.getColumnName;
 import static de.vatrascell.nezr.message.TableColumnNameId.DELETE;
 import static de.vatrascell.nezr.message.TableColumnNameId.EDIT;
 import static de.vatrascell.nezr.model.QuestionType.MULTIPLE_CHOICE_STRING;
 import static de.vatrascell.nezr.model.QuestionType.SHORT_ANSWER_STRING;
+import static de.vatrascell.nezr.model.SceneName.QUESTION_PATH;
 
+@Component
+@FxmlView(QUESTION_PATH)
 public class QuestionController {
     public static Questionnaire questionnaire;
     public static Question question;
     public Button saveButton;
     private final ObservableList<AnswerOptionTableObject> data = FXCollections.observableArrayList();
+
+    private final ScreenController screenController;
+    private final AnswerOptionService answerOptionService;
+    private final CategoryService categoryService;
+    private final HeadlineService headlineService;
+    private final StartController startController;
+    private final QuestionService questionService;
 
     @FXML
     private Label questionLabel;
@@ -110,37 +125,17 @@ public class QuestionController {
     /**
      * The constructor (is called before the initialize()-method).
      */
-    public QuestionController() {
-        // fuer die Generierung der Antwortentabelle
-        data.clear();
-        List<AnswerOptionTableObject> tableObjects = question.getQuestionId() == null ?
-                new ArrayList<>() :
-                AnswerTableObjectConverter.convert(Objects.requireNonNull(AnswerOptionService.getAnswerOptions(question.getQuestionId())));
-        data.addAll(Objects.requireNonNull(tableObjects));
-    }
-
-    public static Button initEditButton(AnswerOption answerOption) {
-        ImageView imgView = new ImageView(GlobalVars.IMG_EDT);
-        imgView.setFitHeight(20);
-        imgView.setFitWidth(20);
-        Button button = new Button("", imgView);
-        button.setOnAction(event -> {
-            //TODO edit Antwort
-        });
-
-        return button;
-    }
-
-    public static Button initDeleteButton(AnswerOption answerOption) {
-        ImageView imgView = new ImageView(GlobalVars.IMG_DEL);
-        imgView.setFitHeight(20);
-        imgView.setFitWidth(20);
-        Button button = new Button("", imgView);
-        button.setOnAction(event -> {
-            //TODO delete Antwort
-        });
-
-        return button;
+    @Autowired
+    @Lazy
+    public QuestionController(AnswerOptionService answerOptionService, CategoryService categoryService,
+                              HeadlineService headlineService, QuestionService questionService,
+                              StartController startController, ScreenController screenController) {
+        this.answerOptionService = answerOptionService;
+        this.categoryService = categoryService;
+        this.headlineService = headlineService;
+        this.questionService = questionService;
+        this.startController = startController;
+        this.screenController = screenController;
     }
 
     /**
@@ -149,6 +144,12 @@ public class QuestionController {
      */
     @FXML
     private void initialize() {
+        // fuer die Generierung der Antwortentabelle
+        data.clear();
+        List<AnswerOptionTableObject> tableObjects = question.getQuestionId() == null ?
+                new ArrayList<>() :
+                AnswerTableObjectConverter.convert(Objects.requireNonNull(answerOptionService.getAnswerOptions(question.getQuestionId())), this);
+        data.addAll(Objects.requireNonNull(tableObjects));
 
         //TODO debug only
         //formGridPane.setGridLinesVisible(true);
@@ -167,6 +168,30 @@ public class QuestionController {
         fillScene();
     }
 
+    public Button initEditButton(AnswerOption answerOption) {
+        ImageView imgView = new ImageView(GlobalVars.IMG_EDT);
+        imgView.setFitHeight(20);
+        imgView.setFitWidth(20);
+        Button button = new Button("", imgView);
+        button.setOnAction(event -> {
+            //TODO edit Antwort
+        });
+
+        return button;
+    }
+
+    public Button initDeleteButton(AnswerOption answerOption) {
+        ImageView imgView = new ImageView(GlobalVars.IMG_DEL);
+        imgView.setFitHeight(20);
+        imgView.setFitWidth(20);
+        Button button = new Button("", imgView);
+        button.setOnAction(event -> {
+            //TODO delete Antwort
+        });
+
+        return button;
+    }
+
     private void fillScene() {
         Pattern MY_PATTERN = Pattern.compile("#\\[[0-9]+]");
         Matcher m = MY_PATTERN.matcher(question.getQuestion());
@@ -174,13 +199,13 @@ public class QuestionController {
             System.out.println("Old dataset pattern found.");
         }
         questionTextField.setText(question.getQuestion());
-        List<Integer> range = IntStream.range(1, QuestionService.getMaxQuestionPosition(questionnaire.getId()) + 2).boxed()
+        List<Integer> range = IntStream.range(1, questionService.getMaxQuestionPosition(questionnaire.getId()) + 2).boxed()
                 .collect(Collectors.toList());
         ObservableList<Integer> positionList = FXCollections.observableArrayList(range);
         positionChoiceBox.setItems(positionList);
         positionChoiceBox.getSelectionModel().select(question.getPosition() - 1);
 
-        ObservableList<Category> categoryList = FXCollections.observableArrayList(CategoryService.getCategories());
+        ObservableList<Category> categoryList = FXCollections.observableArrayList(categoryService.getCategories());
         categoryChoiceBox.setItems(categoryList);
         categoryChoiceBox.getSelectionModel().select(question.getCategory());
 
@@ -235,8 +260,8 @@ public class QuestionController {
     }
 
     @FXML
-    private void exit() throws IOException {
-        ScreenController.activate(SceneName.QUESTION_LIST);
+    private void exit() {
+        screenController.activate(QuestionListController.class);
     }
 
     @FXML
@@ -282,7 +307,7 @@ public class QuestionController {
         questionToSave.setCategory(selectedCategory);
 
         if (!newQuestion.equals(oldQuestion)) {
-            if (QuestionService.doQuestionExistsInQuestionnaire(newQuestion, questionnaire.getId(), questionToSave.getQuestionType())) {
+            if (questionService.doQuestionExistsInQuestionnaire(newQuestion, questionnaire.getId(), questionToSave.getQuestionType())) {
                 NotificationController.createErrorMessage(MessageId.TITLE_SAVE_QUESTION, MessageId.MESSAGE_SAVE_QUESTION_ALREADY_EXISTS_ERROR);
                 return;
             }
@@ -302,19 +327,19 @@ public class QuestionController {
 
             if (param.isEvaluationQuestion()) {
                 for (int i = 0; i < 10; ++i) {
-                    answerOptions.add(Objects.requireNonNull(AnswerOptionService.getAnswerOption(String.valueOf(i))));
+                    answerOptions.add(Objects.requireNonNull(answerOptionService.getAnswerOption(String.valueOf(i))));
                 }
 
                 //QuestionService.getPossibleFlags(flags, param);
                 questionToSave.setFlags(flags);
                 questionToSave.setAnswerOptions(answerOptions);
-                QuestionService.saveMultipleChoice(questionnaire.getId(), questionToSave);
+                questionService.saveMultipleChoice(questionnaire.getId(), questionToSave);
             } else {
                 answerOptions = new ArrayList<>();
 
                 if (param.isYesNoQuestion()) {
-                    answerOptions.add(Objects.requireNonNull(AnswerOptionService.getAnswerOption("ja")));
-                    answerOptions.add(Objects.requireNonNull(AnswerOptionService.getAnswerOption("nein")));
+                    answerOptions.add(Objects.requireNonNull(answerOptionService.getAnswerOption("ja")));
+                    answerOptions.add(Objects.requireNonNull(answerOptionService.getAnswerOption("nein")));
                 } else {
                     answerOptions.addAll(answerTable.getItems());
                 }
@@ -343,22 +368,22 @@ public class QuestionController {
                 //QuestionService.getPossibleFlags(flags, param);
                 questionToSave.setFlags(flags);
                 questionToSave.setAnswerOptions(answerOptions);
-                QuestionService.saveMultipleChoice(questionnaire.getId(), questionToSave);
+                questionService.saveMultipleChoice(questionnaire.getId(), questionToSave);
             }
         } else {
             //QuestionService.getPossibleFlags(flags, param);
             questionToSave.setFlags(flags);
-            QuestionService.saveShortAnswerQuestion(questionnaire.getId(), questionToSave);
+            questionService.saveShortAnswerQuestion(questionnaire.getId(), questionToSave);
         }
 
-        ScreenController.activate(SceneName.QUESTION_LIST);
+        screenController.activate(QuestionListController.class);
 
     }
 
     @FXML
     private void setPreview() throws IOException {
-        StartController.makeQuestionnaire(Collections.singletonList(question), true);
-        ScreenController.activate(SceneName.SURVEY_1);
+        startController.makeQuestionnaire(Collections.singletonList(question), true);
+        screenController.activate(QuestionListController.class);
     }
 
     @FXML
@@ -372,7 +397,7 @@ public class QuestionController {
         result.ifPresent(name -> {
             AnswerOption answerOption = new AnswerOption();
             answerOption.setValue(name);
-            data.add(AnswerTableObjectConverter.convert(answerOption));
+            data.add(AnswerTableObjectConverter.convert(answerOption, this));
 
             NotificationController.createMessage(MessageId.TITLE_CREATE_ANSWER, MessageId.MESSAGE_CREATE_ANSWER, name);
         });
@@ -388,9 +413,9 @@ public class QuestionController {
 
         Optional<String> result = dialog.showAndWait();
         result.ifPresent(name -> {
-            CategoryService.createUniqueCategory(name);
-            Category category = CategoryService.getCategory(name);
-            ObservableList<Category> categoryList = FXCollections.observableArrayList(CategoryService.getCategories());
+            categoryService.createUniqueCategory(name);
+            Category category = categoryService.getCategory(name);
+            ObservableList<Category> categoryList = FXCollections.observableArrayList(categoryService.getCategories());
             categoryChoiceBox.setItems(categoryList);
             categoryChoiceBox.getSelectionModel().select(category);
         });
@@ -405,8 +430,8 @@ public class QuestionController {
 
         Optional<String> result = dialog.showAndWait();
         result.ifPresent(name -> {
-            HeadlineService.createUniqueHeadline(name);
-            Headline headline = HeadlineService.getHeadlineByName(name);
+            headlineService.createUniqueHeadline(name);
+            Headline headline = headlineService.getHeadlineByName(name);
             headlineChoiceBox.setItems(createHeadlineList());
             headlineChoiceBox.getSelectionModel().select(headline);
         });
@@ -417,13 +442,7 @@ public class QuestionController {
     private void react() {
         ReactController.question = question;
         ReactController.questionnaire = questionnaire;
-
-        try {
-            ScreenController.addScreen(SceneName.REACT, getURL(SceneName.REACT_PATH));
-            ScreenController.activate(SceneName.REACT);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        screenController.activate(ReactController.class);
     }
 
     public boolean checkQuestionData() {
@@ -493,19 +512,14 @@ public class QuestionController {
 
     @FXML
     private void validation() {
-        try {
-            ScreenController.addScreen(SceneName.VALIDATION, getURL(SceneName.VALIDATION_PATH));
-            ScreenController.activate(SceneName.VALIDATION);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        screenController.activate(ValidationController.class);
     }
 
     private ObservableList<Headline> createHeadlineList() {
         List<Headline> headlineListArrays = new ArrayList<>();
         headlineListArrays.add(null);
         headlineListArrays.addAll(
-                HeadlineService.getHeadlines(questionnaire.getId()));
+                headlineService.getHeadlines(questionnaire.getId()));
         return FXCollections.observableArrayList(headlineListArrays);
     }
 }

@@ -3,6 +3,7 @@ package de.vatrascell.nezr.react;
 import de.vatrascell.nezr.application.Database;
 import de.vatrascell.nezr.flag.React;
 import de.vatrascell.nezr.model.QuestionType;
+import org.springframework.stereotype.Service;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -19,9 +20,10 @@ import static de.vatrascell.nezr.application.SqlStatement.SQL_COLUMN_SHORT_ANSWE
 import static de.vatrascell.nezr.application.SqlStatement.SQL_GET_MULTIPLE_CHOICE_REACTS;
 import static de.vatrascell.nezr.application.SqlStatement.SQL_GET_SHORT_ANSWER_REACTS;
 
+@Service
 public class ReactService extends Database {
 
-    public static List<React> getReacts(int questionRelationId, QuestionType questionType) {
+    public List<React> getReacts(int questionRelationId, QuestionType questionType) {
         List<React> reacts = new ArrayList<>();
         try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
             PreparedStatement psSql = questionType.equals(QuestionType.SHORT_ANSWER) ?

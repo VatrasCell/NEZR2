@@ -11,6 +11,7 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import org.springframework.stereotype.Service;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -42,9 +43,10 @@ import static de.vatrascell.nezr.application.SqlStatement.SQL_GET_SURVEY_HAS_ANS
 import static de.vatrascell.nezr.application.SqlStatement.SQL_GET_SURVEY_HAS_MULTIPLE_CHOICE_RELATION_ID;
 import static de.vatrascell.nezr.application.SqlStatement.SQL_GET_SURVEY_HAS_SHORT_ANSWER_RELATION_ID;
 
+@Service
 public class SurveyService extends Database {
 
-    public static void saveSurvey(int questionnaireId, List<ArrayList<Question>> questionsLists) {
+    public void saveSurvey(int questionnaireId, List<ArrayList<Question>> questionsLists) {
         try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
             myCon.setAutoCommit(false);
 
@@ -81,7 +83,7 @@ public class SurveyService extends Database {
         }
     }
 
-    public static int createSurvey(Connection connection, int questionnaireId) throws SQLException {
+    public int createSurvey(Connection connection, int questionnaireId) throws SQLException {
         try {
             PreparedStatement psSql = connection.prepareStatement(SQL_CREATE_SURVEY);
             psSql.setInt(1, questionnaireId);
@@ -100,7 +102,7 @@ public class SurveyService extends Database {
         return -1;
     }
 
-    public static void resetQuestionnaire() {
+    public void resetQuestionnaire() {
 
         for (ArrayList<Question> questions : GlobalVars.questionsPerPanel) {
             for (Question question : questions) {
@@ -128,7 +130,7 @@ public class SurveyService extends Database {
         }
     }
 
-    private static void createSurveyMultipleChoiceRelation(Connection connection, int surveyId, int questionId) throws SQLException {
+    private void createSurveyMultipleChoiceRelation(Connection connection, int surveyId, int questionId) throws SQLException {
         try {
             PreparedStatement psSql = connection.prepareStatement(SQL_CREATE_SURVEY_HAS_MULTIPLE_CHOICE_RELATION);
             psSql.setInt(1, surveyId);
@@ -140,7 +142,7 @@ public class SurveyService extends Database {
         }
     }
 
-    private static void createSurveyAnswerOptionRelation(Connection connection, int answerId, int surveyMultipleChoiceRelationId) throws SQLException {
+    private void createSurveyAnswerOptionRelation(Connection connection, int answerId, int surveyMultipleChoiceRelationId) throws SQLException {
         try {
             PreparedStatement psSql = connection.prepareStatement(SQL_CREATE_SURVEY_HAS_ANSWER_OPTION_RELATION);
             psSql.setInt(1, answerId);
@@ -152,7 +154,7 @@ public class SurveyService extends Database {
         }
     }
 
-    private static Integer getSurveyQuestionRelationId(int surveyId, int questionId, QuestionType questionType) {
+    private Integer getSurveyQuestionRelationId(int surveyId, int questionId, QuestionType questionType) {
         try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
             PreparedStatement psSql = myCon.prepareStatement(questionType.equals(QuestionType.MULTIPLE_CHOICE) ?
                     SQL_GET_SURVEY_HAS_MULTIPLE_CHOICE_RELATION_ID : SQL_GET_SURVEY_HAS_ANSWER_OPTION_RELATION_ID);
@@ -170,7 +172,7 @@ public class SurveyService extends Database {
         return null;
     }
 
-    private static void createSurveyShortAnswerRelation(Connection connection, int surveyId, int questionId, String answer) throws SQLException {
+    private void createSurveyShortAnswerRelation(Connection connection, int surveyId, int questionId, String answer) throws SQLException {
         try {
             PreparedStatement psSql = connection.prepareStatement(SQL_CREATE_SURVEY_HAS_SHORT_ANSWER_RELATION);
             psSql.setInt(1, surveyId);
@@ -183,7 +185,7 @@ public class SurveyService extends Database {
         }
     }
 
-    private static boolean existsSurveyShortAnswerRelation(int surveyId, int questionId) {
+    private boolean existsSurveyShortAnswerRelation(int surveyId, int questionId) {
         try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
             PreparedStatement psSql = myCon.prepareStatement(SQL_GET_SURVEY_HAS_SHORT_ANSWER_RELATION_ID);
             psSql.setInt(1, surveyId);
@@ -197,14 +199,14 @@ public class SurveyService extends Database {
         return false;
     }
 
-    private static List<Question> discardSecondDimension(List<ArrayList<Question>> questionsLists) {
+    private List<Question> discardSecondDimension(List<ArrayList<Question>> questionsLists) {
         List<Question> results = new ArrayList<>();
         questionsLists.forEach(results::addAll);
 
         return results;
     }
 
-    public static List<Survey> getSurveys(int questionnaireId, String fromDate, String toDate) {
+    public List<Survey> getSurveys(int questionnaireId, String fromDate, String toDate) {
         List<Survey> surveys = new ArrayList<>();
         try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
             PreparedStatement psSql = myCon.prepareStatement(SQL_GET_SURVEYS_BY_QUESTIONNAIRE_ID);
@@ -226,7 +228,7 @@ public class SurveyService extends Database {
         return surveys;
     }
 
-    public static SubmittedAnswer getAnswer(int surveyId, Question question) {
+    public SubmittedAnswer getAnswer(int surveyId, Question question) {
         if (question.getQuestionType().equals(QuestionType.SHORT_ANSWER)) {
             return getShortAnswerSubmittedAnswer(surveyId, question.getQuestionId());
         } else {
@@ -234,7 +236,7 @@ public class SurveyService extends Database {
         }
     }
 
-    private static SubmittedAnswer getShortAnswerSubmittedAnswer(int surveyId, int questionId) {
+    private SubmittedAnswer getShortAnswerSubmittedAnswer(int surveyId, int questionId) {
         SubmittedAnswer submittedAnswer = new SubmittedAnswer();
         try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
             PreparedStatement psSql = myCon.prepareStatement(SQL_GET_SHORT_ANSWER_OF_SURVEY);
@@ -253,7 +255,7 @@ public class SurveyService extends Database {
         return submittedAnswer;
     }
 
-    private static SubmittedAnswer getMultipleChoiceSubmittedAnswer(int surveyId, int questionId) {
+    private SubmittedAnswer getMultipleChoiceSubmittedAnswer(int surveyId, int questionId) {
         SubmittedAnswer submittedAnswer = new SubmittedAnswer();
         List<AnswerOption> answerOptions = new ArrayList<>();
         try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {

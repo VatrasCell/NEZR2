@@ -3,15 +3,19 @@ package de.vatrascell.nezr.model.tableObject;
 import de.vatrascell.nezr.model.AnswerOption;
 import de.vatrascell.nezr.question.QuestionController;
 import javafx.scene.control.Button;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
+@Component
 public class AnswerOptionTableObject extends AnswerOption {
 
     private Button edit;
     private Button delete;
 
-    public AnswerOptionTableObject() {
-        edit = QuestionController.initEditButton(this);
-        delete = QuestionController.initDeleteButton(this);
+    @Autowired
+    public AnswerOptionTableObject(QuestionController questionController) {
+        edit = questionController.initEditButton(this);
+        delete = questionController.initDeleteButton(this);
     }
 
     public Button getEdit() {

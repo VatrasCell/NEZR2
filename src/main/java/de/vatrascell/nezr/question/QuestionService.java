@@ -10,6 +10,8 @@ import de.vatrascell.nezr.model.Headline;
 import de.vatrascell.nezr.model.Question;
 import de.vatrascell.nezr.model.QuestionType;
 import de.vatrascell.nezr.validation.ValidationService;
+import lombok.AllArgsConstructor;
+import org.springframework.stereotype.Service;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -44,18 +46,24 @@ import static de.vatrascell.nezr.application.SqlStatement.SQL_GET_TARGET_QUESTIO
 import static de.vatrascell.nezr.application.SqlStatement.SQL_SET_POSITION_ON_MULTIPLE_CHOICE_QUESTIONNAIRE_RELATION;
 import static de.vatrascell.nezr.application.SqlStatement.SQL_SET_POSITION_ON_SHORT_ANSWER_QUESTIONNAIRE_RELATION;
 
-
+@Service
+@AllArgsConstructor
 public class QuestionService extends Database {
 
+    private final CategoryService categoryService;
+    private final HeadlineService headlineService;
+    private final FlagListService flagListService;
+    private final AnswerOptionService answerOptionService;
+    private final ValidationService validationService;
 
-    public static int getMaxQuestionPosition(int questionnaireId) {
+    public int getMaxQuestionPosition(int questionnaireId) {
         int maxPosMc = Objects.requireNonNull(getMaxPosition(questionnaireId, QuestionType.MULTIPLE_CHOICE));
         int maxPosFf = Objects.requireNonNull(getMaxPosition(questionnaireId, QuestionType.SHORT_ANSWER));
 
         return Math.max(maxPosFf, maxPosMc);
     }
 
-    private static Integer getMaxPosition(int questionnaireId, QuestionType questionType) {
+    private Integer getMaxPosition(int questionnaireId, QuestionType questionType) {
         try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
             PreparedStatement psSql = myCon.prepareStatement(questionType.equals(QuestionType.MULTIPLE_CHOICE) ?
                     SQL_GET_MAX_MULTIPLE_CHOICE_POSITION : SQL_GET_MAX_SHORT_ANSWER_POSITION);
@@ -72,7 +80,7 @@ public class QuestionService extends Database {
     }
 
     // TODO rework method
-    /*public static void getPossibleFlags(FlagList flags, QuestionEditParam param) {
+    /*public void getPossibleFlags(FlagList flags, QuestionEditParam param) {
         if (param.isRequired()) {
             flags.add(new Symbol(SymbolType.REQUIRED));
         }
@@ -113,43 +121,43 @@ public class QuestionService extends Database {
 
     //TODO duplicateQuestion
 
-    public static void saveShortAnswerQuestion(int questionnaireId, Question question) {
+    public void saveShortAnswerQuestion(int questionnaireId, Question question) {
         try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
             myCon.setAutoCommit(false);
 
             // de.vatrascell.nezr.react
             for (React react : question.getFlags().getReacts()) {
                 if (question.getFlags().isRequired()) {
-                    QuestionService.provideQuestionRequired(myCon, questionnaireId, react.getQuestionType());
+                    provideQuestionRequired(myCon, questionnaireId, react.getQuestionType());
                 }
             }
 
             // category
-            Category category = CategoryService.provideCategory(myCon, question.getCategory().getName());
+            Category category = categoryService.provideCategory(myCon, question.getCategory().getName());
 
             //headline
-            Headline headline = question.getHeadline() == null ? null : HeadlineService.provideHeadline(myCon, question.getHeadline().getName());
+            Headline headline = question.getHeadline() == null ? null : headlineService.provideHeadline(myCon, question.getHeadline().getName());
 
             // de.vatrascell.nezr.question
             Integer shortAnswerId = provideShortAnswerQuestion(myCon, question.getQuestion(), category.getId());
 
-            CategoryService.setCategoryOnQuestion(myCon, category.getId(), shortAnswerId, question.getQuestionType());
+            categoryService.setCategoryOnQuestion(myCon, category.getId(), shortAnswerId, question.getQuestionType());
 
             if (headline != null) {
-                HeadlineService.setHeadlineOnQuestion(myCon, headline.getId(), shortAnswerId, question.getQuestionType());
+                headlineService.setHeadlineOnQuestion(myCon, headline.getId(), shortAnswerId, question.getQuestionType());
             }
 
             // questionnaire
             Integer relationId = getQuestionQuestionnaireRelationId(questionnaireId, shortAnswerId, question.getQuestionType());
 
             if (relationId != null) {
-                FlagListService.updateShortAnswerFlagList(myCon, relationId, question.getFlags());
+                flagListService.updateShortAnswerFlagList(myCon, relationId, question.getFlags());
                 setPositionOnShortAnswerQuestionnaireRelation(myCon, question.getPosition(), relationId);
             } else {
                 Integer validationId = null;
                 if (question.getFlags().getValidation() != null) {
-                    ValidationService.createValidation(myCon, question.getFlags().getValidation());
-                    validationId = ValidationService.getLastValidationId();
+                    validationService.createValidation(myCon, question.getFlags().getValidation());
+                    validationId = validationService.getLastValidationId();
                 }
                 createShortAnswerQuestionnaireRelation(myCon, questionnaireId, shortAnswerId, question.getPosition(), validationId);
             }
@@ -160,14 +168,14 @@ public class QuestionService extends Database {
         }
     }
 
-    public static void saveMultipleChoice(int questionnaireId, Question question) {
+    public void saveMultipleChoice(int questionnaireId, Question question) {
         try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
             myCon.setAutoCommit(false);
 
             // de.vatrascell.nezr.react
             for (React react : question.getFlags().getReacts()) {
                 if (question.getFlags().isRequired()) {
-                    QuestionService.provideQuestionRequired(myCon, questionnaireId, react.getQuestionType());
+                    provideQuestionRequired(myCon, questionnaireId, react.getQuestionType());
                 }
             }
 
@@ -176,24 +184,24 @@ public class QuestionService extends Database {
                     .filter(answerOption -> answerOption.getId() == null)
                     .forEach(answerOption -> {
                         try {
-                            answerOption.setId(AnswerOptionService.provideAnswerOptionId(myCon, answerOption.getValue()));
+                            answerOption.setId(answerOptionService.provideAnswerOptionId(myCon, answerOption.getValue()));
                         } catch (SQLException e) {
                             e.printStackTrace();
                         }
                     });
 
             // category
-            Category category = CategoryService.provideCategory(myCon, question.getCategory().getName());
+            Category category = categoryService.provideCategory(myCon, question.getCategory().getName());
 
             //headline
-            Headline headline = question.getHeadline() == null ? null : HeadlineService.provideHeadline(myCon, question.getHeadline().getName());
+            Headline headline = question.getHeadline() == null ? null : headlineService.provideHeadline(myCon, question.getHeadline().getName());
 
             // de.vatrascell.nezr.question
             Integer multipleChoiceId = provideMultipleChoiceQuestion(myCon, question.getQuestion(), category.getId());
 
-            CategoryService.setCategoryOnQuestion(myCon, category.getId(), multipleChoiceId, question.getQuestionType());
+            categoryService.setCategoryOnQuestion(myCon, category.getId(), multipleChoiceId, question.getQuestionType());
             if (headline != null) {
-                HeadlineService.setHeadlineOnQuestion(myCon, headline.getId(), multipleChoiceId, question.getQuestionType());
+                headlineService.setHeadlineOnQuestion(myCon, headline.getId(), multipleChoiceId, question.getQuestionType());
             }
 
             // answers
@@ -205,13 +213,13 @@ public class QuestionService extends Database {
                 if (relationId != null) {
                     newRelationIds.add(relationId);
                 } else {
-                    AnswerOptionService.createMultipleChoiceAnswerOptionsRelation(myCon, multipleChoiceId, answerOption.getId());
+                    answerOptionService.createMultipleChoiceAnswerOptionsRelation(myCon, multipleChoiceId, answerOption.getId());
                 }
             }
 
             for (int oldRelationId : oldRelationIds) {
                 if (!newRelationIds.contains(oldRelationId)) {
-                    AnswerOptionService.deleteMultipleChoiceAnswerOptionsRelation(myCon, oldRelationId);
+                    answerOptionService.deleteMultipleChoiceAnswerOptionsRelation(myCon, oldRelationId);
                 }
             }
 
@@ -221,13 +229,13 @@ public class QuestionService extends Database {
             if (relationId != null) {
                 newRelationIds.add(relationId);
 
-                FlagListService.updateMultipleChoiceFlagList(myCon, relationId, question.getFlags());
+                flagListService.updateMultipleChoiceFlagList(myCon, relationId, question.getFlags());
                 setPositionOnMultipleChoiceQuestionnaireRelation(myCon, question.getPosition(), relationId);
             } else {
                 createMultipleChoiceQuestionnaireRelation(myCon, questionnaireId, multipleChoiceId, question.getPosition());
                 relationId = getQuestionQuestionnaireRelationId(questionnaireId, multipleChoiceId, question.getQuestionType());
 
-                FlagListService.createMultipleChoiceFlagList(myCon, relationId, question.getFlags());
+                flagListService.createMultipleChoiceFlagList(myCon, relationId, question.getFlags());
             }
 
             myCon.commit();
@@ -236,16 +244,16 @@ public class QuestionService extends Database {
         }
     }
 
-    public static boolean doQuestionExistsInQuestionnaire(String question, int questionnaireId, QuestionType questionType) {
-        Integer questionId = QuestionService.getQuestionId(question, questionType);
+    public boolean doQuestionExistsInQuestionnaire(String question, int questionnaireId, QuestionType questionType) {
+        Integer questionId = getQuestionId(question, questionType);
         if (questionId != null) {
-            return QuestionService.getQuestionQuestionnaireRelationId(questionnaireId, questionId, questionType) != null;
+            return getQuestionQuestionnaireRelationId(questionnaireId, questionId, questionType) != null;
         }
 
         return false;
     }
 
-    public static List<Integer> getMultipleChoiceAnswerOptionsRelationIds(int multipleChoiceId) {
+    public List<Integer> getMultipleChoiceAnswerOptionsRelationIds(int multipleChoiceId) {
         List<Integer> results = new ArrayList<>();
         try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
             PreparedStatement psSql = myCon.prepareStatement(SQL_GET_MULTIPLE_CHOICE_ANSWER_OPTIONS_RELATION_IDS);
@@ -262,7 +270,7 @@ public class QuestionService extends Database {
         return results;
     }
 
-    public static Integer getMultipleChoiceAnswersRelationId(int multipleChoiceId, int answerId) {
+    public Integer getMultipleChoiceAnswersRelationId(int multipleChoiceId, int answerId) {
         try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
             PreparedStatement psSql = myCon.prepareStatement(SQL_GET_MULTIPLE_CHOICE_ANSWER_OPTIONS_RELATION_ID);
             psSql.setInt(1, multipleChoiceId);
@@ -278,7 +286,7 @@ public class QuestionService extends Database {
         return null;
     }
 
-    public static Integer getQuestionQuestionnaireRelationId(int questionnaireId, int questionId, QuestionType questionType) {
+    public Integer getQuestionQuestionnaireRelationId(int questionnaireId, int questionId, QuestionType questionType) {
         try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
             PreparedStatement psSql = myCon.prepareStatement(questionType.equals(QuestionType.MULTIPLE_CHOICE) ?
                     SQL_GET_MULTIPLE_CHOICE_QUESTIONNAIRE_RELATION_ID : SQL_GET_SHORT_ANSWER_QUESTIONNAIRE_RELATION_ID);
@@ -296,7 +304,7 @@ public class QuestionService extends Database {
         return null;
     }
 
-    public static Integer getQuestionId(String question, QuestionType questionType) {
+    public Integer getQuestionId(String question, QuestionType questionType) {
         try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
             PreparedStatement psSql = myCon.prepareStatement(questionType.equals(QuestionType.MULTIPLE_CHOICE) ?
                     SQL_GET_MULTIPLE_CHOICE_ID : SQL_GET_SHORT_ANSWER_ID);
@@ -313,7 +321,7 @@ public class QuestionService extends Database {
         return null;
     }
 
-    private static void deleteFlagsFromTargetQuestion(int questionnaireId, int questionId) {
+    private void deleteFlagsFromTargetQuestion(int questionnaireId, int questionId) {
         try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
             myCon.setAutoCommit(false);
             deleteMultipleChoiceReactFlagsFromTargetQuestion(myCon, questionnaireId, questionId);
@@ -324,7 +332,7 @@ public class QuestionService extends Database {
         }
     }
 
-    private static void deleteShortAnswerReactFlagsFromTargetQuestion(Connection connection, int questionnaireId, int questionId) throws SQLException {
+    private void deleteShortAnswerReactFlagsFromTargetQuestion(Connection connection, int questionnaireId, int questionId) throws SQLException {
         try {
             PreparedStatement psSql = connection.prepareStatement(SQL_GET_TARGET_QUESTION_FLAG_AND_ID_FOR_SHORT_ANSWER);
             psSql.setInt(1, questionId);
@@ -333,7 +341,7 @@ public class QuestionService extends Database {
             ResultSet myRS = psSql.executeQuery();
 
             while (myRS.next()) {
-                FlagList flags = FlagListService.getFlagList(
+                FlagList flags = flagListService.getFlagList(
                         myRS.getInt(SQL_COLUMN_SHORT_ANSWER_QUESTIONNAIRE_RELATION_ID),
                         QuestionType.SHORT_ANSWER);
                 int targetQuestionId = myRS.getInt(SQL_COLUMN_SHORT_ANSWER_ID);
@@ -341,7 +349,7 @@ public class QuestionService extends Database {
                 if (flags != null && !flags.getReacts().isEmpty()) {
                     flags.setReacts(null);
 
-                    FlagListService.setQuestionRequired(connection, questionnaireId, targetQuestionId, QuestionType.SHORT_ANSWER);
+                    flagListService.setQuestionRequired(connection, getQuestionQuestionnaireRelationId(questionnaireId, questionId, QuestionType.SHORT_ANSWER), QuestionType.SHORT_ANSWER);
                 }
             }
         } catch (SQLException e) {
@@ -350,7 +358,7 @@ public class QuestionService extends Database {
         }
     }
 
-    private static void deleteMultipleChoiceReactFlagsFromTargetQuestion(Connection connection, int questionnaireId, int questionId) throws SQLException {
+    private void deleteMultipleChoiceReactFlagsFromTargetQuestion(Connection connection, int questionnaireId, int questionId) throws SQLException {
         try {
             PreparedStatement psSql = connection.prepareStatement(SQL_GET_TARGET_QUESTION_FLAG_AND_ID_FOR_MULTIPLE_CHOICE);
             psSql.setInt(1, questionId);
@@ -359,7 +367,7 @@ public class QuestionService extends Database {
             ResultSet myRS = psSql.executeQuery();
 
             while (myRS.next()) {
-                FlagList flags = FlagListService.getFlagList(
+                FlagList flags = flagListService.getFlagList(
                         myRS.getInt(SQL_COLUMN_MULTIPLE_CHOICE_QUESTIONNAIRE_RELATION_ID),
                         QuestionType.MULTIPLE_CHOICE);
                 int targetQuestionId = myRS.getInt(SQL_COLUMN_MULTIPLE_CHOICE_ID);
@@ -367,7 +375,7 @@ public class QuestionService extends Database {
                 if (flags != null && !flags.getReacts().isEmpty()) {
                     flags.setReacts(null);
 
-                    FlagListService.setQuestionRequired(connection, questionnaireId, targetQuestionId, QuestionType.MULTIPLE_CHOICE);
+                    flagListService.setQuestionRequired(connection, getQuestionQuestionnaireRelationId(questionnaireId, questionId, QuestionType.MULTIPLE_CHOICE), QuestionType.MULTIPLE_CHOICE);
                 }
             }
         } catch (SQLException e) {
@@ -376,16 +384,16 @@ public class QuestionService extends Database {
         }
     }
 
-    private static void provideQuestionRequired(Connection connection, int questionnaireId, QuestionType questionType) throws SQLException {
-        FlagList flagList = FlagListService.getFlagList(questionnaireId, questionType);
+    private void provideQuestionRequired(Connection connection, int questionnaireId, QuestionType questionType) throws SQLException {
+        FlagList flagList = flagListService.getFlagList(questionnaireId, questionType);
         if (!flagList.isRequired()) {
             flagList.setRequired(true);
 
-            FlagListService.setQuestionRequired(connection, flagList.getId(), questionType);
+            flagListService.setQuestionRequired(connection, flagList.getId(), questionType);
         }
     }
 
-    private static void createMultipleChoiceQuestion(Connection connection, String question, int categoryId) throws SQLException {
+    private void createMultipleChoiceQuestion(Connection connection, String question, int categoryId) throws SQLException {
         try {
             PreparedStatement psSql = connection.prepareStatement(SQL_CREATE_MULTIPLE_CHOICE);
             psSql.setString(1, question);
@@ -397,7 +405,7 @@ public class QuestionService extends Database {
         }
     }
 
-    private static Integer provideMultipleChoiceQuestion(Connection connection, String question, int categoryId) throws SQLException {
+    private Integer provideMultipleChoiceQuestion(Connection connection, String question, int categoryId) throws SQLException {
         Integer multipleChoiceId = getQuestionId(question, QuestionType.MULTIPLE_CHOICE);
 
         if (multipleChoiceId == null) {
@@ -408,7 +416,7 @@ public class QuestionService extends Database {
         return multipleChoiceId;
     }
 
-    private static void createShortAnswerQuestion(Connection connection, String question, int categoryId) throws SQLException {
+    private void createShortAnswerQuestion(Connection connection, String question, int categoryId) throws SQLException {
         try {
             PreparedStatement psSql = connection.prepareStatement(SQL_CREATE_SHORT_ANSWER);
             psSql.setString(1, question);
@@ -420,7 +428,7 @@ public class QuestionService extends Database {
         }
     }
 
-    private static Integer provideShortAnswerQuestion(Connection connection, String question, int categoryId) throws SQLException {
+    private Integer provideShortAnswerQuestion(Connection connection, String question, int categoryId) throws SQLException {
         Integer shortAnswerId = getQuestionId(question, QuestionType.SHORT_ANSWER);
 
         if (shortAnswerId == null) {
@@ -431,7 +439,7 @@ public class QuestionService extends Database {
         return shortAnswerId;
     }
 
-    private static void setPositionOnMultipleChoiceQuestionnaireRelation(Connection connection, int position, int relationId) throws SQLException {
+    private void setPositionOnMultipleChoiceQuestionnaireRelation(Connection connection, int position, int relationId) throws SQLException {
         try {
             PreparedStatement psSql = connection.prepareStatement(SQL_SET_POSITION_ON_MULTIPLE_CHOICE_QUESTIONNAIRE_RELATION);
             psSql.setInt(1, position);
@@ -443,7 +451,7 @@ public class QuestionService extends Database {
         }
     }
 
-    private static void setPositionOnShortAnswerQuestionnaireRelation(Connection connection, int position, int relationId) throws SQLException {
+    private void setPositionOnShortAnswerQuestionnaireRelation(Connection connection, int position, int relationId) throws SQLException {
         try {
             PreparedStatement psSql = connection.prepareStatement(SQL_SET_POSITION_ON_SHORT_ANSWER_QUESTIONNAIRE_RELATION);
             psSql.setInt(1, position);
@@ -455,7 +463,7 @@ public class QuestionService extends Database {
         }
     }
 
-    private static void createMultipleChoiceQuestionnaireRelation(Connection connection, int questionnaireId, int multipleChoiceId, int position) throws SQLException {
+    private void createMultipleChoiceQuestionnaireRelation(Connection connection, int questionnaireId, int multipleChoiceId, int position) throws SQLException {
         try {
             PreparedStatement psSql = connection.prepareStatement(SQL_CREATE_MULTIPLE_CHOICE_QUESTIONNAIRE_RELATION);
             psSql.setInt(1, questionnaireId);
@@ -468,7 +476,7 @@ public class QuestionService extends Database {
         }
     }
 
-    private static void createShortAnswerQuestionnaireRelation(Connection connection, int questionnaireId, int shortAnswerId, int position, Integer validationId) throws SQLException {
+    private void createShortAnswerQuestionnaireRelation(Connection connection, int questionnaireId, int shortAnswerId, int position, Integer validationId) throws SQLException {
         try {
             String statement = validationId != null ? SQL_CREATE_SHORT_ANSWER_QUESTIONNAIRE_RELATION_WITH_VALIDATION : SQL_CREATE_SHORT_ANSWER_QUESTIONNAIRE_RELATION;
             PreparedStatement psSql = connection.prepareStatement(statement);

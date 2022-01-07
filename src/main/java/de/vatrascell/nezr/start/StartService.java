@@ -2,6 +2,7 @@ package de.vatrascell.nezr.start;
 
 import de.vatrascell.nezr.application.Database;
 import de.vatrascell.nezr.model.Questionnaire;
+import org.springframework.stereotype.Service;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -15,9 +16,10 @@ import static de.vatrascell.nezr.application.SqlStatement.SQL_COLUMN_QUESTIONNAI
 import static de.vatrascell.nezr.application.SqlStatement.SQL_COLUMN_QUESTIONNAIRE_NAME;
 import static de.vatrascell.nezr.application.SqlStatement.SQL_GET_ACTIVE_QUESTIONNAIRE;
 
+@Service
 public class StartService extends Database {
 
-    public static Questionnaire getActiveQuestionnaire() {
+    public Questionnaire getActiveQuestionnaire() {
 
         try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
             PreparedStatement psSql = myCon.prepareStatement(SQL_GET_ACTIVE_QUESTIONNAIRE);

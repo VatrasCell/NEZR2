@@ -1,13 +1,15 @@
 package de.vatrascell.nezr.login;
 
 import de.vatrascell.nezr.application.Database;
+import org.springframework.stereotype.Service;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 
+@Service
 public class LoginService extends Database {
 
-    public static boolean login(String user, String pwd) {
+    public boolean login(String user, String pwd) {
 
         String url = createDatabaseURL(DB_NAME);
 

@@ -1,17 +1,37 @@
 package de.vatrascell.nezr.application;
 
-import de.vatrascell.nezr.location.LocationService;
-import de.vatrascell.nezr.login.LoginService;
-import de.vatrascell.nezr.model.SceneName;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.stage.Stage;
-
-import java.io.IOException;
-
-import static de.vatrascell.nezr.application.GlobalFuncs.getURL;
+import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.context.ConfigurableApplicationContext;
 
 public class ApplicationStarter extends Application {
 
+    private ConfigurableApplicationContext applicationContext;
+
+    @Override
+    public void init() {
+        String[] args = getParameters().getRaw().toArray(new String[0]);
+
+        this.applicationContext = new SpringApplicationBuilder()
+                .lazyInitialization(true)
+                .sources(Main.class)
+                .run(args);
+    }
+
+    @Override
+    public void start(Stage stage) {
+        applicationContext.publishEvent(new StageReadyEvent(stage));
+    }
+
+    @Override
+    public void stop() {
+        this.applicationContext.close();
+        Platform.exit();
+    }
+
+    /*
     @Override
     public void start(Stage primaryStage) throws IOException {
 
@@ -30,5 +50,5 @@ public class ApplicationStarter extends Application {
         ScreenController.addScreen(SceneName.LOGIN, getURL(SceneName.LOGIN_PATH));
         ScreenController.addScreen(SceneName.LOCATION, getURL(SceneName.LOCATION_PATH));
         ScreenController.activate(SceneName.LOCATION);
-    }
+    }*/
 }

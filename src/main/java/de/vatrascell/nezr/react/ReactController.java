@@ -1,6 +1,6 @@
 package de.vatrascell.nezr.react;
 
-import de.vatrascell.nezr.application.ScreenController;
+import de.vatrascell.nezr.application.controller.ScreenController;
 import de.vatrascell.nezr.flag.FlagList;
 import de.vatrascell.nezr.flag.React;
 import de.vatrascell.nezr.model.AnswerOption;
@@ -8,7 +8,6 @@ import de.vatrascell.nezr.model.Question;
 import de.vatrascell.nezr.model.QuestionType;
 import de.vatrascell.nezr.model.Questionnaire;
 import de.vatrascell.nezr.model.ReactTableElement;
-import de.vatrascell.nezr.model.SceneName;
 import de.vatrascell.nezr.question.QuestionController;
 import de.vatrascell.nezr.questionList.QuestionListService;
 import javafx.beans.binding.Bindings;
@@ -31,16 +30,25 @@ import javafx.scene.layout.HBox;
 import javafx.scene.text.Text;
 import javafx.util.Callback;
 import javafx.util.Pair;
+import net.rgielen.fxweaver.core.FxmlView;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.stereotype.Component;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
+import static de.vatrascell.nezr.model.SceneName.REACT_PATH;
+
+@Component
+@FxmlView(REACT_PATH)
 public class ReactController {
 
     public static Question question;
     public static List<Question> questions;
     public static Questionnaire questionnaire;
+
+    private final ScreenController screenController;
 
     private final int MAX_COUNT_REACTIONS = 1;
 
@@ -68,21 +76,11 @@ public class ReactController {
     /**
      * The constructor (is called before the initialize()-method).
      */
-    public ReactController() {
-        FlagList flags = question.getFlags();
-        questions = QuestionListService.getQuestions(questionnaire.getId());
-
-        for (React react : flags.getReacts()) {
-            Question question = questions.get(getY(react.getQuestionId(), react.getQuestionType(), questions));
-            data.add(new ReactTableElement(question, react.getAnswerPos(), react));
-        }
-
-        questionData.addAll(questions);
-        for (int i = 0; i < questions.size(); ++i) {
-            if (questions.get(i).getQuestionType().equals(question.getQuestionType()) && questions.get(i).getQuestionId() == question.getQuestionId()) {
-                questionData.remove(i);
-            }
-        }
+    @Autowired
+    @Lazy
+    public ReactController(QuestionListService questionListService, ScreenController screenController) {
+        this.screenController = screenController;
+        questions = questionListService.getQuestions(questionnaire.getId());
     }
 
     /**
@@ -91,6 +89,18 @@ public class ReactController {
      */
     @FXML
     private void initialize() {
+        FlagList flags = question.getFlags();
+        for (React react : flags.getReacts()) {
+            Question question = questions.get(getY(react.getQuestionId(), react.getQuestionType(), questions));
+            data.add(new ReactTableElement(question, react.getAnswerPos(), react));
+        }
+
+        questionData.addAll(questions);
+        for (int i = 0; i < questions.size(); ++i) {
+            if (questions.get(i).getQuestionType().equals(question.getQuestionType()) && questions.get(i).getQuestionId().equals(question.getQuestionId())) {
+                questionData.remove(i);
+            }
+        }
 
         tbl_react.setItems(data);
 
@@ -220,14 +230,14 @@ public class ReactController {
     }
 
     @FXML
-    private void save() throws IOException {
+    private void save() {
         QuestionController.question = question;
-        ScreenController.activate(SceneName.QUESTION);
+        screenController.activate(QuestionController.class);
     }
 
     @FXML
-    private void exit() throws IOException {
-        ScreenController.activate(SceneName.QUESTION);
+    private void exit() {
+        screenController.activate(QuestionController.class);
     }
 
     /**

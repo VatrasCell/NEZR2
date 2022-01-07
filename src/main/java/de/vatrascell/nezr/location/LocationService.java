@@ -1,6 +1,7 @@
 package de.vatrascell.nezr.location;
 
 import de.vatrascell.nezr.application.Database;
+import org.springframework.stereotype.Service;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -13,9 +14,10 @@ import java.util.List;
 import static de.vatrascell.nezr.application.SqlStatement.SQL_COLUMN_LOCATION_NAME;
 import static de.vatrascell.nezr.application.SqlStatement.SQL_GET_LOCATION_NAMES;
 
+@Service
 public class LocationService extends Database {
 
-    public static List<String> getLocations() {
+    public List<String> getLocations() {
 
         try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
             PreparedStatement psSql = myCon.prepareStatement(SQL_GET_LOCATION_NAMES);

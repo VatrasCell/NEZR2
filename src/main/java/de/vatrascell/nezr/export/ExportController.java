@@ -1,6 +1,6 @@
 package de.vatrascell.nezr.export;
 
-import de.vatrascell.nezr.application.NotificationController;
+import de.vatrascell.nezr.application.controller.NotificationController;
 import de.vatrascell.nezr.export.model.ExcelQuestionModel;
 import de.vatrascell.nezr.export.model.converter.ExcelQuestionModelConverter;
 import de.vatrascell.nezr.message.MessageId;
@@ -23,6 +23,9 @@ import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.ss.util.RegionUtil;
 import org.apache.poi.ss.util.WorkbookUtil;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.stereotype.Controller;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -30,11 +33,22 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+@Controller
 public class ExportController {
 
     private final Workbook wb = new XSSFWorkbook();
     private final CreationHelper crHelper = this.wb.getCreationHelper();
     private Sheet sheet;
+
+    private final QuestionListService questionListService;
+    private final SurveyService surveyService;
+
+    @Autowired
+    @Lazy
+    public ExportController(QuestionListService questionListService, SurveyService surveyService) {
+        this.questionListService = questionListService;
+        this.surveyService = surveyService;
+    }
 
     public void createExcelFile(Questionnaire questionnaire, String fromDate, String toDate) {
         createExcelFile(createFileName(questionnaire),
@@ -43,7 +57,7 @@ public class ExportController {
 
     public void createExcelFile(File file, Questionnaire questionnaire, String fromDate, String toDate) {
         sheet = this.wb.createSheet(WorkbookUtil.createSafeSheetName(String.format("%s-%s", questionnaire.getName(), questionnaire.getDate())));
-        List<Question> questions = QuestionListService.getQuestions(questionnaire.getId());
+        List<Question> questions = questionListService.getQuestions(questionnaire.getId());
         List<ExcelQuestionModel> excelQuestionModels = ExcelQuestionModelConverter.convert(questions, 1);
 
         createInfoRow(questionnaire.getName(), questionnaire.getDate(), fromDate, toDate);
@@ -61,7 +75,7 @@ public class ExportController {
         final String SELECTED = "1";
         final String NOT_SELECTED = "";
         int rowIndex = 4;
-        List<Survey> surveys = SurveyService.getSurveys(questionnaireId, fromDate, toDate);
+        List<Survey> surveys = surveyService.getSurveys(questionnaireId, fromDate, toDate);
         for (Survey survey : surveys) {
             Row row = this.sheet.createRow(rowIndex);
             row.createCell(0).setCellValue(this.crHelper.createRichTextString(survey.getCreationDate()));
@@ -97,7 +111,7 @@ public class ExportController {
         List<ExcelQuestionModel> excelQuestionModelsInSurvey = new ArrayList<>(excelQuestionModels);
 
         for (ExcelQuestionModel model : excelQuestionModelsInSurvey) {
-            model.setSubmittedAnswer(SurveyService.getAnswer(surveyId, model.getQuestion()));
+            model.setSubmittedAnswer(surveyService.getAnswer(surveyId, model.getQuestion()));
         }
 
         return excelQuestionModelsInSurvey;

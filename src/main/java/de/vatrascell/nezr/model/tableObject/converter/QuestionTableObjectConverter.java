@@ -2,14 +2,17 @@ package de.vatrascell.nezr.model.tableObject.converter;
 
 import de.vatrascell.nezr.model.Question;
 import de.vatrascell.nezr.model.tableObject.QuestionTableObject;
+import de.vatrascell.nezr.questionList.QuestionListController;
+import lombok.experimental.UtilityClass;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
+@UtilityClass
 public class QuestionTableObjectConverter {
 
-    public static QuestionTableObject convert(Question question) {
-        QuestionTableObject tableObject = new QuestionTableObject();
+    public static QuestionTableObject convert(Question question, QuestionListController questionListController) {
+        QuestionTableObject tableObject = new QuestionTableObject(questionListController);
         tableObject.setQuestion(question.getQuestion());
         tableObject.setQuestionId(question.getQuestionId());
         tableObject.setQuestionType(question.getQuestionType());
@@ -32,7 +35,9 @@ public class QuestionTableObjectConverter {
         return tableObject;
     }
 
-    public static List<QuestionTableObject> convert(List<Question> questions) {
-        return questions.stream().map(QuestionTableObjectConverter::convert).collect(Collectors.toList());
+    public static List<QuestionTableObject> convert(List<Question> questions, QuestionListController questionListController) {
+        return questions.stream()
+                .map(question -> QuestionTableObjectConverter.convert(question, questionListController))
+                .collect(Collectors.toList());
     }
 }

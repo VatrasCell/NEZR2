@@ -1,18 +1,23 @@
 package de.vatrascell.nezr.login;
 
+import de.vatrascell.nezr.admin.AdminController;
 import de.vatrascell.nezr.application.GlobalVars;
-import de.vatrascell.nezr.application.NotificationController;
-import de.vatrascell.nezr.application.ScreenController;
+import de.vatrascell.nezr.application.controller.NotificationController;
+import de.vatrascell.nezr.application.controller.ScreenController;
 import de.vatrascell.nezr.message.MessageId;
-import de.vatrascell.nezr.model.SceneName;
+import de.vatrascell.nezr.start.StartController;
 import javafx.fxml.FXML;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import net.rgielen.fxweaver.core.FxmlView;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.stereotype.Component;
 
-import java.io.IOException;
+import static de.vatrascell.nezr.model.SceneName.LOGIN_PATH;
 
-import static de.vatrascell.nezr.application.GlobalFuncs.getURL;
-
+@Component
+@FxmlView(LOGIN_PATH)
 public class LoginController {
 
     @FXML
@@ -21,17 +26,26 @@ public class LoginController {
     @FXML
     private PasswordField password;
 
+    private final LoginService loginService;
+    private final ScreenController screenController;
+
+    @Autowired
+    @Lazy
+    public LoginController(LoginService loginService, ScreenController screenController) {
+        this.loginService = loginService;
+        this.screenController = screenController;
+    }
+
     @FXML
     private void initialize() {
     }
 
     @FXML
-    private void login() throws IOException {
+    private void login() {
         if (!username.getText().equals("") && !password.getText().equals("")) {
-            if (LoginService.login(username.getText(), password.getText())) {
-                ScreenController.addScreen(SceneName.ADMIN, getURL(SceneName.ADMIN_PATH));
+            if (loginService.login(username.getText(), password.getText())) {
                 reset();
-                ScreenController.activate(SceneName.ADMIN);
+                screenController.activate(AdminController.class);
             } else {
                 NotificationController.createErrorMessage(MessageId.TITLE_LOGIN, MessageId.MESSAGE_LOGIN_WRONG_DATA);
             }
@@ -40,11 +54,10 @@ public class LoginController {
         }
     }
 
-    public static void devLogin() throws IOException {
+    public void devLogin() {
         if (GlobalVars.DEV_MODE) {
-            if (LoginService.login("root", "1234")) {
-                ScreenController.addScreen(SceneName.ADMIN, getURL(SceneName.ADMIN_PATH));
-                ScreenController.activate(SceneName.ADMIN);
+            if (loginService.login("root", "1234")) {
+                screenController.activate(AdminController.class);
             } else {
                 NotificationController.createErrorMessage(MessageId.TITLE_LOGIN, MessageId.MESSAGE_LOGIN_WRONG_DATA);
             }
@@ -52,9 +65,9 @@ public class LoginController {
     }
 
     @FXML
-    private void exit() throws IOException {
+    private void exit() {
         reset();
-        ScreenController.activate(SceneName.START);
+        screenController.activate(StartController.class);
     }
 
     private void reset() {

@@ -2,6 +2,7 @@ package de.vatrascell.nezr.question;
 
 import de.vatrascell.nezr.application.Database;
 import de.vatrascell.nezr.model.AnswerOption;
+import org.springframework.stereotype.Service;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -24,8 +25,9 @@ import static de.vatrascell.nezr.application.SqlStatement.SQL_GET_ANSWER_OPTION;
 import static de.vatrascell.nezr.application.SqlStatement.SQL_GET_ANSWER_OPTIONS;
 import static de.vatrascell.nezr.application.SqlStatement.SQL_GET_ANSWER_OPTION_ID;
 
+@Service
 public class AnswerOptionService extends Database {
-    public static List<AnswerOption> getAnswerOptions(int questionId) {
+    public List<AnswerOption> getAnswerOptions(int questionId) {
         try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
             PreparedStatement psSql = myCon.prepareStatement(SQL_GET_ANSWER_OPTIONS);
             psSql.setInt(1, questionId);
@@ -46,7 +48,7 @@ public class AnswerOptionService extends Database {
         return null;
     }
 
-    public static AnswerOption getAnswerOption(String name) {
+    public AnswerOption getAnswerOption(String name) {
         try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
             PreparedStatement psSql = myCon.prepareStatement(SQL_GET_ANSWER_OPTION);
             psSql.setString(1, name);
@@ -65,7 +67,7 @@ public class AnswerOptionService extends Database {
         return null;
     }
 
-    public static int provideAnswerOptionId(Connection connection, String answer) throws SQLException {
+    public int provideAnswerOptionId(Connection connection, String answer) throws SQLException {
 
         Integer id = getAnswerOptionId(Objects.requireNonNull(answer));
 
@@ -77,7 +79,7 @@ public class AnswerOptionService extends Database {
         return Objects.requireNonNull(id);
     }
 
-    public static void deleteAnswerOptions(ArrayList<Integer> answerIds, int multipleChoiceId) {
+    public void deleteAnswerOptions(ArrayList<Integer> answerIds, int multipleChoiceId) {
         try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
             myCon.setAutoCommit(false);
             for (Integer answerId : answerIds) {
@@ -92,7 +94,7 @@ public class AnswerOptionService extends Database {
 
     }
 
-    public static void deleteUnbindedAnswerOptions(Connection connection) throws SQLException {
+    public void deleteUnbindedAnswerOptions(Connection connection) throws SQLException {
         try {
             Statement mySQL = connection.createStatement();
             mySQL.execute(SQL_DELETE_UNBINDED_ANSWER_OPTIONS);
@@ -102,7 +104,7 @@ public class AnswerOptionService extends Database {
         }
     }
 
-    public static Integer getAnswerOptionId(String answer) {
+    public Integer getAnswerOptionId(String answer) {
         try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
             PreparedStatement psSql = myCon.prepareStatement(SQL_GET_ANSWER_OPTION_ID);
             psSql.setString(1, answer);
@@ -117,7 +119,7 @@ public class AnswerOptionService extends Database {
         return null;
     }
 
-    private static void createAnswerOption(Connection connection, String answer) throws SQLException {
+    private void createAnswerOption(Connection connection, String answer) throws SQLException {
         try {
             PreparedStatement psSql = connection.prepareStatement(SQL_CREATE_ANSWER_OPTION);
             psSql.setString(1, answer);
@@ -128,7 +130,7 @@ public class AnswerOptionService extends Database {
         }
     }
 
-    public static void deleteMultipleChoiceAnswerOptionsRelation(Connection connection, int relationId) throws SQLException {
+    public void deleteMultipleChoiceAnswerOptionsRelation(Connection connection, int relationId) throws SQLException {
         try {
             PreparedStatement psSql = connection.prepareStatement(SQL_DELETE_MULTIPLE_CHOICE_ANSWER_OPTIONS_RELATION_BY_ID);
             psSql.setInt(1, relationId);
@@ -139,7 +141,7 @@ public class AnswerOptionService extends Database {
         }
     }
 
-    private static void deleteMultipleChoiceAnswerOptionsRelation(Connection connection, int answerId, int multipleChoiceId) throws SQLException {
+    private void deleteMultipleChoiceAnswerOptionsRelation(Connection connection, int answerId, int multipleChoiceId) throws SQLException {
         try {
             PreparedStatement psSql = connection.prepareStatement(SQL_DELETE_MULTIPLE_CHOICE_ANSWER_OPTIONS_RELATION);
             psSql.setInt(1, answerId);
@@ -151,7 +153,7 @@ public class AnswerOptionService extends Database {
         }
     }
 
-    public static void createMultipleChoiceAnswerOptionsRelation(Connection connection, int multipleChoiceId, int answerId) throws SQLException {
+    public void createMultipleChoiceAnswerOptionsRelation(Connection connection, int multipleChoiceId, int answerId) throws SQLException {
         try {
             PreparedStatement psSql = connection.prepareStatement(SQL_CREATE_MULTIPLE_CHOICE_ANSWER_OPTIONS_RELATION);
             psSql.setInt(1, multipleChoiceId);

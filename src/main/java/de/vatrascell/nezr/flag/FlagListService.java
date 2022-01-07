@@ -2,9 +2,10 @@ package de.vatrascell.nezr.flag;
 
 import de.vatrascell.nezr.application.Database;
 import de.vatrascell.nezr.model.QuestionType;
-import de.vatrascell.nezr.question.QuestionService;
 import de.vatrascell.nezr.react.ReactService;
 import de.vatrascell.nezr.validation.ValidationService;
+import lombok.AllArgsConstructor;
+import org.springframework.stereotype.Service;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -30,17 +31,22 @@ import static de.vatrascell.nezr.application.SqlStatement.SQL_SET_FLAG_LIST_SA_R
 import static de.vatrascell.nezr.application.SqlStatement.SQL_UPDATE_FLAG_LIST_MC;
 import static de.vatrascell.nezr.application.SqlStatement.SQL_UPDATE_FLAG_LIST_SA;
 
+@Service
+@AllArgsConstructor
 public class FlagListService extends Database {
 
-    public static FlagList getFlagList(int questionnaireId, int questionId, QuestionType questionType) {
-        if (questionType.equals(QuestionType.MULTIPLE_CHOICE)) {
-            return getFlagList(QuestionService.getQuestionQuestionnaireRelationId(questionnaireId, questionId, questionType), questionType);
-        } else {
-            return getFlagList(QuestionService.getQuestionQuestionnaireRelationId(questionnaireId, questionId, questionType), questionType);
-        }
-    }
+    private final ValidationService validationService;
+    private final ReactService reactService;
 
-    public static FlagList getFlagList(int questionRelationId, QuestionType questionType) {
+    /*public FlagList getFlagList(int questionnaireId, int questionId, QuestionType questionType) {
+        if (questionType.equals(QuestionType.MULTIPLE_CHOICE)) {
+            return getFlagList(questionService.getQuestionQuestionnaireRelationId(questionnaireId, questionId, questionType), questionType);
+        } else {
+            return getFlagList(questionService.getQuestionQuestionnaireRelationId(questionnaireId, questionId, questionType), questionType);
+        }
+    }*/
+
+    public FlagList getFlagList(int questionRelationId, QuestionType questionType) {
         try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
 
             String statement = questionType.equals(QuestionType.MULTIPLE_CHOICE) ?
@@ -64,8 +70,8 @@ public class FlagListService extends Database {
                     flagList.setTextArea(myRS.getBoolean(SQL_COLUMN_IS_TEXT_AREA));
                 }
 
-                flagList.setValidation(ValidationService.getValidation(questionRelationId));
-                flagList.setReacts(ReactService.getReacts(questionRelationId, questionType));
+                flagList.setValidation(validationService.getValidation(questionRelationId));
+                flagList.setReacts(reactService.getReacts(questionRelationId, questionType));
                 return flagList;
             }
         } catch (SQLException e) {
@@ -74,11 +80,7 @@ public class FlagListService extends Database {
         return null;
     }
 
-    public static void setQuestionRequired(Connection connection, int questionnaireId, int questionId, QuestionType questionType) throws SQLException {
-        setQuestionRequired(connection, QuestionService.getQuestionQuestionnaireRelationId(questionnaireId, questionId, questionType), questionType);
-    }
-
-    public static void setQuestionRequired(Connection connection, int flagListId, QuestionType questionType) throws SQLException {
+    public void setQuestionRequired(Connection connection, int flagListId, QuestionType questionType) throws SQLException {
         try {
             PreparedStatement psSql = connection.prepareStatement(questionType.equals(QuestionType.MULTIPLE_CHOICE) ?
                     SQL_SET_FLAG_LIST_MC_REQUIRED : SQL_SET_FLAG_LIST_SA_REQUIRED);
@@ -91,7 +93,7 @@ public class FlagListService extends Database {
         }
     }
 
-    public static Integer getFlagListIdByQuestionIdAndQuestionnaireId(QuestionType questionType, int questionnaireId, int questionId) {
+    public Integer getFlagListIdByQuestionIdAndQuestionnaireId(QuestionType questionType, int questionnaireId, int questionId) {
         try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
             PreparedStatement psSql = myCon.prepareStatement(questionType.equals(QuestionType.SHORT_ANSWER) ?
                     SQL_GET_FLAG_LIST_ID_ON_SHORT_ANSWER : SQL_GET_FLAG_LIST_ID_ON_MULTIPLE_CHOICE);
@@ -109,7 +111,7 @@ public class FlagListService extends Database {
         return null;
     }
 
-    public static void updateMultipleChoiceFlagList(Connection connection, int relationId, FlagList flagList) throws SQLException {
+    public void updateMultipleChoiceFlagList(Connection connection, int relationId, FlagList flagList) throws SQLException {
         try {
             PreparedStatement psSql = connection.prepareStatement(SQL_UPDATE_FLAG_LIST_MC);
             psSql.setBoolean(1, flagList.isEvaluationQuestion());
@@ -126,7 +128,7 @@ public class FlagListService extends Database {
         }
     }
 
-    public static void updateShortAnswerFlagList(Connection connection, int relationId, FlagList flagList) throws SQLException {
+    public void updateShortAnswerFlagList(Connection connection, int relationId, FlagList flagList) throws SQLException {
         try {
             PreparedStatement psSql = connection.prepareStatement(SQL_UPDATE_FLAG_LIST_SA);
             psSql.setBoolean(1, flagList.isRequired());
@@ -139,7 +141,7 @@ public class FlagListService extends Database {
         }
     }
 
-    public static void createMultipleChoiceFlagList(Connection connection, int relationId, FlagList flagList) throws SQLException {
+    public void createMultipleChoiceFlagList(Connection connection, int relationId, FlagList flagList) throws SQLException {
         try {
             PreparedStatement psSql = connection.prepareStatement(SQL_CREATE_FLAG_LIST_MC);
             psSql.setInt(1, relationId);

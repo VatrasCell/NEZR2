@@ -8,6 +8,8 @@ import de.vatrascell.nezr.model.QuestionType;
 import de.vatrascell.nezr.question.AnswerOptionService;
 import de.vatrascell.nezr.question.CategoryService;
 import de.vatrascell.nezr.question.HeadlineService;
+import lombok.AllArgsConstructor;
+import org.springframework.stereotype.Service;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -44,9 +46,16 @@ import static de.vatrascell.nezr.application.SqlStatement.SQL_GET_OTHER_SHORT_AN
 import static de.vatrascell.nezr.application.SqlStatement.SQL_GET_SHORT_ANSWER_IDS_BY_QUESTIONNAIRE_ID;
 import static de.vatrascell.nezr.application.SqlStatement.SQL_GET_SHORT_ANSWER_QUESTION;
 
+@Service
+@AllArgsConstructor
 public class QuestionListService extends Database {
 
-    public static List<Question> getQuestions(int questionnaireId) {
+    private final AnswerOptionService answerOptionService;
+    private final CategoryService categoryService;
+    private final FlagListService flagListService;
+    private final HeadlineService headlineService;
+
+    public List<Question> getQuestions(int questionnaireId) {
         List<Question> questions = new ArrayList<>();
         questions.addAll(Objects.requireNonNull(getMultipleChoiceQuestions(questionnaireId)));
         questions.addAll(Objects.requireNonNull(getShortAnswerQuestions(questionnaireId)));
@@ -56,7 +65,7 @@ public class QuestionListService extends Database {
         return questions;
     }
 
-    public static List<Question> getMultipleChoiceQuestions(int questionnaireId) {
+    public List<Question> getMultipleChoiceQuestions(int questionnaireId) {
         List<Question> questions = new ArrayList<>();
         try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
             PreparedStatement psSql = myCon.prepareStatement(SQL_GET_MULTIPLE_CHOICE_QUESTION);
@@ -67,17 +76,17 @@ public class QuestionListService extends Database {
                 Question question = new Question();
                 question.setQuestion(myRS.getString(SQL_COLUMN_QUESTION));
                 question.setQuestionId(myRS.getInt(SQL_COLUMN_MULTIPLE_CHOICE_ID));
-                question.setCategory(CategoryService.getCategory(myRS.getString(SQL_COLUMN_CATEGORY_NAME)));
+                question.setCategory(categoryService.getCategory(myRS.getString(SQL_COLUMN_CATEGORY_NAME)));
                 question.setDate(myRS.getString(SQL_COLUMN_CREATION_DATE));
-                question.setFlags(FlagListService.getFlagList(
+                question.setFlags(flagListService.getFlagList(
                         myRS.getInt(SQL_COLUMN_MULTIPLE_CHOICE_QUESTIONNAIRE_RELATION_ID),
                         QuestionType.MULTIPLE_CHOICE));
                 question.setPosition(Integer.parseInt(myRS.getString(SQL_COLUMN_POSITION)));
                 question.setQuestionType(QuestionType.MULTIPLE_CHOICE);
-                question.setAnswerOptions(AnswerOptionService.getAnswerOptions(question.getQuestionId()));
+                question.setAnswerOptions(answerOptionService.getAnswerOptions(question.getQuestionId()));
                 int headlineId = myRS.getInt(SQL_COLUMN_HEADLINE_ID);
                 if (headlineId > 0) {
-                    question.setHeadline(HeadlineService.getHeadline(headlineId));
+                    question.setHeadline(headlineService.getHeadline(headlineId));
                 }
                 question.setQuestionnaireId(questionnaireId);
                 questions.add(question);
@@ -91,7 +100,7 @@ public class QuestionListService extends Database {
         return null;
     }
 
-    public static List<Question> getShortAnswerQuestions(int questionnaireId) {
+    public List<Question> getShortAnswerQuestions(int questionnaireId) {
         List<Question> questions = new ArrayList<>();
         try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
             PreparedStatement psSql = myCon.prepareStatement(SQL_GET_SHORT_ANSWER_QUESTION);
@@ -102,16 +111,16 @@ public class QuestionListService extends Database {
                 Question question = new Question();
                 question.setQuestion(myRS.getString(SQL_COLUMN_QUESTION));
                 question.setQuestionId(myRS.getInt(SQL_COLUMN_SHORT_ANSWER_ID));
-                question.setCategory(CategoryService.getCategory(myRS.getString(SQL_COLUMN_CATEGORY_NAME)));
+                question.setCategory(categoryService.getCategory(myRS.getString(SQL_COLUMN_CATEGORY_NAME)));
                 question.setDate(myRS.getString(SQL_COLUMN_CREATION_DATE));
-                question.setFlags(FlagListService.getFlagList(
+                question.setFlags(flagListService.getFlagList(
                         myRS.getInt(SQL_COLUMN_SHORT_ANSWER_QUESTIONNAIRE_RELATION_ID),
                         QuestionType.SHORT_ANSWER));
                 question.setPosition(Integer.parseInt(myRS.getString(SQL_COLUMN_POSITION)));
                 question.setQuestionType(QuestionType.SHORT_ANSWER);
                 int headlineId = myRS.getInt(SQL_COLUMN_HEADLINE_ID2);
                 if (headlineId > 0) {
-                    question.setHeadline(HeadlineService.getHeadline(headlineId));
+                    question.setHeadline(headlineService.getHeadline(headlineId));
                 }
                 question.setQuestionnaireId(questionnaireId);
                 questions.add(question);
@@ -125,7 +134,7 @@ public class QuestionListService extends Database {
         return null;
     }
 
-    public static List<AnswerOption> getMultipleChoiceQuestionAnswers(int questionnaireId, int questionId) {
+    public List<AnswerOption> getMultipleChoiceQuestionAnswers(int questionnaireId, int questionId) {
         List<AnswerOption> answerOptions = new ArrayList<>();
         try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
             PreparedStatement psSql = myCon.prepareStatement(SQL_GET_MULTIPLE_CHOICE_QUESTION_ANSWERS);
@@ -149,7 +158,7 @@ public class QuestionListService extends Database {
         return answerOptions;
     }
 
-    public static List<Integer> getQuestionsByQuestionnaireId(int questionnaireId, QuestionType questionType) {
+    public List<Integer> getQuestionsByQuestionnaireId(int questionnaireId, QuestionType questionType) {
         try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
             List<Integer> results = new ArrayList<>();
             PreparedStatement psSql = myCon.prepareStatement(questionType.equals(QuestionType.MULTIPLE_CHOICE) ?
@@ -170,7 +179,7 @@ public class QuestionListService extends Database {
         return null;
     }
 
-    public static boolean doesQuestionExistsInOtherQuestionnaire(int questionnaireId, int questionId, QuestionType questionType) {
+    public boolean doesQuestionExistsInOtherQuestionnaire(int questionnaireId, int questionId, QuestionType questionType) {
         try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
             PreparedStatement psSql = myCon.prepareStatement(questionType.equals(QuestionType.MULTIPLE_CHOICE) ?
                     SQL_GET_OTHER_MULTIPLE_CHOICE_QUESTIONNAIRE_RELATION_IDS : SQL_GET_OTHER_SHORT_ANSWER_QUESTIONNAIRE_RELATION_IDS);
@@ -185,7 +194,7 @@ public class QuestionListService extends Database {
         return true;
     }
 
-    public static void deleteQuestion(int questionnaireId, Question question) {
+    public void deleteQuestion(int questionnaireId, Question question) {
         try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
             myCon.setAutoCommit(false);
 
@@ -197,7 +206,7 @@ public class QuestionListService extends Database {
         }
     }
 
-    public static void deleteQuestion(Connection connection, int questionnaireId, int questionId, QuestionType questionType) throws SQLException {
+    public void deleteQuestion(Connection connection, int questionnaireId, int questionId, QuestionType questionType) throws SQLException {
         //TODO refactor
         //QuestionService.deleteFlagsFromTargetQuestion(myCon, questionnaireId, questionId);
 
@@ -219,10 +228,10 @@ public class QuestionListService extends Database {
             }
         }
 
-        AnswerOptionService.deleteUnbindedAnswerOptions(connection);
+        answerOptionService.deleteUnbindedAnswerOptions(connection);
     }
 
-    private static void deleteShortAnswerQuestion(Connection connection, int questionId) throws SQLException {
+    private void deleteShortAnswerQuestion(Connection connection, int questionId) throws SQLException {
         try {
             PreparedStatement psSql = connection.prepareStatement(SQL_DELETE_SHORT_ANSWER);
             psSql.setInt(1, questionId);
@@ -234,7 +243,7 @@ public class QuestionListService extends Database {
         }
     }
 
-    private static void deleteMultipleChoiceQuestion(Connection connection, int questionId) throws SQLException {
+    private void deleteMultipleChoiceQuestion(Connection connection, int questionId) throws SQLException {
         try {
             PreparedStatement psSql = connection.prepareStatement(SQL_DELETE_MULTIPLE_CHOICE);
             psSql.setInt(1, questionId);
@@ -246,7 +255,7 @@ public class QuestionListService extends Database {
         }
     }
 
-    private static void deleteMultipleChoiceHasAnswerRelation(Connection connection, int questionId) throws SQLException {
+    private void deleteMultipleChoiceHasAnswerRelation(Connection connection, int questionId) throws SQLException {
         try {
             PreparedStatement psSql = connection.prepareStatement(SQL_DELETE_MULTIPLE_CHOICE_ANSWER_OPTIONS_RELATION_BY_QUESTION_ID);
             psSql.setInt(1, questionId);
@@ -258,7 +267,7 @@ public class QuestionListService extends Database {
         }
     }
 
-    private static void deleteShortAnswerQuestionnaireRelation(Connection connection, int questionnaireId, int questionId) throws SQLException {
+    private void deleteShortAnswerQuestionnaireRelation(Connection connection, int questionnaireId, int questionId) throws SQLException {
         try {
             PreparedStatement psSql = connection.prepareStatement(SQL_DELETE_SHORT_ANSWER_QUESTIONNAIRE_RELATION);
             psSql.setInt(1, questionId);
@@ -271,7 +280,7 @@ public class QuestionListService extends Database {
         }
     }
 
-    private static void deleteMultipleChoiceQuestionnaireRelation(Connection connection, int questionnaireId, int questionId) throws SQLException {
+    private void deleteMultipleChoiceQuestionnaireRelation(Connection connection, int questionnaireId, int questionId) throws SQLException {
         try {
             PreparedStatement psSql = connection.prepareStatement(SQL_DELETE_MULTIPLE_CHOICE_QUESTIONNAIRE_RELATION);
             psSql.setInt(1, questionId);

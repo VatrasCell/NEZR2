@@ -6,6 +6,8 @@ import de.vatrascell.nezr.application.GlobalVars;
 import de.vatrascell.nezr.model.QuestionType;
 import de.vatrascell.nezr.model.Questionnaire;
 import de.vatrascell.nezr.questionList.QuestionListService;
+import lombok.AllArgsConstructor;
+import org.springframework.stereotype.Service;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -34,9 +36,13 @@ import static de.vatrascell.nezr.application.SqlStatement.SQL_IS_QUESTIONNAIRE_F
 import static de.vatrascell.nezr.application.SqlStatement.SQL_RENAME_QUESTIONNAIRE;
 import static de.vatrascell.nezr.application.SqlStatement.SQL_SET_QUESTIONNAIRE_FINAL_STATUS;
 
+@Service
+@AllArgsConstructor
 public class AdminService extends Database {
 
-    public static ArrayList<Questionnaire> getQuestionnaires(String location) {
+    private final QuestionListService questionListService;
+
+    public ArrayList<Questionnaire> getQuestionnaires(String location) {
         try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
             ArrayList<Questionnaire> questionnaire = new ArrayList<>();
             int locationId = getLocationId(location);
@@ -62,7 +68,7 @@ public class AdminService extends Database {
         return null;
     }
 
-    public static void activateQuestionnaire(int questionnaireId) {
+    public void activateQuestionnaire(int questionnaireId) {
         try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
             PreparedStatement psSql = myCon.prepareStatement(SQL_ACTIVATE_QUESTIONNAIRE);
             psSql.setInt(1, questionnaireId);
@@ -77,7 +83,7 @@ public class AdminService extends Database {
         }
     }
 
-    public static void disableQuestionnaire(int questionnaireId) {
+    public void disableQuestionnaire(int questionnaireId) {
         try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
             PreparedStatement psSql = myCon.prepareStatement(SQL_DEACTIVATE_QUESTIONNAIRE);
             psSql.setInt(1, questionnaireId);
@@ -89,7 +95,7 @@ public class AdminService extends Database {
     }
 
     //TODO refactor
-    public static boolean copyQuestionnaire(Questionnaire questionnaire, String location) {
+    public boolean copyQuestionnaire(Questionnaire questionnaire, String location) {
         return false;
         /*questionnaire.setId(createQuestionnaire(questionnaire.getName(), de.vatrascell.nezr.location));
         List<Question> questions = QuestionListService.getQuestions(questionnaire.getId());
@@ -103,28 +109,28 @@ public class AdminService extends Database {
         return true;*/
     }
 
-    public static boolean deleteQuestionnaire(int questionnaireId) {
+    public boolean deleteQuestionnaire(int questionnaireId) {
         try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
             myCon.setAutoCommit(false);
 
-            List<Integer> multipleChoiceIds = QuestionListService.getQuestionsByQuestionnaireId(questionnaireId, QuestionType.MULTIPLE_CHOICE);
+            List<Integer> multipleChoiceIds = questionListService.getQuestionsByQuestionnaireId(questionnaireId, QuestionType.MULTIPLE_CHOICE);
 
             if (multipleChoiceIds != null) {
                 multipleChoiceIds.forEach(questionId -> {
                     try {
-                        QuestionListService.deleteQuestion(myCon, questionnaireId, questionId, QuestionType.MULTIPLE_CHOICE);
+                        questionListService.deleteQuestion(myCon, questionnaireId, questionId, QuestionType.MULTIPLE_CHOICE);
                     } catch (SQLException e) {
                         e.printStackTrace();
                     }
                 });
             }
 
-            List<Integer> shortAnswerIds = QuestionListService.getQuestionsByQuestionnaireId(questionnaireId, QuestionType.SHORT_ANSWER);
+            List<Integer> shortAnswerIds = questionListService.getQuestionsByQuestionnaireId(questionnaireId, QuestionType.SHORT_ANSWER);
 
             if (shortAnswerIds != null) {
                 shortAnswerIds.forEach(questionId -> {
                     try {
-                        QuestionListService.deleteQuestion(myCon, questionnaireId, questionId, QuestionType.SHORT_ANSWER);
+                        questionListService.deleteQuestion(myCon, questionnaireId, questionId, QuestionType.SHORT_ANSWER);
                     } catch (SQLException e) {
                         e.printStackTrace();
                     }
@@ -142,13 +148,13 @@ public class AdminService extends Database {
         return false;
     }
 
-    private static void deleteQuestionnaire(Connection connection, int questionnaireId) throws SQLException {
+    private void deleteQuestionnaire(Connection connection, int questionnaireId) throws SQLException {
         PreparedStatement psSql = connection.prepareStatement(SQL_DELETE_QUESTIONNAIRE);
         psSql.setInt(1, questionnaireId);
         psSql.execute();
     }
 
-    public static boolean renameQuestionnaire(Questionnaire questionnaire) {
+    public boolean renameQuestionnaire(Questionnaire questionnaire) {
         try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
             PreparedStatement psSql = myCon.prepareStatement(SQL_RENAME_QUESTIONNAIRE);
             psSql.setString(1, questionnaire.getName());
@@ -162,7 +168,7 @@ public class AdminService extends Database {
         return false;
     }
 
-    public static void setFinal(Questionnaire fb) {
+    public void setFinal(Questionnaire fb) {
         try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
             PreparedStatement psSql = myCon.prepareStatement(SQL_SET_QUESTIONNAIRE_FINAL_STATUS);
             psSql.setBoolean(1, true);
@@ -174,7 +180,7 @@ public class AdminService extends Database {
         }
     }
 
-    public static void setUnFinal(Questionnaire fb) {
+    public void setUnFinal(Questionnaire fb) {
         try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
             PreparedStatement psSql = myCon.prepareStatement(SQL_SET_QUESTIONNAIRE_FINAL_STATUS);
             psSql.setBoolean(1, false);
@@ -186,7 +192,7 @@ public class AdminService extends Database {
         }
     }
 
-    public static boolean isFinal(Questionnaire fb) {
+    public boolean isFinal(Questionnaire fb) {
         try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
             PreparedStatement psSql = myCon.prepareStatement(SQL_IS_QUESTIONNAIRE_FINAL);
             psSql.setInt(1, fb.getId());
@@ -199,11 +205,11 @@ public class AdminService extends Database {
         return false;
     }
 
-    public static int createQuestionnaire(String name) {
+    public int createQuestionnaire(String name) {
         return createQuestionnaire(name, GlobalVars.location);
     }
 
-    public static int createQuestionnaire(String name, String location) {
+    public int createQuestionnaire(String name, String location) {
         try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
             PreparedStatement psSql = myCon.prepareStatement(SQL_CREATE_QUESTIONNAIRE);
             psSql.setString(1, GlobalFuncs.getCurrentDate());
@@ -225,7 +231,7 @@ public class AdminService extends Database {
         return -1;
     }
 
-    public static int getLocationId(String location) {
+    public int getLocationId(String location) {
         int locationId = -1;
         try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
             PreparedStatement psSql = myCon.prepareStatement(SQL_GET_LOCATION_ID);

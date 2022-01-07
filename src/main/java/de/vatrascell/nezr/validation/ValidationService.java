@@ -1,6 +1,7 @@
 package de.vatrascell.nezr.validation;
 
 import de.vatrascell.nezr.application.Database;
+import org.springframework.stereotype.Service;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -23,10 +24,9 @@ import static de.vatrascell.nezr.application.SqlStatement.SQL_CREATE_VALIDATION;
 import static de.vatrascell.nezr.application.SqlStatement.SQL_GET_VALIDATION_BY_SA_REL_ID;
 import static de.vatrascell.nezr.application.SqlStatement.SQL_LAST_VALIDATION_ID;
 
+@Service
 public class ValidationService extends Database {
-
-
-    public static Validation getValidation(int questionRelationId) {
+    public Validation getValidation(int questionRelationId) {
 
         try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
 
@@ -57,7 +57,7 @@ public class ValidationService extends Database {
         return null;
     }
 
-    public static void createValidation(Connection connection, Validation validation) throws SQLException {
+    public void createValidation(Connection connection, Validation validation) throws SQLException {
         try {
             PreparedStatement psSql = connection.prepareStatement(SQL_CREATE_VALIDATION);
             psSql.setBoolean(1, validation.isNumbers());
@@ -78,7 +78,7 @@ public class ValidationService extends Database {
         }
     }
 
-    public static Integer getLastValidationId() {
+    public Integer getLastValidationId() {
         try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
             PreparedStatement psSql = myCon.prepareStatement(SQL_LAST_VALIDATION_ID);
 
