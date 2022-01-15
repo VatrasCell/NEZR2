@@ -41,7 +41,6 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -380,8 +379,9 @@ public class QuestionController {
 
     @FXML
     private void setPreview() throws IOException {
-        startController.makeQuestionnaire(Collections.singletonList(question), true);
-        screenController.activate(QuestionListController.class);
+        System.out.println("no preview");
+        //startController.makeQuestionnaire(Collections.singletonList(question), true);
+        //screenController.activate(QuestionListController.class);
     }
 
     @FXML

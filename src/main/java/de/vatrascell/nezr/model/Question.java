@@ -9,12 +9,16 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.Pane;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 
+@Getter
+@Setter
 public class Question implements Comparable<Question>, Comparator<Question> {
 
     public static final String QUESTION = "question";
@@ -32,7 +36,7 @@ public class Question implements Comparable<Question>, Comparator<Question> {
     private FlagList flags;
     private int position;
     private Headline headline;
-    private SubmittedAnswer submittedAnswer;
+    private SubmittedAnswer submittedAnswer = new SubmittedAnswer();
     private List<AnswerOption> answerOptions = new ArrayList<>();
     private Label questionLabel;
     private Pane scene;
@@ -55,256 +59,6 @@ public class Question implements Comparable<Question>, Comparator<Question> {
         this.questionType = QuestionType.MULTIPLE_CHOICE;
         this.position = ++size;
         this.flags = new FlagList();
-    }
-
-    /**
-     * @return the de.vatrascell.nezr.question
-     */
-    public String getQuestion() {
-        return question;
-    }
-
-    /**
-     * @param question the de.vatrascell.nezr.question to set
-     */
-    public void setQuestion(String question) {
-        this.question = question;
-    }
-
-    /**
-     * @return the questionID
-     */
-    public Integer getQuestionId() {
-        return questionId;
-    }
-
-    /**
-     * @param questionId the questionID to set
-     */
-    public void setQuestionId(Integer questionId) {
-        this.questionId = questionId;
-    }
-
-    /**
-     * @return the type
-     */
-    public QuestionType getQuestionType() {
-        return questionType;
-    }
-
-    /**
-     * @param questionType the type to set
-     */
-    public void setQuestionType(QuestionType questionType) {
-        this.questionType = questionType;
-    }
-
-    /**
-     * @return the category
-     */
-    public Category getCategory() {
-        return category;
-    }
-
-    /**
-     * @param category the category to set
-     */
-    public void setCategory(Category category) {
-        this.category = category;
-    }
-
-    /**
-     * @return the date
-     */
-    public String getDate() {
-        return date;
-    }
-
-    /**
-     * @param date the date to set
-     */
-    public void setDate(String date) {
-        this.date = date;
-    }
-
-    /**
-     * @return the flags
-     */
-    public FlagList getFlags() {
-        return flags == null ? new FlagList() : flags;
-    }
-
-    /**
-     * @param flags the flags to set
-     */
-    public void setFlags(FlagList flags) {
-        this.flags = flags;
-    }
-
-    /**
-     * @return the position
-     */
-    public int getPosition() {
-        return position;
-    }
-
-    /**
-     * @param position the position to set
-     */
-    public void setPosition(int position) {
-        this.position = position;
-    }
-
-    public Headline getHeadline() {
-        return headline;
-    }
-
-    public void setHeadline(Headline headline) {
-        this.headline = headline;
-    }
-
-    /**
-     * @return the answerOptions
-     */
-    public List<AnswerOption> getAnswerOptions() {
-        return answerOptions;
-    }
-
-    /**
-     * @param answerOptions the answerOptions to set
-     */
-    public void setAnswerOptions(List<AnswerOption> answerOptions) {
-        this.answerOptions = answerOptions;
-    }
-
-    public void addAnswerOption(AnswerOption answerOption) {
-        this.answerOptions.add(answerOption);
-    }
-
-    /**
-     * @return the answer
-     */
-    public SubmittedAnswer getSubmittedAnswer() {
-        return submittedAnswer;
-    }
-
-    /**
-     * @param submittedAnswer the answer to set
-     */
-    public void setSubmittedAnswer(SubmittedAnswer submittedAnswer) {
-        this.submittedAnswer = submittedAnswer;
-    }
-
-    /**
-     * @return the answersMC
-     */
-    public List<CheckBox> getAnswerCheckBoxes() {
-        return answerCheckBoxes;
-    }
-
-    /**
-     * @param answerCheckBoxes the answersMC to set
-     */
-    public void setAnswerCheckBoxes(List<CheckBox> answerCheckBoxes) {
-        this.answerCheckBoxes = answerCheckBoxes;
-    }
-
-    /**
-     * @return the answersFF
-     */
-    public TextField getAnswerTextField() {
-        return answerTextField;
-    }
-
-    /**
-     * @param answerTextField the answersFF to set
-     */
-    public void setAnswerTextField(TextField answerTextField) {
-        this.answerTextField = answerTextField;
-    }
-
-    /**
-     * @return the answersLIST
-     */
-    public ListView<AnswerOption> getAnswerOptionListView() {
-        return answerOptionListView;
-    }
-
-    /**
-     * @param answerOptionListView the answersLIST to set
-     */
-    public void setAnswerOptionListView(ListView<AnswerOption> answerOptionListView) {
-        this.answerOptionListView = answerOptionListView;
-    }
-
-    /**
-     * @return the answersTEXT
-     */
-    public TextArea getAnswerTextArea() {
-        return answerTextArea;
-    }
-
-    /**
-     * @param answerTextArea the answersTEXT to set
-     */
-    public void setAnswerTextArea(TextArea answerTextArea) {
-        this.answerTextArea = answerTextArea;
-    }
-
-    /**
-     * @return the target
-     */
-    public Question getTarget() {
-        return target;
-    }
-
-    /**
-     * @param target the target to set
-     */
-    public void setTarget(Question target) {
-        this.target = target;
-    }
-
-    /**
-     * @return the questionnaireID
-     */
-    public int getQuestionnaireId() {
-        return questionnaireId;
-    }
-
-    /**
-     * @param questionnaireId the questionnaireID to set
-     */
-    public void setQuestionnaireId(int questionnaireId) {
-        this.questionnaireId = questionnaireId;
-    }
-
-    /**
-     * @return the scene
-     */
-    public Pane getScene() {
-        return scene;
-    }
-
-    /**
-     * @param scene the scene to set
-     */
-    public void setScene(Pane scene) {
-        this.scene = scene;
-    }
-
-    /**
-     * @return the questionLabel
-     */
-    public Label getQuestionLabel() {
-        return questionLabel;
-    }
-
-    /**
-     * @param questionLabel the questionLabel to set
-     */
-    public void setQuestionLabel(Label questionLabel) {
-        this.questionLabel = questionLabel;
     }
 
     @Override

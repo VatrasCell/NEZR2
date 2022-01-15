@@ -1,53 +1,92 @@
 package de.vatrascell.nezr.survey;
 
 import de.vatrascell.nezr.application.GlobalVars;
+import de.vatrascell.nezr.application.controller.NotificationController;
 import de.vatrascell.nezr.application.controller.ScreenController;
 import de.vatrascell.nezr.gratitude.GratitudeController;
+import de.vatrascell.nezr.message.MessageId;
 import de.vatrascell.nezr.model.AnswerOption;
+import de.vatrascell.nezr.model.Headline;
 import de.vatrascell.nezr.model.Question;
 import de.vatrascell.nezr.model.QuestionType;
 import de.vatrascell.nezr.model.SubmittedAnswer;
+import de.vatrascell.nezr.model.SurveyPage;
 import de.vatrascell.nezr.question.QuestionController;
+import de.vatrascell.nezr.questionList.QuestionListService;
 import de.vatrascell.nezr.start.StartController;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.value.ObservableBooleanValue;
+import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
+import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.DialogPane;
+import javafx.scene.control.Label;
+import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
+import javafx.scene.control.ProgressBar;
+import javafx.scene.control.RadioButton;
+import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.control.ToggleGroup;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
+import net.rgielen.fxweaver.core.FxmlView;
+import org.controlsfx.validation.Severity;
+import org.controlsfx.validation.ValidationSupport;
+import org.controlsfx.validation.Validator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static de.vatrascell.nezr.application.GlobalFuncs.getURL;
 import static de.vatrascell.nezr.application.controller.ScreenController.STYLESHEET;
+import static de.vatrascell.nezr.model.SceneName.SURVEY_PATH;
 
 @Component
-//@FxmlView(SURVEY_PATH)
+@FxmlView(SURVEY_PATH)
 public class SurveyController {
 
-    private static boolean isPreview;
-    private static int pageCount;
-    private static int pageNumber = 1;
-
+    private final QuestionListService questionListService;
+    private boolean isPreview;
+    private int pageCount;
+    private int pageNumber = 0;
+    private List<SurveyPage> pages;
+    @FXML
+    private Pane basePane;
+    @FXML
+    private VBox outerVBox;
+    @FXML
+    private Button nextButton;
+    @FXML
+    private HBox footerHBox;
+    @FXML
+    private ProgressBar progressBar;
+    @FXML
+    private Label countLabel;
+    @FXML
+    private Label headlineLabel;
     private final ScreenController screenController;
 
     @Autowired
-    public SurveyController(ScreenController screenController) {
+    public SurveyController(QuestionListService questionListService, ScreenController screenController) {
+        this.questionListService = questionListService;
         this.screenController = screenController;
-    }
-
-    //@FXML
-    //Pane pane;
-
-    public static void setPageCount(int pageCount) {
-        SurveyController.pageCount = pageCount;
     }
 
     /**
@@ -85,17 +124,29 @@ public class SurveyController {
                 "-fx-background-attachment: fixed;" +
                 "-fx-background-size: 10% auto;" +
                 "-fx-background-position: 98% 5%;");*/
+
+        List<Question> questions = questionListService.getQuestions(GlobalVars.activeQuestionnaire.getId());
+        if (questions.isEmpty()) {
+            NotificationController.createErrorMessage(MessageId.TITLE_QUESTIONNAIRE, MessageId.MESSAGE_QUESTIONNAIRE_IS_EMPTY);
+            return;
+        }
+
+        pages = getSurveyPages(questions);
+        this.pageCount = pages.size();
+        this.isPreview = false;
+        setContentToBasePane(pages.get(pageNumber));
     }
 
     @FXML
     private void next() {
         if (true /*check()*/) {
-            if (pageNumber < pageCount) {
+            if (pageNumber < pageCount - 1) {
+                putSubmittedAnswersToQuestions(pages.get(pageNumber).getQuestions());
                 pageNumber++;
-                //screenController.activate(SceneName.SURVEY + pageNumber);
+                setContentToBasePane(pages.get(pageNumber));
             } else {
                 if (!isPreview) {
-                    //SurveyService.saveSurvey(GlobalVars.activeQuestionnaire.getId(), GlobalVars.questionsPerPanel);
+                    //SurveyService.saveSurvey(GlobalVars.activeQuestionnaire.getId(), pages);
                     System.out.println("save is disabled");
                     screenController.activate(GratitudeController.class);
                 } else {
@@ -130,315 +181,13 @@ public class SurveyController {
 
     @FXML
     private void pre() {
-        if (pageNumber > 1) {
+        if (pageNumber > 0) {
+            putSubmittedAnswersToQuestions(pages.get(pageNumber).getQuestions());
             pageNumber--;
-            //screenController.activate("survey_" + pageNumber);
+            setContentToBasePane(pages.get(pageNumber));
         } else {
             System.out.println("still page 1");
         }
-    }
-
-    private boolean check() {
-        GlobalVars.everythingIsAwesome = true;
-        if (GlobalVars.IGNORE_CHECK && GlobalVars.DEV_MODE) return true;
-        for (Question question : GlobalVars.questionsPerPanel.get(GlobalVars.page)) {
-            if (!checkInt(question) || !checkPflichtfrage(question)) {
-                GlobalVars.everythingIsAwesome = false;
-                break;
-            }
-        }
-
-
-        if (GlobalVars.everythingIsAwesome) {
-            for (Question question : GlobalVars.questionsPerPanel.get(GlobalVars.page)) {
-                if (question.getQuestionType().equals(QuestionType.MULTIPLE_CHOICE)) {
-                    if (question.getFlags().isList()) {
-                        List<AnswerOption> submittedAnswerOptions = new ArrayList<>();
-                        ListView<AnswerOption> listView = question.getAnswerOptionListView();
-
-                        if (listView.isVisible()) {
-                            submittedAnswerOptions.addAll(listView.getSelectionModel().getSelectedItems());
-                        }
-
-                        SubmittedAnswer submittedAnswer = new SubmittedAnswer(submittedAnswerOptions);
-                        question.setSubmittedAnswer(submittedAnswer);
-
-                    } else {
-
-                        ArrayList<AnswerOption> submittedAnswerOptions = new ArrayList<>();
-                        for (CheckBox checkbox : question.getAnswerCheckBoxes()) {
-                            if (checkbox.isSelected() && checkbox.isVisible()) {
-                                submittedAnswerOptions.add((AnswerOption) checkbox.getUserData());
-                            }
-                        }
-
-                        SubmittedAnswer submittedAnswer = new SubmittedAnswer(submittedAnswerOptions);
-                        question.setSubmittedAnswer(submittedAnswer);
-                    }
-                } else {
-
-                    if (question.getFlags().isTextArea()) {
-                        TextArea textArea = question.getAnswerTextArea();
-                        SubmittedAnswer submittedAnswer = new SubmittedAnswer();
-                        if (!textArea.getText().isBlank() && textArea.isVisible()) {
-                            submittedAnswer.setSubmittedAnswerText(textArea.getText());
-                        }
-
-                        question.setSubmittedAnswer(submittedAnswer);
-
-                    } else {
-                        SubmittedAnswer submittedAnswer = new SubmittedAnswer();
-                        TextField textField = question.getAnswerTextField();
-                        if (!textField.getText().isBlank() && textField.isVisible()) {
-                            submittedAnswer.setSubmittedAnswerText(textField.getText());
-                        }
-                        question.setSubmittedAnswer(submittedAnswer);
-                    }
-                }
-            }
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    /**
-     * Prueft, ob die gegebene Frage dem de.vatrascell.nezr.flag INT genuegt.
-     *
-     * @param question FrageErstellen: die Frage
-     * @return boolean
-     */
-	/*
-	private boolean checkInt(Frage frage) {
-		Pattern MY_PATTERNint = Pattern.compile("INT[<>=]=[0-9]+");
-		Matcher mint = MY_PATTERNint.matcher(frage.getFlags());
-		if (mint.find()) {
-			String s = mint.group(0);
-			int i = Integer.parseInt(s.substring(5));
-			String op = s.substring(3, 5);
-			
-			TextField textField = frage.getAntwortenFF().get(0);
-			if(textField.getText().equals("")) {
-				return true;
-			} else {
-				switch(op) {
-				case "==":
-					try {
-						Integer.parseInt(frage.getAntwortenFF().get(0).getText());
-						if(textField.getText().length() == i) {
-							return true;
-						} else {
-//							BalloonTip fehler = new BalloonTip(textField, "die Zahl ist nicht gleich " + i + " Zeichen lang");
-//							fehler.getStyle();
-//							fehler.setCloseButton(null);
-//							TimingUtils.showTimedBalloon(fehler, 2000);
-//							fehler.setVisible(true);
-							return false;
-						}
-					} catch (NumberFormatException eeee) {
-//						BalloonTip fehler = new BalloonTip(textField, "keine g\u00fcltige Zahl");
-//						fehler.setCloseButton(null);
-//						TimingUtils.showTimedBalloon(fehler, 2000);
-//						fehler.setVisible(true);
-						return false;
-					}
-				case "<=":
-					try {
-						Integer.parseInt(frage.getAntwortenFF().get(0).getText());
-						if(textField.getText().length() <= i) {
-							return true;
-						} else {
-//							BalloonTip fehler = new BalloonTip(textField, "die Zahl ist nicht kleiner oder gleich " + i + " Zeichen lang");
-//							fehler.setCloseButton(null);
-//							TimingUtils.showTimedBalloon(fehler, 2000);
-//							fehler.setVisible(true);
-							return false;
-						}
-					} catch (NumberFormatException ee) {
-						//BalloonTip fehler = new BalloonTip(textField, "keine g\u00fcltige Zahl");
-						//fehler.setCloseButton(null);
-						//TimingUtils.showTimedBalloon(fehler, 2000);
-						//fehler.setVisible(true);
-						return false;
-					}
-				case ">=":
-					try {
-						Integer.parseInt(frage.getAntwortenFF().get(0).getText());
-						if(textField.getText().length() >= i) {
-							return true;
-						} else {
-							//BalloonTip fehler = new BalloonTip(textField, "die Zahl ist nicht gr\u00f6\u00dfer oder gleich " + i + " Zeichen lang");
-							//fehler.setCloseButton(null);
-							//TimingUtils.showTimedBalloon(fehler, 2000);
-							//fehler.setVisible(true);
-							return false;
-						}
-					} catch (NumberFormatException eee) {
-						//BalloonTip fehler = new BalloonTip(textField, "keine g\u00fcltige Zahl");
-						//fehler.setCloseButton(null);
-						//TimingUtils.showTimedBalloon(fehler, 2000);
-						//fehler.setVisible(true);
-						return false;
-					}
-					default:
-						return true;
-				}	
-			}
-		} else {
-			return true;
-		}
-	}*/
-    private boolean checkInt(Question question) {
-        return true;
-        //TODO real time de.vatrascell.nezr.validation
-        /*
-        List<Number> numbers = de.vatrascell.nezr.question.getFlags().getAll(Number.class);
-        for (Number number : numbers) {
-            TextField textField = de.vatrascell.nezr.question.getAnswersFF().get(0);
-            if (textField.getText().equals("")) {
-                return true;
-            }
-            switch (number.getOperator()) {
-                case EQ:
-                    try {
-                        Integer.parseInt(de.vatrascell.nezr.question.getAnswersFF().get(0).getText());
-                        if (textField.getText().length() == number.getDigits()) {
-                            continue;
-                        } else {
-//						BalloonTip fehler = new BalloonTip(textField, "die Zahl ist nicht gleich " + i + " Zeichen lang");
-//						fehler.getStyle();
-//						fehler.setCloseButton(null);
-//						TimingUtils.showTimedBalloon(fehler, 2000);
-//						fehler.setVisible(true);
-                            return false;
-                        }
-                    } catch (NumberFormatException eeee) {
-//					BalloonTip fehler = new BalloonTip(textField, "keine g\u00fcltige Zahl");
-//					fehler.setCloseButton(null);
-//					TimingUtils.showTimedBalloon(fehler, 2000);
-//					fehler.setVisible(true);
-                        return false;
-                    }
-                case LTE:
-                    try {
-                        Integer.parseInt(de.vatrascell.nezr.question.getAnswersFF().get(0).getText());
-                        if (textField.getText().length() <= number.getDigits()) {
-                            continue;
-                        } else {
-//						BalloonTip fehler = new BalloonTip(textField, "die Zahl ist nicht kleiner oder gleich " + i + " Zeichen lang");
-//						fehler.setCloseButton(null);
-//						TimingUtils.showTimedBalloon(fehler, 2000);
-//						fehler.setVisible(true);
-                            return false;
-                        }
-                    } catch (NumberFormatException ee) {
-                        //BalloonTip fehler = new BalloonTip(textField, "keine g\u00fcltige Zahl");
-                        //fehler.setCloseButton(null);
-                        //TimingUtils.showTimedBalloon(fehler, 2000);
-                        //fehler.setVisible(true);
-                        return false;
-                    }
-                case GTE:
-                    try {
-                        Integer.parseInt(de.vatrascell.nezr.question.getAnswersFF().get(0).getText());
-                        if (textField.getText().length() >= number.getDigits()) {
-                        } else {
-                            //BalloonTip fehler = new BalloonTip(textField, "die Zahl ist nicht gr\u00f6\u00dfer oder gleich " + i + " Zeichen lang");
-                            //fehler.setCloseButton(null);
-                            //TimingUtils.showTimedBalloon(fehler, 2000);
-                            //fehler.setVisible(true);
-                            return false;
-                        }
-                    } catch (NumberFormatException eee) {
-                        //BalloonTip fehler = new BalloonTip(textField, "keine g\u00fcltige Zahl");
-                        //fehler.setCloseButton(null);
-                        //TimingUtils.showTimedBalloon(fehler, 2000);
-                        //fehler.setVisible(true);
-                        return false;
-                    }
-            }
-        }
-        return true;*/
-    }
-
-    /**
-     * Prueft, ob die gegebene Frage der Pfichtfrage genuegt.
-     *
-     * @param question FrageErstellen: die Frage
-     * @return boolean
-     */
-    private boolean checkPflichtfrage(Question question) {
-        if (question.getFlags().isRequired() && question.getQuestionLabel().isVisible()) {
-            if (question.getQuestionType().equals(QuestionType.MULTIPLE_CHOICE)) {
-                boolean selected = false;
-                for (CheckBox checkbox : question.getAnswerCheckBoxes()) {
-                    if (checkbox.isSelected()) {
-                        selected = true;
-                        break;
-                    }
-                }
-                if (selected) {
-                    return true;
-                } else {
-//					BalloonTip fehler = new BalloonTip(button, "Das ist eine Pflichtfrage!");
-//					fehler.setCloseButton(null);
-//					TimingUtils.showTimedBalloon(fehler, 2000);
-//					fehler.setVisible(true);
-                    return false;
-                }
-            } else {
-                if (question.getFlags().isList()) {
-                    ListView<AnswerOption> listView = question.getAnswerOptionListView();
-                    if (listView.getSelectionModel().isEmpty()) {
-//							BalloonTip fehler = new BalloonTip(button, "Das ist eine Pflichtfrage!");
-//							fehler.setCloseButton(null);
-//							TimingUtils.showTimedBalloon(fehler, 2000);
-//							fehler.setVisible(true);
-                        return false;
-                    } else {
-                        return true;
-                    }
-
-                } else if (question.getFlags().isTextArea()) {
-                    TextArea myText = question.getAnswerTextArea();
-                    if (myText.getText().isEmpty()) {
-//							BalloonTip fehler = new BalloonTip(button, "Das ist eine Pflichtfrage!");
-//							fehler.setCloseButton(null);
-//							TimingUtils.showTimedBalloon(fehler, 2000);
-//							fehler.setVisible(true);
-                        return false;
-                    } else {
-                        return true;
-                    }
-                } else {
-                    boolean selected = false;
-                    TextField textField = question.getAnswerTextField();
-                    if (!textField.getText().equals("")) {
-                        selected = true;
-                    }
-
-                    if (selected) {
-                        return true;
-                    } else {
-//						BalloonTip fehler = new BalloonTip(button, "Das ist eine Pflichtfrage!");
-//						fehler.setCloseButton(null);
-//						TimingUtils.showTimedBalloon(fehler, 2000);
-//						fehler.setVisible(true);
-                        return false;
-                    }
-                }
-            }
-        } else {
-            return true;
-        }
-    }
-
-    public static boolean isPreview() {
-        return isPreview;
-    }
-
-    public static void setPreview(boolean isPreview) {
-        SurveyController.isPreview = isPreview;
     }
 
     @FXML
@@ -456,5 +205,368 @@ public class SurveyController {
             screenController.activate(QuestionController.class);
         }
 
+    }
+
+    private void putSubmittedAnswersToQuestions(List<Question> questions) {
+        for (int i = 0; i < questions.size(); ++i) {
+            VBox innerVBox = (VBox) outerVBox.getChildren().get(i);
+            questions.get(i).setSubmittedAnswer(getSubmittedAnswerFormVBox(innerVBox));
+        }
+    }
+
+    private SubmittedAnswer getSubmittedAnswerFormVBox(VBox vBox) {
+        SubmittedAnswer submittedAnswer = new SubmittedAnswer();
+        for (Node element : vBox.getChildren()) {
+            if (element instanceof HBox) {
+                HBox hBox = (HBox) element;
+                for (Node innerElement : hBox.getChildren()) {
+                    if (innerElement instanceof CheckBox) {
+                        if (((CheckBox) innerElement).isSelected()) {
+                            submittedAnswer.addSubmittedAnswerOption((AnswerOption) innerElement.getUserData());
+                        }
+                    }
+                    if (innerElement instanceof RadioButton) {
+                        if (((RadioButton) innerElement).isSelected()) {
+                            submittedAnswer.addSubmittedAnswerOption((AnswerOption) innerElement.getUserData());
+                        }
+                    }
+                    if (innerElement instanceof ListView) {
+                        submittedAnswer.addSubmittedAnswerOptions(((ListView) innerElement).getSelectionModel().getSelectedItems());
+                    }
+                    if (innerElement instanceof TextArea) {
+                        submittedAnswer.setSubmittedAnswerText(((TextArea) innerElement).getText());
+                    }
+                    if (innerElement instanceof TextField) {
+                        submittedAnswer.setSubmittedAnswerText(((TextField) innerElement).getText());
+                    }
+                }
+            }
+        }
+        return submittedAnswer;
+    }
+
+    private List<SurveyPage> getSurveyPages(List<Question> questions) {
+        List<SurveyPage> pages = new ArrayList<>();
+        int oldPosition = 1;
+        Headline currentHeadline = questions.get(0).getHeadline();
+        SurveyPage page = new SurveyPage();
+        for (Question question : questions) {
+            //check need for new page and create it if necessary
+            if (isNewHeadline(currentHeadline, question.getHeadline()) || oldPosition < question.getPosition() || page.getQuestions().size() == GlobalVars.PER_COLUMN) {
+                page.setPageNumber(pages.size() + 1);
+                page.setHeadline(currentHeadline);
+                pages.add(page);
+                currentHeadline = question.getHeadline();
+
+                page = new SurveyPage();
+            }
+
+            oldPosition = question.getPosition();
+            page.addQuestion(question);
+        }
+
+        //add last page
+        page.setPageNumber(pages.size() + 1);
+        page.setHeadline(currentHeadline);
+        pages.add(page);
+
+        return pages;
+    }
+
+    public void setContentToBasePane(SurveyPage page) {
+
+        setHeaderFields(page.getPageNumber(), pageCount, page.getHeadline());
+
+        setQuestions(basePane, page.getQuestions());
+
+        if (needsEvaluationQuestionFooter(page.getQuestions())) {
+            createEvaluationQuestionFooter();
+        }
+    }
+
+    private boolean needsEvaluationQuestionFooter(List<Question> questions) {
+        return questions.stream().anyMatch(question -> question.getFlags().isEvaluationQuestion());
+    }
+
+    private void setHeaderFields(int pageNumber, int pageCount, Headline headline) {
+        progressBar.setProgress((float) (pageNumber) / (float) pageCount);
+
+        countLabel.setText(String.format("Frage %s/%s", (pageNumber), pageCount));
+
+        if (headline != null) {
+            headlineLabel.setText(removeMark(headline.getName()));
+        }
+
+    }
+
+    private void setQuestions(Pane scene, List<Question> questions) {
+        ValidationSupport validationSupport = new ValidationSupport();
+        outerVBox.getChildren().clear();
+
+        HashMap<Integer, List<BooleanProperty>> booleanPropertyHashMap = new HashMap<>();
+        BooleanProperty checkRequiredValue = new SimpleBooleanProperty(true);
+
+        for (Question question : questions) {
+            VBox innerVBox = new VBox();
+            innerVBox.setAlignment(Pos.CENTER);
+            innerVBox.getChildren().add(createQuestionLabel(scene, question));
+
+            if (question.getQuestionType().equals(QuestionType.MULTIPLE_CHOICE)) {
+                createMultipleChoiceQuestion(innerVBox, question, booleanPropertyHashMap, checkRequiredValue);
+            } else {
+                createShortAnswerQuestion(innerVBox, question, validationSupport);
+            }
+
+            outerVBox.getChildren().add(innerVBox);
+        }
+
+        nextButton.disableProperty().bind(validationSupport.invalidProperty().isEqualTo(checkRequiredValue));
+    }
+
+    private void createEvaluationQuestionFooter() {
+        footerHBox.getChildren().clear();
+        footerHBox.getChildren().add(new Label("0: keine Aussage"));
+        footerHBox.getChildren().add(new Label("1: sehr schlecht"));
+        footerHBox.getChildren().add(new Label("10: sehr gut"));
+    }
+
+    private void createMultipleChoiceQuestion(VBox innerVBox, Question question, HashMap<Integer, List<BooleanProperty>> booleanPropertyHashMap, BooleanProperty checkRequiredValue) {
+        if (question.getFlags().isList()) {
+            innerVBox.getChildren().add(createListViewHBox(question, booleanPropertyHashMap, checkRequiredValue));
+        } else {
+            innerVBox.getChildren().add(createCheckboxHBox(question, booleanPropertyHashMap, checkRequiredValue));
+        }
+    }
+
+    private void createShortAnswerQuestion(VBox innerVBox, Question question, ValidationSupport validationSupport) {
+        if (question.getFlags().isTextArea()) {
+            innerVBox.getChildren().add(createTextAreaHBox(question, validationSupport));
+        } else {
+            innerVBox.getChildren().add(createTextFieldHBox(question, validationSupport));
+        }
+    }
+
+    private HBox createTextFieldHBox(Question question, ValidationSupport validationSupport) {
+        HBox hBox = new HBox();
+        hBox.setAlignment(Pos.CENTER);
+        TextField textField = new TextField();
+
+        String submittedText = question.getSubmittedAnswer().getSubmittedAnswerText();
+        textField.setText(submittedText == null ? "" : submittedText);
+
+        if (question.getFlags().getValidation() != null) {
+            validationSupport.registerValidator(textField,
+                    Validator.createRegexValidator("FELHER", regexOrEmpty(question.getFlags().getValidation().getRegex()), Severity.ERROR));
+        }
+
+        if (question.getFlags().isRequired()) {
+            validationSupport.registerValidator(textField, Validator.createEmptyValidator("FEHLER"));
+        }
+
+        hBox.getChildren().add(textField);
+        return hBox;
+    }
+
+    private HBox createTextAreaHBox(Question question, ValidationSupport validationSupport) {
+        HBox hBox = new HBox();
+        hBox.setAlignment(Pos.CENTER);
+        TextArea textArea = new TextArea();
+
+        String submittedText = question.getSubmittedAnswer().getSubmittedAnswerText();
+        textArea.setText(submittedText == null ? "" : submittedText);
+
+        if (question.getFlags().getValidation() != null) {
+            validationSupport.registerValidator(textArea,
+                    Validator.createRegexValidator("FELHER", regexOrEmpty(question.getFlags().getValidation().getRegex()), Severity.ERROR));
+        }
+
+        if (question.getFlags().isRequired()) {
+            validationSupport.registerValidator(textArea, Validator.createEmptyValidator("FEHLER"));
+        }
+
+        hBox.getChildren().add(textArea);
+        return hBox;
+    }
+
+    private String regexOrEmpty(String regex) {
+        return String.format("(^$|%s)", regex);
+    }
+
+    private HBox createListViewHBox(Question question, HashMap<Integer, List<BooleanProperty>> booleanPropertyHashMap, BooleanProperty checkRequiredValue) {
+        HBox hBox = new HBox();
+        hBox.setAlignment(Pos.CENTER);
+
+        if (question.getFlags().isRequired()) {
+            checkRequiredValue.setValue(false);
+            booleanPropertyHashMap.put(question.getQuestionId(), new ArrayList<>());
+        }
+
+        ListView<AnswerOption> answerOptionListView = new ListView<>();
+        if (question.getFlags().isMultipleChoice()) {
+            answerOptionListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+        } else {
+            answerOptionListView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
+        }
+
+        answerOptionListView.addEventFilter(MouseEvent.MOUSE_PRESSED, evt -> {
+            Node node = evt.getPickResult().getIntersectedNode();
+            // go up from the target node until a list cell is found or it's clear
+            // it was not a cell that was clicked
+            while (node != null && node != answerOptionListView && !(node instanceof ListCell)) {
+                node = node.getParent();
+            }
+
+            // if is part of a cell or the cell,
+            // handle event instead of using standard handling
+            if (node instanceof ListCell) {
+                // prevent further handling
+                evt.consume();
+
+                ListCell<AnswerOption> cell = (ListCell) node;
+                ListView<AnswerOption> lv = cell.getListView();
+
+                // focus the listview
+                lv.requestFocus();
+
+                if (!cell.isEmpty()) {
+                    // handle selection for non-empty cells
+                    int index = cell.getIndex();
+                    if (cell.isSelected()) {
+                        lv.getSelectionModel().clearSelection(index);
+                    } else {
+                        lv.getSelectionModel().select(index);
+                    }
+                }
+            }
+
+            if (question.getFlags().isRequired()) {
+                List<BooleanProperty> booleanProperties = booleanPropertyHashMap.get(question.getQuestionId());
+                booleanProperties.add(new SimpleBooleanProperty(!answerOptionListView.selectionModelProperty().getValue().getSelectedItems().isEmpty()));
+                booleanPropertyHashMap.put(question.getQuestionId(), booleanProperties);
+
+                checkObservableValues(checkRequiredValue, booleanPropertyHashMap);
+            }
+        });
+
+        answerOptionListView.setItems(FXCollections.observableArrayList(question.getAnswerOptions()));
+
+        for (AnswerOption submittedAnswerOption : question.getSubmittedAnswer().getSubmittedAnswerOptions()) {
+            answerOptionListView.getSelectionModel().select(submittedAnswerOption);
+        }
+
+        hBox.getChildren().add(answerOptionListView);
+        return hBox;
+    }
+
+    private HBox createCheckboxHBox(Question question, HashMap<Integer, List<BooleanProperty>> booleanPropertyHashMap, BooleanProperty checkRequiredValue) {
+        ToggleGroup group = new ToggleGroup();
+        HBox hBox = new HBox();
+        hBox.setAlignment(Pos.CENTER);
+
+        if (question.getFlags().isRequired()) {
+            checkRequiredValue.setValue(false);
+            booleanPropertyHashMap.put(question.getQuestionId(), new ArrayList<>());
+        }
+
+        for (AnswerOption answerOption : question.getAnswerOptions()) {
+            if (question.getFlags().isMultipleChoice()) {
+                CheckBox checkBox = new CheckBox();
+                checkBox.setUserData(answerOption);
+                checkBox.setText(answerOption.getValue());
+
+                if (question.getFlags().isRequired()) {
+                    List<BooleanProperty> booleanProperties = booleanPropertyHashMap.get(question.getQuestionId());
+                    booleanProperties.add(checkBox.selectedProperty());
+                    booleanPropertyHashMap.put(question.getQuestionId(), booleanProperties);
+
+                    checkBox.selectedProperty().addListener((observableValue, aBoolean, t1) -> {
+                        checkObservableValues(checkRequiredValue, booleanPropertyHashMap);
+                    });
+                }
+                for (AnswerOption submittedAnswerOption : question.getSubmittedAnswer().getSubmittedAnswerOptions()) {
+                    if (answerOption.equals(submittedAnswerOption)) {
+                        checkBox.setSelected(true);
+                    }
+                }
+                hBox.getChildren().add(checkBox);
+            } else {
+                RadioButton radioButton = new RadioButton();
+                radioButton.setUserData(answerOption);
+                radioButton.setText(answerOption.getValue());
+                radioButton.setToggleGroup(group);
+
+                if (question.getFlags().isRequired()) {
+                    List<BooleanProperty> booleanProperties = booleanPropertyHashMap.get(question.getQuestionId());
+                    booleanProperties.add(radioButton.selectedProperty());
+                    booleanPropertyHashMap.put(question.getQuestionId(), booleanProperties);
+
+                    radioButton.selectedProperty().addListener((observableValue, aBoolean, t1) -> {
+                        checkObservableValues(checkRequiredValue, booleanPropertyHashMap);
+                    });
+                }
+
+                for (AnswerOption submittedAnswerOption : question.getSubmittedAnswer().getSubmittedAnswerOptions()) {
+                    if (answerOption.equals(submittedAnswerOption)) {
+                        radioButton.setSelected(true);
+                    }
+                }
+                hBox.getChildren().add(radioButton);
+            }
+        }
+
+        return hBox;
+    }
+
+    private void checkObservableValues(BooleanProperty checkRequiredValue, HashMap<Integer, List<BooleanProperty>> booleanPropertyHashMap) {
+        List<Boolean> booleans = new ArrayList<>();
+
+        for (List<BooleanProperty> booleanProperties : booleanPropertyHashMap.values()) {
+            booleans.add(booleanProperties.stream().anyMatch(ObservableBooleanValue::get));
+        }
+        checkRequiredValue.setValue(booleans.stream().allMatch(aBoolean -> aBoolean));
+    }
+
+
+    private boolean isNewHeadline(Headline currentHeadline, Headline headline) {
+        if (currentHeadline != null && headline != null) {
+            return !currentHeadline.equals(headline);
+        } else {
+            return currentHeadline == null ^ headline == null;
+        }
+    }
+
+    private Label createQuestionLabel(Pane screen, Question question) {
+        String questionTest = removeMark(question.getQuestion());
+
+        questionTest = addRequiredTag(questionTest, question.getFlags().isRequired());
+
+        Label questionLabel = new Label(questionTest);
+        // System.out.println("frageObj.get(y).frageid = " +
+        // frageObj.get(y).getFrageID());
+        questionLabel.setId("lbl_question_" + question.getQuestionId());
+
+        if (question.getFlags().hasMultipleChoiceReact()) {
+            //questionLabel.setVisible(false);
+        }
+
+        // allePanel.get(z).add(questionLabel, "align center, span, wrap");
+        question.setScene(screen);
+        question.setQuestionLabel(questionLabel);
+
+        return questionLabel;
+    }
+
+    private String removeMark(String text) {
+        Pattern MY_PATTERNs = Pattern.compile("#\\[[0-9]+\\]");
+        Matcher ms = MY_PATTERNs.matcher(text);
+        if (ms.find()) {
+            System.out.println("Old dataset pattern found.");
+        }
+
+        return text;
+    }
+
+    private String addRequiredTag(String text, boolean required) {
+        return required ? text + " *" : text;
     }
 }

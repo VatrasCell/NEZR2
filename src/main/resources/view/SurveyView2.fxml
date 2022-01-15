@@ -10,25 +10,26 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
-<DecorationPane xmlns:fx="http://javafx.com/fxml/1" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
+<DecorationPane xmlns:fx="http://javafx.com/fxml/1" fx:id="basePane" maxHeight="-Infinity" maxWidth="-Infinity"
+                minHeight="-Infinity"
                 minWidth="-Infinity"
                 prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/11.0.1"
                 fx:controller="de.vatrascell.nezr.survey.SurveyController">
     <BorderPane prefHeight="200.0" prefWidth="200.0">
         <center>
-            <VBox fx:id="vbox" alignment="TOP_CENTER" spacing="8.0" BorderPane.alignment="CENTER"/>
+            <VBox fx:id="outerVBox" alignment="TOP_CENTER" spacing="8.0" BorderPane.alignment="CENTER"/>
         </center>
         <bottom>
             <AnchorPane prefHeight="70.0" prefWidth="600.0" BorderPane.alignment="CENTER">
                 <Button layoutX="14.0" layoutY="361.0" mnemonicParsing="false" onAction="#exit" text="X"
                         textAlignment="CENTER" AnchorPane.bottomAnchor="15.0" AnchorPane.leftAnchor="15.0"/>
-                <Button fx:id="btn_next" layoutX="527.0" layoutY="356.0" mnemonicParsing="false" onAction="#next"
+                <Button fx:id="nextButton" layoutX="527.0" layoutY="356.0" mnemonicParsing="false" onAction="#next"
                         text="&gt;" textAlignment="CENTER" AnchorPane.bottomAnchor="15.0"
                         AnchorPane.rightAnchor="15.0"/>
                 <Button fx:id="btn_pre" layoutX="537.0" layoutY="366.0" mnemonicParsing="false" onAction="#pre"
                         text="&lt;" textAlignment="CENTER" AnchorPane.bottomAnchor="15.0"
                         AnchorPane.rightAnchor="80.0"/>
-                <HBox fx:id="footer_hBox" alignment="CENTER" layoutX="129.0" layoutY="23.0" prefHeight="25.0"
+                <HBox fx:id="footerHBox" alignment="CENTER" layoutX="129.0" layoutY="23.0" prefHeight="25.0"
                       prefWidth="309.0" spacing="8.0" AnchorPane.leftAnchor="129.0" AnchorPane.rightAnchor="162.0"/>
             </AnchorPane>
         </bottom>
@@ -46,8 +47,8 @@
                         <Insets left="128.0" right="128.0"/>
                     </padding>
                 </ProgressBar>
-                <Label fx:id="lbl_count" alignment="CENTER" text="Frage xx/xx" textAlignment="CENTER"/>
-                <Label fx:id="lbl_headline" alignment="CENTER" textAlignment="CENTER">
+                <Label fx:id="countLabel" alignment="CENTER" text="Frage xx/xx" textAlignment="CENTER"/>
+                <Label fx:id="headlineLabel" alignment="CENTER" textAlignment="CENTER">
                     <font>
                         <Font name="System Bold" size="12.0"/>
                     </font>

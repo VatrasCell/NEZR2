@@ -31,13 +31,17 @@ public class SubmittedAnswer {
         this.submittedAnswerOptions.add(submittedAnswerOption);
     }
 
+    public void addSubmittedAnswerOptions(List<AnswerOption> submittedAnswerOptions) {
+        this.submittedAnswerOptions.addAll(submittedAnswerOptions);
+    }
+
     public String getSubmittedAnswerText() {
         return submittedAnswerText;
     }
 
     public void setSubmittedAnswerText(String submittedAnswerText) {
         if (submittedAnswerText != null) {
-            this.submittedAnswerText = submittedAnswerText.replaceAll("<.*>", "");
+            this.submittedAnswerText = submittedAnswerText.replaceAll("<.*>", "").trim();
         } else {
             this.submittedAnswerText = null;
         }

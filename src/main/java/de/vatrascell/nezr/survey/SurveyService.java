@@ -7,6 +7,7 @@ import de.vatrascell.nezr.model.Question;
 import de.vatrascell.nezr.model.QuestionType;
 import de.vatrascell.nezr.model.SubmittedAnswer;
 import de.vatrascell.nezr.model.Survey;
+import de.vatrascell.nezr.model.SurveyPage;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextArea;
@@ -46,12 +47,12 @@ import static de.vatrascell.nezr.application.SqlStatement.SQL_GET_SURVEY_HAS_SHO
 @Service
 public class SurveyService extends Database {
 
-    public void saveSurvey(int questionnaireId, List<ArrayList<Question>> questionsLists) {
+    public void saveSurvey(int questionnaireId, List<SurveyPage> pages) {
         try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
             myCon.setAutoCommit(false);
 
             int surveyId = createSurvey(myCon, questionnaireId);
-            List<Question> questions = discardSecondDimension(questionsLists);
+            List<Question> questions = discardSecondDimension(pages);
 
             for (Question question : questions) {
                 if (question.getQuestionType().equals(QuestionType.MULTIPLE_CHOICE)) {
@@ -199,9 +200,9 @@ public class SurveyService extends Database {
         return false;
     }
 
-    private List<Question> discardSecondDimension(List<ArrayList<Question>> questionsLists) {
+    private List<Question> discardSecondDimension(List<SurveyPage> pages) {
         List<Question> results = new ArrayList<>();
-        questionsLists.forEach(results::addAll);
+        pages.forEach(page -> results.addAll(page.getQuestions()));
 
         return results;
     }
