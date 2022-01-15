@@ -3,6 +3,7 @@ package de.vatrascell.nezr.survey;
 import de.vatrascell.nezr.application.GlobalVars;
 import de.vatrascell.nezr.application.controller.NotificationController;
 import de.vatrascell.nezr.application.controller.ScreenController;
+import de.vatrascell.nezr.application.svg.SvgImageLoader;
 import de.vatrascell.nezr.gratitude.GratitudeController;
 import de.vatrascell.nezr.message.MessageId;
 import de.vatrascell.nezr.model.AnswerOption;
@@ -15,9 +16,12 @@ import de.vatrascell.nezr.question.QuestionController;
 import de.vatrascell.nezr.questionList.QuestionListService;
 import de.vatrascell.nezr.start.StartController;
 import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.value.ObservableBooleanValue;
 import javafx.collections.FXCollections;
+import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -36,6 +40,7 @@ import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
@@ -47,6 +52,8 @@ import org.controlsfx.validation.Validator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -63,9 +70,9 @@ import static de.vatrascell.nezr.model.SceneName.SURVEY_PATH;
 public class SurveyController {
 
     private final QuestionListService questionListService;
+    private final IntegerProperty pageNumber = new SimpleIntegerProperty(0);
     private boolean isPreview;
     private int pageCount;
-    private int pageNumber = 0;
     private List<SurveyPage> pages;
     @FXML
     private Pane basePane;
@@ -74,6 +81,8 @@ public class SurveyController {
     @FXML
     private Button nextButton;
     @FXML
+    private Button preButton;
+    @FXML
     private HBox footerHBox;
     @FXML
     private ProgressBar progressBar;
@@ -81,6 +90,8 @@ public class SurveyController {
     private Label countLabel;
     @FXML
     private Label headlineLabel;
+    @FXML
+    private ImageView imageView;
     private final ScreenController screenController;
 
     @Autowired
@@ -98,32 +109,41 @@ public class SurveyController {
         String value;
         switch (GlobalVars.location) {
             case "R\u00FCgen":
-                value = "images/img/logo_nezr.png";
+                value = "images/svg/logo-naturerbe-zentrum-ruegen.svg";
                 break;
             case "Bayerischer Wald":
-                value = "images/img/logo_bw.png";
+                value = "images/svg/logo-baumwipfelpfad-bayerische-wald.svg";
                 break;
             case "Saarschleife":
-                value = "images/img/logo_saar.png";
+                value = "images/svg/logo-baumwipfelpfad-saarschleife.svg";
                 break;
             case "Schwarzwald":
-                value = "images/img/logo_sw.png";
+                value = "images/svg/logo-baumwipfelpfad-schwarzwald.svg";
                 break;
-            case "Lipno":
-                value = "images/img/logo_lipno_de.png";
+            case "Usedom":
+                value = "images/svg/logo-baumwipfelpfad-usedom.svg";
                 break;
-
-            default:
-                value = "images/img/logo_default.png";
+            case "Elsass":
+                value = "images/svg/logo-baumwipfelpfad-elsass.svg";
+                break;
+            case "Salzkammergut":
+                value = "images/svg/logo-baumwipfelpfad-salzkammergut.svg";
+                break;
+            default: //Bachledka, Krkonoše, Lipno, Pohorje
+                value = "images/svg/baumwipfelpfade-logo.svg";
                 break;
         }
 
-        String image = getURL(value).toExternalForm();
-        /*pane.setStyle("-fx-background-image: url('" + image + "');" +
-                "-fx-background-repeat: no-repeat;" +
-                "-fx-background-attachment: fixed;" +
-                "-fx-background-size: 10% auto;" +
-                "-fx-background-position: 98% 5%;");*/
+        try {
+            imageView.fitHeightProperty().bind(basePane.heightProperty().multiply(0.55));
+            imageView.fitWidthProperty().bind(basePane.widthProperty().multiply(0.7));
+            imageView.translateXProperty().bind(basePane.widthProperty().multiply(0.4));
+            imageView.translateYProperty().bind(basePane.heightProperty().multiply(-0.18));
+            BufferedImage image = SvgImageLoader.loadSvg(getURL(value), 500);
+            imageView.setImage(SwingFXUtils.toFXImage(image, null));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         List<Question> questions = questionListService.getQuestions(GlobalVars.activeQuestionnaire.getId());
         if (questions.isEmpty()) {
@@ -134,16 +154,17 @@ public class SurveyController {
         pages = getSurveyPages(questions);
         this.pageCount = pages.size();
         this.isPreview = false;
-        setContentToBasePane(pages.get(pageNumber));
+        preButton.disableProperty().bind(pageNumber.isEqualTo(0));
+        setContentToBasePane(pages.get(pageNumber.get()));
     }
 
     @FXML
     private void next() {
         if (true /*check()*/) {
-            if (pageNumber < pageCount - 1) {
-                putSubmittedAnswersToQuestions(pages.get(pageNumber).getQuestions());
-                pageNumber++;
-                setContentToBasePane(pages.get(pageNumber));
+            if (pageNumber.get() < pageCount - 1) {
+                putSubmittedAnswersToQuestions(pages.get(pageNumber.get()).getQuestions());
+                pageNumber.set(pageNumber.get() + 1);
+                setContentToBasePane(pages.get(pageNumber.get()));
             } else {
                 if (!isPreview) {
                     //SurveyService.saveSurvey(GlobalVars.activeQuestionnaire.getId(), pages);
@@ -181,10 +202,10 @@ public class SurveyController {
 
     @FXML
     private void pre() {
-        if (pageNumber > 0) {
-            putSubmittedAnswersToQuestions(pages.get(pageNumber).getQuestions());
-            pageNumber--;
-            setContentToBasePane(pages.get(pageNumber));
+        if (pageNumber.get() > 0) {
+            putSubmittedAnswersToQuestions(pages.get(pageNumber.get()).getQuestions());
+            pageNumber.set(pageNumber.get() - 1);
+            setContentToBasePane(pages.get(pageNumber.get()));
         } else {
             System.out.println("still page 1");
         }

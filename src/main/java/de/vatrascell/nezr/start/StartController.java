@@ -4,8 +4,6 @@ import de.vatrascell.nezr.application.GlobalVars;
 import de.vatrascell.nezr.application.controller.ScreenController;
 import de.vatrascell.nezr.application.svg.SvgImageLoader;
 import de.vatrascell.nezr.login.LoginController;
-import de.vatrascell.nezr.login.LoginService;
-import de.vatrascell.nezr.questionList.QuestionListService;
 import de.vatrascell.nezr.survey.SurveyController;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
@@ -46,8 +44,6 @@ public class StartController {
     private static final StringProperty questionnaireText = new SimpleStringProperty();
     private static final StringProperty questionnaireWarn = new SimpleStringProperty();
 
-    private final QuestionListService questionListService;
-    private final LoginService loginService;
     private final ScreenController screenController;
     private final LoginController loginController;
 
@@ -55,10 +51,8 @@ public class StartController {
      * The constructor (is called before the initialize()-method).
      */
     @Autowired
-    public StartController(StartService startService, QuestionListService questionListService,
-                           LoginService loginService, ScreenController screenController, LoginController loginController) {
-        this.questionListService = questionListService;
-        this.loginService = loginService;
+    public StartController(StartService startService, ScreenController screenController, LoginController loginController) {
+
         this.screenController = screenController;
         this.loginController = loginController;
         GlobalVars.activeQuestionnaire = startService.getActiveQuestionnaire();
