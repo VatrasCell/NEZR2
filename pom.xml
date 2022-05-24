@@ -15,12 +15,10 @@
         <poi.version>4.1.2</poi.version>
         <ooxml-schemas.version>1.4</ooxml-schemas.version>
         <h2.version>1.4.196</h2.version>
-        <junit.version>4.13.2</junit.version>
+        <junit.version>5.8.2</junit.version>
         <mockito-all.version>1.10.19</mockito-all.version>
-        <powermock-module-junit4.version>2.0.9</powermock-module-junit4.version>
-        <powermock-api-mockito.version>1.7.4</powermock-api-mockito.version>
-        <powermock-core.version>2.0.9</powermock-core.version>
         <javafx-weaver-spring-boot-starter.version>1.3.0</javafx-weaver-spring-boot-starter.version>
+        <spring-boot-starter-test.version>2.6.2</spring-boot-starter-test.version>
         <lombok.version>1.18.22</lombok.version>
     </properties>
     <dependencies>
@@ -48,10 +46,10 @@
             <artifactId>h2</artifactId>
             <version>${h2.version}</version>
         </dependency>
-        <!-- https://mvnrepository.com/artifact/junit/junit -->
+        <!-- https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-engine -->
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
             <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
@@ -60,26 +58,6 @@
             <groupId>org.mockito</groupId>
             <artifactId>mockito-all</artifactId>
             <version>${mockito-all.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <!-- https://mvnrepository.com/artifact/org.powermock/powermock-module-junit4 -->
-        <dependency>
-            <groupId>org.powermock</groupId>
-            <artifactId>powermock-module-junit4</artifactId>
-            <version>${powermock-module-junit4.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <!-- https://mvnrepository.com/artifact/org.powermock/powermock-api-mockito -->
-        <dependency>
-            <groupId>org.powermock</groupId>
-            <artifactId>powermock-api-mockito</artifactId>
-            <version>${powermock-api-mockito.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.powermock</groupId>
-            <artifactId>powermock-core</artifactId>
-            <version>${powermock-core.version}</version>
             <scope>test</scope>
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.controlsfx/controlsfx -->
@@ -149,6 +127,13 @@
             <groupId>net.rgielen</groupId>
             <artifactId>javafx-weaver-spring-boot-starter</artifactId>
             <version>${javafx-weaver-spring-boot-starter.version}</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-test -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <version>${spring-boot-starter-test.version}</version>
+            <scope>test</scope>
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.projectlombok/lombok -->
         <dependency>
