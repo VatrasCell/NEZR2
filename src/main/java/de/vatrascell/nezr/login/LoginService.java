@@ -13,6 +13,8 @@ public class LoginService extends Database {
 
         String url = createDatabaseURL(DB_NAME);
 
+        System.out.println("url: " + url);
+
         try (Connection ignored = DriverManager.getConnection(url, user, pwd)) {
             Database.user = user;
             Database.pwd = pwd;
