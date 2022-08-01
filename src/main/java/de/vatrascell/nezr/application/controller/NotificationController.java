@@ -6,7 +6,7 @@ import org.controlsfx.control.Notifications;
 
 public class NotificationController {
 
-    private static PropertyLoader propertyLoader;
+    private static final PropertyLoader propertyLoader;
 
     static {
         propertyLoader = new PropertyLoader("message");

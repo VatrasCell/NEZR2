@@ -10,7 +10,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-import static de.vatrascell.nezr.application.GlobalFuncs.getURL;
+import static de.vatrascell.nezr.application.util.ResourceUtil.getURL;
 
 public class DBTestUtil extends Database {
 

@@ -6,7 +6,7 @@ import javafx.scene.control.Dialog;
 
 public class DialogMessageController {
 
-    private static PropertyLoader propertyLoader;
+    private static final PropertyLoader propertyLoader;
 
     static {
         propertyLoader = new PropertyLoader("dialog");

@@ -14,7 +14,7 @@ import org.springframework.stereotype.Controller;
 import java.net.URL;
 import java.util.HashMap;
 
-import static de.vatrascell.nezr.application.GlobalFuncs.getURL;
+import static de.vatrascell.nezr.application.util.ResourceUtil.getURL;
 
 @Controller
 public class ScreenController implements ApplicationListener<StageReadyEvent> {

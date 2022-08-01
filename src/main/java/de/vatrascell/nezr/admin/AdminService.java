@@ -1,8 +1,8 @@
 package de.vatrascell.nezr.admin;
 
 import de.vatrascell.nezr.application.Database;
-import de.vatrascell.nezr.application.GlobalFuncs;
 import de.vatrascell.nezr.application.GlobalVars;
+import de.vatrascell.nezr.application.util.DateUtil;
 import de.vatrascell.nezr.model.QuestionType;
 import de.vatrascell.nezr.model.Questionnaire;
 import de.vatrascell.nezr.questionList.QuestionListService;
@@ -41,6 +41,8 @@ import static de.vatrascell.nezr.application.SqlStatement.SQL_SET_QUESTIONNAIRE_
 public class AdminService extends Database {
 
     private final QuestionListService questionListService;
+
+    private final DateUtil dateUtil;
 
     public ArrayList<Questionnaire> getQuestionnaires(String location) {
         try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
@@ -212,7 +214,7 @@ public class AdminService extends Database {
     public int createQuestionnaire(String name, String location) {
         try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
             PreparedStatement psSql = myCon.prepareStatement(SQL_CREATE_QUESTIONNAIRE);
-            psSql.setString(1, GlobalFuncs.getCurrentDate());
+            psSql.setString(1, dateUtil.getCurrentDate());
             psSql.setString(2, name);
             psSql.setInt(3, getLocationId(location));
             psSql.execute();

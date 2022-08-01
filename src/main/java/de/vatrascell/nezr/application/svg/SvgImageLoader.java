@@ -19,7 +19,7 @@ import static org.apache.batik.util.SVGConstants.SVG_NAMESPACE_URI;
 import static org.apache.batik.util.SVGConstants.SVG_SVG_TAG;
 
 /**
- * Loads SVG images from disk. See https://en.wikipedia.org/wiki/Scalable_Vector_Graphics.
+ * Loads SVG images from disk. See <a href="https://en.wikipedia.org/wiki/Scalable_Vector_Graphics">here</a>.
  */
 
 public class SvgImageLoader {

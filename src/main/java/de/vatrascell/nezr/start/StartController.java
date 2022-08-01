@@ -1,6 +1,7 @@
 package de.vatrascell.nezr.start;
 
 import de.vatrascell.nezr.application.GlobalVars;
+import de.vatrascell.nezr.application.controller.LocationLogoController;
 import de.vatrascell.nezr.application.controller.ScreenController;
 import de.vatrascell.nezr.application.svg.SvgImageLoader;
 import de.vatrascell.nezr.login.LoginController;
@@ -21,7 +22,7 @@ import org.springframework.stereotype.Component;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 
-import static de.vatrascell.nezr.application.GlobalFuncs.getURL;
+import static de.vatrascell.nezr.application.util.ResourceUtil.getURL;
 import static de.vatrascell.nezr.model.SceneName.START_PATH;
 
 @Component
@@ -46,15 +47,18 @@ public class StartController {
 
     private final ScreenController screenController;
     private final LoginController loginController;
+    private final LocationLogoController locationLogoController;
 
     /**
      * The constructor (is called before the initialize()-method).
      */
     @Autowired
-    public StartController(StartService startService, ScreenController screenController, LoginController loginController) {
+    public StartController(StartService startService, ScreenController screenController, LoginController loginController,
+                           LocationLogoController locationLogoController) {
 
         this.screenController = screenController;
         this.loginController = loginController;
+        this.locationLogoController = locationLogoController;
         GlobalVars.activeQuestionnaire = startService.getActiveQuestionnaire();
     }
 
@@ -65,38 +69,12 @@ public class StartController {
     @FXML
     private void initialize() {
         System.out.println("initialize StartController");
-        String value;
-        switch (GlobalVars.location) {
-            case "R\u00FCgen":
-                value = "images/svg/logo-naturerbe-zentrum-ruegen.svg";
-                break;
-            case "Bayerischer Wald":
-                value = "images/svg/logo-baumwipfelpfad-bayerische-wald.svg";
-                break;
-            case "Saarschleife":
-                value = "images/svg/logo-baumwipfelpfad-saarschleife.svg";
-                break;
-            case "Schwarzwald":
-                value = "images/svg/logo-baumwipfelpfad-schwarzwald.svg";
-                break;
-            case "Usedom":
-                value = "images/svg/logo-baumwipfelpfad-usedom.svg";
-                break;
-            case "Elsass":
-                value = "images/svg/logo-baumwipfelpfad-elsass.svg";
-                break;
-            case "Salzkammergut":
-                value = "images/svg/logo-baumwipfelpfad-salzkammergut.svg";
-                break;
-            default: //Bachledka, Krkonoše, Lipno, Pohorje
-                value = "images/svg/baumwipfelpfade-logo.svg";
-                break;
-        }
+        String locationPath = locationLogoController.getLocationLogoPath(GlobalVars.location);
 
         try {
             imageView.fitHeightProperty().bind(gridPane.heightProperty().multiply(0.55));
             imageView.fitWidthProperty().bind(gridPane.widthProperty().multiply(0.7));
-            BufferedImage image = SvgImageLoader.loadSvg(getURL(value), 500);
+            BufferedImage image = SvgImageLoader.loadSvg(getURL(locationPath), 500);
             imageView.setImage(SwingFXUtils.toFXImage(image, null));
         } catch (IOException e) {
             e.printStackTrace();

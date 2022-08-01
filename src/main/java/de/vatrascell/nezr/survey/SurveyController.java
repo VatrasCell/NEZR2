@@ -1,6 +1,7 @@
 package de.vatrascell.nezr.survey;
 
 import de.vatrascell.nezr.application.GlobalVars;
+import de.vatrascell.nezr.application.controller.LocationLogoController;
 import de.vatrascell.nezr.application.controller.NotificationController;
 import de.vatrascell.nezr.application.controller.ScreenController;
 import de.vatrascell.nezr.application.svg.SvgImageLoader;
@@ -61,8 +62,8 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static de.vatrascell.nezr.application.GlobalFuncs.getURL;
 import static de.vatrascell.nezr.application.controller.ScreenController.STYLESHEET;
+import static de.vatrascell.nezr.application.util.ResourceUtil.getURL;
 import static de.vatrascell.nezr.model.SceneName.SURVEY_PATH;
 
 @Component
@@ -93,11 +94,14 @@ public class SurveyController {
     @FXML
     private ImageView imageView;
     private final ScreenController screenController;
+    private final LocationLogoController locationLogoController;
 
     @Autowired
-    public SurveyController(QuestionListService questionListService, ScreenController screenController) {
+    public SurveyController(QuestionListService questionListService, ScreenController screenController,
+                            LocationLogoController locationLogoController) {
         this.questionListService = questionListService;
         this.screenController = screenController;
+        this.locationLogoController = locationLogoController;
     }
 
     /**
@@ -106,40 +110,14 @@ public class SurveyController {
      */
     @FXML
     private void initialize() {
-        String value;
-        switch (GlobalVars.location) {
-            case "R\u00FCgen":
-                value = "images/svg/logo-naturerbe-zentrum-ruegen.svg";
-                break;
-            case "Bayerischer Wald":
-                value = "images/svg/logo-baumwipfelpfad-bayerische-wald.svg";
-                break;
-            case "Saarschleife":
-                value = "images/svg/logo-baumwipfelpfad-saarschleife.svg";
-                break;
-            case "Schwarzwald":
-                value = "images/svg/logo-baumwipfelpfad-schwarzwald.svg";
-                break;
-            case "Usedom":
-                value = "images/svg/logo-baumwipfelpfad-usedom.svg";
-                break;
-            case "Elsass":
-                value = "images/svg/logo-baumwipfelpfad-elsass.svg";
-                break;
-            case "Salzkammergut":
-                value = "images/svg/logo-baumwipfelpfad-salzkammergut.svg";
-                break;
-            default: //Bachledka, Krkonoše, Lipno, Pohorje
-                value = "images/svg/baumwipfelpfade-logo.svg";
-                break;
-        }
+        String locationPath = locationLogoController.getLocationLogoPath(GlobalVars.location);
 
         try {
             imageView.fitHeightProperty().bind(basePane.heightProperty().multiply(0.55));
             imageView.fitWidthProperty().bind(basePane.widthProperty().multiply(0.7));
             imageView.translateXProperty().bind(basePane.widthProperty().multiply(0.4));
             imageView.translateYProperty().bind(basePane.heightProperty().multiply(-0.18));
-            BufferedImage image = SvgImageLoader.loadSvg(getURL(value), 500);
+            BufferedImage image = SvgImageLoader.loadSvg(getURL(locationPath), 500);
             imageView.setImage(SwingFXUtils.toFXImage(image, null));
         } catch (IOException e) {
             e.printStackTrace();

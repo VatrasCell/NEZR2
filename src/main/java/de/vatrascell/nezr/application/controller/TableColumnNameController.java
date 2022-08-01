@@ -5,7 +5,7 @@ import de.vatrascell.nezr.message.TableColumnNameId;
 
 public class TableColumnNameController {
 
-    private static PropertyLoader propertyLoader;
+    private static final PropertyLoader propertyLoader;
 
     static {
         propertyLoader = new PropertyLoader("tableColumnName");

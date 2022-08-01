@@ -49,9 +49,9 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import static de.vatrascell.nezr.application.GlobalFuncs.getURL;
 import static de.vatrascell.nezr.application.controller.ScreenController.STYLESHEET;
 import static de.vatrascell.nezr.application.controller.TableColumnNameController.getColumnName;
+import static de.vatrascell.nezr.application.util.ResourceUtil.getURL;
 import static de.vatrascell.nezr.message.TableColumnNameId.DELETE;
 import static de.vatrascell.nezr.message.TableColumnNameId.EDIT;
 import static de.vatrascell.nezr.model.QuestionType.MULTIPLE_CHOICE_STRING;

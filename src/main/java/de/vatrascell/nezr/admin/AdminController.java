@@ -51,10 +51,10 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
 
-import static de.vatrascell.nezr.application.GlobalFuncs.getURL;
 import static de.vatrascell.nezr.application.controller.DialogMessageController.getDialogMessage;
 import static de.vatrascell.nezr.application.controller.ScreenController.STYLESHEET;
 import static de.vatrascell.nezr.application.controller.TableColumnNameController.getColumnName;
+import static de.vatrascell.nezr.application.util.ResourceUtil.getURL;
 import static de.vatrascell.nezr.message.TableColumnNameId.ADMIN_ACTIVE;
 import static de.vatrascell.nezr.message.TableColumnNameId.ADMIN_COPY;
 import static de.vatrascell.nezr.message.TableColumnNameId.ADMIN_FINAL;
