@@ -12,18 +12,19 @@
 	-swatch-100: #BBDEFB;
 	-swatch-200: #90CAF9;
 	-swatch-400: #42A5F5;
-	
+
 	-COLOR-BROWN: #5F372B; /*rgb(95, 55, 43)*/
-	-COLOR-LIGHT-YELLOW: #FCF5D9; /*rgb(252, 245, 217)*/
+	-COLOR-BACKGROUND-LIGHT: #F4FAE5; /*rgb(244, 250, 229)*/
+	/*-COLOR-BACKGROUND-LIGHT: #FCF5D9; /*rgb(252, 245, 217)*/
 	-COLOR-LIGHT-GREEN: #9ABC2A; /*rgb(154, 188, 42)*/
 	-COLOR-GREEN: #00843D; /*rgb(0, 132, 61)*/
 	-COLOR-ORANGE: #F6660D; /*rgb(246, 102, 13)*/
 
 	-COLOR-WHITE: #FFFFFF; /*rgb(255.0, 255.0, 255.0)*/
-	-COLOR-GRAY-245: #F5F5F5;  /*rgb(245.0, 245.0, 245.0)*/
-	-COLOR-GRAY-200: #C8C8C8;  /*rgb(200.0, 200.0, 200.0)*/
-	-COLOR-GRAY-130: #828282;  /*rgb(130.0, 130.0, 130.0)*/
-	-COLOR-GRAY-100: #646464;  /*rgb(100.0, 100.0, 100.0)*/
+	-COLOR-GRAY-245: #F5F5F5; /*rgb(245.0, 245.0, 245.0)*/
+	-COLOR-GRAY-200: #C8C8C8; /*rgb(200.0, 200.0, 200.0)*/
+	-COLOR-GRAY-130: #828282; /*rgb(130.0, 130.0, 130.0)*/
+	-COLOR-GRAY-100: #646464; /*rgb(100.0, 100.0, 100.0)*/
 	-COLOR-GRAY-65: #414141; /*rgb(65.0, 65.0, 65.0)*/
 	-COLOR-GRAY-45: #2D2D2D; /*rgb(45.0, 45.0, 45.0)*/
 
@@ -36,11 +37,11 @@
 	-fx-text-subtitle-color: -COLOR-GRAY-65;
 	-fx-text-control-title-color: -COLOR-GRAY-130;
 	-fx-text-fill: -COLOR-BROWN;
-	-fx-background-color: -COLOR-LIGHT-YELLOW;
+	-fx-background-color: -COLOR-BACKGROUND-LIGHT;
 
 	/*default font */
-	-fx-font-family: 'Roboto Medium';
-	-fx-font-size: 14.0px;
+	-fx-font-family: 'Circular-Pro-Bold-S';
+	-fx-font-size: 18.0px;
 	-fx-disabled-opacity: 0.6;
 
 	/*
@@ -131,7 +132,7 @@
 
 .toggle-button, .button {
 	-fx-text-fill: -fx-text-button-normal;
-	-fx-font-family: 'Roboto';
+	-fx-font-family: 'Circular-Pro-Bold-S';
 	-fx-font-weight: bold;
 	-fx-background-insets: 0.0;
 	-fx-background-radius: 4.0;
@@ -177,7 +178,7 @@
 }
 
 .icon-button .text {
-	-fx-font-family: 'MaterialDesignIconicFont';
+	-fx-font-family: 'Circular-Pro-Bold-S';
 	-fx-font-size: 24px;
 }
 
@@ -329,7 +330,7 @@
 }
 
 .content-area {
-	-fx-background-color: -COLOR-LIGHT-YELLOW;
+	-fx-background-color: -COLOR-BACKGROUND-LIGHT;
 }
 
 .content-background {
@@ -616,7 +617,7 @@
 	-fx-background-radius: 0;
 	-fx-border-width: 0;
 	-fx-padding: 0.5em 0.5em 0.5em 0.1em;
-	-fx-prompt-text-fill: derive(-COLOR-LIGHT-YELLOW, 50.0%);
+	-fx-prompt-text-fill: derive(-COLOR-BACKGROUND-LIGHT, 50.0%);
 	-fx-highlight-fill: rgb(94.0, 203.0, 234.0);
 }
 
@@ -700,13 +701,13 @@
 	-fx-padding: 0.5em 0.5em 0.5em 0.1em;
 	-fx-border-color: -COLOR-GRAY-200;
 	-fx-border-width: 0 0 2 0;
-	-fx-prompt-text-fill: derive(-COLOR-LIGHT-YELLOW, 50.0%);
+	-fx-prompt-text-fill: derive(-COLOR-BACKGROUND-LIGHT, 50.0%);
 	-fx-highlight-fill: rgb(94.0, 203.0, 234.0);
 }
 
 .text-area .text, .text-field>*>.text {
 	-fx-effect: null;
-	-fx-fill: -COLOR-LIGHT-YELLOW;
+	-fx-fill: -COLOR-BACKGROUND-LIGHT;
 }
 
 .text-area {
