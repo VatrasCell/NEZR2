@@ -9,18 +9,18 @@
     <version>2.0-SNAPSHOT</version>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <java-fx-version>18.0.1</java-fx-version>
-        <controls-fx-version>11.1.1</controls-fx-version>
-        <maven.compiler.release>11</maven.compiler.release>
+        <java-fx-version>19.0.2.1</java-fx-version>
+        <controls-fx-version>11.1.2</controls-fx-version>
+        <maven.compiler.release>17</maven.compiler.release>
         <javafx.maven.plugin.version>0.0.6</javafx.maven.plugin.version>
         <poi.version>5.2.2</poi.version>
         <ooxml-schemas.version>1.4</ooxml-schemas.version>
         <h2.version>2.1.214</h2.version>
-        <junit.version>5.8.2</junit.version>
+        <junit.version>5.9.2</junit.version>
         <mockito-all.version>1.10.19</mockito-all.version>
         <javafx-weaver-spring-boot-starter.version>1.3.0</javafx-weaver-spring-boot-starter.version>
-        <spring-boot-starter-test.version>2.7.0</spring-boot-starter-test.version>
-        <lombok.version>1.18.24</lombok.version>
+        <spring-boot-starter-test.version>3.0.4</spring-boot-starter-test.version>
+        <lombok.version>1.18.26</lombok.version>
     </properties>
     <dependencies>
         <!-- https://mvnrepository.com/artifact/org.apache.poi/poi-ooxml -->
@@ -109,7 +109,7 @@
             <artifactId>bootstrapfx-core</artifactId>
             <version>0.4.0</version>
         </dependency>
-        <!-- https://mvnrepository.com/artifact/org.apache.xmlgraphics/batik-all -->
+        <!-- https://mvnrepository.com/artifact/org.apache.xmlgraphics/batik-transcoder -->
         <dependency>
             <groupId>org.apache.xmlgraphics</groupId>
             <artifactId>batik-all</artifactId>

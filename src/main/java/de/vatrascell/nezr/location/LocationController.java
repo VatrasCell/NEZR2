@@ -54,7 +54,8 @@ public class LocationController {
         choiceBox.setItems(choiceBoxData);
         choiceBox.getSelectionModel().selectFirst();
 
-        intMapView();
+        //TODO use other lib
+        //intMapView();
     }
 
     @FXML
@@ -71,7 +72,7 @@ public class LocationController {
             MapLabel labelClick = new MapLabel(location, 10, -10).setVisible(true);
             marker.attachLabel(labelClick);
             return marker;
-        }).collect(Collectors.toList());
+        }).toList();
 
         mapView.setMapType(MapType.OSM);
         mapView.initialize(Configuration.builder()
