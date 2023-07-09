@@ -1,7 +1,6 @@
 package de.vatrascell.nezr.start;
 
 import de.vatrascell.nezr.application.GlobalVars;
-import de.vatrascell.nezr.application.controller.LocationLogoController;
 import de.vatrascell.nezr.application.controller.ScreenController;
 import de.vatrascell.nezr.application.svg.SvgImageLoader;
 import de.vatrascell.nezr.login.LoginController;
@@ -47,18 +46,15 @@ public class StartController {
 
     private final ScreenController screenController;
     private final LoginController loginController;
-    private final LocationLogoController locationLogoController;
 
     /**
      * The constructor (is called before the initialize()-method).
      */
     @Autowired
-    public StartController(StartService startService, ScreenController screenController, LoginController loginController,
-                           LocationLogoController locationLogoController) {
+    public StartController(StartService startService, ScreenController screenController, LoginController loginController) {
 
         this.screenController = screenController;
         this.loginController = loginController;
-        this.locationLogoController = locationLogoController;
         GlobalVars.activeQuestionnaire = startService.getActiveQuestionnaire();
     }
 
@@ -69,12 +65,11 @@ public class StartController {
     @FXML
     private void initialize() {
         System.out.println("initialize StartController");
-        String locationPath = locationLogoController.getLocationLogoPath(GlobalVars.location);
 
         try {
             imageView.fitHeightProperty().bind(gridPane.heightProperty().multiply(0.55));
             imageView.fitWidthProperty().bind(gridPane.widthProperty().multiply(0.7));
-            BufferedImage image = SvgImageLoader.loadSvg(getURL(locationPath), 500);
+            BufferedImage image = SvgImageLoader.loadSvg(getURL(GlobalVars.location.getLogoPath()), 500);
             imageView.setImage(SwingFXUtils.toFXImage(image, null));
         } catch (IOException e) {
             e.printStackTrace();
@@ -94,7 +89,7 @@ public class StartController {
     public void setStartText() {
         if (GlobalVars.activeQuestionnaire != null) {
             questionnaireText.set(String.format("Fragebogen: %s", GlobalVars.activeQuestionnaire.getName()));
-            if (!GlobalVars.activeQuestionnaire.getLocation().equals(GlobalVars.location)) {
+            if (!GlobalVars.activeQuestionnaire.getLocation().equals(GlobalVars.location.getName())) {
                 questionnaireWarn.set("Fragebogen ist nicht für diesen Standort optimiert");
             } else {
                 questionnaireWarn.set("");

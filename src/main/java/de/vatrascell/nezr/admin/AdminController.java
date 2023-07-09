@@ -9,6 +9,7 @@ import de.vatrascell.nezr.location.LocationController;
 import de.vatrascell.nezr.login.LoginService;
 import de.vatrascell.nezr.message.DialogId;
 import de.vatrascell.nezr.message.MessageId;
+import de.vatrascell.nezr.model.Location;
 import de.vatrascell.nezr.model.Questionnaire;
 import de.vatrascell.nezr.model.tableObject.QuestionnaireTableObject;
 import de.vatrascell.nezr.model.tableObject.converter.QuestionnaireTableObjectConverter;
@@ -119,7 +120,7 @@ public class AdminController {
     private void getData() {
         data.clear();
         List<QuestionnaireTableObject> tableObjects =
-                QuestionnaireTableObjectConverter.convert(Objects.requireNonNull(adminService.getQuestionnaires(GlobalVars.location)), this);
+                QuestionnaireTableObjectConverter.convert(Objects.requireNonNull(adminService.getQuestionnaires(GlobalVars.location.getName())), this);
         data.addAll(Objects.requireNonNull(tableObjects));
     }
 
@@ -219,26 +220,26 @@ public class AdminController {
         imgView.setFitWidth(30);
         Button button = new Button("", imgView);
         button.setOnAction(event -> {
-            ChoiceDialog<String> dialog = new ChoiceDialog<>(GlobalVars.location, GlobalVars.locations);
+            ChoiceDialog<Location> dialog = new ChoiceDialog<>(GlobalVars.location, GlobalVars.locations);
             DialogMessageController.setMessage(dialog,
                     DialogId.TITLE_COPY_QUESTIONNAIRE,
                     DialogId.CONTENT_TEXT_COPY_QUESTIONNAIRE);
             DialogPane dialogPane = dialog.getDialogPane();
             dialogPane.getStylesheets().add(getURL(STYLESHEET).toExternalForm());
 
-            Optional<String> result = dialog.showAndWait();
-            result.ifPresent(ort -> {
-                        if (adminService.copyQuestionnaire(questionnaire, ort)) {
-                            getData();
-                            NotificationController.createMessage(
-                                    MessageId.TITLE_COPY_QUESTIONNAIRE,
-                                    MessageId.MESSAGE_COPY_QUESTIONNAIRE,
-                                    questionnaire.getName(),
-                                    ort);
-                        } else {
-                            NotificationController.createErrorMessage(
-                                    MessageId.TITLE_COPY_QUESTIONNAIRE,
-                                    MessageId.MESSAGE_UNDEFINED_ERROR);
+            Optional<Location> result = dialog.showAndWait();
+            result.ifPresent(location -> {
+                if (adminService.copyQuestionnaire(questionnaire, location.getName())) {
+                    getData();
+                    NotificationController.createMessage(
+                            MessageId.TITLE_COPY_QUESTIONNAIRE,
+                            MessageId.MESSAGE_COPY_QUESTIONNAIRE,
+                            questionnaire.getName(),
+                            location.getName());
+                } else {
+                    NotificationController.createErrorMessage(
+                            MessageId.TITLE_COPY_QUESTIONNAIRE,
+                            MessageId.MESSAGE_UNDEFINED_ERROR);
                         }
                     }
             );

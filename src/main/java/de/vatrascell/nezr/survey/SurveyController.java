@@ -1,7 +1,6 @@
 package de.vatrascell.nezr.survey;
 
 import de.vatrascell.nezr.application.GlobalVars;
-import de.vatrascell.nezr.application.controller.LocationLogoController;
 import de.vatrascell.nezr.application.controller.NotificationController;
 import de.vatrascell.nezr.application.controller.ScreenController;
 import de.vatrascell.nezr.application.svg.SvgImageLoader;
@@ -94,14 +93,11 @@ public class SurveyController {
     @FXML
     private ImageView imageView;
     private final ScreenController screenController;
-    private final LocationLogoController locationLogoController;
 
     @Autowired
-    public SurveyController(QuestionListService questionListService, ScreenController screenController,
-                            LocationLogoController locationLogoController) {
+    public SurveyController(QuestionListService questionListService, ScreenController screenController) {
         this.questionListService = questionListService;
         this.screenController = screenController;
-        this.locationLogoController = locationLogoController;
     }
 
     /**
@@ -110,14 +106,13 @@ public class SurveyController {
      */
     @FXML
     private void initialize() {
-        String locationPath = locationLogoController.getLocationLogoPath(GlobalVars.location);
 
         try {
             imageView.fitHeightProperty().bind(basePane.heightProperty().multiply(0.55));
             imageView.fitWidthProperty().bind(basePane.widthProperty().multiply(0.7));
             imageView.translateXProperty().bind(basePane.widthProperty().multiply(0.4));
             imageView.translateYProperty().bind(basePane.heightProperty().multiply(-0.18));
-            BufferedImage image = SvgImageLoader.loadSvg(getURL(locationPath), 500);
+            BufferedImage image = SvgImageLoader.loadSvg(getURL(GlobalVars.location.getLogoPath()), 500);
             imageView.setImage(SwingFXUtils.toFXImage(image, null));
         } catch (IOException e) {
             e.printStackTrace();

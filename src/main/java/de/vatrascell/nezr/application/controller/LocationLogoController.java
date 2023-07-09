@@ -1,7 +1,6 @@
 package de.vatrascell.nezr.application.controller;
 
 import com.sothawo.mapjfx.Coordinate;
-import de.vatrascell.nezr.application.GlobalVars;
 import org.springframework.stereotype.Controller;
 
 @Controller
@@ -9,8 +8,8 @@ public class LocationLogoController {
 
     public String getLocationLogoPath(String location) {
         String value;
-        switch (GlobalVars.location) {
-            case "R\u00FCgen":
+        switch (location) {
+            case "Rügen":
                 value = "images/svg/logo-naturerbe-zentrum-ruegen.svg";
                 break;
             case "Bayerischer Wald":
@@ -43,7 +42,7 @@ public class LocationLogoController {
     public Coordinate getLocationsCoordinates(String location) {
         Coordinate value;
         switch (location) {
-            case "R\u00FCgen":
+            case "Rügen":
                 value = new Coordinate(54.4298063, 13.5620475);
                 break;
             case "Bayerischer Wald":

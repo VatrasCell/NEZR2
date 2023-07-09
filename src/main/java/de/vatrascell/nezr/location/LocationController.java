@@ -6,11 +6,10 @@ import com.sothawo.mapjfx.MapLabel;
 import com.sothawo.mapjfx.MapType;
 import com.sothawo.mapjfx.MapView;
 import com.sothawo.mapjfx.Marker;
-import com.sothawo.mapjfx.event.MarkerEvent;
 import de.vatrascell.nezr.application.GlobalVars;
-import de.vatrascell.nezr.application.controller.LocationLogoController;
 import de.vatrascell.nezr.application.controller.ScreenController;
 import de.vatrascell.nezr.login.LoginService;
+import de.vatrascell.nezr.model.Location;
 import de.vatrascell.nezr.start.StartController;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -33,13 +32,12 @@ public class LocationController {
     private final LocationService locationService;
     private final LoginService loginService;
     private final ScreenController screenController;
-    private final LocationLogoController locationLogoController;
 
     @FXML
-    private ChoiceBox<String> choiceBox;
+    private ChoiceBox<Location> choiceBox;
     @FXML
     private MapView mapView;
-    private ObservableList<String> choiceBoxData = FXCollections.observableArrayList();
+    private ObservableList<Location> choiceBoxData = FXCollections.observableArrayList();
 
     /**
      * Initializes the controller class. This method is automatically called
@@ -55,7 +53,7 @@ public class LocationController {
         choiceBox.getSelectionModel().selectFirst();
 
         //TODO use other lib
-        //intMapView();
+        intMapView();
     }
 
     @FXML
@@ -68,8 +66,8 @@ public class LocationController {
 
         List<Marker> markers = locationService.getLocations().stream().map(location -> {
             Marker marker = Marker.createProvided(Marker.Provided.GREEN).setPosition(
-                    locationLogoController.getLocationsCoordinates(location)).setVisible(true);
-            MapLabel labelClick = new MapLabel(location, 10, -10).setVisible(true);
+                    location.getCoordinates()).setVisible(true);
+            MapLabel labelClick = new MapLabel(location.getName(), 10, -10).setVisible(true);
             marker.attachLabel(labelClick);
             return marker;
         }).toList();
@@ -83,9 +81,9 @@ public class LocationController {
         mapView.setCenter(new Coordinate(51.206387, 10.2787497));
         mapView.setZoom(6);
 
-        mapView.addEventHandler(MarkerEvent.MARKER_CLICKED, event -> {
+        /*mapView.addEventHandler(MarkerEvent.MARKER_CLICKED, event -> {
             event.consume();
-            choiceBox.getSelectionModel().select(event.getMarker().getMapLabel().get().getText());
+            choiceBox.getSelectionModel().select(new Location(event.getMarker().getMapLabel().get().getText()));
 
             //TODO add info box with location info
             //mapView.setCenter(event.getMarker().getPosition());
@@ -96,6 +94,6 @@ public class LocationController {
             if (newValue) {
                 markers.forEach(marker -> mapView.addMarker(marker));
             }
-        });
+        });*/
     }
 }

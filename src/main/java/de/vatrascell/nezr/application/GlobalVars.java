@@ -1,6 +1,7 @@
 package de.vatrascell.nezr.application;
 
 import com.sothawo.mapjfx.Projection;
+import de.vatrascell.nezr.model.Location;
 import de.vatrascell.nezr.model.Question;
 import de.vatrascell.nezr.model.Questionnaire;
 import javafx.scene.image.Image;
@@ -13,10 +14,10 @@ import static de.vatrascell.nezr.application.util.ResourceUtil.getInputStream;
 public class GlobalVars {
     public static final boolean DEV_MODE = true;
     public static final int PER_COLUMN = 3;
-    public static String location;
+    public static Location location;
     public static Questionnaire activeQuestionnaire = null;
     public static List<ArrayList<Question>> questionsPerPanel = new ArrayList<>();
-    public static List<String> locations;
+    public static List<Location> locations;
 
     public static Projection projection;
 

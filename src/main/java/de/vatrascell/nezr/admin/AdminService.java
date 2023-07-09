@@ -208,7 +208,7 @@ public class AdminService extends Database {
     }
 
     public int createQuestionnaire(String name) {
-        return createQuestionnaire(name, GlobalVars.location);
+        return createQuestionnaire(name, GlobalVars.location.getName());
     }
 
     public int createQuestionnaire(String name, String location) {
