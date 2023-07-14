@@ -1,6 +1,5 @@
 package de.vatrascell.nezr.application;
 
-import com.sothawo.mapjfx.Projection;
 import de.vatrascell.nezr.model.Location;
 import de.vatrascell.nezr.model.Question;
 import de.vatrascell.nezr.model.Questionnaire;
@@ -19,7 +18,7 @@ public class GlobalVars {
     public static List<ArrayList<Question>> questionsPerPanel = new ArrayList<>();
     public static List<Location> locations;
 
-    public static Projection projection;
+    //public static Projection projection;
 
     public static final Image IMG_DEL = new Image(getInputStream("images/icons/delete_2.png"));
     public static final Image IMG_COP = new Image(getInputStream("images/icons/copy_2.png"));

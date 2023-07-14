@@ -1,6 +1,5 @@
 package de.vatrascell.nezr.application;
 
-import com.sothawo.mapjfx.Projection;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.stage.Stage;
@@ -23,8 +22,8 @@ public class ApplicationStarter extends Application {
 
     @Override
     public void start(Stage stage) {
-        GlobalVars.projection = getParameters().getUnnamed().contains("wgs84")
-                ? Projection.WGS_84 : Projection.WEB_MERCATOR;
+        //GlobalVars.projection = getParameters().getUnnamed().contains("wgs84")
+        //        ? Projection.WGS_84 : Projection.WEB_MERCATOR;
         applicationContext.publishEvent(new StageReadyEvent(stage));
     }
 
