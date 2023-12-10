@@ -53,7 +53,7 @@ public class LocationController {
         choiceBox.getSelectionModel().selectFirst();
 
         //TODO use other lib
-        intMapView();
+        //intMapView();
     }
 
     @FXML

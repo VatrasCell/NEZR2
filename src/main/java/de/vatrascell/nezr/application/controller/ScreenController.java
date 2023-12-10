@@ -6,8 +6,8 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import net.rgielen.fxweaver.core.FxWeaver;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
-import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Controller;
 
 import static de.vatrascell.nezr.application.util.ResourceUtil.getURL;
@@ -19,8 +19,9 @@ public class ScreenController implements ApplicationListener<StageReadyEvent> {
     private final FxWeaver fxWeaver;
     private Stage stage;
 
-    public ScreenController(ConfigurableApplicationContext applicationContext) {
-        fxWeaver = applicationContext.getBean(FxWeaver.class);
+    @Autowired
+    public ScreenController(FxWeaver fxWeaver) {
+        this.fxWeaver = fxWeaver;
     }
 
     @Override
