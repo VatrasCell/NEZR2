@@ -1,12 +1,9 @@
 package de.vatrascell.nezr.location;
 
-import com.sothawo.mapjfx.Configuration;
-import com.sothawo.mapjfx.Coordinate;
-import com.sothawo.mapjfx.MapLabel;
-import com.sothawo.mapjfx.MapType;
-import com.sothawo.mapjfx.MapView;
-import com.sothawo.mapjfx.Marker;
+import com.gluonhq.maps.MapPoint;
+import com.gluonhq.maps.MapView;
 import de.vatrascell.nezr.application.GlobalVars;
+import de.vatrascell.nezr.application.controller.PoiLayer;
 import de.vatrascell.nezr.application.controller.ScreenController;
 import de.vatrascell.nezr.login.LoginService;
 import de.vatrascell.nezr.model.Location;
@@ -15,6 +12,8 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.ChoiceBox;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
 import lombok.RequiredArgsConstructor;
 import net.rgielen.fxweaver.core.FxmlView;
 import org.springframework.stereotype.Component;
@@ -32,6 +31,7 @@ public class LocationController {
     private final LocationService locationService;
     private final LoginService loginService;
     private final ScreenController screenController;
+    private final PoiLayer poiLayer;
 
     @FXML
     private ChoiceBox<Location> choiceBox;
@@ -64,22 +64,26 @@ public class LocationController {
 
     private void intMapView() {
 
-        List<Marker> markers = locationService.getLocations().stream().map(location -> {
-            Marker marker = Marker.createProvided(Marker.Provided.GREEN).setPosition(
-                    location.getCoordinates()).setVisible(true);
-            MapLabel labelClick = new MapLabel(location.getName(), 10, -10).setVisible(true);
-            marker.attachLabel(labelClick);
-            return marker;
+
+
+        List<MapPoint> mapPoints = locationService.getLocations().stream().map(location -> {
+            MapPoint mapPoint = new MapPoint(location.getCoordinates().getLatitude(), location.getCoordinates().getLongitude());
+            /*MapLabel labelClick = new MapLabel(location.getName(), 10, -10).setVisible(true);
+            mapPoint.attachLabel(labelClick);*/
+            poiLayer.addPoint(mapPoint, new Circle(7, Color.RED));
+            return mapPoint;
         }).toList();
 
-        mapView.setMapType(MapType.OSM);
+
+        /*mapView.setMapType(MapType.OSM);
         mapView.initialize(Configuration.builder()
                 .interactive(true)
                 .projection(GlobalVars.projection)
                 .showZoomControls(true)
-                .build());
-        mapView.setCenter(new Coordinate(51.206387, 10.2787497));
+                .build());*/
+        mapView.setCenter(new MapPoint(51.206387, 10.2787497));
         mapView.setZoom(6);
+        mapView.addLayer(poiLayer);
 
         /*mapView.addEventHandler(MarkerEvent.MARKER_CLICKED, event -> {
             event.consume();
@@ -92,7 +96,7 @@ public class LocationController {
 
         mapView.initializedProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue) {
-                markers.forEach(marker -> mapView.addMarker(marker));
+                mapPoints.forEach(marker -> mapView.addMarker(marker));
             }
         });*/
     }

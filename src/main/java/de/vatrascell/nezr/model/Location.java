@@ -1,6 +1,5 @@
 package de.vatrascell.nezr.model;
 
-import com.sothawo.mapjfx.Coordinate;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;

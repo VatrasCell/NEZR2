@@ -1,6 +1,6 @@
 package de.vatrascell.nezr.application.controller;
 
-import com.sothawo.mapjfx.Coordinate;
+import de.vatrascell.nezr.model.Coordinate;
 import org.springframework.stereotype.Controller;
 
 @Controller
