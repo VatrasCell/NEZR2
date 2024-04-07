@@ -1,13 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <databaseChangeLog
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
-        xmlns:pro="http://www.liquibase.org/xml/ns/pro"
         xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
-http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
-http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd
-http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-latest.xsd">
+http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
     <changeSet id="20240207-init" author="">
         <createTable tableName="questionnaire_has_short_answer">
             <column name="q_sa_relation_id" type="bigint" autoIncrement="true"/>
@@ -21,7 +17,6 @@ http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibas
         <addNotNullConstraint tableName="questionnaire_has_short_answer" columnName="questionnaire_id"/>
         <addNotNullConstraint tableName="questionnaire_has_short_answer" columnName="short_answer_id"/>
         <addNotNullConstraint tableName="questionnaire_has_short_answer" columnName="position"/>
-        <addNotNullConstraint tableName="questionnaire_has_short_answer" columnName="validation_id"/>
 
         <addPrimaryKey tableName="questionnaire_has_short_answer" columnNames="q_sa_relation_id"/>
 

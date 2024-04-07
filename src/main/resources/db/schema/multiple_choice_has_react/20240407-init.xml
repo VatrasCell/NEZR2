@@ -1,33 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <databaseChangeLog
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
-        xmlns:pro="http://www.liquibase.org/xml/ns/pro"
         xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
-http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
-http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd
-http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-latest.xsd">
+http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
     <changeSet id="20240207-init" author="">
         <createTable tableName="multiple_choice_has_react">
             <column name="mc_react_relation_id" type="bigint" autoIncrement="true"/>
-            <column name="q_mc_relation_id" type="bigint"/>
             <column name="react_id" type="bigint"/>
+            <column name="q_mc_relation_id" type="bigint"/>
         </createTable>
 
         <addNotNullConstraint tableName="multiple_choice_has_react" columnName="mc_react_relation_id"/>
-        <addNotNullConstraint tableName="multiple_choice_has_react" columnName="q_mc_relation_id"/>
         <addNotNullConstraint tableName="multiple_choice_has_react" columnName="react_id"/>
+        <addNotNullConstraint tableName="multiple_choice_has_react" columnName="q_mc_relation_id"/>
 
         <addPrimaryKey tableName="multiple_choice_has_react" columnNames="mc_react_relation_id"/>
 
+        <addForeignKeyConstraint baseTableName="multiple_choice_has_react" baseColumnNames="react_id"
+                                 constraintName="fk_react_multiple_choice_has_react"
+                                 referencedTableName="react" referencedColumnNames="react_id"/>
         <addForeignKeyConstraint baseTableName="multiple_choice_has_react" baseColumnNames="q_mc_relation_id"
                                  constraintName="fk_questionnaire_has_multiple_choice_multiple_choice_has_react"
                                  referencedTableName="questionnaire_has_multiple_choice"
                                  referencedColumnNames="q_mc_relation_id"/>
-        <addForeignKeyConstraint baseTableName="multiple_choice_has_react" baseColumnNames="react_id"
-                                 constraintName="fk_react_multiple_choice_has_react"
-                                 referencedTableName="react" referencedColumnNames="react_id"/>
 
     </changeSet>
 </databaseChangeLog>
