@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+        xmlns:pro="http://www.liquibase.org/xml/ns/pro"
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
+http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd
+http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-latest.xsd">
+    <changeSet id="20240207-init" author="">
+        <createTable tableName="react">
+            <column name="react_id" type="bigint" autoIncrement="true"/>
+            <column name="short_answer_id" type="bigint"/>
+            <column name="multiple_choice_id" type="bigint"/>
+            <column name="answer_position" type="int"/>
+        </createTable>
+
+        <addNotNullConstraint tableName="react" columnName="react_id"/>
+        <addNotNullConstraint tableName="react" columnName="answer_position"/>
+
+        <addPrimaryKey tableName="react" columnNames="react_id"/>
+
+        <addForeignKeyConstraint baseTableName="react" baseColumnNames="short_answer_id"
+                                 constraintName="fk_short_answer_react"
+                                 referencedTableName="short_answer" referencedColumnNames="short_answer_id"/>
+        <addForeignKeyConstraint baseTableName="react" baseColumnNames="multiple_choice_id"
+                                 constraintName="fk_multiple_choice_answer_react"
+                                 referencedTableName="multiple_choice" referencedColumnNames="multiple_choice_id"/>
+
+    </changeSet>
+</databaseChangeLog>

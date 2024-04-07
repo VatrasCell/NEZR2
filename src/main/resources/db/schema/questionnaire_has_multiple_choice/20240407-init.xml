@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+        xmlns:pro="http://www.liquibase.org/xml/ns/pro"
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
+http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd
+http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-latest.xsd">
+    <changeSet id="20240207-init" author="">
+        <createTable tableName="questionnaire_has_multiple_choice">
+            <column name="q_mc_relation_id" type="bigint" autoIncrement="true"/>
+            <column name="questionnaire_id" type="bigint"/>
+            <column name="multiple_choice_id" type="bigint"/>
+            <column name="position" type="int"/>
+        </createTable>
+
+        <addNotNullConstraint tableName="questionnaire_has_multiple_choice" columnName="q_mc_relation_id"/>
+        <addNotNullConstraint tableName="questionnaire_has_multiple_choice" columnName="questionnaire_id"/>
+        <addNotNullConstraint tableName="questionnaire_has_multiple_choice" columnName="multiple_choice_id"/>
+        <addNotNullConstraint tableName="questionnaire_has_multiple_choice" columnName="position"/>
+
+        <addPrimaryKey tableName="questionnaire_has_multiple_choice" columnNames="q_mc_relation_id"/>
+
+        <addForeignKeyConstraint baseTableName="questionnaire_has_multiple_choice" baseColumnNames="questionnaire_id"
+                                 constraintName="fk_questionnaire_questionnaire_has_multiple_choice"
+                                 referencedTableName="questionnaire" referencedColumnNames="questionnaire_id"/>
+        <addForeignKeyConstraint baseTableName="questionnaire_has_multiple_choice" baseColumnNames="multiple_choice_id"
+                                 constraintName="fk_multiple_choice_questionnaire_has_multiple_choice"
+                                 referencedTableName="multiple_choice" referencedColumnNames="multiple_choice_id"/>
+
+    </changeSet>
+</databaseChangeLog>

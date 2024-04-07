@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+        xmlns:pro="http://www.liquibase.org/xml/ns/pro"
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
+http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd
+http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-latest.xsd">
+    <changeSet id="20240407-init" author="">
+        <createTable tableName="questionnaire">
+            <column name="questionnaire_id" type="bigint" autoIncrement="true"/>
+            <column name="creation_date" type="DATETIME"/>
+            <column name="name" type="VARCHAR(255)"/>
+            <column name="is_active" type="boolean"/>
+            <column name="is_final" type="boolean"/>
+            <column name="location_id" type="bigint"/>
+        </createTable>
+
+        <addNotNullConstraint tableName="questionnaire" columnName="questionnaire_id"/>
+        <addNotNullConstraint tableName="questionnaire" columnName="creation_date"/>
+        <addNotNullConstraint tableName="questionnaire" columnName="name"/>
+        <addNotNullConstraint tableName="questionnaire" columnName="is_active"/>
+        <addNotNullConstraint tableName="questionnaire" columnName="is_final"/>
+        <addNotNullConstraint tableName="questionnaire" columnName="location_id"/>
+
+        <addPrimaryKey tableName="questionnaire" columnNames="questionnaire_id"/>
+
+        <addForeignKeyConstraint baseTableName="questionnaire" baseColumnNames="location_id"
+                                 constraintName="fk_location_questionnaire"
+                                 referencedTableName="location" referencedColumnNames="location_id"/>
+
+    </changeSet>
+</databaseChangeLog>

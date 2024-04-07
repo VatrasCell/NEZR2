@@ -18,8 +18,6 @@ public class GlobalVars {
     public static List<ArrayList<Question>> questionsPerPanel = new ArrayList<>();
     public static List<Location> locations;
 
-    //public static Projection projection;
-
     public static final Image IMG_DEL = new Image(getInputStream("images/icons/delete_2.png"));
     public static final Image IMG_COP = new Image(getInputStream("images/icons/copy_2.png"));
     public static final Image IMG_EDT = new Image(getInputStream("images/icons/edit_2.png"));

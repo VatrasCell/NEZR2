@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+        xmlns:pro="http://www.liquibase.org/xml/ns/pro"
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
+http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd
+http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-latest.xsd">
+    <changeSet id="20240207-init" author="">
+        <createTable tableName="questionnaire_has_short_answer">
+            <column name="q_sa_relation_id" type="bigint" autoIncrement="true"/>
+            <column name="questionnaire_id" type="bigint"/>
+            <column name="short_answer_id" type="bigint"/>
+            <column name="position" type="int"/>
+            <column name="validation_id" type="bigint"/>
+        </createTable>
+
+        <addNotNullConstraint tableName="questionnaire_has_short_answer" columnName="q_sa_relation_id"/>
+        <addNotNullConstraint tableName="questionnaire_has_short_answer" columnName="questionnaire_id"/>
+        <addNotNullConstraint tableName="questionnaire_has_short_answer" columnName="short_answer_id"/>
+        <addNotNullConstraint tableName="questionnaire_has_short_answer" columnName="position"/>
+        <addNotNullConstraint tableName="questionnaire_has_short_answer" columnName="validation_id"/>
+
+        <addPrimaryKey tableName="questionnaire_has_short_answer" columnNames="q_sa_relation_id"/>
+
+        <addForeignKeyConstraint baseTableName="questionnaire_has_short_answer" baseColumnNames="questionnaire_id"
+                                 constraintName="fk_questionnaire_questionnaire_has_short_answer"
+                                 referencedTableName="questionnaire" referencedColumnNames="questionnaire_id"/>
+        <addForeignKeyConstraint baseTableName="questionnaire_has_short_answer" baseColumnNames="short_answer_id"
+                                 constraintName="fk_short_answer_questionnaire_has_short_answer"
+                                 referencedTableName="short_answer" referencedColumnNames="short_answer_id"/>
+        <addForeignKeyConstraint baseTableName="questionnaire_has_short_answer" baseColumnNames="validation_id"
+                                 constraintName="fk_validation_questionnaire_has_short_answer"
+                                 referencedTableName="validation" referencedColumnNames="validation_id"/>
+
+    </changeSet>
+</databaseChangeLog>

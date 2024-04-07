@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+        xmlns:pro="http://www.liquibase.org/xml/ns/pro"
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
+http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd
+http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-latest.xsd">
+    <changeSet id="20240207-init" author="">
+        <createTable tableName="survey">
+            <column name="survey_id" type="bigint" autoIncrement="true"/>
+            <column name="creation_date" type="DATETIME"/>
+            <column name="questionnaire_id" type="bigint"/>
+        </createTable>
+
+        <addNotNullConstraint tableName="survey" columnName="survey_id"/>
+        <addNotNullConstraint tableName="survey" columnName="creation_date"/>
+        <addNotNullConstraint tableName="survey" columnName="questionnaire_id"/>
+
+        <addPrimaryKey tableName="survey" columnNames="survey_id"/>
+
+        <addForeignKeyConstraint baseTableName="survey" baseColumnNames="questionnaire_id"
+                                 constraintName="fk_questionnaire_survey"
+                                 referencedTableName="questionnaire" referencedColumnNames="questionnaire_id"/>
+
+    </changeSet>
+</databaseChangeLog>

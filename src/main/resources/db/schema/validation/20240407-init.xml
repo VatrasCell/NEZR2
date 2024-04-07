@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+        xmlns:pro="http://www.liquibase.org/xml/ns/pro"
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
+http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd
+http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-latest.xsd">
+    <changeSet id="20240207-init" author="">
+        <createTable tableName="validation">
+            <column name="validation_id" type="bigint" autoIncrement="true"/>
+            <column name="is_numbers" type="boolean" defaultValueBoolean="false"/>
+            <column name="is_letters" type="boolean" defaultValueBoolean="false"/>
+            <column name="is_alphanumeric" type="boolean" defaultValueBoolean="false"/>
+            <column name="is_all_chars" type="boolean" defaultValueBoolean="false"/>
+            <column name="is_regex" type="boolean" defaultValueBoolean="false"/>
+            <column name="has_length" type="boolean" defaultValueBoolean="false"/>
+            <column name="regex" type="varchar(255)"/>
+            <column name="min_length" type="int"/>
+            <column name="max_length" type="int"/>
+            <column name="length" type="int"/>
+        </createTable>
+
+        <addNotNullConstraint tableName="validation" columnName="validation_id"/>
+        <addNotNullConstraint tableName="validation" columnName="is_numbers"/>
+        <addNotNullConstraint tableName="validation" columnName="is_letters"/>
+        <addNotNullConstraint tableName="validation" columnName="is_alphanumeric"/>
+        <addNotNullConstraint tableName="validation" columnName="is_all_chars"/>
+        <addNotNullConstraint tableName="validation" columnName="is_regex"/>
+        <addNotNullConstraint tableName="validation" columnName="has_length"/>
+
+        <addPrimaryKey tableName="validation" columnNames="validation_id"/>
+
+    </changeSet>
+</databaseChangeLog>

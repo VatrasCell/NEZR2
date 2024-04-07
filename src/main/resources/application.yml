@@ -1,0 +1,12 @@
+spring:
+  datasource:
+    url: jdbc:h2:D:\Java_Workspace\NEZR2\db\nezr_v8;MODE=MySQL
+    username: usr
+    password: Q#DQ8Ka&9Vq6`;)s
+  liquibase:
+    enabled: true
+    change-log: db/master-changelog.xml
+
+logging:
+  level:
+    liquibase: debug

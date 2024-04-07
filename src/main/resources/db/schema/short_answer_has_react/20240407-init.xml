@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+        xmlns:pro="http://www.liquibase.org/xml/ns/pro"
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
+http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd
+http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-latest.xsd">
+    <changeSet id="20240207-init" author="">
+        <createTable tableName="short_answer_has_react">
+            <column name="sa_react_relation_id" type="bigint" autoIncrement="true"/>
+            <column name="q_sa_relation_id" type="bigint"/>
+            <column name="react_id" type="bigint"/>
+        </createTable>
+
+        <addNotNullConstraint tableName="short_answer_has_react" columnName="sa_react_relation_id"/>
+        <addNotNullConstraint tableName="short_answer_has_react" columnName="q_sa_relation_id"/>
+        <addNotNullConstraint tableName="short_answer_has_react" columnName="react_id"/>
+
+        <addPrimaryKey tableName="short_answer_has_react" columnNames="sa_react_relation_id"/>
+
+        <addForeignKeyConstraint baseTableName="short_answer_has_react" baseColumnNames="q_sa_relation_id"
+                                 constraintName="fk_questionnaire_has_short_answer_short_answer_has_react"
+                                 referencedTableName="questionnaire_has_short_answer"
+                                 referencedColumnNames="q_sa_relation_id"/>
+        <addForeignKeyConstraint baseTableName="short_answer_has_react" baseColumnNames="react_id"
+                                 constraintName="fk_react_short_answer_has_react"
+                                 referencedTableName="react" referencedColumnNames="react_id"/>
+
+    </changeSet>
+</databaseChangeLog>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+        xmlns:pro="http://www.liquibase.org/xml/ns/pro"
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
+http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd
+http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-latest.xsd">
+    <changeSet id="20240207-init" author="">
+        <createTable tableName="flag_list_multiple_choice">
+            <column name="flag_list_multiple_choice_id" type="bigint" autoIncrement="true"/>
+            <column name="is_evaluation_question" type="boolean" defaultValueBoolean="false"/>
+            <column name="is_required" type="boolean" defaultValueBoolean="false"/>
+            <column name="is_multiple_choice" type="boolean" defaultValueBoolean="false"/>
+            <column name="is_list" type="boolean" defaultValueBoolean="false"/>
+            <column name="is_yes_no_question" type="boolean" defaultValueBoolean="false"/>
+            <column name="is_single_line" type="boolean" defaultValueBoolean="false"/>
+        </createTable>
+
+        <addNotNullConstraint tableName="flag_list_multiple_choice" columnName="flag_list_multiple_choice_id"/>
+        <addNotNullConstraint tableName="flag_list_multiple_choice" columnName="is_evaluation_question"/>
+        <addNotNullConstraint tableName="flag_list_multiple_choice" columnName="is_required"/>
+        <addNotNullConstraint tableName="flag_list_multiple_choice" columnName="is_list"/>
+        <addNotNullConstraint tableName="flag_list_multiple_choice" columnName="is_yes_no_question"/>
+        <addNotNullConstraint tableName="flag_list_multiple_choice" columnName="is_single_line"/>
+
+        <addPrimaryKey tableName="flag_list_multiple_choice" columnNames="flag_list_multiple_choice_id"/>
+
+    </changeSet>
+</databaseChangeLog>

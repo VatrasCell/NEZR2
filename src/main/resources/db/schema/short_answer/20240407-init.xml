@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+        xmlns:pro="http://www.liquibase.org/xml/ns/pro"
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
+http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd
+http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-latest.xsd">
+    <changeSet id="20240207-init" author="">
+        <createTable tableName="short_answer">
+            <column name="short_answer_id" type="bigint" autoIncrement="true"/>
+            <column name="question" type="varchar(255)"/>
+            <column name="category_id" type="bigint"/>
+            <column name="headline_id" type="bigint"/>
+        </createTable>
+
+        <addNotNullConstraint tableName="short_answer" columnName="short_answer_id"/>
+        <addNotNullConstraint tableName="short_answer" columnName="question"/>
+
+        <addPrimaryKey tableName="short_answer" columnNames="short_answer_id"/>
+
+        <addForeignKeyConstraint baseTableName="short_answer" baseColumnNames="category_id"
+                                 constraintName="fk_category_short_answer"
+                                 referencedTableName="category" referencedColumnNames="category_id"/>
+        <addForeignKeyConstraint baseTableName="short_answer" baseColumnNames="headline_id"
+                                 constraintName="fk_headline_short_answer"
+                                 referencedTableName="headline" referencedColumnNames="headline_id"/>
+
+    </changeSet>
+</databaseChangeLog>

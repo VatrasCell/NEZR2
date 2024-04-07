@@ -5,6 +5,7 @@ import de.vatrascell.nezr.location.LocationController;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import lombok.extern.log4j.Log4j2;
 import net.rgielen.fxweaver.core.FxWeaver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Controller;
 import static de.vatrascell.nezr.application.util.ResourceUtil.getURL;
 
 @Controller
+@Log4j2
 public class ScreenController implements ApplicationListener<StageReadyEvent> {
 
     public static final String STYLESHEET = "style/application.css";
@@ -42,6 +44,6 @@ public class ScreenController implements ApplicationListener<StageReadyEvent> {
         stage.getScene().getRoot().getStylesheets().add(getURL(STYLESHEET).toExternalForm());
 
         stage.show();
-        System.out.println("activate " + name);
+        log.info("activate {}", name);
     }
 }

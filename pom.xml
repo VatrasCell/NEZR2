@@ -19,13 +19,15 @@
         <junit.version>5.9.2</junit.version>
         <mockito-all.version>1.10.19</mockito-all.version>
         <javafx-weaver-spring-boot-starter.version>1.3.0</javafx-weaver-spring-boot-starter.version>
-        <spring-boot-starter-test.version>3.2.0</spring-boot-starter-test.version>
+        <spring-boot-starter.version>3.2.4</spring-boot-starter.version>
         <lombok.version>1.18.26</lombok.version>
-        <batik-all.version>1.14</batik-all.version>
         <org.osgi.framework.version>1.10.0</org.osgi.framework.version>
         <bootstrapfx-core.version>0.4.0</bootstrapfx-core.version>
         <javafx-weaver.version>master-76230d4319-1</javafx-weaver.version>
         <mapjfx.version>3.1.0</mapjfx.version>
+        <batik-transcoder.version>1.17</batik-transcoder.version>
+        <liquibase-core.version>4.26.0</liquibase-core.version>
+        <spring-boot-starter-data-jpa.version>3.2.4</spring-boot-starter-data-jpa.version>
     </properties>
     <dependencies>
         <!-- https://mvnrepository.com/artifact/org.apache.poi/poi-ooxml -->
@@ -117,10 +119,10 @@
         <!-- https://mvnrepository.com/artifact/org.apache.xmlgraphics/batik-transcoder -->
         <dependency>
             <groupId>org.apache.xmlgraphics</groupId>
-            <artifactId>batik-all</artifactId>
-            <version>${batik-all.version}</version>
-            <type>pom</type>
+            <artifactId>batik-transcoder</artifactId>
+            <version>${batik-transcoder.version}</version>
         </dependency>
+
         <!-- https://mvnrepository.com/artifact/org.osgi/org.osgi.framework -->
         <dependency>
             <groupId>org.osgi</groupId>
@@ -144,8 +146,8 @@
         <!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-test -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
-            <version>${spring-boot-starter-test.version}</version>
+            <artifactId>spring-boot-starter</artifactId>
+            <version>${spring-boot-starter.version}</version>
             <scope>test</scope>
             <exclusions>
                 <exclusion>
@@ -153,6 +155,17 @@
                     <artifactId>logback-classic</artifactId>
                 </exclusion>
             </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-core</artifactId>
+            <version>2.23.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-api</artifactId>
+            <version>2.23.1</version>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/org.projectlombok/lombok -->
@@ -163,11 +176,17 @@
             <scope>provided</scope>
         </dependency>
 
-        <!-- https://mvnrepository.com/artifact/com.sothawo/mapjfx -->
+        <!-- https://mvnrepository.com/artifact/org.liquibase/liquibase-core -->
         <dependency>
-            <groupId>com.sothawo</groupId>
-            <artifactId>mapjfx</artifactId>
-            <version>${mapjfx.version}</version>
+            <groupId>org.liquibase</groupId>
+            <artifactId>liquibase-core</artifactId>
+            <version>${liquibase-core.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+            <version>${spring-boot-starter-data-jpa.version}</version>
         </dependency>
 
     </dependencies>

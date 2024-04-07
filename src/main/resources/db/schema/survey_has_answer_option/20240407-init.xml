@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+        xmlns:pro="http://www.liquibase.org/xml/ns/pro"
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
+http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd
+http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-latest.xsd">
+    <changeSet id="20240207-init" author="">
+        <createTable tableName="survey_has_answer_option">
+            <column name="s_ao_relation_id" type="bigint" autoIncrement="true"/>
+            <column name="answer_option_id" type="bigint"/>
+            <column name="s_mc_relation_id" type="bigint"/>
+        </createTable>
+
+        <addNotNullConstraint tableName="survey_has_answer_option" columnName="s_ao_relation_id"/>
+        <addNotNullConstraint tableName="survey_has_answer_option" columnName="answer_option_id"/>
+        <addNotNullConstraint tableName="survey_has_answer_option" columnName="s_mc_relation_id"/>
+
+        <addPrimaryKey tableName="survey_has_answer_option" columnNames="s_ao_relation_id"/>
+
+        <addForeignKeyConstraint baseTableName="survey_has_answer_option" baseColumnNames="answer_option_id"
+                                 constraintName="fk_answer_option_survey_has_multiple_choice"
+                                 referencedTableName="answer_option" referencedColumnNames="answer_option_id"/>
+        <addForeignKeyConstraint baseTableName="survey_has_answer_option" baseColumnNames="s_mc_relation_id"
+                                 constraintName="fk_survey_has_multiple_choice_survey_has_multiple_choice"
+                                 referencedTableName="survey_has_multiple_choice"
+                                 referencedColumnNames="s_mc_relation_id"/>
+
+    </changeSet>
+</databaseChangeLog>

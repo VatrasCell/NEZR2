@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    <include file="db/schema/location/20240217-init.xml" relativeToChangelogFile="false"/>
+    <include file="db/schema/questionnaire/20240407-init.xml" relativeToChangelogFile="false"/>
+    <include file="db/schema/category/20240407-init.xml" relativeToChangelogFile="false"/>
+    <include file="db/schema/headline/20240407-init.xml" relativeToChangelogFile="false"/>
+    <include file="db/schema/multiple_choice/20240407-init.xml" relativeToChangelogFile="false"/>
+    <include file="db/schema/questionnaire_has_multiple_choice/20240407-init.xml" relativeToChangelogFile="false"/>
+    <include file="db/schema/short_answer/20240407-init.xml" relativeToChangelogFile="false"/>
+    <include file="db/schema/validation/20240407-init.xml" relativeToChangelogFile="false"/>
+    <include file="db/schema/questionnaire_has_short_answer/20240407-init.xml" relativeToChangelogFile="false"/>
+    <include file="db/schema/survey/20240407-init.xml" relativeToChangelogFile="false"/>
+    <include file="db/schema/survey_has_multiple_choice/20240407-init.xml" relativeToChangelogFile="false"/>
+    <include file="db/schema/survey_has_short_answer/20240407-init.xml" relativeToChangelogFile="false"/>
+    <include file="db/schema/react/20240407-init.xml" relativeToChangelogFile="false"/>
+    <include file="db/schema/flag_list_multiple_choice/20240407-init.xml" relativeToChangelogFile="false"/>
+    <include file="db/schema/short_answer_has_react/20240407-init.xml" relativeToChangelogFile="false"/>
+    <include file="db/schema/multiple_choice_has_react/20240407-init.xml" relativeToChangelogFile="false"/>
+    <include file="db/schema/flag_list_short_answer/20240407-init.xml" relativeToChangelogFile="false"/>
+    <include file="db/schema/answer_option/20240407-init.xml" relativeToChangelogFile="false"/>
+    <include file="db/schema/multiple_choice_has_answer_option/20240407-init.xml" relativeToChangelogFile="false"/>
+    <include file="db/schema/survey_has_answer_option/20240407-init.xml" relativeToChangelogFile="false"/>
+
+    <include file="db/schema/location/20240217-init_data.xml" relativeToChangelogFile="false"/>
+</databaseChangeLog>

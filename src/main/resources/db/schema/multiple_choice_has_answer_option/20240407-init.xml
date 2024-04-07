@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+        xmlns:pro="http://www.liquibase.org/xml/ns/pro"
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
+http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd
+http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-latest.xsd">
+    <changeSet id="20240207-init" author="">
+        <createTable tableName="multiple_choice_has_answer_option">
+            <column name="mc_ao_relation_id" type="bigint" autoIncrement="true"/>
+            <column name="multiple_choice_id" type="bigint"/>
+            <column name="answer_option_id" type="bigint"/>
+        </createTable>
+
+        <addNotNullConstraint tableName="multiple_choice_has_answer_option" columnName="mc_ao_relation_id"/>
+        <addNotNullConstraint tableName="multiple_choice_has_answer_option" columnName="multiple_choice_id"/>
+        <addNotNullConstraint tableName="multiple_choice_has_answer_option" columnName="answer_option_id"/>
+
+        <addPrimaryKey tableName="multiple_choice_has_answer_option" columnNames="mc_ao_relation_id"/>
+
+        <addForeignKeyConstraint baseTableName="multiple_choice_has_answer_option" baseColumnNames="multiple_choice_id"
+                                 constraintName="fk_multiple_choice_multiple_choice_has_answer_option"
+                                 referencedTableName="multiple_choice" referencedColumnNames="multiple_choice_id"/>
+        <addForeignKeyConstraint baseTableName="multiple_choice_has_answer_option" baseColumnNames="answer_option_id"
+                                 constraintName="fk_answer_option_multiple_choice_has_answer_option"
+                                 referencedTableName="answer_option" referencedColumnNames="answer_option_id"/>
+
+    </changeSet>
+</databaseChangeLog>
