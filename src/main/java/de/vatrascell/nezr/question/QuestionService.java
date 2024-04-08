@@ -1,6 +1,7 @@
 package de.vatrascell.nezr.question;
 
 import de.vatrascell.nezr.application.Database;
+import de.vatrascell.nezr.category.CategoryService;
 import de.vatrascell.nezr.flag.FlagList;
 import de.vatrascell.nezr.flag.FlagListService;
 import de.vatrascell.nezr.flag.React;
@@ -134,7 +135,7 @@ public class QuestionService extends Database {
             }
 
             // category
-            Category category = categoryService.provideCategory(myCon, question.getCategory().getName());
+            Category category = categoryService.createCategory(question.getCategory().getName());
 
             //headline
             Headline headline = question.getHeadline() == null ? null : headlineService.createHeadline(question.getHeadline().getName());
@@ -192,7 +193,7 @@ public class QuestionService extends Database {
                     });
 
             // category
-            Category category = categoryService.provideCategory(myCon, question.getCategory().getName());
+            Category category = categoryService.createCategory(question.getCategory().getName());
 
             //headline
             Headline headline = question.getHeadline() == null ? null : headlineService.createHeadline(question.getHeadline().getName());

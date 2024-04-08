@@ -1,13 +1,16 @@
-package de.vatrascell.nezr.model;
+package de.vatrascell.nezr.category;
 
-import lombok.AllArgsConstructor;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
-@AllArgsConstructor
+@Entity
 public class Category {
+
+    @Id
     private int id;
     private String name;
 

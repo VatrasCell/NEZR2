@@ -4,6 +4,7 @@ import de.vatrascell.nezr.application.GlobalVars;
 import de.vatrascell.nezr.application.controller.DialogMessageController;
 import de.vatrascell.nezr.application.controller.NotificationController;
 import de.vatrascell.nezr.application.controller.ScreenController;
+import de.vatrascell.nezr.category.CategoryService;
 import de.vatrascell.nezr.flag.FlagList;
 import de.vatrascell.nezr.headline.HeadlineService;
 import de.vatrascell.nezr.message.DialogId;
@@ -412,8 +413,7 @@ public class QuestionController {
 
         Optional<String> result = dialog.showAndWait();
         result.ifPresent(name -> {
-            categoryService.createUniqueCategory(name);
-            Category category = categoryService.getCategory(name);
+            Category category = categoryService.createCategory(name);
             ObservableList<Category> categoryList = FXCollections.observableArrayList(categoryService.getCategories());
             categoryChoiceBox.setItems(categoryList);
             categoryChoiceBox.getSelectionModel().select(category);
