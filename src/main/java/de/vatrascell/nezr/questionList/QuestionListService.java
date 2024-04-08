@@ -2,12 +2,12 @@ package de.vatrascell.nezr.questionList;
 
 import de.vatrascell.nezr.application.Database;
 import de.vatrascell.nezr.flag.FlagListService;
+import de.vatrascell.nezr.headline.HeadlineService;
 import de.vatrascell.nezr.model.AnswerOption;
 import de.vatrascell.nezr.model.Question;
 import de.vatrascell.nezr.model.QuestionType;
 import de.vatrascell.nezr.question.AnswerOptionService;
 import de.vatrascell.nezr.question.CategoryService;
-import de.vatrascell.nezr.question.HeadlineService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 

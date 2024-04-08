@@ -17,7 +17,6 @@
         <ooxml-schemas.version>1.4</ooxml-schemas.version>
         <h2.version>2.1.214</h2.version>
         <junit.version>5.9.2</junit.version>
-        <mockito-all.version>1.10.19</mockito-all.version>
         <javafx-weaver-spring-boot-starter.version>1.3.0</javafx-weaver-spring-boot-starter.version>
         <spring-boot-starter.version>3.2.4</spring-boot-starter.version>
         <lombok.version>1.18.26</lombok.version>
@@ -28,6 +27,7 @@
         <batik-transcoder.version>1.17</batik-transcoder.version>
         <liquibase-core.version>4.26.0</liquibase-core.version>
         <spring-boot-starter-data-jpa.version>3.2.4</spring-boot-starter-data-jpa.version>
+        <mockito-core.version>5.11.0</mockito-core.version>
     </properties>
     <dependencies>
         <!-- https://mvnrepository.com/artifact/org.apache.poi/poi-ooxml -->
@@ -61,11 +61,11 @@
             <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
-        <!-- https://mvnrepository.com/artifact/org.mockito/mockito-all -->
+        <!-- https://mvnrepository.com/artifact/org.mockito/mockito-core -->
         <dependency>
             <groupId>org.mockito</groupId>
-            <artifactId>mockito-all</artifactId>
-            <version>${mockito-all.version}</version>
+            <artifactId>mockito-core</artifactId>
+            <version>${mockito-core.version}</version>
             <scope>test</scope>
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.controlsfx/controlsfx -->
@@ -258,6 +258,13 @@
                         </goals>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <argLine>--add-opens java.base/java.lang=ALL-UNNAMED</argLine>
+                </configuration>
             </plugin>
         </plugins>
     </build>

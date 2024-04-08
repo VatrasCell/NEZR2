@@ -4,6 +4,7 @@ import de.vatrascell.nezr.application.Database;
 import de.vatrascell.nezr.flag.FlagList;
 import de.vatrascell.nezr.flag.FlagListService;
 import de.vatrascell.nezr.flag.React;
+import de.vatrascell.nezr.headline.HeadlineService;
 import de.vatrascell.nezr.model.AnswerOption;
 import de.vatrascell.nezr.model.Category;
 import de.vatrascell.nezr.model.Headline;
@@ -136,7 +137,7 @@ public class QuestionService extends Database {
             Category category = categoryService.provideCategory(myCon, question.getCategory().getName());
 
             //headline
-            Headline headline = question.getHeadline() == null ? null : headlineService.provideHeadline(myCon, question.getHeadline().getName());
+            Headline headline = question.getHeadline() == null ? null : headlineService.createHeadline(question.getHeadline().getName());
 
             // de.vatrascell.nezr.question
             Integer shortAnswerId = provideShortAnswerQuestion(myCon, question.getQuestion(), category.getId());
@@ -194,7 +195,7 @@ public class QuestionService extends Database {
             Category category = categoryService.provideCategory(myCon, question.getCategory().getName());
 
             //headline
-            Headline headline = question.getHeadline() == null ? null : headlineService.provideHeadline(myCon, question.getHeadline().getName());
+            Headline headline = question.getHeadline() == null ? null : headlineService.createHeadline(question.getHeadline().getName());
 
             // de.vatrascell.nezr.question
             Integer multipleChoiceId = provideMultipleChoiceQuestion(myCon, question.getQuestion(), category.getId());

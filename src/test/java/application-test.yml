@@ -1,0 +1,5 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:db;MODE=MySQL
+    username: usr
+    password: Q#DQ8Ka&9Vq6`;)s

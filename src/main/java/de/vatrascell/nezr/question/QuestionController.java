@@ -5,6 +5,7 @@ import de.vatrascell.nezr.application.controller.DialogMessageController;
 import de.vatrascell.nezr.application.controller.NotificationController;
 import de.vatrascell.nezr.application.controller.ScreenController;
 import de.vatrascell.nezr.flag.FlagList;
+import de.vatrascell.nezr.headline.HeadlineService;
 import de.vatrascell.nezr.message.DialogId;
 import de.vatrascell.nezr.message.MessageId;
 import de.vatrascell.nezr.model.AnswerOption;
@@ -428,8 +429,9 @@ public class QuestionController {
 
         Optional<String> result = dialog.showAndWait();
         result.ifPresent(name -> {
-            headlineService.createUniqueHeadline(name);
-            Headline headline = headlineService.getHeadlineByName(name);
+            Headline headline = headlineService.createHeadline(name);
+            NotificationController
+                    .createMessage(MessageId.TITLE_CREATE_HEADLINE, MessageId.MESSAGE_CREATE_HEADLINE, name);
             headlineChoiceBox.setItems(createHeadlineList());
             headlineChoiceBox.getSelectionModel().select(headline);
         });
@@ -517,7 +519,7 @@ public class QuestionController {
         List<Headline> headlineListArrays = new ArrayList<>();
         headlineListArrays.add(null);
         headlineListArrays.addAll(
-                headlineService.getHeadlines(questionnaire.getId()));
+                headlineService.getHeadlines());
         return FXCollections.observableArrayList(headlineListArrays);
     }
 }
