@@ -198,7 +198,7 @@ public class QuestionController {
             System.out.println("Old dataset pattern found.");
         }
         questionTextField.setText(question.getQuestion());
-        List<Integer> range = IntStream.range(1, questionService.getMaxQuestionPosition(questionnaire.getId()) + 2).boxed()
+        List<Integer> range = IntStream.range(1, questionService.getMaxQuestionPosition(Long.valueOf(questionnaire.getId()).intValue()) + 2).boxed()
                 .collect(Collectors.toList());
         ObservableList<Integer> positionList = FXCollections.observableArrayList(range);
         positionChoiceBox.setItems(positionList);
@@ -306,7 +306,7 @@ public class QuestionController {
         questionToSave.setCategory(selectedCategory);
 
         if (!newQuestion.equals(oldQuestion)) {
-            if (questionService.doQuestionExistsInQuestionnaire(newQuestion, questionnaire.getId(), questionToSave.getQuestionType())) {
+            if (questionService.doQuestionExistsInQuestionnaire(newQuestion, Long.valueOf(questionnaire.getId()).intValue(), questionToSave.getQuestionType())) {
                 NotificationController.createErrorMessage(MessageId.TITLE_SAVE_QUESTION, MessageId.MESSAGE_SAVE_QUESTION_ALREADY_EXISTS_ERROR);
                 return;
             }
@@ -332,7 +332,7 @@ public class QuestionController {
                 //QuestionService.getPossibleFlags(flags, param);
                 questionToSave.setFlags(flags);
                 questionToSave.setAnswerOptions(answerOptions);
-                questionService.saveMultipleChoice(questionnaire.getId(), questionToSave);
+                questionService.saveMultipleChoice(Long.valueOf(questionnaire.getId()).intValue(), questionToSave);
             } else {
                 answerOptions = new ArrayList<>();
 
@@ -367,12 +367,12 @@ public class QuestionController {
                 //QuestionService.getPossibleFlags(flags, param);
                 questionToSave.setFlags(flags);
                 questionToSave.setAnswerOptions(answerOptions);
-                questionService.saveMultipleChoice(questionnaire.getId(), questionToSave);
+                questionService.saveMultipleChoice(Long.valueOf(questionnaire.getId()).intValue(), questionToSave);
             }
         } else {
             //QuestionService.getPossibleFlags(flags, param);
             questionToSave.setFlags(flags);
-            questionService.saveShortAnswerQuestion(questionnaire.getId(), questionToSave);
+            questionService.saveShortAnswerQuestion(Long.valueOf(questionnaire.getId()).intValue(), questionToSave);
         }
 
         screenController.activate(QuestionListController.class);

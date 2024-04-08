@@ -10,7 +10,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import static de.vatrascell.nezr.application.SqlStatement.SQL_COLUMN_CREATION_DATE;
 import static de.vatrascell.nezr.application.SqlStatement.SQL_COLUMN_LOCATION_NAME;
 import static de.vatrascell.nezr.application.SqlStatement.SQL_COLUMN_QUESTIONNAIRE_ID;
 import static de.vatrascell.nezr.application.SqlStatement.SQL_COLUMN_QUESTIONNAIRE_NAME;
@@ -28,7 +27,7 @@ public class StartService extends Database {
             if (myRS.next()) {
                 Questionnaire questionnaire = new Questionnaire();
                 questionnaire.setName(myRS.getString(SQL_COLUMN_QUESTIONNAIRE_NAME));
-                questionnaire.setDate(myRS.getString(SQL_COLUMN_CREATION_DATE));
+                //questionnaire.setCreationDate(myRS.getString(SQL_COLUMN_CREATION_DATE));
                 questionnaire.setId(myRS.getInt(SQL_COLUMN_QUESTIONNAIRE_ID));
                 questionnaire.setLocation(myRS.getString(SQL_COLUMN_LOCATION_NAME));
                 questionnaire.setActive(true);

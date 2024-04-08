@@ -78,7 +78,7 @@ public class ReactController {
     @Autowired
     public ReactController(QuestionListService questionListService, ScreenController screenController) {
         this.screenController = screenController;
-        questions = questionListService.getQuestions(questionnaire.getId());
+        questions = questionListService.getQuestions(Long.valueOf(questionnaire.getId()).intValue());
     }
 
     /**

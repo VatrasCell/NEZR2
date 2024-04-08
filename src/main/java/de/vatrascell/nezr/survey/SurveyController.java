@@ -118,7 +118,7 @@ public class SurveyController {
             e.printStackTrace();
         }
 
-        List<Question> questions = questionListService.getQuestions(GlobalVars.activeQuestionnaire.getId());
+        List<Question> questions = questionListService.getQuestions(Long.valueOf(GlobalVars.activeQuestionnaire.getId()).intValue());
         if (questions.isEmpty()) {
             NotificationController.createErrorMessage(MessageId.TITLE_QUESTIONNAIRE, MessageId.MESSAGE_QUESTIONNAIRE_IS_EMPTY);
             return;

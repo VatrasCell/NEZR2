@@ -3,7 +3,13 @@ package de.vatrascell.nezr.model;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ObservableBooleanValue;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
+@Data
+@NoArgsConstructor
 public class Questionnaire {
 
     public static String ID = "id";
@@ -19,43 +25,20 @@ public class Questionnaire {
     public static String XLS_EXPORT = "xlsExport";
     public static String DELETE = "delete";
 
-    private int id;
-    private String date;
+    private long id;
+    private LocalDateTime creationDate;
     private String name;
     private String location;
     private BooleanProperty isActive = new SimpleBooleanProperty();
     private BooleanProperty isFinal = new SimpleBooleanProperty();
 
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
+    public Questionnaire(long id, LocalDateTime creationDate, String name, String location, boolean isActive, boolean isFinal) {
         this.id = id;
-    }
-
-    public String getDate() {
-        return date;
-    }
-
-    public void setDate(String date) {
-        this.date = date;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
+        this.creationDate = creationDate;
         this.name = name;
-    }
-
-    public String getLocation() {
-        return location;
-    }
-
-    public void setLocation(String location) {
         this.location = location;
+        this.isActive.set(isActive);
+        this.isFinal.set(isFinal);
     }
 
     public ObservableBooleanValue isActive() {
@@ -73,11 +56,4 @@ public class Questionnaire {
     public void setFinal(boolean isFinal) {
         this.isFinal.set(isFinal);
     }
-
-    @Override
-    public String toString() {
-        return "Questionnaire [id=" + id + ", date=" + date + ", name=" + name + ", ort=" + location + ", activ=" + isActive
-                + ", isFinal=" + isFinal + "]";
-    }
-
 }

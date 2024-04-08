@@ -54,7 +54,7 @@ public class LoginController {
 
     public void devLogin() {
         if (GlobalVars.DEV_MODE) {
-            if (loginService.login("root", "1234")) {
+            if (loginService.login("usr", "Q#DQ8Ka&9Vq6`;)s")) {
                 screenController.activate(AdminController.class);
             } else {
                 NotificationController.createErrorMessage(MessageId.TITLE_LOGIN, MessageId.MESSAGE_LOGIN_WRONG_DATA);

@@ -56,14 +56,14 @@ public class ExportController {
     }
 
     public void createExcelFile(File file, Questionnaire questionnaire, String fromDate, String toDate) {
-        sheet = this.wb.createSheet(WorkbookUtil.createSafeSheetName(String.format("%s-%s", questionnaire.getName(), questionnaire.getDate())));
-        List<Question> questions = questionListService.getQuestions(questionnaire.getId());
+        sheet = this.wb.createSheet(WorkbookUtil.createSafeSheetName(String.format("%s-%s", questionnaire.getName(), questionnaire.getCreationDate())));
+        List<Question> questions = questionListService.getQuestions(Long.valueOf(questionnaire.getId()).intValue());
         List<ExcelQuestionModel> excelQuestionModels = ExcelQuestionModelConverter.convert(questions, 1);
 
-        createInfoRow(questionnaire.getName(), questionnaire.getDate(), fromDate, toDate);
+        createInfoRow(questionnaire.getName(), questionnaire.getCreationDate().toString(), fromDate, toDate);
         createCategoryAndQuestionRow(excelQuestionModels);
         createAnswerOptionRow(excelQuestionModels);
-        createAnswerRows(excelQuestionModels, questionnaire.getId(), fromDate, toDate);
+        createAnswerRows(excelQuestionModels, Long.valueOf(questionnaire.getId()).intValue(), fromDate, toDate);
 
         saveExcelFile(file);
         NotificationController.createMessage(

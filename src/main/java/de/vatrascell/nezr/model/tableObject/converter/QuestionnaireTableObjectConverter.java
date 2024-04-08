@@ -15,7 +15,7 @@ public class QuestionnaireTableObjectConverter {
         QuestionnaireTableObject tableObject = new QuestionnaireTableObject(adminController);
         tableObject.setId(questionnaire.getId());
         tableObject.setActive(questionnaire.isActive().get());
-        tableObject.setDate(questionnaire.getDate());
+        //tableObject.setDate(questionnaire.getCreationDate());
         tableObject.setFinal(questionnaire.isFinal().get());
         tableObject.setLocation(questionnaire.getLocation());
         tableObject.setName(questionnaire.getName());

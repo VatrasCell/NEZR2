@@ -72,7 +72,7 @@ public class AdminController {
 
     private static final ObservableList<QuestionnaireTableObject> data = FXCollections.observableArrayList();
 
-    private final AdminService adminService;
+    private final QuestionnaireService questionnaireService;
     private final LoginService loginService;
     private final StartController startController;
     private final ExportController exportController;
@@ -108,9 +108,9 @@ public class AdminController {
      * The constructor (is called before the initialize()-method).
      */
     @Autowired
-    public AdminController(AdminService adminService, LoginService loginService, StartController startController, ExportController exportController,
+    public AdminController(QuestionnaireService questionnaireService, LoginService loginService, StartController startController, ExportController exportController,
                            ScreenController screenController) {
-        this.adminService = adminService;
+        this.questionnaireService = questionnaireService;
         this.loginService = loginService;
         this.startController = startController;
         this.exportController = exportController;
@@ -120,7 +120,7 @@ public class AdminController {
     private void getData() {
         data.clear();
         List<QuestionnaireTableObject> tableObjects =
-                QuestionnaireTableObjectConverter.convert(Objects.requireNonNull(adminService.getQuestionnaires(GlobalVars.location.getName())), this);
+                QuestionnaireTableObjectConverter.convert(Objects.requireNonNull(questionnaireService.getQuestionnaires(GlobalVars.location.getName())), this);
         data.addAll(Objects.requireNonNull(tableObjects));
     }
 
@@ -148,11 +148,11 @@ public class AdminController {
             property.addListener((observable, oldValue, newValue) -> {
                 questionnaire.setActive(newValue);
                 if (newValue) {
-                    adminService.activateQuestionnaire(questionnaire.getId());
+                    questionnaireService.activateQuestionnaire(Long.valueOf(questionnaire.getId()).intValue());
                     GlobalVars.activeQuestionnaire = questionnaire;
                     deactivateAllOtherQuestionnaires(questionnaire);
                 } else {
-                    adminService.disableQuestionnaire(questionnaire.getId());
+                    questionnaireService.disableQuestionnaire(Long.valueOf(questionnaire.getId()).intValue());
                     GlobalVars.activeQuestionnaire = null;
                 }
                 startController.setStartText();
@@ -169,11 +169,7 @@ public class AdminController {
             ObservableBooleanValue property = cellValue.isFinal();
 
             property.addListener((observable, oldValue, newValue) -> {
-                if (newValue) {
-                    adminService.setFinal(cellValue);
-                } else {
-                    adminService.setUnFinal(cellValue);
-                }
+                questionnaireService.updateIsFinal(newValue, cellValue);
                 cellValue.setFinal(newValue);
             });
 
@@ -229,20 +225,15 @@ public class AdminController {
 
             Optional<Location> result = dialog.showAndWait();
             result.ifPresent(location -> {
-                if (adminService.copyQuestionnaire(questionnaire, location.getName())) {
-                    getData();
-                    NotificationController.createMessage(
-                            MessageId.TITLE_COPY_QUESTIONNAIRE,
-                            MessageId.MESSAGE_COPY_QUESTIONNAIRE,
-                            questionnaire.getName(),
-                            location.getName());
-                } else {
-                    NotificationController.createErrorMessage(
-                            MessageId.TITLE_COPY_QUESTIONNAIRE,
-                            MessageId.MESSAGE_UNDEFINED_ERROR);
-                        }
-                    }
-            );
+                questionnaireService.copyQuestionnaire(questionnaire, location);
+                getData();
+                NotificationController.createMessage(
+                        MessageId.TITLE_COPY_QUESTIONNAIRE,
+                        MessageId.MESSAGE_COPY_QUESTIONNAIRE,
+                        questionnaire.getName(),
+                        location.getName());
+
+            });
 
         });
 
@@ -271,9 +262,8 @@ public class AdminController {
             Optional<String> result = dialog.showAndWait();
             result.ifPresent(questionnaire::setName);
 
-            if (adminService.renameQuestionnaire(questionnaire)) {
-                getData();
-            }
+            questionnaireService.renameQuestionnaire(questionnaire);
+            getData();
         });
 
         return button;
@@ -336,17 +326,13 @@ public class AdminController {
 
             Optional<ButtonType> result = alert.showAndWait();
             if (result.isPresent() && result.get() == ButtonType.OK) {
-                if (adminService.deleteQuestionnaire(questionnaire.getId())) {
-                    getData();
-                    NotificationController.createErrorMessage(
-                            MessageId.TITLE_REMOVE_QUESTIONNAIRE,
-                            MessageId.MESSAGE_DELETED_QUESTIONNAIRE_SUCCESSFULLY,
-                            questionnaire.getName());
-                } else {
-                    NotificationController.createErrorMessage(
-                            MessageId.TITLE_REMOVE_QUESTIONNAIRE,
-                            MessageId.MESSAGE_UNDEFINED_ERROR);
-                }
+                questionnaireService.deleteQuestionnaire(Long.valueOf(questionnaire.getId()).intValue());
+                getData();
+                NotificationController.createErrorMessage(
+                        MessageId.TITLE_REMOVE_QUESTIONNAIRE,
+                        MessageId.MESSAGE_DELETED_QUESTIONNAIRE_SUCCESSFULLY,
+                        questionnaire.getName());
+
             }
         });
 
@@ -414,7 +400,7 @@ public class AdminController {
     private void deactivateAllOtherQuestionnaires(Questionnaire activeQuestionnaire) {
         for (Questionnaire questionnaire : data) {
             if (questionnaire.isActive().get() && questionnaire.getId() != activeQuestionnaire.getId()) {
-                adminService.disableQuestionnaire(questionnaire.getId());
+                questionnaireService.disableQuestionnaire(Long.valueOf(questionnaire.getId()).intValue());
             }
         }
     }
@@ -436,7 +422,7 @@ public class AdminController {
 
         Optional<String> result = dialog.showAndWait();
         result.ifPresent(name -> {
-            if (adminService.createQuestionnaire(name) != -1) {
+            if (questionnaireService.createQuestionnaire(name) != null) {
                 getData();
                 questionnaireTableView.refresh();
             }

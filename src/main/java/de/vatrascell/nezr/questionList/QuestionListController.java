@@ -70,7 +70,7 @@ public class QuestionListController {
     private void getData() {
         data.clear();
         List<QuestionTableObject> tableObjects =
-                QuestionTableObjectConverter.convert(Objects.requireNonNull(questionListService.getQuestions(questionnaire.getId())), this);
+                QuestionTableObjectConverter.convert(Objects.requireNonNull(questionListService.getQuestions(Long.valueOf(questionnaire.getId()).intValue())), this);
         data.addAll(Objects.requireNonNull(tableObjects));
     }
 
@@ -117,7 +117,7 @@ public class QuestionListController {
         imgView.setFitWidth(30);
         Button button = new Button("", imgView);
         button.setOnAction(event -> {
-            questionListService.deleteQuestion(questionnaire.getId(), question);
+            questionListService.deleteQuestion(Long.valueOf(questionnaire.getId()).intValue(), question);
             getData();
         });
 
@@ -133,7 +133,7 @@ public class QuestionListController {
     private void newQuestion() {
         QuestionController.questionnaire = questionnaire;
 
-        QuestionController.question = new Question(questionService.getMaxQuestionPosition(questionnaire.getId()));
+        QuestionController.question = new Question(questionService.getMaxQuestionPosition(Long.valueOf(questionnaire.getId()).intValue()));
         screenController.activate(QuestionController.class);
     }
 }
