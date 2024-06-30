@@ -18,6 +18,7 @@ http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibas
 
         <addNotNullConstraint tableName="multiple_choice" columnName="multiple_choice_id"/>
         <addNotNullConstraint tableName="multiple_choice" columnName="question"/>
+        <addNotNullConstraint tableName="multiple_choice" columnName="category_id"/>
 
         <addPrimaryKey tableName="multiple_choice" columnNames="multiple_choice_id"/>
 

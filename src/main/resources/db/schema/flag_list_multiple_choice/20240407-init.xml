@@ -10,7 +10,7 @@ http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/
 http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-latest.xsd">
     <changeSet id="20240207-init" author="">
         <createTable tableName="flag_list_multiple_choice">
-            <column name="flag_list_multiple_choice_id" type="bigint" autoIncrement="true"/>
+            <column name="q_mc_relation_id" type="bigint"/>
             <column name="is_evaluation_question" type="boolean" defaultValueBoolean="false"/>
             <column name="is_required" type="boolean" defaultValueBoolean="false"/>
             <column name="is_multiple_choice" type="boolean" defaultValueBoolean="false"/>
@@ -19,14 +19,18 @@ http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibas
             <column name="is_single_line" type="boolean" defaultValueBoolean="false"/>
         </createTable>
 
-        <addNotNullConstraint tableName="flag_list_multiple_choice" columnName="flag_list_multiple_choice_id"/>
+        <addNotNullConstraint tableName="flag_list_multiple_choice" columnName="q_mc_relation_id"/>
         <addNotNullConstraint tableName="flag_list_multiple_choice" columnName="is_evaluation_question"/>
         <addNotNullConstraint tableName="flag_list_multiple_choice" columnName="is_required"/>
         <addNotNullConstraint tableName="flag_list_multiple_choice" columnName="is_list"/>
         <addNotNullConstraint tableName="flag_list_multiple_choice" columnName="is_yes_no_question"/>
         <addNotNullConstraint tableName="flag_list_multiple_choice" columnName="is_single_line"/>
 
-        <addPrimaryKey tableName="flag_list_multiple_choice" columnNames="flag_list_multiple_choice_id"/>
+        <addForeignKeyConstraint baseTableName="flag_list_multiple_choice" baseColumnNames="q_mc_relation_id"
+                                 constraintName="fk_questionnaire_has_multiple_choice_flag_list_multiple_choice"
+                                 referencedTableName="questionnaire_has_multiple_choice" referencedColumnNames="q_mc_relation_id"/>
+
+        <addPrimaryKey tableName="flag_list_multiple_choice" columnNames="q_mc_relation_id"/>
 
     </changeSet>
 </databaseChangeLog>

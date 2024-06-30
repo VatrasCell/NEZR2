@@ -10,16 +10,20 @@ http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/
 http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-latest.xsd">
     <changeSet id="20240207-init" author="">
         <createTable tableName="flag_list_short_answer">
-            <column name="flag_list_short_answer_id" type="bigint" autoIncrement="true"/>
+            <column name="q_sa_relation_id" type="bigint"/>
             <column name="is_required" type="boolean" defaultValueBoolean="false"/>
             <column name="is_text_area" type="boolean" defaultValueBoolean="false"/>
         </createTable>
 
-        <addNotNullConstraint tableName="flag_list_short_answer" columnName="flag_list_short_answer_id"/>
+        <addNotNullConstraint tableName="flag_list_short_answer" columnName="q_sa_relation_id"/>
         <addNotNullConstraint tableName="flag_list_short_answer" columnName="is_required"/>
         <addNotNullConstraint tableName="flag_list_short_answer" columnName="is_text_area"/>
 
-        <addPrimaryKey tableName="flag_list_short_answer" columnNames="flag_list_short_answer_id"/>
+        <addForeignKeyConstraint baseTableName="flag_list_short_answer" baseColumnNames="q_sa_relation_id"
+                                 constraintName="fk_questionnaire_has_short_answer_flag_list_short_answer"
+                                 referencedTableName="questionnaire_has_short_answer" referencedColumnNames="q_sa_relation_id"/>
+
+        <addPrimaryKey tableName="flag_list_short_answer" columnNames="q_sa_relation_id"/>
 
     </changeSet>
 </databaseChangeLog>

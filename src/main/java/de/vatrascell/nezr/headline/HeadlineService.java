@@ -56,6 +56,6 @@ public class HeadlineService extends Database {
     }
 
     private Headline convert(de.vatrascell.nezr.headline.Headline headline) {
-        return new Headline(headline.getId(), headline.getName());
+        return new Headline(headline.getHeadlineId(), headline.getName());
     }
 }

@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 public class Headline {
 
     @Id
-    private int id;
+    private int headlineId;
     private String name;
 
     public Headline(String name) {

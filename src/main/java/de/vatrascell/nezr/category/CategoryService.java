@@ -52,6 +52,6 @@ public class CategoryService extends Database {
     }
 
     private Category convert(de.vatrascell.nezr.category.Category category) {
-        return new Category(category.getId(), category.getName());
+        return new Category(category.getCategoryId(), category.getName());
     }
 }

@@ -1,4 +1,4 @@
-package de.vatrascell.nezr.admin;
+package de.vatrascell.nezr.multipleChoiceQuestion;
 
 import de.vatrascell.nezr.application.Main;
 import lombok.extern.log4j.Log4j2;
@@ -14,19 +14,17 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest(classes = Main.class)
 @ActiveProfiles("test")
 @Log4j2
-class QuestionnaireRepositoryTest {
+class MultipleChoiceQuestionRepositoryTest {
 
     @Autowired
-    private QuestionnaireRepository questionnaireRepository;
+    private MultipleChoiceQuestionRepository multipleChoiceQuestionRepository;
 
     @Test
-    void testFindAll() {
-        questionnaireRepository.setQuestionnaireActiveById(1);
+    void test() {
+        List<MultipleChoiceQuestion> multipleChoiceQuestions = multipleChoiceQuestionRepository.findAll();
 
-        List<Questionnaire> questionnaires = questionnaireRepository.findAll();
-
-        assertThat(questionnaires).isNotNull();
-        log.info(questionnaires);
+        assertThat(multipleChoiceQuestions).isNotNull();
+        log.info(multipleChoiceQuestions);
     }
 
 }

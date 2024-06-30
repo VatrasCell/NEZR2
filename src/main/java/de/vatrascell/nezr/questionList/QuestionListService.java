@@ -65,7 +65,7 @@ public class QuestionListService extends Database {
         return questions;
     }
 
-    public List<Question> getMultipleChoiceQuestions(int questionnaireId) {
+    private List<Question> getMultipleChoiceQuestions(int questionnaireId) {
         List<Question> questions = new ArrayList<>();
         try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
             PreparedStatement psSql = myCon.prepareStatement(SQL_GET_MULTIPLE_CHOICE_QUESTION);
@@ -100,7 +100,7 @@ public class QuestionListService extends Database {
         return null;
     }
 
-    public List<Question> getShortAnswerQuestions(int questionnaireId) {
+    private List<Question> getShortAnswerQuestions(int questionnaireId) {
         List<Question> questions = new ArrayList<>();
         try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
             PreparedStatement psSql = myCon.prepareStatement(SQL_GET_SHORT_ANSWER_QUESTION);
