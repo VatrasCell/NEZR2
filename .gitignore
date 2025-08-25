@@ -2,6 +2,7 @@ exportExcel/*
 exportSQL/*
 bin/**
 .settings/*
+.vscode/*
 /bin/
 .idea/
 nezr2.iml
