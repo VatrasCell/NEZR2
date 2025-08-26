@@ -5,6 +5,7 @@ import de.vatrascell.nezr.model.QuestionType;
 import de.vatrascell.nezr.react.ReactService;
 import de.vatrascell.nezr.validation.ValidationService;
 import lombok.extern.log4j.Log4j2;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -21,7 +22,11 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @SpringBootTest(classes = Main.class)
 @ActiveProfiles("test")
@@ -242,7 +247,7 @@ class FlagListServiceTest {
         verify(preparedStatement, times(1)).executeUpdate();
     }
 
-    @org.junit.jupiter.api.AfterEach
+    @AfterEach
     void tearDown() {
         if (driverManagerMockedStatic != null) {
             driverManagerMockedStatic.close();
