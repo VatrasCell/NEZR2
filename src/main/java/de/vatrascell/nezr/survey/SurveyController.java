@@ -70,7 +70,7 @@ import static de.vatrascell.nezr.model.SceneName.SURVEY_PATH;
 public class SurveyController {
 
     private final QuestionListService questionListService;
-    private final IntegerProperty pageNumber = new SimpleIntegerProperty(0);
+    private IntegerProperty pageNumber;
     private boolean isPreview;
     private int pageCount;
     private List<SurveyPage> pages;
@@ -124,6 +124,7 @@ public class SurveyController {
             return;
         }
 
+        pageNumber = new SimpleIntegerProperty(0);
         pages = getSurveyPages(questions);
         this.pageCount = pages.size();
         this.isPreview = false;

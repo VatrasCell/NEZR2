@@ -3,6 +3,7 @@ exportSQL/*
 bin/**
 .settings/*
 .vscode/*
+.ai/*
 /bin/
 .idea/
 nezr2.iml

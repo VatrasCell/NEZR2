@@ -26,7 +26,6 @@ import static de.vatrascell.nezr.application.SqlStatement.SQL_COLUMN_ANSWER_OPTI
 import static de.vatrascell.nezr.application.SqlStatement.SQL_COLUMN_CATEGORY_NAME;
 import static de.vatrascell.nezr.application.SqlStatement.SQL_COLUMN_CREATION_DATE;
 import static de.vatrascell.nezr.application.SqlStatement.SQL_COLUMN_HEADLINE_ID;
-import static de.vatrascell.nezr.application.SqlStatement.SQL_COLUMN_HEADLINE_ID2;
 import static de.vatrascell.nezr.application.SqlStatement.SQL_COLUMN_MULTIPLE_CHOICE_ID;
 import static de.vatrascell.nezr.application.SqlStatement.SQL_COLUMN_MULTIPLE_CHOICE_QUESTIONNAIRE_RELATION_ID;
 import static de.vatrascell.nezr.application.SqlStatement.SQL_COLUMN_POSITION;
@@ -118,7 +117,7 @@ public class QuestionListService extends Database {
                         QuestionType.SHORT_ANSWER));
                 question.setPosition(Integer.parseInt(myRS.getString(SQL_COLUMN_POSITION)));
                 question.setQuestionType(QuestionType.SHORT_ANSWER);
-                int headlineId = myRS.getInt(SQL_COLUMN_HEADLINE_ID2);
+                int headlineId = myRS.getInt(SQL_COLUMN_HEADLINE_ID);
                 if (headlineId > 0) {
                     question.setHeadline(headlineService.getHeadline(headlineId));
                 }

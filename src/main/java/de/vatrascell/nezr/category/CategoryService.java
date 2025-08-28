@@ -18,7 +18,7 @@ import static de.vatrascell.nezr.application.SqlStatement.SQL_SET_CATEGORY_ON_SH
 @RequiredArgsConstructor
 public class CategoryService extends Database {
 
-    private CategoryRepository categoryRepository;
+    private final CategoryRepository categoryRepository;
 
     public List<Category> getCategories() {
         return categoryRepository.findAll()
