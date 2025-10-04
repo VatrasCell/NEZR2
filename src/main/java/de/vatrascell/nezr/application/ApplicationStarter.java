@@ -20,10 +20,12 @@ public class ApplicationStarter extends Application {
             context.registerBean(Parameters.class, this::getParameters); // for demonstration, not really needed
         };
 
+        var dbCredentialInitializer = new DatabaseCredentialInitializer();
+
         this.context = new SpringApplicationBuilder()
                 .lazyInitialization(true)
                 .sources(Main.class)
-                .initializers(initializer)
+                .initializers(initializer, dbCredentialInitializer)
                 .run(getParameters().getRaw().toArray(new String[0]));
     }
 
