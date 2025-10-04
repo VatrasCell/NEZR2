@@ -1,7 +1,7 @@
 package de.vatrascell.nezr.gratitude;
 
 import de.vatrascell.nezr.application.controller.ScreenController;
-import de.vatrascell.nezr.start.StartController;
+import de.vatrascell.nezr.landing.LandingController;
 import javafx.fxml.FXML;
 import lombok.AllArgsConstructor;
 import net.rgielen.fxweaver.core.FxmlView;
@@ -18,7 +18,7 @@ public class GratitudeController {
 
     @FXML
     private void exit() {
-        screenController.activate(StartController.class);
+        screenController.activate(LandingController.class);
     }
 
 }

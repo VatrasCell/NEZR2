@@ -1,4 +1,4 @@
-package de.vatrascell.nezr.start;
+package de.vatrascell.nezr.landing;
 
 import de.vatrascell.nezr.application.Database;
 import de.vatrascell.nezr.model.Questionnaire;
@@ -16,7 +16,7 @@ import static de.vatrascell.nezr.application.SqlStatement.SQL_COLUMN_QUESTIONNAI
 import static de.vatrascell.nezr.application.SqlStatement.SQL_GET_ACTIVE_QUESTIONNAIRE;
 
 @Service
-public class StartService extends Database {
+public class LandingService extends Database {
 
     public Questionnaire getActiveQuestionnaire() {
 

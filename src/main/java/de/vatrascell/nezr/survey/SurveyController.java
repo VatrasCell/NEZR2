@@ -5,6 +5,7 @@ import de.vatrascell.nezr.application.controller.NotificationController;
 import de.vatrascell.nezr.application.controller.ScreenController;
 import de.vatrascell.nezr.application.svg.SvgImageLoader;
 import de.vatrascell.nezr.gratitude.GratitudeController;
+import de.vatrascell.nezr.landing.LandingController;
 import de.vatrascell.nezr.message.MessageId;
 import de.vatrascell.nezr.model.AnswerOption;
 import de.vatrascell.nezr.model.Headline;
@@ -14,7 +15,6 @@ import de.vatrascell.nezr.model.SubmittedAnswer;
 import de.vatrascell.nezr.model.SurveyPage;
 import de.vatrascell.nezr.question.QuestionController;
 import de.vatrascell.nezr.questionList.QuestionListService;
-import de.vatrascell.nezr.start.StartController;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -169,7 +169,7 @@ public class SurveyController {
 
             Optional<ButtonType> result = alert.showAndWait();
             if (result.isPresent() && result.get() == ButtonType.OK) {
-                screenController.activate(StartController.class);
+                screenController.activate(LandingController.class);
             }
         }
     }

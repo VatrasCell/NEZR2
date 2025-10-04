@@ -1,4 +1,4 @@
-package de.vatrascell.nezr.start;
+package de.vatrascell.nezr.landing;
 
 import de.vatrascell.nezr.application.GlobalVars;
 import de.vatrascell.nezr.application.controller.ScreenController;
@@ -14,6 +14,7 @@ import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
+import lombok.extern.log4j.Log4j2;
 import net.rgielen.fxweaver.core.FxmlView;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -26,7 +27,8 @@ import static de.vatrascell.nezr.model.SceneName.START_PATH;
 
 @Component
 @FxmlView(START_PATH)
-public class StartController {
+@Log4j2
+public class LandingController {
 
     @FXML
     Label questionnaireLabel;
@@ -51,11 +53,11 @@ public class StartController {
      * The constructor (is called before the initialize()-method).
      */
     @Autowired
-    public StartController(StartService startService, ScreenController screenController, LoginController loginController) {
+    public LandingController(LandingService landingService, ScreenController screenController, LoginController loginController) {
 
         this.screenController = screenController;
         this.loginController = loginController;
-        GlobalVars.activeQuestionnaire = startService.getActiveQuestionnaire();
+        GlobalVars.activeQuestionnaire = landingService.getActiveQuestionnaire();
     }
 
     /**
@@ -64,7 +66,7 @@ public class StartController {
      */
     @FXML
     private void initialize() {
-        System.out.println("initialize StartController");
+        log.info("initialize StartController");
 
         try {
             imageView.fitHeightProperty().bind(gridPane.heightProperty().multiply(0.55));

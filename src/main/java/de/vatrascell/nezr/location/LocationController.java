@@ -2,9 +2,9 @@ package de.vatrascell.nezr.location;
 
 import de.vatrascell.nezr.application.GlobalVars;
 import de.vatrascell.nezr.application.controller.ScreenController;
+import de.vatrascell.nezr.landing.LandingController;
 import de.vatrascell.nezr.login.LoginService;
 import de.vatrascell.nezr.model.Location;
-import de.vatrascell.nezr.start.StartController;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -50,7 +50,7 @@ public class LocationController {
     @FXML
     private void next() {
         GlobalVars.location = choiceBox.getValue();
-        screenController.activate(StartController.class);
+        screenController.activate(LandingController.class);
     }
 
     private void intMapView() {

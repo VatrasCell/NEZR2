@@ -4,8 +4,8 @@ import de.vatrascell.nezr.admin.AdminController;
 import de.vatrascell.nezr.application.GlobalVars;
 import de.vatrascell.nezr.application.controller.NotificationController;
 import de.vatrascell.nezr.application.controller.ScreenController;
+import de.vatrascell.nezr.landing.LandingController;
 import de.vatrascell.nezr.message.MessageId;
-import de.vatrascell.nezr.start.StartController;
 import javafx.fxml.FXML;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
@@ -65,7 +65,7 @@ public class LoginController {
     @FXML
     private void exit() {
         reset();
-        screenController.activate(StartController.class);
+        screenController.activate(LandingController.class);
     }
 
     private void reset() {

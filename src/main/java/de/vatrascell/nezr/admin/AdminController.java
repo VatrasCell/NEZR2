@@ -5,6 +5,7 @@ import de.vatrascell.nezr.application.controller.DialogMessageController;
 import de.vatrascell.nezr.application.controller.NotificationController;
 import de.vatrascell.nezr.application.controller.ScreenController;
 import de.vatrascell.nezr.export.ExportController;
+import de.vatrascell.nezr.landing.LandingController;
 import de.vatrascell.nezr.location.LocationController;
 import de.vatrascell.nezr.login.LoginService;
 import de.vatrascell.nezr.message.DialogId;
@@ -14,7 +15,6 @@ import de.vatrascell.nezr.model.Questionnaire;
 import de.vatrascell.nezr.model.tableObject.QuestionnaireTableObject;
 import de.vatrascell.nezr.model.tableObject.converter.QuestionnaireTableObjectConverter;
 import de.vatrascell.nezr.questionList.QuestionListController;
-import de.vatrascell.nezr.start.StartController;
 import javafx.application.Platform;
 import javafx.beans.value.ObservableBooleanValue;
 import javafx.collections.FXCollections;
@@ -74,7 +74,7 @@ public class AdminController {
 
     private final QuestionnaireService questionnaireService;
     private final LoginService loginService;
-    private final StartController startController;
+    private final LandingController landingController;
     private final ExportController exportController;
     private final ScreenController screenController;
 
@@ -108,11 +108,11 @@ public class AdminController {
      * The constructor (is called before the initialize()-method).
      */
     @Autowired
-    public AdminController(QuestionnaireService questionnaireService, LoginService loginService, StartController startController, ExportController exportController,
+    public AdminController(QuestionnaireService questionnaireService, LoginService loginService, LandingController landingController, ExportController exportController,
                            ScreenController screenController) {
         this.questionnaireService = questionnaireService;
         this.loginService = loginService;
-        this.startController = startController;
+        this.landingController = landingController;
         this.exportController = exportController;
         this.screenController = screenController;
     }
@@ -155,7 +155,7 @@ public class AdminController {
                     questionnaireService.disableQuestionnaire(Long.valueOf(questionnaire.getId()).intValue());
                     GlobalVars.activeQuestionnaire = null;
                 }
-                startController.setStartText();
+                landingController.setStartText();
                 getData();
                 questionnaireTableView.refresh();
             });
@@ -432,7 +432,7 @@ public class AdminController {
     @FXML
     private void logout() {
         loginService.login("usr", "Q#DQ8Ka&9Vq6`;)s");
-        screenController.activate(StartController.class);
+        screenController.activate(LandingController.class);
     }
 
     @FXML

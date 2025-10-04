@@ -7,6 +7,7 @@ import de.vatrascell.nezr.application.controller.ScreenController;
 import de.vatrascell.nezr.category.CategoryService;
 import de.vatrascell.nezr.flag.FlagList;
 import de.vatrascell.nezr.headline.HeadlineService;
+import de.vatrascell.nezr.landing.LandingController;
 import de.vatrascell.nezr.message.DialogId;
 import de.vatrascell.nezr.message.MessageId;
 import de.vatrascell.nezr.model.AnswerOption;
@@ -20,7 +21,6 @@ import de.vatrascell.nezr.model.tableObject.AnswerOptionTableObject;
 import de.vatrascell.nezr.model.tableObject.converter.AnswerTableObjectConverter;
 import de.vatrascell.nezr.questionList.QuestionListController;
 import de.vatrascell.nezr.react.ReactController;
-import de.vatrascell.nezr.start.StartController;
 import de.vatrascell.nezr.validation.ValidationController;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -72,7 +72,7 @@ public class QuestionController {
     private final AnswerOptionService answerOptionService;
     private final CategoryService categoryService;
     private final HeadlineService headlineService;
-    private final StartController startController;
+    private final LandingController landingController;
     private final QuestionService questionService;
 
     @FXML
@@ -128,12 +128,12 @@ public class QuestionController {
     @Autowired
     public QuestionController(AnswerOptionService answerOptionService, CategoryService categoryService,
                               HeadlineService headlineService, QuestionService questionService,
-                              StartController startController, ScreenController screenController) {
+                              LandingController landingController, ScreenController screenController) {
         this.answerOptionService = answerOptionService;
         this.categoryService = categoryService;
         this.headlineService = headlineService;
         this.questionService = questionService;
-        this.startController = startController;
+        this.landingController = landingController;
         this.screenController = screenController;
     }
 
