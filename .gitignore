@@ -4,6 +4,7 @@ bin/**
 .settings/*
 .vscode/*
 .ai/*
+db/*
 /bin/
 .idea/
 nezr2.iml
@@ -18,4 +19,3 @@ buildNumber.properties
 .mvn/timing.properties
 src/test/resources/db/log/**
 create_db_error.log
-**/nezr*.trace.db

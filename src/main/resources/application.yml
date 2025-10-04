@@ -3,8 +3,6 @@ spring:
     lazy-initialization: true
   datasource:
     url: jdbc:h2:.\db\nezr_v8;MODE=MySQL
-    username: usr
-    password: Q#DQ8Ka&9Vq6`;)s
   liquibase:
     enabled: true
     change-log: db/master-changelog.xml
