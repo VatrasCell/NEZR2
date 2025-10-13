@@ -19,6 +19,8 @@ public interface QuestionnaireRepository extends JpaRepository<Questionnaire, Lo
 
     List<Questionnaire> findByLocationName(String locationName);
 
+    Questionnaire getQuestionnaireByIsActiveIsTrue();
+
     @Modifying
     @Query("UPDATE Questionnaire q SET q.isActive = TRUE WHERE q.questionnaireId = :questionnaireId")
     void setQuestionnaireActiveById(@Param("questionnaireId") long questionnaireId);

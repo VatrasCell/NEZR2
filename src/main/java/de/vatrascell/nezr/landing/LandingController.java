@@ -23,10 +23,10 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 
 import static de.vatrascell.nezr.application.util.ResourceUtil.getURL;
-import static de.vatrascell.nezr.model.SceneName.START_PATH;
+import static de.vatrascell.nezr.model.SceneName.LANDING_PATH;
 
 @Component
-@FxmlView(START_PATH)
+@FxmlView(LANDING_PATH)
 @Log4j2
 public class LandingController {
 

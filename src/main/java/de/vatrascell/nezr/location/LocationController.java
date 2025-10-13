@@ -3,7 +3,6 @@ package de.vatrascell.nezr.location;
 import de.vatrascell.nezr.application.GlobalVars;
 import de.vatrascell.nezr.application.controller.ScreenController;
 import de.vatrascell.nezr.landing.LandingController;
-import de.vatrascell.nezr.login.LoginService;
 import de.vatrascell.nezr.model.Location;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -23,7 +22,6 @@ import static de.vatrascell.nezr.model.SceneName.LOCATION_PATH;
 public class LocationController {
 
     private final LocationService locationService;
-    private final LoginService loginService;
     private final ScreenController screenController;
 
     @FXML
@@ -36,7 +34,7 @@ public class LocationController {
      */
     @FXML
     private void initialize() {
-        loginService.login("usr", "Q#DQ8Ka&9Vq6`;)s");
+        choiceBoxData.clear();
         choiceBoxData.addAll(locationService.getLocations());
         choiceBoxData = choiceBoxData.stream().distinct().collect(Collectors.toCollection(FXCollections::observableArrayList));
         // Init ComboBox items.

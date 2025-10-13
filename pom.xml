@@ -28,6 +28,7 @@
         <liquibase-core.version>4.26.0</liquibase-core.version>
         <spring-boot-starter-data-jpa.version>3.2.4</spring-boot-starter-data-jpa.version>
         <mockito-core.version>5.11.0</mockito-core.version>
+        <mapstruct.version>1.6.3</mapstruct.version>
     </properties>
     <dependencies>
         <!-- https://mvnrepository.com/artifact/org.apache.poi/poi-ooxml -->
@@ -201,7 +202,12 @@
             <artifactId>liquibase-core</artifactId>
             <version>${liquibase-core.version}</version>
         </dependency>
-
+        <!-- https://mvnrepository.com/artifact/org.mapstruct/mapstruct -->
+        <dependency>
+            <groupId>org.mapstruct</groupId>
+            <artifactId>mapstruct</artifactId>
+            <version>${mapstruct.version}</version>
+        </dependency>
     </dependencies>
     <repositories>
         <repository>
@@ -226,9 +232,21 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.8.1</version>
+                <version>3.14.1</version>
                 <configuration>
                     <release>${maven.compiler.release}</release>
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>org.mapstruct</groupId>
+                            <artifactId>mapstruct-processor</artifactId>
+                            <version>${mapstruct.version}</version>
+                        </path>
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                            <version>${lombok.version}</version>
+                        </path>
+                    </annotationProcessorPaths>
                 </configuration>
             </plugin>
             <plugin>
