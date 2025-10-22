@@ -1,6 +1,6 @@
 package de.vatrascell.nezr.util;
 
-import de.vatrascell.nezr.flag.FlagList;
+import de.vatrascell.nezr.model.FlagList;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;

@@ -1,8 +1,8 @@
-package de.vatrascell.nezr.flag;
+package de.vatrascell.nezr.model;
 
-import de.vatrascell.nezr.model.QuestionEditParam;
-import de.vatrascell.nezr.model.QuestionType;
-import de.vatrascell.nezr.validation.Validation;
+import de.vatrascell.nezr.flag.React;
+import de.vatrascell.nezr.flag.Symbol;
+import de.vatrascell.nezr.flag.SymbolType;
 
 import java.util.ArrayList;
 import java.util.List;

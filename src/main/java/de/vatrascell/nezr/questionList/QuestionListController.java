@@ -70,7 +70,7 @@ public class QuestionListController {
     private void getData() {
         data.clear();
         List<QuestionTableObject> tableObjects =
-                QuestionTableObjectConverter.convert(Objects.requireNonNull(questionListService.getQuestions(Long.valueOf(questionnaire.getId()).intValue())), this);
+                QuestionTableObjectConverter.convert(Objects.requireNonNull(questionListService.getQuestions(questionnaire.getId())), this);
         data.addAll(Objects.requireNonNull(tableObjects));
     }
 

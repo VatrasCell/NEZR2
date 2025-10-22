@@ -27,10 +27,10 @@ import static de.vatrascell.nezr.application.SqlStatement.SQL_GET_ANSWER_OPTION_
 
 @Service
 public class AnswerOptionService extends Database {
-    public List<AnswerOption> getAnswerOptions(int questionId) {
+    public List<AnswerOption> getAnswerOptions(long questionId) {
         try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
             PreparedStatement psSql = myCon.prepareStatement(SQL_GET_ANSWER_OPTIONS);
-            psSql.setInt(1, questionId);
+            psSql.setLong(1, questionId);
 
             ResultSet myRS = psSql.executeQuery();
             ArrayList<AnswerOption> answerOptions = new ArrayList<>();

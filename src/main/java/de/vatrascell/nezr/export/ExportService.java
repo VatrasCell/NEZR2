@@ -54,8 +54,8 @@ public class ExportService extends Database {
         ArrayList<ExcelCell> excelCells = new ArrayList<>();
         try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
             PreparedStatement psSql = myCon.prepareStatement(SQL_GET_MULTIPLE_CHOICE_SURVEY_ID_BY_ANSWER);
-            psSql.setInt(1, question.getQuestionnaireId());
-            psSql.setInt(2, question.getQuestionId());
+            psSql.setLong(1, question.getQuestionnaireId());
+            psSql.setLong(2, question.getQuestionId());
             psSql.setInt(3, answerOption.getId());
             psSql.setString(4, fromDate);
             psSql.setString(5, toDate);
@@ -86,12 +86,12 @@ public class ExportService extends Database {
                 || (question.getFlags().isYesNoQuestion());
     }
 
-    private List<ExcelCell> getMultipleChoiceAnswerCells(int questionnaireId, int questionId, String fromDate, String toDate) {
+    private List<ExcelCell> getMultipleChoiceAnswerCells(long questionnaireId, long questionId, String fromDate, String toDate) {
         List<ExcelCell> excelCells = new ArrayList<>();
         try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
             PreparedStatement psSql = myCon.prepareStatement(SQL_GET_MULTIPLE_CHOICE_SURVEY_ID_AND_ANSWER);
-            psSql.setInt(1, questionnaireId);
-            psSql.setInt(2, questionId);
+            psSql.setLong(1, questionnaireId);
+            psSql.setLong(2, questionId);
             psSql.setString(3, fromDate);
             psSql.setString(4, toDate);
             ResultSet myRS = psSql.executeQuery();
@@ -115,12 +115,12 @@ public class ExportService extends Database {
         return excelCells;
     }
 
-    private List<ExcelCell> getShortAnswerAnswerCells(int questionnaireId, int questionId, String fromDate, String toDate) {
+    private List<ExcelCell> getShortAnswerAnswerCells(long questionnaireId, long questionId, String fromDate, String toDate) {
         List<ExcelCell> excelCells = new ArrayList<>();
         try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
             PreparedStatement psSql = myCon.prepareStatement(SQL_GET_SHORT_ANSWER_SURVEY_ID_AND_ANSWER);
-            psSql.setInt(1, questionnaireId);
-            psSql.setInt(2, questionId);
+            psSql.setLong(1, questionnaireId);
+            psSql.setLong(2, questionId);
             psSql.setString(3, fromDate);
             psSql.setString(4, toDate);
             ResultSet myRS = psSql.executeQuery();

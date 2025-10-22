@@ -8,17 +8,17 @@ public class React {
     private int id;
     private final String ANSWER = "A";
     private QuestionType questionType;
-    private int questionId;
+    private long questionId;
     private int answerPos;
 
-    public React(QuestionType questionType, int questionId, int answerPos) {
+    public React(QuestionType questionType, long questionId, int answerPos) {
         super();
         this.questionType = questionType;
         this.questionId = questionId;
         this.answerPos = answerPos;
     }
 
-    public React(int id, QuestionType questionType, int questionId, int answerPos) {
+    public React(int id, QuestionType questionType, long questionId, int answerPos) {
         super();
         this.id = id;
         this.questionType = questionType;
@@ -34,7 +34,7 @@ public class React {
         this.questionType = questionType;
     }
 
-    public int getQuestionId() {
+    public long getQuestionId() {
         return questionId;
     }
 

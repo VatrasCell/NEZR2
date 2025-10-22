@@ -298,7 +298,7 @@ public class SurveyController {
         ValidationSupport validationSupport = new ValidationSupport();
         outerVBox.getChildren().clear();
 
-        HashMap<Integer, List<BooleanProperty>> booleanPropertyHashMap = new HashMap<>();
+        HashMap<Long, List<BooleanProperty>> booleanPropertyHashMap = new HashMap<>();
         BooleanProperty checkRequiredValue = new SimpleBooleanProperty(true);
 
         for (Question question : questions) {
@@ -325,7 +325,7 @@ public class SurveyController {
         footerHBox.getChildren().add(new Label("10: sehr gut"));
     }
 
-    private void createMultipleChoiceQuestion(VBox innerVBox, Question question, HashMap<Integer, List<BooleanProperty>> booleanPropertyHashMap, BooleanProperty checkRequiredValue) {
+    private void createMultipleChoiceQuestion(VBox innerVBox, Question question, HashMap<Long, List<BooleanProperty>> booleanPropertyHashMap, BooleanProperty checkRequiredValue) {
         if (question.getFlags().isList()) {
             innerVBox.getChildren().add(createListViewHBox(question, booleanPropertyHashMap, checkRequiredValue));
         } else {
@@ -387,7 +387,7 @@ public class SurveyController {
         return String.format("(^$|%s)", regex);
     }
 
-    private HBox createListViewHBox(Question question, HashMap<Integer, List<BooleanProperty>> booleanPropertyHashMap, BooleanProperty checkRequiredValue) {
+    private HBox createListViewHBox(Question question, HashMap<Long, List<BooleanProperty>> booleanPropertyHashMap, BooleanProperty checkRequiredValue) {
         HBox hBox = new HBox();
         hBox.setAlignment(Pos.CENTER);
 
@@ -453,7 +453,7 @@ public class SurveyController {
         return hBox;
     }
 
-    private HBox createCheckboxHBox(Question question, HashMap<Integer, List<BooleanProperty>> booleanPropertyHashMap, BooleanProperty checkRequiredValue) {
+    private HBox createCheckboxHBox(Question question, HashMap<Long, List<BooleanProperty>> booleanPropertyHashMap, BooleanProperty checkRequiredValue) {
         ToggleGroup group = new ToggleGroup();
         HBox hBox = new HBox();
         hBox.setAlignment(Pos.CENTER);
@@ -512,7 +512,7 @@ public class SurveyController {
         return hBox;
     }
 
-    private void checkObservableValues(BooleanProperty checkRequiredValue, HashMap<Integer, List<BooleanProperty>> booleanPropertyHashMap) {
+    private void checkObservableValues(BooleanProperty checkRequiredValue, HashMap<Long, List<BooleanProperty>> booleanPropertyHashMap) {
         List<Boolean> booleans = new ArrayList<>();
 
         for (List<BooleanProperty> booleanProperties : booleanPropertyHashMap.values()) {

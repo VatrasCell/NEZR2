@@ -1,9 +1,9 @@
 package de.vatrascell.nezr.react;
 
 import de.vatrascell.nezr.application.controller.ScreenController;
-import de.vatrascell.nezr.flag.FlagList;
 import de.vatrascell.nezr.flag.React;
 import de.vatrascell.nezr.model.AnswerOption;
+import de.vatrascell.nezr.model.FlagList;
 import de.vatrascell.nezr.model.Question;
 import de.vatrascell.nezr.model.QuestionType;
 import de.vatrascell.nezr.model.Questionnaire;
@@ -248,7 +248,7 @@ public class ReactController {
      * @param questions    ArrayList FrageErstellen: alle Fragen
      * @return Postition im ArrayList "questions" als int.
      */
-    private static int getY(int x, QuestionType questionType, List<Question> questions) {
+    private static int getY(long x, QuestionType questionType, List<Question> questions) {
         for (int i = 0; i < questions.size(); i++) {
             if (x == questions.get(i).getQuestionId() && questionType.equals(questions.get(i).getQuestionType())) {
                 return i;

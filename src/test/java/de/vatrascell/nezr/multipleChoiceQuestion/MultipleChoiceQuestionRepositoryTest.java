@@ -1,6 +1,8 @@
 package de.vatrascell.nezr.multipleChoiceQuestion;
 
 import de.vatrascell.nezr.application.Main;
+import de.vatrascell.nezr.question.MultipleChoiceQuestion;
+import de.vatrascell.nezr.question.MultipleChoiceQuestionRepository;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

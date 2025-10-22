@@ -1,7 +1,7 @@
 package de.vatrascell.nezr.relation;
 
 import de.vatrascell.nezr.admin.Questionnaire;
-import de.vatrascell.nezr.question.MultipleChoiceQuestion;
+import de.vatrascell.nezr.question.ShortAnswerQuestion;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
@@ -15,16 +15,16 @@ import lombok.NoArgsConstructor;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "questionnaire_has_multiple_choice")
-public class QuestionnaireHasMultipleChoiceRelation {
+@Table(name = "questionnaire_has_short_answer")
+public class QuestionnaireHasShortAnswerRelation {
 
     @Id
-    private long qMcRelationId;
+    private long qSaRelationId;
     private int position;
     @ManyToOne
     @JoinColumn(name = "questionnaire_id")
     private Questionnaire questionnaire;
     @ManyToOne
-    @JoinColumn(name = "multiple_choice_id")
-    private MultipleChoiceQuestion multipleChoiceQuestion;
+    @JoinColumn(name = "short_answer_id")
+    private ShortAnswerQuestion shortAnswerQuestion;
 }

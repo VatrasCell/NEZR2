@@ -1,6 +1,7 @@
 package de.vatrascell.nezr.validation;
 
 import de.vatrascell.nezr.application.Database;
+import de.vatrascell.nezr.model.Validation;
 import org.springframework.stereotype.Service;
 
 import java.sql.Connection;

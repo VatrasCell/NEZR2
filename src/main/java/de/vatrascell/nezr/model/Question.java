@@ -1,6 +1,5 @@
 package de.vatrascell.nezr.model;
 
-import de.vatrascell.nezr.flag.FlagList;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
@@ -27,7 +26,7 @@ public class Question implements Comparable<Question>, Comparator<Question> {
     public static String DELETE = "delete";
 
     private String question;
-    private Integer questionId;
+    private Long questionId;
     private QuestionType questionType;
     private Category category;
     private String date;
@@ -43,7 +42,7 @@ public class Question implements Comparable<Question>, Comparator<Question> {
     private ListView<AnswerOption> answerOptionListView;
     private TextArea answerTextArea;
     private Question target;
-    private int questionnaireId;
+    private long questionnaireId;
 
     /**
      *

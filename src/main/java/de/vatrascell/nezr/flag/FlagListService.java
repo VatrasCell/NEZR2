@@ -1,6 +1,7 @@
 package de.vatrascell.nezr.flag;
 
 import de.vatrascell.nezr.application.Database;
+import de.vatrascell.nezr.model.FlagList;
 import de.vatrascell.nezr.model.QuestionType;
 import de.vatrascell.nezr.react.ReactService;
 import de.vatrascell.nezr.validation.ValidationService;

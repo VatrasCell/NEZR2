@@ -131,11 +131,11 @@ public class SurveyService extends Database {
         }
     }
 
-    private void createSurveyMultipleChoiceRelation(Connection connection, int surveyId, int questionId) throws SQLException {
+    private void createSurveyMultipleChoiceRelation(Connection connection, int surveyId, long questionId) throws SQLException {
         try {
             PreparedStatement psSql = connection.prepareStatement(SQL_CREATE_SURVEY_HAS_MULTIPLE_CHOICE_RELATION);
             psSql.setInt(1, surveyId);
-            psSql.setInt(2, questionId);
+            psSql.setLong(2, questionId);
             psSql.execute();
         } catch (SQLException e) {
             connection.rollback();
@@ -155,12 +155,12 @@ public class SurveyService extends Database {
         }
     }
 
-    private Integer getSurveyQuestionRelationId(int surveyId, int questionId, QuestionType questionType) {
+    private Integer getSurveyQuestionRelationId(int surveyId, long questionId, QuestionType questionType) {
         try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
             PreparedStatement psSql = myCon.prepareStatement(questionType.equals(QuestionType.MULTIPLE_CHOICE) ?
                     SQL_GET_SURVEY_HAS_MULTIPLE_CHOICE_RELATION_ID : SQL_GET_SURVEY_HAS_ANSWER_OPTION_RELATION_ID);
             psSql.setInt(1, surveyId);
-            psSql.setInt(2, questionId);
+            psSql.setLong(2, questionId);
             ResultSet myRS = psSql.executeQuery();
             if (myRS.next()) {
                 return myRS.getInt(questionType.equals(QuestionType.MULTIPLE_CHOICE) ?
@@ -173,11 +173,11 @@ public class SurveyService extends Database {
         return null;
     }
 
-    private void createSurveyShortAnswerRelation(Connection connection, int surveyId, int questionId, String answer) throws SQLException {
+    private void createSurveyShortAnswerRelation(Connection connection, int surveyId, long questionId, String answer) throws SQLException {
         try {
             PreparedStatement psSql = connection.prepareStatement(SQL_CREATE_SURVEY_HAS_SHORT_ANSWER_RELATION);
             psSql.setInt(1, surveyId);
-            psSql.setInt(2, questionId);
+            psSql.setLong(2, questionId);
             psSql.setString(3, answer);
             psSql.execute();
         } catch (SQLException e) {
@@ -186,11 +186,11 @@ public class SurveyService extends Database {
         }
     }
 
-    private boolean existsSurveyShortAnswerRelation(int surveyId, int questionId) {
+    private boolean existsSurveyShortAnswerRelation(int surveyId, long questionId) {
         try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
             PreparedStatement psSql = myCon.prepareStatement(SQL_GET_SURVEY_HAS_SHORT_ANSWER_RELATION_ID);
             psSql.setInt(1, surveyId);
-            psSql.setInt(2, questionId);
+            psSql.setLong(2, questionId);
             ResultSet myRS = psSql.executeQuery();
             return myRS.next();
         } catch (SQLException e) {
@@ -237,12 +237,12 @@ public class SurveyService extends Database {
         }
     }
 
-    private SubmittedAnswer getShortAnswerSubmittedAnswer(int surveyId, int questionId) {
+    private SubmittedAnswer getShortAnswerSubmittedAnswer(int surveyId, long questionId) {
         SubmittedAnswer submittedAnswer = new SubmittedAnswer();
         try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
             PreparedStatement psSql = myCon.prepareStatement(SQL_GET_SHORT_ANSWER_OF_SURVEY);
             psSql.setInt(1, surveyId);
-            psSql.setInt(2, questionId);
+            psSql.setLong(2, questionId);
             ResultSet myRS = psSql.executeQuery();
             if (myRS.next()) {
                 submittedAnswer = new SubmittedAnswer();
@@ -256,13 +256,13 @@ public class SurveyService extends Database {
         return submittedAnswer;
     }
 
-    private SubmittedAnswer getMultipleChoiceSubmittedAnswer(int surveyId, int questionId) {
+    private SubmittedAnswer getMultipleChoiceSubmittedAnswer(int surveyId, long questionId) {
         SubmittedAnswer submittedAnswer = new SubmittedAnswer();
         List<AnswerOption> answerOptions = new ArrayList<>();
         try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
             PreparedStatement psSql = myCon.prepareStatement(SQL_GET_MULTIPLE_CHOICE_ANSWERS);
             psSql.setInt(1, surveyId);
-            psSql.setInt(2, questionId);
+            psSql.setLong(2, questionId);
             ResultSet myRS = psSql.executeQuery();
             while (myRS.next()) {
                 AnswerOption answerOption = new AnswerOption();

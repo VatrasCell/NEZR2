@@ -2,12 +2,12 @@ package de.vatrascell.nezr.question;
 
 import de.vatrascell.nezr.application.Database;
 import de.vatrascell.nezr.category.CategoryService;
-import de.vatrascell.nezr.flag.FlagList;
 import de.vatrascell.nezr.flag.FlagListService;
 import de.vatrascell.nezr.flag.React;
 import de.vatrascell.nezr.headline.HeadlineService;
 import de.vatrascell.nezr.model.AnswerOption;
 import de.vatrascell.nezr.model.Category;
+import de.vatrascell.nezr.model.FlagList;
 import de.vatrascell.nezr.model.Headline;
 import de.vatrascell.nezr.model.Question;
 import de.vatrascell.nezr.model.QuestionType;
