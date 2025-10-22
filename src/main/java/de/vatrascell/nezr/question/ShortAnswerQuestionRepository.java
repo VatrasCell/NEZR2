@@ -10,16 +10,14 @@ import java.util.List;
 @Repository
 public interface ShortAnswerQuestionRepository extends JpaRepository<ShortAnswerQuestion, Long> {
 
-    @Override
-    List<ShortAnswerQuestion> findAll();
-
     @Query("SELECT new de.vatrascell.nezr.question.ShortAnswerQuestion(" +
             "sa.question, sa.shortAnswerId, q.creationDate, qhsa.position, " +
-            "c, sa.headline, qhsa.qSaRelationId) " +
+            "c, sa.headline, qhsa.qSaRelationId, f) " +
             "FROM Questionnaire q " +
             "JOIN QuestionnaireHasShortAnswerRelation qhsa ON qhsa.questionnaire = q " +
             "JOIN qhsa.shortAnswerQuestion sa ON qhsa.shortAnswerQuestion = sa " +
             "LEFT JOIN sa.headline h " +
+            "LEFT JOIN FlagListShortAnswer f ON f.qSaRelationId = qhsa.qSaRelationId " +
             "JOIN sa.category c " +
             "WHERE q.questionnaireId = :questionnaireId")
     List<ShortAnswerQuestion> findShortAnswerQuestionsByQuestionnaireId(@Param("questionnaireId") Long questionnaireId);

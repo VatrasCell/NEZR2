@@ -2,6 +2,7 @@ package de.vatrascell.nezr.question;
 
 import de.vatrascell.nezr.admin.Questionnaire;
 import de.vatrascell.nezr.category.Category;
+import de.vatrascell.nezr.flag.FlagListShortAnswer;
 import de.vatrascell.nezr.headline.Headline;
 import de.vatrascell.nezr.model.QuestionType;
 import jakarta.persistence.Entity;
@@ -70,9 +71,13 @@ public class ShortAnswerQuestion {
     @Transient
     private long qSaRelationId;
 
+    @Transient
+    private FlagListShortAnswer flagListShortAnswer;
+
     // Konstruktor für die Repository-Abfrage
     public ShortAnswerQuestion(String question, long shortAnswerId, LocalDateTime creationDate,
-                               int position, Category category, Headline headline, long qSaRelationId) {
+                               int position, Category category, Headline headline, long qSaRelationId,
+                               FlagListShortAnswer flagListShortAnswer) {
         this.question = question;
         this.shortAnswerId = shortAnswerId;
         this.creationDate = creationDate;
@@ -80,5 +85,6 @@ public class ShortAnswerQuestion {
         this.qSaRelationId = qSaRelationId;
         this.category = category;
         this.headline = headline;
+        this.flagListShortAnswer = flagListShortAnswer;
     }
 }
