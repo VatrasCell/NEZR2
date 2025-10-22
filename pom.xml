@@ -9,26 +9,32 @@
     <version>2.0-SNAPSHOT</version>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <java-fx-version>19.0.2.1</java-fx-version>
-        <controls-fx-version>11.1.2</controls-fx-version>
-        <maven.compiler.release>20</maven.compiler.release>
+        <maven.compiler.release>21</maven.compiler.release>
+
+        <java-fx-version>21.0.5</java-fx-version>
+        <controls-fx-version>11.2.2</controls-fx-version>
         <javafx.maven.plugin.version>0.0.8</javafx.maven.plugin.version>
-        <poi.version>5.2.2</poi.version>
-        <ooxml-schemas.version>1.4</ooxml-schemas.version>
-        <h2.version>2.1.214</h2.version>
-        <junit.version>5.9.2</junit.version>
-        <javafx-weaver-spring-boot-starter.version>1.3.0</javafx-weaver-spring-boot-starter.version>
-        <spring-boot-starter.version>3.2.4</spring-boot-starter.version>
-        <lombok.version>1.18.26</lombok.version>
-        <org.osgi.framework.version>1.10.0</org.osgi.framework.version>
-        <bootstrapfx-core.version>0.4.0</bootstrapfx-core.version>
+        <javafx-weaver-spring-boot-starter.version>2.0.1</javafx-weaver-spring-boot-starter.version>
         <javafx-weaver.version>master-76230d4319-1</javafx-weaver.version>
         <mapjfx.version>3.1.0</mapjfx.version>
-        <batik-transcoder.version>1.17</batik-transcoder.version>
-        <liquibase-core.version>4.26.0</liquibase-core.version>
-        <spring-boot-starter-data-jpa.version>3.2.4</spring-boot-starter-data-jpa.version>
-        <mockito-core.version>5.11.0</mockito-core.version>
+
+        <poi.version>5.4.1</poi.version>
+        <ooxml-schemas.version>1.4</ooxml-schemas.version>
+        <h2.version>2.4.240</h2.version>
+        <junit.version>5.12.2</junit.version>
+        <lombok.version>1.18.42</lombok.version>
+        <org.osgi.framework.version>1.10.0</org.osgi.framework.version>
+        <bootstrapfx-core.version>0.4.0</bootstrapfx-core.version>
+        <batik-transcoder.version>1.19</batik-transcoder.version>
+        <liquibase-core.version>5.0.1</liquibase-core.version>
+        <mockito-core.version>5.20.0</mockito-core.version>
         <mapstruct.version>1.6.3</mapstruct.version>
+
+        <spring.version>3.5.6</spring.version>
+        <spring-boot-starter-data-jpa.version>${spring.version}</spring-boot-starter-data-jpa.version>
+        <spring-boot-starter.version>${spring.version}</spring-boot-starter.version>
+        <spring-boot-starter-test.version>${spring.version}</spring-boot-starter-test.version>
+        <spring-boot-starter-log4j2.version>${spring.version}</spring-boot-starter-log4j2.version>
     </properties>
     <dependencies>
         <!-- https://mvnrepository.com/artifact/org.apache.poi/poi-ooxml -->
@@ -148,7 +154,7 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
-            <version>3.2.4</version>
+            <version>${spring-boot-starter-test.version}</version>
             <scope>test</scope>
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter -->
@@ -173,7 +179,7 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-log4j2</artifactId>
-            <version>3.2.4</version>
+            <version>${spring-boot-starter-log4j2.version}</version>
         </dependency>
 
 
@@ -265,7 +271,7 @@
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
-                <version>0.8.6</version>
+                <version>0.8.12</version>
                 <executions>
                     <execution>
                         <id>default-prepare-agent</id>
