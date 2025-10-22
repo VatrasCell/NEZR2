@@ -156,7 +156,7 @@ public class QuestionController {
         answerTable.setItems(data);
 
         //answerIdTableColumn.setCellValueFactory(new PropertyValueFactory<>(Answer.ID));
-        answerValueTableColumn.setCellValueFactory(new PropertyValueFactory<>(AnswerOption.VALUE));
+        answerValueTableColumn.setCellValueFactory(new PropertyValueFactory<>(AnswerOption.NAME));
 
         editButtonColumn.setCellValueFactory(new PropertyValueFactory<>(Questionnaire.EDIT));
         answerTable.getColumns().add(editButtonColumn);
@@ -249,7 +249,7 @@ public class QuestionController {
 
         if (question.getQuestionType().equals(QuestionType.MULTIPLE_CHOICE)) {
             if (question.getAnswerOptions().size() > 0) {
-                if (question.getAnswerOptions().get(0).getValue().equals("#####")) {
+                if (question.getAnswerOptions().get(0).getName().equals("#####")) {
                     System.out.println("Old dataset pattern found.");
                 }
             }
@@ -396,7 +396,7 @@ public class QuestionController {
         Optional<String> result = dialog.showAndWait();
         result.ifPresent(name -> {
             AnswerOption answerOption = new AnswerOption();
-            answerOption.setValue(name);
+            answerOption.setName(name);
             data.add(AnswerTableObjectConverter.convert(answerOption, this));
 
             NotificationController.createMessage(MessageId.TITLE_CREATE_ANSWER, MessageId.MESSAGE_CREATE_ANSWER, name);

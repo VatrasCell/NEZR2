@@ -180,7 +180,7 @@ public class ReactController {
                 okButton.setDisable(!(hasQuestion && hasAnswer));
                 answerData.clear();
                 for (AnswerOption answerOption : newQuestion.getAnswerOptions()) {
-                    String answer = answerOption.getValue();
+                    String answer = answerOption.getName();
                     if (answer.equals("")) {
                         answer = "<Textfeld>";
                     }

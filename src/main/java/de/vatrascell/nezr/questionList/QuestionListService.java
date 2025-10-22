@@ -3,9 +3,9 @@ package de.vatrascell.nezr.questionList;
 import de.vatrascell.nezr.category.CategoryService;
 import de.vatrascell.nezr.flag.FlagListService;
 import de.vatrascell.nezr.headline.HeadlineService;
-import de.vatrascell.nezr.model.AnswerOption;
 import de.vatrascell.nezr.model.Question;
 import de.vatrascell.nezr.model.QuestionType;
+import de.vatrascell.nezr.question.AnswerOption;
 import de.vatrascell.nezr.question.AnswerOptionService;
 import de.vatrascell.nezr.question.MultipleChoiceMapper;
 import de.vatrascell.nezr.question.MultipleChoiceQuestion;
@@ -48,6 +48,12 @@ public class QuestionListService {
     private List<Question> getMultipleChoiceQuestions(long questionnaireId) {
         List<MultipleChoiceQuestion> multipleChoiceQuestions =
                 multipleChoiceQuestionRepository.findMultipleChoiceQuestionsByQuestionnaireId(questionnaireId);
+
+        multipleChoiceQuestions.forEach(question -> {
+            question.setAnswerOptions(multipleChoiceQuestionRepository.findAnswerOptionsWithQuestionIdsByQuestionId(
+                    question.getMultipleChoiceId()));
+        });
+
         return multipleChoiceQuestions.stream()
                 .map((MultipleChoiceQuestion multipleChoiceQuestion) -> multipleChoiceMapper.mapMultipleChoiceQuestion(multipleChoiceQuestion, questionnaireId))
                 .toList();
@@ -62,20 +68,8 @@ public class QuestionListService {
     }
 
     public List<AnswerOption> getMultipleChoiceQuestionAnswers(int questionnaireId, int questionId) {
-        List<AnswerOption> answerOptions = new ArrayList<>();
-        List<Object[]> results = multipleChoiceQuestionRepository.findMultipleChoiceQuestionAnswers(questionnaireId, questionId);
-
-        for (Object[] row : results) {
-            AnswerOption answerOption = new AnswerOption();
-            answerOption.setId((Integer) row[0]);
-            answerOption.setValue((String) row[1]);
-
-            if (!answerOptions.contains(answerOption)) {
-                answerOptions.add(answerOption);
-            }
-        }
-
-        return answerOptions;
+        //return multipleChoiceQuestionRepository.findMultipleChoiceQuestionAnswers(questionnaireId, questionId);
+        return null;
     }
 
     public List<Integer> getQuestionsByQuestionnaireId(int questionnaireId, QuestionType questionType) {

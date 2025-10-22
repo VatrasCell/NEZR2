@@ -1,53 +1,26 @@
 package de.vatrascell.nezr.model;
 
-import java.util.Objects;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class AnswerOption {
 
     public static final String ID = "id";
-    public static final String VALUE = "value";
+    public static final String NAME = "name";
 
-    private Integer id;
-    private String value;
+    private Integer answerOptionId;
+    private String name;
 
-    public AnswerOption() {
-    }
-
-    public AnswerOption(String value) {
-        this.value = value;
-    }
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public String getValue() {
-        return value;
-    }
-
-    public void setValue(String value) {
-        this.value = value;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        AnswerOption that = (AnswerOption) o;
-        return Objects.equals(getId(), that.getId()) && Objects.equals(getValue(), that.getValue());
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(getId(), getValue());
+    public AnswerOption(String name) {
+        this.name = name;
     }
 
     @Override
     public String toString() {
-        return this.value;
+        return this.name;
     }
 }

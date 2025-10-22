@@ -56,7 +56,7 @@ public class ExportService extends Database {
             PreparedStatement psSql = myCon.prepareStatement(SQL_GET_MULTIPLE_CHOICE_SURVEY_ID_BY_ANSWER);
             psSql.setLong(1, question.getQuestionnaireId());
             psSql.setLong(2, question.getQuestionId());
-            psSql.setInt(3, answerOption.getId());
+            psSql.setInt(3, answerOption.getAnswerOptionId());
             psSql.setString(4, fromDate);
             psSql.setString(5, toDate);
             ResultSet myRS = psSql.executeQuery();

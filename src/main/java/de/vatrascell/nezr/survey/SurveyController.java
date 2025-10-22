@@ -467,7 +467,7 @@ public class SurveyController {
             if (question.getFlags().isMultipleChoice()) {
                 CheckBox checkBox = new CheckBox();
                 checkBox.setUserData(answerOption);
-                checkBox.setText(answerOption.getValue());
+                checkBox.setText(answerOption.getName());
 
                 if (question.getFlags().isRequired()) {
                     List<BooleanProperty> booleanProperties = booleanPropertyHashMap.get(question.getQuestionId());
@@ -487,7 +487,7 @@ public class SurveyController {
             } else {
                 RadioButton radioButton = new RadioButton();
                 radioButton.setUserData(answerOption);
-                radioButton.setText(answerOption.getValue());
+                radioButton.setText(answerOption.getName());
                 radioButton.setToggleGroup(group);
 
                 if (question.getFlags().isRequired()) {

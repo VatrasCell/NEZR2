@@ -37,8 +37,8 @@ public class AnswerOptionService extends Database {
 
             while (myRS.next()) {
                 AnswerOption answerOption = new AnswerOption();
-                answerOption.setId(myRS.getInt(SQL_COLUMN_ANSWER_OPTION_ID));
-                answerOption.setValue(myRS.getString(SQL_COLUMN_NAME));
+                answerOption.setAnswerOptionId(myRS.getInt(SQL_COLUMN_ANSWER_OPTION_ID));
+                answerOption.setName(myRS.getString(SQL_COLUMN_NAME));
                 answerOptions.add(answerOption);
             }
             return answerOptions;
@@ -57,8 +57,8 @@ public class AnswerOptionService extends Database {
 
             if (myRS.next()) {
                 AnswerOption answerOption = new AnswerOption();
-                answerOption.setId(myRS.getInt(SQL_COLUMN_ANSWER_OPTION_ID));
-                answerOption.setValue(myRS.getString(SQL_COLUMN_NAME));
+                answerOption.setAnswerOptionId(myRS.getInt(SQL_COLUMN_ANSWER_OPTION_ID));
+                answerOption.setName(myRS.getString(SQL_COLUMN_NAME));
                 return answerOption;
             }
         } catch (SQLException e) {

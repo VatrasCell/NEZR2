@@ -91,7 +91,7 @@ public class ExportController {
                     } else {
                         if (question.getFlags().isSingleLine()) {
                             String value = question.getSubmittedAnswer().getSubmittedAnswerOptions().isEmpty() ?
-                                    NOT_SELECTED : question.getSubmittedAnswer().getSubmittedAnswerOptions().get(0).getValue();
+                                    NOT_SELECTED : question.getSubmittedAnswer().getSubmittedAnswerOptions().get(0).getName();
                             row.createCell(model.getFistCellPosition() + i)
                                     .setCellValue(this.crHelper.createRichTextString(value));
                         } else {

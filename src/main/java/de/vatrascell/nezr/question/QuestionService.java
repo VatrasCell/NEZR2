@@ -183,10 +183,10 @@ public class QuestionService extends Database {
 
             // answerOptions
             question.getAnswerOptions().stream()
-                    .filter(answerOption -> answerOption.getId() == null)
+                    .filter(answerOption -> answerOption.getAnswerOptionId() == null)
                     .forEach(answerOption -> {
                         try {
-                            answerOption.setId(answerOptionService.provideAnswerOptionId(myCon, answerOption.getValue()));
+                            answerOption.setAnswerOptionId(answerOptionService.provideAnswerOptionId(myCon, answerOption.getName()));
                         } catch (SQLException e) {
                             e.printStackTrace();
                         }
@@ -211,11 +211,11 @@ public class QuestionService extends Database {
             List<Integer> newRelationIds = new ArrayList<>();
 
             for (AnswerOption answerOption : question.getAnswerOptions()) {
-                Integer relationId = getMultipleChoiceAnswersRelationId(multipleChoiceId, answerOption.getId());
+                Integer relationId = getMultipleChoiceAnswersRelationId(multipleChoiceId, answerOption.getAnswerOptionId());
                 if (relationId != null) {
                     newRelationIds.add(relationId);
                 } else {
-                    answerOptionService.createMultipleChoiceAnswerOptionsRelation(myCon, multipleChoiceId, answerOption.getId());
+                    answerOptionService.createMultipleChoiceAnswerOptionsRelation(myCon, multipleChoiceId, answerOption.getAnswerOptionId());
                 }
             }
 

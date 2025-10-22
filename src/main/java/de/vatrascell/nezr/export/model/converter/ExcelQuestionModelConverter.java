@@ -18,7 +18,7 @@ public class ExcelQuestionModelConverter {
         if (question.getQuestionType().equals(QuestionType.SHORT_ANSWER) || question.getFlags().isSingleLine()) {
             answerOptions.add(question.getQuestion());
         } else {
-            answerOptions.addAll(question.getAnswerOptions().stream().map(AnswerOption::getValue).collect(Collectors.toList()));
+            answerOptions.addAll(question.getAnswerOptions().stream().map(AnswerOption::getName).collect(Collectors.toList()));
         }
         model.setAnswerOptions(answerOptions);
         model.setFistCellPosition(startPosition);

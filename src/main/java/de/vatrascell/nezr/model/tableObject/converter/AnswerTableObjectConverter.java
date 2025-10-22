@@ -13,8 +13,8 @@ public class AnswerTableObjectConverter {
 
     public static AnswerOptionTableObject convert(AnswerOption answerOption, QuestionController questionController) {
         AnswerOptionTableObject tableObject = new AnswerOptionTableObject(questionController);
-        tableObject.setId(answerOption.getId());
-        tableObject.setValue(answerOption.getValue());
+        tableObject.setAnswerOptionId(answerOption.getAnswerOptionId());
+        tableObject.setName(answerOption.getName());
 
         return tableObject;
     }

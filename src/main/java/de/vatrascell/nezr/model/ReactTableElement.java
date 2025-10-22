@@ -13,7 +13,7 @@ public class ReactTableElement {
     public ReactTableElement(Question question, int answerPos, React flag) {
         super();
         this.question = question.getQuestion();
-        this.answer = question.getAnswerOptions().get(answerPos).getValue();
+        this.answer = question.getAnswerOptions().get(answerPos).getName();
         this.comment = String.format(REACT_DESCRIPTION, answer, this.question);
         this.flag = flag;
     }

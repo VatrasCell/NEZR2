@@ -63,9 +63,9 @@ public class SurveyService extends Database {
                         surveyMultipleChoiceRelationId = Objects.requireNonNull(getSurveyQuestionRelationId(surveyId, question.getQuestionId(), question.getQuestionType()));
                     }
                     for (AnswerOption answerOption : submittedAnswerOptions) {
-                        Integer relId = getSurveyQuestionRelationId(answerOption.getId(), surveyMultipleChoiceRelationId, question.getQuestionType());
+                        Integer relId = getSurveyQuestionRelationId(answerOption.getAnswerOptionId(), surveyMultipleChoiceRelationId, question.getQuestionType());
                         if (relId == null) {
-                            createSurveyAnswerOptionRelation(myCon, answerOption.getId(), surveyMultipleChoiceRelationId);
+                            createSurveyAnswerOptionRelation(myCon, answerOption.getAnswerOptionId(), surveyMultipleChoiceRelationId);
                         }
                     }
 
@@ -266,8 +266,8 @@ public class SurveyService extends Database {
             ResultSet myRS = psSql.executeQuery();
             while (myRS.next()) {
                 AnswerOption answerOption = new AnswerOption();
-                answerOption.setId(myRS.getInt(SQL_COLUMN_ANSWER_OPTION_ID));
-                answerOption.setValue(myRS.getString(SQL_COLUMN_NAME));
+                answerOption.setAnswerOptionId(myRS.getInt(SQL_COLUMN_ANSWER_OPTION_ID));
+                answerOption.setName(myRS.getString(SQL_COLUMN_NAME));
                 answerOptions.add(answerOption);
             }
 
