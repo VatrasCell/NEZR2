@@ -1,7 +1,7 @@
-package de.vatrascell.nezr.question;
+package de.vatrascell.nezr.answerOption;
 
-import de.vatrascell.nezr.application.Database;
 import de.vatrascell.nezr.model.AnswerOption;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.sql.Connection;
@@ -22,34 +22,23 @@ import static de.vatrascell.nezr.application.SqlStatement.SQL_DELETE_MULTIPLE_CH
 import static de.vatrascell.nezr.application.SqlStatement.SQL_DELETE_MULTIPLE_CHOICE_ANSWER_OPTIONS_RELATION_BY_ID;
 import static de.vatrascell.nezr.application.SqlStatement.SQL_DELETE_UNBINDED_ANSWER_OPTIONS;
 import static de.vatrascell.nezr.application.SqlStatement.SQL_GET_ANSWER_OPTION;
-import static de.vatrascell.nezr.application.SqlStatement.SQL_GET_ANSWER_OPTIONS;
 import static de.vatrascell.nezr.application.SqlStatement.SQL_GET_ANSWER_OPTION_ID;
 
 @Service
-public class AnswerOptionService extends Database {
+@RequiredArgsConstructor
+public class AnswerOptionService {
+
+    private final AnswerOptionRepository answerOptionRepository;
+    private final AnswerOptionMapper answerOptionMapper;
+    
     public List<AnswerOption> getAnswerOptions(long questionId) {
-        try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
-            PreparedStatement psSql = myCon.prepareStatement(SQL_GET_ANSWER_OPTIONS);
-            psSql.setLong(1, questionId);
-
-            ResultSet myRS = psSql.executeQuery();
-            ArrayList<AnswerOption> answerOptions = new ArrayList<>();
-
-            while (myRS.next()) {
-                AnswerOption answerOption = new AnswerOption();
-                answerOption.setAnswerOptionId(myRS.getInt(SQL_COLUMN_ANSWER_OPTION_ID));
-                answerOption.setName(myRS.getString(SQL_COLUMN_NAME));
-                answerOptions.add(answerOption);
-            }
-            return answerOptions;
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return null;
+        return answerOptionRepository.findAnswerOptionsByQuestionId(questionId)
+                .stream().map(answerOptionMapper::mapAnswerOption)
+                .toList();
     }
 
     public AnswerOption getAnswerOption(String name) {
-        try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
+        try (Connection myCon = DriverManager.getConnection(null, null, null)) {
             PreparedStatement psSql = myCon.prepareStatement(SQL_GET_ANSWER_OPTION);
             psSql.setString(1, name);
 
@@ -80,7 +69,7 @@ public class AnswerOptionService extends Database {
     }
 
     public void deleteAnswerOptions(ArrayList<Integer> answerIds, int multipleChoiceId) {
-        try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
+        try (Connection myCon = DriverManager.getConnection(null, null, null)) {
             myCon.setAutoCommit(false);
             for (Integer answerId : answerIds) {
                 deleteMultipleChoiceAnswerOptionsRelation(myCon, answerId, multipleChoiceId);
@@ -105,7 +94,7 @@ public class AnswerOptionService extends Database {
     }
 
     public Integer getAnswerOptionId(String answer) {
-        try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
+        try (Connection myCon = DriverManager.getConnection(null, null, null)) {
             PreparedStatement psSql = myCon.prepareStatement(SQL_GET_ANSWER_OPTION_ID);
             psSql.setString(1, answer);
             ResultSet myRS = psSql.executeQuery();

@@ -10,7 +10,7 @@ import java.util.List;
 @Repository
 public interface ShortAnswerQuestionRepository extends JpaRepository<ShortAnswerQuestion, Long> {
 
-    @Query("SELECT new de.vatrascell.nezr.question.ShortAnswerQuestion(" +
+    @Query("SELECT new ShortAnswerQuestion(" +
             "sa.question, sa.shortAnswerId, q.creationDate, qhsa.position, " +
             "c, sa.headline, qhsa.qSaRelationId, f) " +
             "FROM Questionnaire q " +

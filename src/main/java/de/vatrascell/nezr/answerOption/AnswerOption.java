@@ -1,4 +1,4 @@
-package de.vatrascell.nezr.question;
+package de.vatrascell.nezr.answerOption;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;

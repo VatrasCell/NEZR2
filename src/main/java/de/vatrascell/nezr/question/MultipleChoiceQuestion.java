@@ -1,6 +1,7 @@
 package de.vatrascell.nezr.question;
 
 import de.vatrascell.nezr.admin.Questionnaire;
+import de.vatrascell.nezr.answerOption.AnswerOption;
 import de.vatrascell.nezr.category.Category;
 import de.vatrascell.nezr.flag.FlagListMultipleChoice;
 import de.vatrascell.nezr.headline.Headline;

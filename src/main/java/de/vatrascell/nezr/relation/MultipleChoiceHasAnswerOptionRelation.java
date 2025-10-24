@@ -1,6 +1,6 @@
 package de.vatrascell.nezr.relation;
 
-import de.vatrascell.nezr.question.AnswerOption;
+import de.vatrascell.nezr.answerOption.AnswerOption;
 import de.vatrascell.nezr.question.MultipleChoiceQuestion;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;

@@ -1,12 +1,13 @@
 package de.vatrascell.nezr.questionList;
 
+import de.vatrascell.nezr.answerOption.AnswerOption;
+import de.vatrascell.nezr.answerOption.AnswerOptionRepository;
+import de.vatrascell.nezr.answerOption.AnswerOptionService;
 import de.vatrascell.nezr.category.CategoryService;
 import de.vatrascell.nezr.flag.FlagListService;
 import de.vatrascell.nezr.headline.HeadlineService;
 import de.vatrascell.nezr.model.Question;
 import de.vatrascell.nezr.model.QuestionType;
-import de.vatrascell.nezr.question.AnswerOption;
-import de.vatrascell.nezr.question.AnswerOptionService;
 import de.vatrascell.nezr.question.MultipleChoiceMapper;
 import de.vatrascell.nezr.question.MultipleChoiceQuestion;
 import de.vatrascell.nezr.question.MultipleChoiceQuestionRepository;
@@ -32,6 +33,7 @@ public class QuestionListService {
     private final HeadlineService headlineService;
     private final MultipleChoiceQuestionRepository multipleChoiceQuestionRepository;
     private final ShortAnswerQuestionRepository shortAnswerQuestionRepository;
+    private final AnswerOptionRepository answerOptionRepository;
     private final MultipleChoiceMapper multipleChoiceMapper;
     private final ShortAnswerMapper shortAnswerMapper;
 
@@ -50,20 +52,23 @@ public class QuestionListService {
                 multipleChoiceQuestionRepository.findMultipleChoiceQuestionsByQuestionnaireId(questionnaireId);
 
         multipleChoiceQuestions.forEach(question -> {
-            question.setAnswerOptions(multipleChoiceQuestionRepository.findAnswerOptionsWithQuestionIdsByQuestionId(
+            question.setAnswerOptions(answerOptionRepository.findAnswerOptionsByQuestionId(
                     question.getMultipleChoiceId()));
         });
 
         return multipleChoiceQuestions.stream()
-                .map((MultipleChoiceQuestion multipleChoiceQuestion) -> multipleChoiceMapper.mapMultipleChoiceQuestion(multipleChoiceQuestion, questionnaireId))
+                .map((MultipleChoiceQuestion multipleChoiceQuestion) ->
+                        multipleChoiceMapper.mapMultipleChoiceQuestion(multipleChoiceQuestion, questionnaireId))
                 .toList();
     }
 
     private List<Question> getShortAnswerQuestions(long questionnaireId) {
         List<ShortAnswerQuestion> shortAnswerQuestions =
                 shortAnswerQuestionRepository.findShortAnswerQuestionsByQuestionnaireId(questionnaireId);
+
         return shortAnswerQuestions.stream()
-                .map((ShortAnswerQuestion shortAnswerQuestion) -> shortAnswerMapper.mapShortAnswerQuestion(shortAnswerQuestion, questionnaireId))
+                .map((ShortAnswerQuestion shortAnswerQuestion) ->
+                        shortAnswerMapper.mapShortAnswerQuestion(shortAnswerQuestion, questionnaireId))
                 .toList();
     }
 
