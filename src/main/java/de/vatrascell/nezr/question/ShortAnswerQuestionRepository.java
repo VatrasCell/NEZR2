@@ -13,13 +13,14 @@ public interface ShortAnswerQuestionRepository extends JpaRepository<ShortAnswer
 
     @Query("SELECT new ShortAnswerQuestion(" +
             "sa.question, sa.shortAnswerId, q.creationDate, qhsa.position, " +
-            "c, sa.headline, qhsa.qSaRelationId, f) " +
+            "c, sa.headline, qhsa.qSaRelationId, f, v) " +
             "FROM Questionnaire q " +
             "JOIN QuestionnaireHasShortAnswerRelation qhsa ON qhsa.questionnaire = q " +
             "JOIN qhsa.shortAnswerQuestion sa ON qhsa.shortAnswerQuestion = sa " +
             "LEFT JOIN sa.headline h " +
             "LEFT JOIN FlagListShortAnswer f ON f.qSaRelationId = qhsa.qSaRelationId " +
             "JOIN sa.category c " +
+            "LEFT JOIN qhsa.validation v " +
             "WHERE q.questionnaireId = :questionnaireId")
     List<ShortAnswerQuestion> findShortAnswerQuestionsByQuestionnaireId(@Param("questionnaireId") Long questionnaireId);
 

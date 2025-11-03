@@ -51,7 +51,7 @@ public class ValidationService extends Database {
 
     public Integer getLastValidationId() {
         return validationRepository.findAll().stream()
-                .mapToInt(de.vatrascell.nezr.validation.Validation::getId)
+                .mapToInt(de.vatrascell.nezr.validation.Validation::getValidationId)
                 .max()
                 .orElse(0);
     }

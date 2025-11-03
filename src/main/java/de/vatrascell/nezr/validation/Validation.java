@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 public class Validation {
 
     @Id
-    private int id;
+    private int validationId;
     private boolean isNumbers;
     private boolean isLetters;
     private boolean isAlphanumeric;
@@ -19,7 +19,7 @@ public class Validation {
     private boolean isRegex;
     private boolean hasLength;
     private String regex;
-    private int minLength;
-    private int maxLength;
-    private int length;
+    private Integer minLength;
+    private Integer maxLength;
+    private Integer length;
 }

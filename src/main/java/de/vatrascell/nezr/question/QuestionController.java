@@ -7,7 +7,6 @@ import de.vatrascell.nezr.application.controller.NotificationController;
 import de.vatrascell.nezr.application.controller.ScreenController;
 import de.vatrascell.nezr.category.CategoryService;
 import de.vatrascell.nezr.headline.HeadlineService;
-import de.vatrascell.nezr.landing.LandingController;
 import de.vatrascell.nezr.message.DialogId;
 import de.vatrascell.nezr.message.MessageId;
 import de.vatrascell.nezr.model.AnswerOption;
@@ -73,7 +72,7 @@ public class QuestionController {
     private final AnswerOptionService answerOptionService;
     private final CategoryService categoryService;
     private final HeadlineService headlineService;
-    private final LandingController landingController;
+    private final ValidationController validationController;
     private final QuestionService questionService;
 
     @FXML
@@ -129,12 +128,12 @@ public class QuestionController {
     @Autowired
     public QuestionController(AnswerOptionService answerOptionService, CategoryService categoryService,
                               HeadlineService headlineService, QuestionService questionService,
-                              LandingController landingController, ScreenController screenController) {
+                              ValidationController validationController, ScreenController screenController) {
         this.answerOptionService = answerOptionService;
         this.categoryService = categoryService;
         this.headlineService = headlineService;
         this.questionService = questionService;
-        this.landingController = landingController;
+        this.validationController = validationController;
         this.screenController = screenController;
     }
 
@@ -249,8 +248,8 @@ public class QuestionController {
         }
 
         if (question.getQuestionType().equals(QuestionType.MULTIPLE_CHOICE)) {
-            if (question.getAnswerOptions().size() > 0) {
-                if (question.getAnswerOptions().get(0).getName().equals("#####")) {
+            if (!question.getAnswerOptions().isEmpty()) {
+                if (question.getAnswerOptions().getFirst().getName().equals("#####")) {
                     System.out.println("Old dataset pattern found.");
                 }
             }
@@ -513,6 +512,7 @@ public class QuestionController {
 
     @FXML
     private void validation() {
+        ValidationController.validation = question.getFlags().getValidation();
         screenController.activate(ValidationController.class);
     }
 

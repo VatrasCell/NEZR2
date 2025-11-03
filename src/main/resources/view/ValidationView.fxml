@@ -15,7 +15,7 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 <BorderPane xmlns:fx="http://javafx.com/fxml/1" prefHeight="400.0" prefWidth="600.0"
-            xmlns="http://javafx.com/javafx/11.0.1" fx:controller="de.vatrascell.nezr.validation.ValidationController">
+            xmlns="http://javafx.com/javafx/17.0.12" fx:controller="de.vatrascell.nezr.validation.ValidationController">
     <top>
         <Label text="Validierung anpassen" BorderPane.alignment="CENTER">
             <BorderPane.margin>
@@ -47,14 +47,17 @@
          <children>
             <FlowPane hgap="8.0" prefHeight="49.0" prefWidth="600.0">
                <children>
-                  <RadioButton mnemonicParsing="false" text="Zahl">
+                   <RadioButton fx:id="radioNumbers" mnemonicParsing="false" text="Zahl">
                      <toggleGroup>
                         <ToggleGroup fx:id="toggleGroup1" />
                      </toggleGroup></RadioButton>
-                  <RadioButton mnemonicParsing="false" text="Buchstaben" toggleGroup="$toggleGroup1" />
-                  <RadioButton mnemonicParsing="false" text="alphanumerisch" toggleGroup="$toggleGroup1" />
-                  <RadioButton mnemonicParsing="false" text="alle Zeichen" toggleGroup="$toggleGroup1" />
-                  <RadioButton mnemonicParsing="false" text="RegEx" toggleGroup="$toggleGroup1" />
+                   <RadioButton fx:id="radioLetters" mnemonicParsing="false" text="Buchstaben"
+                                toggleGroup="$toggleGroup1"/>
+                   <RadioButton fx:id="radioAlphanumeric" mnemonicParsing="false" text="alphanumerisch"
+                                toggleGroup="$toggleGroup1"/>
+                   <RadioButton fx:id="radioAllChars" mnemonicParsing="false" text="alle Zeichen"
+                                toggleGroup="$toggleGroup1"/>
+                   <RadioButton fx:id="radioRegex" mnemonicParsing="false" text="RegEx" toggleGroup="$toggleGroup1"/>
                </children>
                <VBox.margin>
                   <Insets top="8.0" />
@@ -82,15 +85,16 @@
                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
               </rowConstraints>
                <children>
-                  <TextField GridPane.columnIndex="2" />
+                   <TextField fx:id="textMinLength" GridPane.columnIndex="2"/>
                   <Label alignment="CENTER" maxWidth="1.7976931348623157E308" text="min" GridPane.columnIndex="1" />
                   <Label alignment="CENTER" maxWidth="1.7976931348623157E308" text="max" GridPane.columnIndex="3" />
-                  <TextField GridPane.columnIndex="4" />
-                  <CheckBox mnemonicParsing="false" text="Länge" />
-                  <TextField maxWidth="1.7976931348623157E308" GridPane.columnIndex="1" GridPane.columnSpan="6" GridPane.rowIndex="2" />
+                   <TextField fx:id="textMaxLength" GridPane.columnIndex="4"/>
+                   <CheckBox fx:id="checkHasLength" mnemonicParsing="false" text="Länge"/>
+                   <TextField fx:id="textRegex" maxWidth="1.7976931348623157E308" GridPane.columnIndex="1"
+                              GridPane.columnSpan="6" GridPane.rowIndex="2"/>
                   <Label text="RegEx" GridPane.rowIndex="2" />
                   <Label alignment="CENTER" maxWidth="1.7976931348623157E308" text="genau" GridPane.columnIndex="5" />
-                  <TextField GridPane.columnIndex="6" />
+                   <TextField fx:id="textExactLength" GridPane.columnIndex="6"/>
                </children>
                <VBox.margin>
                   <Insets left="8.0" right="8.0" />

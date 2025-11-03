@@ -5,6 +5,7 @@ import de.vatrascell.nezr.category.Category;
 import de.vatrascell.nezr.flag.FlagListShortAnswer;
 import de.vatrascell.nezr.headline.Headline;
 import de.vatrascell.nezr.model.QuestionType;
+import de.vatrascell.nezr.validation.Validation;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -14,6 +15,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 import lombok.AllArgsConstructor;
@@ -74,10 +76,14 @@ public class ShortAnswerQuestion {
     @Transient
     private FlagListShortAnswer flagListShortAnswer;
 
+    @Transient
+    @OneToOne(fetch = FetchType.LAZY)
+    private Validation validation;
+
     // Konstruktor für die Repository-Abfrage
     public ShortAnswerQuestion(String question, long shortAnswerId, LocalDateTime creationDate,
                                int position, Category category, Headline headline, long qSaRelationId,
-                               FlagListShortAnswer flagListShortAnswer) {
+                               FlagListShortAnswer flagListShortAnswer, Validation validation) {
         this.question = question;
         this.shortAnswerId = shortAnswerId;
         this.creationDate = creationDate;
@@ -85,6 +91,7 @@ public class ShortAnswerQuestion {
         this.qSaRelationId = qSaRelationId;
         this.category = category;
         this.headline = headline;
+        this.validation = validation;
         this.flagListShortAnswer = flagListShortAnswer;
     }
 }

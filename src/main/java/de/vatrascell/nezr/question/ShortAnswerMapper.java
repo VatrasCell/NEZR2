@@ -13,5 +13,6 @@ public interface ShortAnswerMapper {
     @Mapping(target = "questionnaireId", source = "questionnaireId")
     @Mapping(target = "questionId", source = "shortAnswerQuestion.shortAnswerId")
     @Mapping(target = "flags", source = "shortAnswerQuestion.flagListShortAnswer")
+    @Mapping(target = "flags.validation", source = "shortAnswerQuestion.validation")
     Question mapShortAnswerQuestion(ShortAnswerQuestion shortAnswerQuestion, long questionnaireId);
 }
