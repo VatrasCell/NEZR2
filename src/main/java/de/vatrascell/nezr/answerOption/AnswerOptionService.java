@@ -5,7 +5,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -27,14 +26,14 @@ public class AnswerOptionService {
         return answerOptionMapper.mapAnswerOption(answerOptionRepository.findByName(name));
     }
 
-    public int provideAnswerOptionId(Connection connection, String answer) throws SQLException {
+    public int provideAnswerOptionId(String answer) {
         AnswerOption existing = getAnswerOption(Objects.requireNonNull(answer));
 
         if (existing != null) {
             return existing.getAnswerOptionId();
         }
 
-        createAnswerOption(connection, answer);
+        createAnswerOption(answer);
         AnswerOption created = getAnswerOption(answer);
         return Objects.requireNonNull(created).getAnswerOptionId();
     }
@@ -55,21 +54,21 @@ public class AnswerOptionService {
         return answerOption != null ? answerOption.getAnswerOptionId() : null;
     }
 
-    private void createAnswerOption(Connection connection, String answer) {
+    private void createAnswerOption(String answer) {
         var newOption = new de.vatrascell.nezr.answerOption.AnswerOption();
         newOption.setName(answer);
         answerOptionRepository.save(newOption);
     }
 
-    public void deleteMultipleChoiceAnswerOptionsRelation(Connection connection, int relationId) {
-        answerOptionRepository.deleteRelationById((long) relationId);
+    public void deleteMultipleChoiceAnswerOptionsRelation(long relationId) {
+        answerOptionRepository.deleteMultipleChoiceAnswerOptionsRelation(relationId);
     }
 
     private void deleteMultipleChoiceAnswerOptionsRelation(Connection connection, int answerId, int multipleChoiceId) {
         answerOptionRepository.deleteRelationByIds((long) multipleChoiceId, (long) answerId);
     }
 
-    public void createMultipleChoiceAnswerOptionsRelation(Connection connection, int multipleChoiceId, int answerId) {
-        answerOptionRepository.createRelation((long) multipleChoiceId, (long) answerId);
+    public void createMultipleChoiceAnswerOptionsRelation(long multipleChoiceId, long answerId) {
+        answerOptionRepository.createMultipleChoiceAnswerOptionsRelation(multipleChoiceId, answerId);
     }
 }

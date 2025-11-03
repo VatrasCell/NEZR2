@@ -3,10 +3,12 @@ package de.vatrascell.nezr.model;
 import de.vatrascell.nezr.flag.React;
 import de.vatrascell.nezr.flag.Symbol;
 import de.vatrascell.nezr.flag.SymbolType;
+import lombok.Data;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Data
 public class FlagList {
 
     private int id;
@@ -35,86 +37,6 @@ public class FlagList {
         this.isSingleLine = param.isSingleLine();
         this.isRequired = param.isRequired();
         this.isEvaluationQuestion = param.isEvaluationQuestion();
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public boolean isList() {
-        return isList;
-    }
-
-    public void setList(boolean list) {
-        isList = list;
-    }
-
-    public boolean isMultipleChoice() {
-        return isMultipleChoice;
-    }
-
-    public void setMultipleChoice(boolean multipleChoice) {
-        isMultipleChoice = multipleChoice;
-    }
-
-    public boolean isTextArea() {
-        return isTextArea;
-    }
-
-    public void setTextArea(boolean textArea) {
-        isTextArea = textArea;
-    }
-
-    public boolean isYesNoQuestion() {
-        return isYesNoQuestion;
-    }
-
-    public void setYesNoQuestion(boolean yesNoQuestion) {
-        isYesNoQuestion = yesNoQuestion;
-    }
-
-    public boolean isSingleLine() {
-        return isSingleLine;
-    }
-
-    public void setSingleLine(boolean singleLine) {
-        isSingleLine = singleLine;
-    }
-
-    public boolean isRequired() {
-        return isRequired;
-    }
-
-    public void setRequired(boolean required) {
-        isRequired = required;
-    }
-
-    public boolean isEvaluationQuestion() {
-        return isEvaluationQuestion;
-    }
-
-    public void setEvaluationQuestion(boolean evaluationQuestion) {
-        isEvaluationQuestion = evaluationQuestion;
-    }
-
-    public Validation getValidation() {
-        return validation;
-    }
-
-    public void setValidation(Validation validation) {
-        this.validation = validation;
-    }
-
-    public List<React> getReacts() {
-        return reacts;
-    }
-
-    public void setReacts(List<React> reacts) {
-        this.reacts = reacts;
     }
 
     public void addReact(React react) {

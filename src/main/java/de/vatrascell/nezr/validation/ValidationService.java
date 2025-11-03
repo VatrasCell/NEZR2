@@ -2,60 +2,26 @@ package de.vatrascell.nezr.validation;
 
 import de.vatrascell.nezr.application.Database;
 import de.vatrascell.nezr.model.Validation;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import static de.vatrascell.nezr.application.SqlStatement.SQL_COLUMN_HAS_LENGTH;
-import static de.vatrascell.nezr.application.SqlStatement.SQL_COLUMN_IS_ALL_CHARS;
-import static de.vatrascell.nezr.application.SqlStatement.SQL_COLUMN_IS_ALPHANUMERIC;
-import static de.vatrascell.nezr.application.SqlStatement.SQL_COLUMN_IS_LETTERS;
-import static de.vatrascell.nezr.application.SqlStatement.SQL_COLUMN_IS_NUMBERS;
-import static de.vatrascell.nezr.application.SqlStatement.SQL_COLUMN_IS_REGEX;
-import static de.vatrascell.nezr.application.SqlStatement.SQL_COLUMN_LENGTH;
-import static de.vatrascell.nezr.application.SqlStatement.SQL_COLUMN_MAX_LENGTH;
-import static de.vatrascell.nezr.application.SqlStatement.SQL_COLUMN_MIN_LENGTH;
-import static de.vatrascell.nezr.application.SqlStatement.SQL_COLUMN_REGEX;
-import static de.vatrascell.nezr.application.SqlStatement.SQL_COLUMN_VALIDATION_ID;
 import static de.vatrascell.nezr.application.SqlStatement.SQL_CREATE_VALIDATION;
-import static de.vatrascell.nezr.application.SqlStatement.SQL_GET_VALIDATION_BY_SA_REL_ID;
-import static de.vatrascell.nezr.application.SqlStatement.SQL_LAST_VALIDATION_ID;
 
 @Service
+@RequiredArgsConstructor
 public class ValidationService extends Database {
+
+    private final ValidationRepository validationRepository;
+    private final ValidationMapper validationMapper;
+
     public Validation getValidation(int questionRelationId) {
-
-        try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
-
-            PreparedStatement psSql = myCon.prepareStatement(SQL_GET_VALIDATION_BY_SA_REL_ID);
-            psSql.setInt(1, questionRelationId);
-            ResultSet myRS = psSql.executeQuery();
-
-            if (myRS.next()) {
-                Validation validation = new Validation();
-                validation.setId(myRS.getInt(SQL_COLUMN_VALIDATION_ID));
-                validation.setNumbers(myRS.getBoolean(SQL_COLUMN_IS_NUMBERS));
-                validation.setLetters(myRS.getBoolean(SQL_COLUMN_IS_LETTERS));
-                validation.setAlphanumeric(myRS.getBoolean(SQL_COLUMN_IS_ALPHANUMERIC));
-                validation.setAllChars(myRS.getBoolean(SQL_COLUMN_IS_ALL_CHARS));
-                validation.setRegex(myRS.getBoolean(SQL_COLUMN_IS_REGEX));
-                validation.setHasLength(myRS.getBoolean(SQL_COLUMN_HAS_LENGTH));
-                validation.setRegex(myRS.getString(SQL_COLUMN_REGEX));
-                validation.setMinLength(myRS.getInt(SQL_COLUMN_MIN_LENGTH));
-                validation.setMaxLength(myRS.getInt(SQL_COLUMN_MAX_LENGTH));
-                validation.setLength(myRS.getInt(SQL_COLUMN_LENGTH));
-                return validation;
-            }
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        return null;
+        return validationMapper.mapValidation(
+                validationRepository.findByShortAnswerRelationId(questionRelationId)
+                        .orElse(null));
     }
 
     public void createValidation(Connection connection, Validation validation) throws SQLException {
@@ -79,20 +45,14 @@ public class ValidationService extends Database {
         }
     }
 
+    public Validation save(Validation validation) {
+        return validationMapper.mapValidation(validationRepository.save(validationMapper.mapValidation(validation)));
+    }
+
     public Integer getLastValidationId() {
-        try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
-            PreparedStatement psSql = myCon.prepareStatement(SQL_LAST_VALIDATION_ID);
-
-            ResultSet myRS = psSql.executeQuery();
-
-            if (myRS.next()) {
-                return myRS.getInt(SQL_COLUMN_VALIDATION_ID);
-            }
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        return null;
+        return validationRepository.findAll().stream()
+                .mapToInt(de.vatrascell.nezr.validation.Validation::getId)
+                .max()
+                .orElse(0);
     }
 }

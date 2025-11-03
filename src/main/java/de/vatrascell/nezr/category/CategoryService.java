@@ -3,22 +3,20 @@ package de.vatrascell.nezr.category;
 import de.vatrascell.nezr.application.Database;
 import de.vatrascell.nezr.model.Category;
 import de.vatrascell.nezr.model.QuestionType;
+import de.vatrascell.nezr.question.MultipleChoiceQuestionRepository;
+import de.vatrascell.nezr.question.ShortAnswerQuestionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
 import java.util.List;
-
-import static de.vatrascell.nezr.application.SqlStatement.SQL_SET_CATEGORY_ON_MULTIPLE_CHOICE;
-import static de.vatrascell.nezr.application.SqlStatement.SQL_SET_CATEGORY_ON_SHORT_ANSWER;
 
 @Service
 @RequiredArgsConstructor
 public class CategoryService extends Database {
 
     private final CategoryRepository categoryRepository;
+    private final MultipleChoiceQuestionRepository multipleChoiceQuestionRepository;
+    private final ShortAnswerQuestionRepository shortAnswerQuestionRepository;
 
     public List<Category> getCategories() {
         return categoryRepository.findAll()
@@ -38,16 +36,12 @@ public class CategoryService extends Database {
                 .orElse(categoryRepository.save(new de.vatrascell.nezr.category.Category(name))));
     }
 
-    public void setCategoryOnQuestion(Connection connection, int categoryId, int questionId, QuestionType questionType) throws SQLException {
-        try {
-            PreparedStatement psSql = connection.prepareStatement(questionType.equals(QuestionType.MULTIPLE_CHOICE) ?
-                    SQL_SET_CATEGORY_ON_MULTIPLE_CHOICE : SQL_SET_CATEGORY_ON_SHORT_ANSWER);
-            psSql.setInt(1, categoryId);
-            psSql.setInt(2, questionId);
-            psSql.executeUpdate();
-        } catch (SQLException e) {
-            connection.rollback();
-            e.printStackTrace();
+    public void setCategoryOnQuestion(long categoryId, long questionId, QuestionType questionType) {
+
+        if (questionType.equals(QuestionType.MULTIPLE_CHOICE)) {
+            multipleChoiceQuestionRepository.updateCategory(categoryId, questionId);
+        } else {
+            shortAnswerQuestionRepository.updateCategory(categoryId, questionId);
         }
     }
 

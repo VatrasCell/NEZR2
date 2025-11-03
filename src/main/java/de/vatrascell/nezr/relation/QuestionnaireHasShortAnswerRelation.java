@@ -2,6 +2,7 @@ package de.vatrascell.nezr.relation;
 
 import de.vatrascell.nezr.admin.Questionnaire;
 import de.vatrascell.nezr.question.ShortAnswerQuestion;
+import de.vatrascell.nezr.validation.Validation;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
@@ -27,4 +28,7 @@ public class QuestionnaireHasShortAnswerRelation {
     @ManyToOne
     @JoinColumn(name = "short_answer_id")
     private ShortAnswerQuestion shortAnswerQuestion;
+    @ManyToOne
+    @JoinColumn(name = "validation_id")
+    private Validation validation;
 }

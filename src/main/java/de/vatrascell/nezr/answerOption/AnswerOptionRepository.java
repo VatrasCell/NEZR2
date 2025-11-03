@@ -26,7 +26,7 @@ public interface AnswerOptionRepository extends JpaRepository<AnswerOption, Long
 
     @Modifying
     @Query("DELETE FROM MultipleChoiceHasAnswerOptionRelation mchao WHERE mchao.mcAoRelationId = :relationId")
-    void deleteRelationById(@Param("relationId") Long relationId);
+    void deleteMultipleChoiceAnswerOptionsRelation(@Param("relationId") Long relationId);
 
     @Modifying
     @Query("DELETE FROM MultipleChoiceHasAnswerOptionRelation mchao WHERE mchao.multipleChoiceQuestion.multipleChoiceId = :multipleChoiceId AND mchao.answerOption.answerOptionId = :answerId")
@@ -34,5 +34,5 @@ public interface AnswerOptionRepository extends JpaRepository<AnswerOption, Long
 
     @Modifying
     @Query("INSERT INTO MultipleChoiceHasAnswerOptionRelation (multipleChoiceQuestion, answerOption) VALUES (:multipleChoiceId, :answerId)")
-    void createRelation(@Param("multipleChoiceId") Long multipleChoiceId, @Param("answerId") Long answerId);
+    void createMultipleChoiceAnswerOptionsRelation(@Param("multipleChoiceId") Long multipleChoiceId, @Param("answerId") Long answerId);
 }
