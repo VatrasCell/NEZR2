@@ -49,10 +49,10 @@ public class ValidationService extends Database {
         return validationMapper.mapValidation(validationRepository.save(validationMapper.mapValidation(validation)));
     }
 
-    public Integer getLastValidationId() {
+    public Long getLastValidationId() {
         return validationRepository.findAll().stream()
-                .mapToInt(de.vatrascell.nezr.validation.Validation::getValidationId)
+                .mapToLong(de.vatrascell.nezr.validation.Validation::getValidationId)
                 .max()
-                .orElse(0);
+                .orElse(0L);
     }
 }

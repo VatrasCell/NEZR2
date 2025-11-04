@@ -276,6 +276,8 @@ public class SurveyController {
 
         if (needsEvaluationQuestionFooter(page.getQuestions())) {
             createEvaluationQuestionFooter();
+        } else {
+            footerHBox.getChildren().clear();
         }
     }
 
@@ -351,7 +353,7 @@ public class SurveyController {
 
         if (question.getFlags().getValidation() != null) {
             validationSupport.registerValidator(textField,
-                    Validator.createRegexValidator("FELHER", regexOrEmpty(question.getFlags().getValidation().getRegex()), Severity.ERROR));
+                    Validator.createRegexValidator("FEHLER", regexOrEmpty(question.getFlags().getValidation().getRegex()), Severity.ERROR));
         }
 
         if (question.getFlags().isRequired()) {
@@ -372,7 +374,7 @@ public class SurveyController {
 
         if (question.getFlags().getValidation() != null) {
             validationSupport.registerValidator(textArea,
-                    Validator.createRegexValidator("FELHER", regexOrEmpty(question.getFlags().getValidation().getRegex()), Severity.ERROR));
+                    Validator.createRegexValidator("FEHLER", regexOrEmpty(question.getFlags().getValidation().getRegex()), Severity.ERROR));
         }
 
         if (question.getFlags().isRequired()) {

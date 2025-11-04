@@ -9,7 +9,7 @@ import jakarta.persistence.Table;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
@@ -18,7 +18,7 @@ import java.time.LocalDate;
 public class Survey {
     @Id
     private long surveyId;
-    private LocalDate creationDate;
+    private LocalDateTime creationDate;
     @ManyToOne
     @JoinColumn(name = "questionnaire_id")
     private Questionnaire questionnaire;

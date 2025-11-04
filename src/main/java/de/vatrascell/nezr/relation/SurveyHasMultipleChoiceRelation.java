@@ -20,7 +20,6 @@ public class SurveyHasMultipleChoiceRelation {
 
     @Id
     private long sMcRelationId;
-    private int position;
     @ManyToOne
     @JoinColumn(name = "survey_id")
     private Survey survey;

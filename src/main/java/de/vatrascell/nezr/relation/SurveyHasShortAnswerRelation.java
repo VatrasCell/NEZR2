@@ -20,11 +20,11 @@ public class SurveyHasShortAnswerRelation {
 
     @Id
     private long sSaRelationId;
-    private int position;
     @ManyToOne
     @JoinColumn(name = "survey_id")
     private Survey survey;
     @ManyToOne
     @JoinColumn(name = "short_answer_id")
     private ShortAnswerQuestion shortAnswerQuestion;
+    private String answer;
 }

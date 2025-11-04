@@ -7,7 +7,6 @@ import de.vatrascell.nezr.model.QuestionType;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class ExcelQuestionModelConverter {
 
@@ -18,7 +17,7 @@ public class ExcelQuestionModelConverter {
         if (question.getQuestionType().equals(QuestionType.SHORT_ANSWER) || question.getFlags().isSingleLine()) {
             answerOptions.add(question.getQuestion());
         } else {
-            answerOptions.addAll(question.getAnswerOptions().stream().map(AnswerOption::getName).collect(Collectors.toList()));
+            answerOptions.addAll(question.getAnswerOptions().stream().map(AnswerOption::getName).toList());
         }
         model.setAnswerOptions(answerOptions);
         model.setFistCellPosition(startPosition);

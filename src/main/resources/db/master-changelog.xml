@@ -25,5 +25,7 @@ http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
     <include file="db/schema/multiple_choice_has_answer_option/20240407-init.xml" relativeToChangelogFile="false"/>
     <include file="db/schema/survey_has_answer_option/20240407-init.xml" relativeToChangelogFile="false"/>
 
+    <include file="db/schema/survey_has_short_answer/20251104-add_answer.xml" relativeToChangelogFile="false"/>
+
     <include file="db/schema/init_data/20240407-init.xml" relativeToChangelogFile="false"/>
 </databaseChangeLog>
