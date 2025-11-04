@@ -1,43 +1,26 @@
 package de.vatrascell.nezr.export;
 
-import de.vatrascell.nezr.application.Database;
 import de.vatrascell.nezr.export.model.ExcelCell;
 import de.vatrascell.nezr.model.AnswerOption;
 import de.vatrascell.nezr.model.Question;
 import de.vatrascell.nezr.model.QuestionType;
+import de.vatrascell.nezr.survey.SurveyRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-
-import static de.vatrascell.nezr.application.SqlStatement.SQL_COLUMN_ANSWER;
-import static de.vatrascell.nezr.application.SqlStatement.SQL_COLUMN_NAME;
-import static de.vatrascell.nezr.application.SqlStatement.SQL_COLUMN_SURVEY_ID;
-import static de.vatrascell.nezr.application.SqlStatement.SQL_COLUMN_SURVEY_ID_COUNT;
-import static de.vatrascell.nezr.application.SqlStatement.SQL_GET_MULTIPLE_CHOICE_SURVEY_ID_AND_ANSWER;
-import static de.vatrascell.nezr.application.SqlStatement.SQL_GET_MULTIPLE_CHOICE_SURVEY_ID_BY_ANSWER;
-import static de.vatrascell.nezr.application.SqlStatement.SQL_GET_SHORT_ANSWER_SURVEY_ID_AND_ANSWER;
-import static de.vatrascell.nezr.application.SqlStatement.SQL_GET_SURVEY_COUNT;
+import java.util.stream.Collectors;
 
 @Service
-public class ExportService extends Database {
+@RequiredArgsConstructor
+//TODO obsolete?
+public class ExportService {
+
+    private final SurveyRepository surveyRepository;
 
     public int getSurveyCount() {
-        try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
-            PreparedStatement psSql = myCon.prepareStatement(SQL_GET_SURVEY_COUNT);
-            ResultSet myRS = psSql.executeQuery();
-            if (myRS.next()) {
-                return myRS.getInt(SQL_COLUMN_SURVEY_ID_COUNT);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return -1;
+        return surveyRepository.findAll().size();
     }
 
     public ArrayList<ExcelCell> getAnswerPositions(Question question, String fromDate, String toDate) {
@@ -51,33 +34,13 @@ public class ExportService extends Database {
     }
 
     public ArrayList<ExcelCell> getAnswerPositions(Question question, AnswerOption answerOption, String fromDate, String toDate) {
-        ArrayList<ExcelCell> excelCells = new ArrayList<>();
-        try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
-            PreparedStatement psSql = myCon.prepareStatement(SQL_GET_MULTIPLE_CHOICE_SURVEY_ID_BY_ANSWER);
-            psSql.setLong(1, question.getQuestionnaireId());
-            psSql.setLong(2, question.getQuestionId());
-            psSql.setInt(3, answerOption.getAnswerOptionId());
-            psSql.setString(4, fromDate);
-            psSql.setString(5, toDate);
-            ResultSet myRS = psSql.executeQuery();
-
-            int oldId = -1;
-            ArrayList<String> answers = new ArrayList<>();
-            while (myRS.next()) {
-                int newId = myRS.getInt(SQL_COLUMN_SURVEY_ID);
-                if (oldId != newId) {
-                    answers = new ArrayList<>();
-                    answers.add("1");
-                    excelCells.add(new ExcelCell(newId, answers));
-                    oldId = newId;
-                } else {
-                    answers.add("1");
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return excelCells;
+        return surveyRepository.findSurveysByQuestionnaireIdAndDateRange(question.getQuestionnaireId(), fromDate, toDate)
+                .stream()
+                .filter(survey -> surveyRepository.findMultipleChoiceAnswersBySurveyIdAndQuestionId(survey.getSurveyId(), question.getQuestionId())
+                        .stream()
+                        .anyMatch(ao -> ao.getAnswerOptionId().equals(answerOption.getAnswerOptionId())))
+                .map(survey -> new ExcelCell(survey.getSurveyId(), List.of("1")))
+                .collect(Collectors.toCollection(ArrayList::new));
     }
 
     private boolean isFlaggedMultipleChoiceQuestion(Question question) {
@@ -87,60 +50,26 @@ public class ExportService extends Database {
     }
 
     private List<ExcelCell> getMultipleChoiceAnswerCells(long questionnaireId, long questionId, String fromDate, String toDate) {
-        List<ExcelCell> excelCells = new ArrayList<>();
-        try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
-            PreparedStatement psSql = myCon.prepareStatement(SQL_GET_MULTIPLE_CHOICE_SURVEY_ID_AND_ANSWER);
-            psSql.setLong(1, questionnaireId);
-            psSql.setLong(2, questionId);
-            psSql.setString(3, fromDate);
-            psSql.setString(4, toDate);
-            ResultSet myRS = psSql.executeQuery();
-
-            int oldId = -1;
-            ArrayList<String> answers = new ArrayList<>();
-            while (myRS.next()) {
-                int newId = myRS.getInt(SQL_COLUMN_SURVEY_ID);
-                answers.add(myRS.getString(SQL_COLUMN_NAME));
-                if (oldId != newId) {
-                    answers = new ArrayList<>();
-                    excelCells.add(new ExcelCell(newId, answers));
-                    oldId = newId;
-                }
-            }
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        return excelCells;
+        return surveyRepository.findSurveysByQuestionnaireIdAndDateRange(questionnaireId, fromDate, toDate)
+                .stream()
+                .map(survey -> {
+                    List<String> answerNames = surveyRepository.findMultipleChoiceAnswersBySurveyIdAndQuestionId(survey.getSurveyId(), questionId)
+                            .stream()
+                            .map(de.vatrascell.nezr.answerOption.AnswerOption::getName)
+                            .collect(Collectors.toList());
+                    return new ExcelCell(survey.getSurveyId(), answerNames);
+                })
+                .collect(Collectors.toList());
     }
 
     private List<ExcelCell> getShortAnswerAnswerCells(long questionnaireId, long questionId, String fromDate, String toDate) {
-        List<ExcelCell> excelCells = new ArrayList<>();
-        try (Connection myCon = DriverManager.getConnection(url, user, pwd)) {
-            PreparedStatement psSql = myCon.prepareStatement(SQL_GET_SHORT_ANSWER_SURVEY_ID_AND_ANSWER);
-            psSql.setLong(1, questionnaireId);
-            psSql.setLong(2, questionId);
-            psSql.setString(3, fromDate);
-            psSql.setString(4, toDate);
-            ResultSet myRS = psSql.executeQuery();
-
-            int oldId = -1;
-            ArrayList<String> answers = new ArrayList<>();
-            while (myRS.next()) {
-                int newId = myRS.getInt(SQL_COLUMN_SURVEY_ID);
-                answers.add(myRS.getString(SQL_COLUMN_ANSWER));
-                if (oldId != newId) {
-                    answers = new ArrayList<>();
-                    excelCells.add(new ExcelCell(newId, answers));
-                    oldId = newId;
-                }
-            }
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        return excelCells;
+        return surveyRepository.findSurveysByQuestionnaireIdAndDateRange((int) questionnaireId, fromDate, toDate)
+                .stream()
+                .map(survey -> {
+                    String answer = surveyRepository.findShortAnswerBySurveyIdAndQuestionId(survey.getSurveyId(), questionId);
+                    List<String> answers = answer != null ? List.of(answer) : List.of();
+                    return new ExcelCell(survey.getSurveyId(), answers);
+                })
+                .collect(Collectors.toList());
     }
 }

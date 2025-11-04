@@ -1,11 +1,13 @@
 package de.vatrascell.nezr.export.model;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
-import java.util.ArrayList;
+import java.util.List;
 
 @Data
+@AllArgsConstructor
 public class ExcelCell {
-    private int surveyId;
-    private ArrayList<String> answers;
+    private long surveyId;
+    private List<String> answers;
 }

@@ -20,11 +20,11 @@ public interface SurveyRepository extends JpaRepository<Survey, Long> {
     Integer findMaxSurveyId();
 
     @Query("SELECT s FROM Survey s WHERE s.questionnaire.questionnaireId = :questionnaireId AND s.creationDate BETWEEN :fromDate AND :toDate ORDER BY s.creationDate")
-    List<Survey> findSurveysByQuestionnaireIdAndDateRange(@Param("questionnaireId") int questionnaireId, @Param("fromDate") String fromDate, @Param("toDate") String toDate);
+    List<Survey> findSurveysByQuestionnaireIdAndDateRange(@Param("questionnaireId") long questionnaireId, @Param("fromDate") String fromDate, @Param("toDate") String toDate);
 
     @Query("SELECT shsa.answer FROM SurveyHasShortAnswerRelation shsa WHERE shsa.survey.surveyId = :surveyId AND shsa.shortAnswerQuestion.shortAnswerId = :questionId")
-    String findShortAnswerBySurveyIdAndQuestionId(@Param("surveyId") int surveyId, @Param("questionId") long questionId);
+    String findShortAnswerBySurveyIdAndQuestionId(@Param("surveyId") long surveyId, @Param("questionId") long questionId);
 
     @Query("SELECT ao FROM SurveyHasAnswerOptionRelation shao JOIN shao.answerOption ao WHERE shao.surveyHasMultipleChoiceRelation.survey.surveyId = :surveyId AND shao.surveyHasMultipleChoiceRelation.multipleChoiceQuestion.multipleChoiceId = :questionId")
-    List<AnswerOption> findMultipleChoiceAnswersBySurveyIdAndQuestionId(@Param("surveyId") int surveyId, @Param("questionId") long questionId);
+    List<AnswerOption> findMultipleChoiceAnswersBySurveyIdAndQuestionId(@Param("surveyId") long surveyId, @Param("questionId") long questionId);
 }
