@@ -1,11 +1,13 @@
 package de.vatrascell.nezr.flag;
 
 import de.vatrascell.nezr.model.FlagList;
+import de.vatrascell.nezr.react.ReactMapper;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants;
 
-@Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
+@Mapper(componentModel = MappingConstants.ComponentModel.SPRING,
+        uses = ReactMapper.class)
 public interface FlagListMapper {
 
     @Mapping(source = "QMcRelationId", target = "id")

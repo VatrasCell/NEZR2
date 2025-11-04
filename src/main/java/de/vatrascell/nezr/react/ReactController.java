@@ -90,7 +90,7 @@ public class ReactController {
         FlagList flags = question.getFlags();
         for (React react : flags.getReacts()) {
             Question question = questions.get(getY(react.getQuestionId(), react.getQuestionType(), questions));
-            data.add(new ReactTableElement(question, react.getAnswerPos(), react));
+            data.add(new ReactTableElement(question, react.getAnswerPosition(), react));
         }
 
         questionData.addAll(questions);
