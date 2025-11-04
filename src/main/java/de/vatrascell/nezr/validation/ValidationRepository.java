@@ -8,8 +8,11 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface ValidationRepository extends JpaRepository<Validation, Integer> {
+public interface ValidationRepository extends JpaRepository<Validation, Long> {
 
-    @Query("SELECT v FROM Validation v WHERE v.id = (SELECT qhsa.validation.id FROM QuestionnaireHasShortAnswerRelation qhsa WHERE qhsa.qSaRelationId = :relationId)")
+    @Query("SELECT v FROM Validation v WHERE v.validationId = " +
+            "(SELECT qhsa.validation.validationId " +
+            "FROM QuestionnaireHasShortAnswerRelation qhsa " +
+            "WHERE qhsa.qSaRelationId = :relationId)")
     Optional<Validation> findByShortAnswerRelationId(@Param("relationId") int relationId);
 }
