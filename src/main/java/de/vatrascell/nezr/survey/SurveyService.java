@@ -1,7 +1,6 @@
 package de.vatrascell.nezr.survey;
 
 import de.vatrascell.nezr.answerOption.AnswerOptionMapper;
-import de.vatrascell.nezr.application.Database;
 import de.vatrascell.nezr.application.GlobalVars;
 import de.vatrascell.nezr.model.AnswerOption;
 import de.vatrascell.nezr.model.Question;
@@ -25,7 +24,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class SurveyService extends Database {
+public class SurveyService {
 
     private final SurveyRepository surveyRepository;
     private final SurveyHasMultipleChoiceRelationRepository surveyHasMultipleChoiceRelationRepository;

@@ -1,6 +1,5 @@
 package de.vatrascell.nezr.location;
 
-import de.vatrascell.nezr.application.Database;
 import de.vatrascell.nezr.application.controller.LocationLogoController;
 import de.vatrascell.nezr.model.Location;
 import lombok.RequiredArgsConstructor;
@@ -10,7 +9,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class LocationService extends Database {
+public class LocationService {
 
     private final LocationLogoController locationLogoController;
     private final LocationRepository locationRepository;

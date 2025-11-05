@@ -1,6 +1,5 @@
 package de.vatrascell.nezr.headline;
 
-import de.vatrascell.nezr.application.Database;
 import de.vatrascell.nezr.model.Headline;
 import de.vatrascell.nezr.model.QuestionType;
 import de.vatrascell.nezr.question.MultipleChoiceQuestionRepository;
@@ -12,7 +11,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class HeadlineService extends Database {
+public class HeadlineService {
 
     private final HeadlineRepository headlineRepository;
     private final MultipleChoiceQuestionRepository multipleChoiceQuestionRepository;

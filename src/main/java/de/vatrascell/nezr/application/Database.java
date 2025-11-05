@@ -2,6 +2,7 @@ package de.vatrascell.nezr.application;
 
 import java.io.File;
 
+//TODO obsolete
 public class Database {
 
     protected final static String DB_NAME = "nezr_v8"; // Datenbankname

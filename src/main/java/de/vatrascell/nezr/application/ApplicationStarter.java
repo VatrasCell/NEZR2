@@ -33,9 +33,9 @@ public class ApplicationStarter extends Application {
     }
 
     @Override
-    public void start(Stage primaryStage) throws Exception {
+    public void start(Stage primaryStage) {
         ObservableList<Screen> screens = Screen.getScreens();
-        Rectangle2D bounds = screens.get(0).getVisualBounds();
+        Rectangle2D bounds = screens.getFirst().getVisualBounds();
         primaryStage.setX(bounds.getMinX());
         primaryStage.setY(bounds.getMinY());
         context.publishEvent(new StageReadyEvent(primaryStage));

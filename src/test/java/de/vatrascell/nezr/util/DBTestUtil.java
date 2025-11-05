@@ -12,6 +12,7 @@ import java.sql.SQLException;
 
 import static de.vatrascell.nezr.application.util.ResourceUtil.getURL;
 
+//TODO obsolete
 public class DBTestUtil extends Database {
 
     @BeforeAll

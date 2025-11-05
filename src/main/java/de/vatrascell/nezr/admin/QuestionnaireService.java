@@ -1,6 +1,5 @@
 package de.vatrascell.nezr.admin;
 
-import de.vatrascell.nezr.application.Database;
 import de.vatrascell.nezr.application.util.DateUtil;
 import de.vatrascell.nezr.model.Location;
 import de.vatrascell.nezr.model.Questionnaire;
@@ -13,7 +12,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class QuestionnaireService extends Database {
+public class QuestionnaireService {
 
     private final QuestionnaireRepository questionnaireRepository;
 

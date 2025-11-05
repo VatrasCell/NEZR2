@@ -1,6 +1,5 @@
 package de.vatrascell.nezr.category;
 
-import de.vatrascell.nezr.application.Database;
 import de.vatrascell.nezr.model.Category;
 import de.vatrascell.nezr.model.QuestionType;
 import de.vatrascell.nezr.question.MultipleChoiceQuestionRepository;
@@ -12,7 +11,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class CategoryService extends Database {
+public class CategoryService {
 
     private final CategoryRepository categoryRepository;
     private final MultipleChoiceQuestionRepository multipleChoiceQuestionRepository;
