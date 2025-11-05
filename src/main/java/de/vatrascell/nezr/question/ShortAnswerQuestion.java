@@ -5,6 +5,7 @@ import de.vatrascell.nezr.category.Category;
 import de.vatrascell.nezr.flag.FlagListShortAnswer;
 import de.vatrascell.nezr.headline.Headline;
 import de.vatrascell.nezr.model.QuestionType;
+import de.vatrascell.nezr.react.React;
 import de.vatrascell.nezr.validation.Validation;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -79,6 +80,9 @@ public class ShortAnswerQuestion {
     @Transient
     @OneToOne(fetch = FetchType.LAZY)
     private Validation validation;
+
+    @Transient
+    private List<React> reacts;
 
     // Konstruktor für die Repository-Abfrage
     public ShortAnswerQuestion(String question, long shortAnswerId, LocalDateTime creationDate,

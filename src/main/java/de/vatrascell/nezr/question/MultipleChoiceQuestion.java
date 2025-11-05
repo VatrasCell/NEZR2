@@ -6,6 +6,7 @@ import de.vatrascell.nezr.category.Category;
 import de.vatrascell.nezr.flag.FlagListMultipleChoice;
 import de.vatrascell.nezr.headline.Headline;
 import de.vatrascell.nezr.model.QuestionType;
+import de.vatrascell.nezr.react.React;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -83,6 +84,9 @@ public class MultipleChoiceQuestion {
 
     @Transient
     private FlagListMultipleChoice flagListMultipleChoice;
+
+    @Transient
+    private List<React> reacts;
 
     // Konstruktor für die Repository-Abfrage
     public MultipleChoiceQuestion(String question, long multipleChoiceId, LocalDateTime creationDate,

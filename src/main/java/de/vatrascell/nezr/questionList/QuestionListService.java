@@ -14,6 +14,8 @@ import de.vatrascell.nezr.question.MultipleChoiceQuestionRepository;
 import de.vatrascell.nezr.question.ShortAnswerMapper;
 import de.vatrascell.nezr.question.ShortAnswerQuestion;
 import de.vatrascell.nezr.question.ShortAnswerQuestionRepository;
+import de.vatrascell.nezr.relation.MultipleChoiceHasReactRelationRepository;
+import de.vatrascell.nezr.relation.ShortAnswerHasReactRelationRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,6 +36,9 @@ public class QuestionListService {
     private final MultipleChoiceQuestionRepository multipleChoiceQuestionRepository;
     private final ShortAnswerQuestionRepository shortAnswerQuestionRepository;
     private final AnswerOptionRepository answerOptionRepository;
+    private final MultipleChoiceHasReactRelationRepository multipleChoiceHasReactRelationRepository;
+    private final ShortAnswerHasReactRelationRepository shortAnswerHasReactRelationRepository;
+
     private final MultipleChoiceMapper multipleChoiceMapper;
     private final ShortAnswerMapper shortAnswerMapper;
 
@@ -56,8 +61,13 @@ public class QuestionListService {
                     question.getMultipleChoiceId()));
         });
 
+        multipleChoiceQuestions.forEach(question -> {
+            question.setReacts(multipleChoiceHasReactRelationRepository
+                    .findReactsByRelationId(question.getQMcRelationId()));
+        });
+
         return multipleChoiceQuestions.stream()
-                .map((MultipleChoiceQuestion multipleChoiceQuestion) ->
+                .map(multipleChoiceQuestion ->
                         multipleChoiceMapper.mapMultipleChoiceQuestion(multipleChoiceQuestion, questionnaireId))
                 .toList();
     }
@@ -66,8 +76,13 @@ public class QuestionListService {
         List<ShortAnswerQuestion> shortAnswerQuestions =
                 shortAnswerQuestionRepository.findShortAnswerQuestionsByQuestionnaireId(questionnaireId);
 
-        return shortAnswerQuestions.stream()
-                .map((ShortAnswerQuestion shortAnswerQuestion) ->
+        shortAnswerQuestions.forEach(question ->
+                question.setReacts(shortAnswerHasReactRelationRepository
+                        .findReactsByRelationId(question.getQSaRelationId())));
+
+        return shortAnswerQuestions
+                .stream()
+                .map(shortAnswerQuestion ->
                         shortAnswerMapper.mapShortAnswerQuestion(shortAnswerQuestion, questionnaireId))
                 .toList();
     }
