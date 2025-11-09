@@ -4,6 +4,7 @@ import de.vatrascell.nezr.application.GlobalVars;
 import de.vatrascell.nezr.application.controller.NotificationController;
 import de.vatrascell.nezr.application.controller.ScreenController;
 import de.vatrascell.nezr.application.svg.SvgImageLoader;
+import de.vatrascell.nezr.flag.React;
 import de.vatrascell.nezr.gratitude.GratitudeController;
 import de.vatrascell.nezr.landing.LandingController;
 import de.vatrascell.nezr.message.MessageId;
@@ -57,6 +58,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -136,7 +138,7 @@ public class SurveyController {
     private void next() {
         if (true /*check()*/) {
             if (pageNumber.get() < pageCount - 1) {
-                putSubmittedAnswersToQuestions(pages.get(pageNumber.get()).getQuestions());
+                putSubmittedAnswersToQuestions(pages.get(pageNumber.get()).getQuestions().values().stream().toList());
                 pageNumber.set(pageNumber.get() + 1);
                 setContentToBasePane(pages.get(pageNumber.get()));
             } else {
@@ -177,7 +179,7 @@ public class SurveyController {
     @FXML
     private void pre() {
         if (pageNumber.get() > 0) {
-            putSubmittedAnswersToQuestions(pages.get(pageNumber.get()).getQuestions());
+            putSubmittedAnswersToQuestions(pages.get(pageNumber.get()).getQuestions().values().stream().toList());
             pageNumber.set(pageNumber.get() - 1);
             setContentToBasePane(pages.get(pageNumber.get()));
         } else {
@@ -257,7 +259,8 @@ public class SurveyController {
             }
 
             oldPosition = question.getPosition();
-            page.addQuestion(question);
+            String key = String.format("%s%dA", question.getQuestionType().getQuestionType(), question.getQuestionId());
+            page.addQuestion(key, question);
         }
 
         //add last page
@@ -274,7 +277,7 @@ public class SurveyController {
 
         setQuestions(basePane, page.getQuestions());
 
-        if (needsEvaluationQuestionFooter(page.getQuestions())) {
+        if (needsEvaluationQuestionFooter(page.getQuestions().values().stream().toList())) {
             createEvaluationQuestionFooter();
         } else {
             footerHBox.getChildren().clear();
@@ -296,14 +299,14 @@ public class SurveyController {
 
     }
 
-    private void setQuestions(Pane scene, List<Question> questions) {
+    private void setQuestions(Pane scene, Map<String, Question> questions) {
         ValidationSupport validationSupport = new ValidationSupport();
         outerVBox.getChildren().clear();
 
         HashMap<Long, List<BooleanProperty>> booleanPropertyHashMap = new HashMap<>();
         BooleanProperty checkRequiredValue = new SimpleBooleanProperty(true);
 
-        for (Question question : questions) {
+        for (Question question : questions.values()) {
             VBox innerVBox = new VBox();
             innerVBox.setAlignment(Pos.CENTER);
             innerVBox.getChildren().add(createQuestionLabel(scene, question));
@@ -315,6 +318,12 @@ public class SurveyController {
             }
 
             outerVBox.getChildren().add(innerVBox);
+
+            if (!question.getFlags().getReacts().isEmpty()) {
+                React react = question.getFlags().getReacts().getFirst();
+                question.setTarget(questions.get(String.format("%s%dA", react.getQuestionType().getQuestionType(), react.getQuestionId())));
+                System.out.println();
+            }
         }
 
         nextButton.disableProperty().bind(validationSupport.invalidProperty().isEqualTo(checkRequiredValue));
@@ -533,20 +542,23 @@ public class SurveyController {
     }
 
     private Label createQuestionLabel(Pane screen, Question question) {
-        String questionTest = removeMark(question.getQuestion());
+        String questionText = removeMark(question.getQuestion());
 
-        questionTest = addRequiredTag(questionTest, question.getFlags().isRequired());
+        questionText = addRequiredTag(questionText, question.getFlags().isRequired());
 
-        Label questionLabel = new Label(questionTest);
-        // System.out.println("frageObj.get(y).frageid = " +
-        // frageObj.get(y).getFrageID());
+        //TODO for testing
+        questionText += String.format(" [%s%d]", question.getQuestionType().getQuestionType(), question.getQuestionId());
+        if (!question.getFlags().getReacts().isEmpty()) {
+            questionText += String.format(" -> [%s]", question.getFlags().getReacts().getFirst());
+        }
+
+        Label questionLabel = new Label(questionText);
         questionLabel.setId("lbl_question_" + question.getQuestionId());
 
         if (question.getFlags().hasMultipleChoiceReact()) {
             //questionLabel.setVisible(false);
         }
 
-        // allePanel.get(z).add(questionLabel, "align center, span, wrap");
         question.setScene(screen);
         question.setQuestionLabel(questionLabel);
 

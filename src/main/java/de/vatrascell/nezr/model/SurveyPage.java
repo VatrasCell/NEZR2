@@ -1,39 +1,20 @@
 package de.vatrascell.nezr.model;
 
-import java.util.ArrayList;
-import java.util.List;
+import lombok.Getter;
+import lombok.Setter;
 
+import java.util.HashMap;
+import java.util.Map;
+
+@Getter
+@Setter
 public class SurveyPage {
 
-    private List<Question> questions = new ArrayList<>();
+    private Map<String, Question> questions = new HashMap<>();
     private int pageNumber;
     private Headline headline;
 
-    public List<Question> getQuestions() {
-        return questions;
-    }
-
-    public void setQuestions(List<Question> questions) {
-        this.questions = questions;
-    }
-
-    public void addQuestion(Question question) {
-        this.questions.add(question);
-    }
-
-    public int getPageNumber() {
-        return pageNumber;
-    }
-
-    public void setPageNumber(int pageNumber) {
-        this.pageNumber = pageNumber;
-    }
-
-    public Headline getHeadline() {
-        return headline;
-    }
-
-    public void setHeadline(Headline headline) {
-        this.headline = headline;
+    public void addQuestion(String key, Question question) {
+        this.questions.put(key, question);
     }
 }

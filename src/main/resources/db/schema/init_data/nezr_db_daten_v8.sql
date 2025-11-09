@@ -1,3 +1,4 @@
+-- answer_option_id, name
 INSERT INTO answer_option
 VALUES (NULL, 'ja'),
        (NULL, 'nein'),
@@ -63,6 +64,7 @@ VALUES (NULL, 'ja'),
        (NULL, 'Glemmtaler Baumwipfelweg'),
        (NULL, 'Baumwipfelpfad Lipno(CZ)');
 
+-- category_id, name
 INSERT INTO category
 VALUES (NULL, 'A1'),
        (NULL, 'A2'),
@@ -80,10 +82,12 @@ VALUES (NULL, 'A1'),
        (NULL, 'C3'),
        (NULL, 'D1');
 
+-- headline_id, name
 INSERT INTO headline
 VALUES (NULL, 'Wohnort'),
        (NULL, 'Wie bewerten Sie das Ausflugsziel Baumwipfelpfad?');
 
+-- multiple_choice_id, question, category_id, headline_id
 INSERT INTO multiple_choice
 VALUES (NULL, 'Geschlecht', 1, NULL),
        (NULL, 'Sind Sie mit Kindern/Enkeln hier?', 2, NULL),
@@ -114,6 +118,7 @@ VALUES (NULL, 'Geschlecht', 1, NULL),
        (NULL, 'wenn ja: wo?', 10, NULL),
        (NULL, 'wenn ja: welche(n)?', 11, NULL);
 
+-- location_id, name
 INSERT INTO location
 VALUES (NULL, 'Bayerischer Wald'),
        (NULL, 'Rügen'),
@@ -121,6 +126,7 @@ VALUES (NULL, 'Bayerischer Wald'),
        (NULL, 'Schwarzwald'),
        (NULL, 'Lipno');
 
+-- short_answer_id, question, category_id, headline_id
 INSERT INTO short_answer
 VALUES (NULL, 'Urlaubsort:', 4, NULL),
        (NULL, 'Land (wenn nicht D):', 5, 1),
@@ -129,15 +135,16 @@ VALUES (NULL, 'Urlaubsort:', 4, NULL),
        (NULL, 'wenn ja: wie oft?', 9, NULL),
        (NULL, 'Anregungen/Bemerkungen', 15, NULL);
 
+-- questionnaire_id, creation_date, name, is_active, is_final, location_id
 INSERT INTO questionnaire
 VALUES (NULL, '2016-08-01T00:00:00', 'Besucherumfrage', TRUE, FALSE, 2);
 
+-- validation_id, is_numbers, is_letters, is_alphanumeric, is_all_chars, is_regex, has_length, regex, min_length, max_length, length
 INSERT INTO validation
-VALUES
--- id   123   abc   12ab   1a$% is_regex has_l   regex     min   max  l
-(NULL, TRUE, FALSE, FALSE, FALSE, FALSE, TRUE, '[0-9]{5}', NULL, NULL, 5),
-(NULL, TRUE, FALSE, FALSE, FALSE, FALSE, TRUE, '[0-9]{0,5}', NULL, 5, NULL);
+VALUES (NULL, TRUE, FALSE, FALSE, FALSE, FALSE, TRUE, '[0-9]{5}', NULL, NULL, 5),
+       (NULL, TRUE, FALSE, FALSE, FALSE, FALSE, TRUE, '[0-9]{0,5}', NULL, 5, NULL);
 
+-- q_mc_relation_id, questionnaire_id, multiple_choice_id, position
 INSERT INTO questionnaire_has_multiple_choice
 VALUES (NULL, 1, 1, 1),
        (NULL, 1, 2, 2),
@@ -168,6 +175,7 @@ VALUES (NULL, 1, 1, 1),
        (NULL, 1, 27, 10),
        (NULL, 1, 28, 11);
 
+-- q_sa_relation_id, questionnaire_id, short_answer_id, position, validation_id
 INSERT INTO questionnaire_has_short_answer
 VALUES (NULL, 1, 1, 4, NULL),
        (NULL, 1, 2, 5, NULL),
@@ -176,67 +184,68 @@ VALUES (NULL, 1, 1, 4, NULL),
        (NULL, 1, 5, 9, 2),
        (NULL, 1, 6, 14, NULL);
 
+-- q_mc_relation_id, is_evaluation_question, is_required, is_multiple_choice, is_list, is_yes_no_question, is_single_line
 INSERT INTO flag_list_multiple_choice
-VALUES
--- id B      +      *     LIST   JN      X
-(1, FALSE, TRUE, FALSE, FALSE, FALSE, FALSE),
-(2, FALSE, TRUE, FALSE, FALSE, TRUE, FALSE),
-(3, FALSE, TRUE, FALSE, FALSE, FALSE, FALSE),
-(4, FALSE, FALSE, FALSE, FALSE, TRUE, TRUE),
-(5, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE),
-(6, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE),
-(7, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE),
-(8, FALSE, FALSE, TRUE, FALSE, FALSE, FALSE),
-(9, FALSE, FALSE, FALSE, FALSE, TRUE, FALSE),
-(10, FALSE, FALSE, FALSE, FALSE, TRUE, FALSE),
-(11, FALSE, FALSE, FALSE, FALSE, TRUE, FALSE),
-(12, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE),
-(13, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE),
-(14, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE),
-(15, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE),
-(16, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE),
-(17, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE),
-(18, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE),
-(19, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE),
-(20, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE),
-(21, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE),
-(22, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE),
-(23, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE),
-(24, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE),
-(25, FALSE, FALSE, FALSE, FALSE, TRUE, FALSE),
-(26, FALSE, FALSE, FALSE, FALSE, TRUE, FALSE),
-(27, FALSE, FALSE, TRUE, TRUE, FALSE, FALSE),
-(28, FALSE, FALSE, TRUE, TRUE, FALSE, FALSE);
+VALUES (1, FALSE, TRUE, FALSE, FALSE, FALSE, FALSE),
+       (2, FALSE, TRUE, FALSE, FALSE, TRUE, FALSE),
+       (3, FALSE, TRUE, FALSE, FALSE, FALSE, FALSE),
+       (4, FALSE, FALSE, FALSE, FALSE, TRUE, TRUE),
+       (5, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE),
+       (6, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE),
+       (7, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE),
+       (8, FALSE, FALSE, TRUE, FALSE, FALSE, FALSE),
+       (9, FALSE, FALSE, FALSE, FALSE, TRUE, FALSE),
+       (10, FALSE, FALSE, FALSE, FALSE, TRUE, FALSE),
+       (11, FALSE, FALSE, FALSE, FALSE, TRUE, FALSE),
+       (12, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE),
+       (13, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE),
+       (14, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE),
+       (15, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE),
+       (16, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE),
+       (17, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE),
+       (18, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE),
+       (19, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE),
+       (20, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE),
+       (21, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE),
+       (22, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE),
+       (23, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE),
+       (24, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE),
+       (25, FALSE, FALSE, FALSE, FALSE, TRUE, FALSE),
+       (26, FALSE, FALSE, FALSE, FALSE, TRUE, FALSE),
+       (27, FALSE, FALSE, TRUE, TRUE, FALSE, FALSE),
+       (28, FALSE, FALSE, TRUE, TRUE, FALSE, FALSE);
 
+-- q_sa_relation_id, is_required, is_text_area
 INSERT INTO flag_list_short_answer
-VALUES
--- id +     TEXT
-(1, FALSE, FALSE),
-(2, FALSE, FALSE),
-(3, FALSE, FALSE),
-(4, FALSE, FALSE),
-(5, FALSE, FALSE),
-(6, FALSE, TRUE);
+VALUES (1, FALSE, FALSE),
+       (2, FALSE, FALSE),
+       (3, FALSE, FALSE),
+       (4, FALSE, FALSE),
+       (5, FALSE, FALSE),
+       (6, FALSE, TRUE);
 
+-- react_id, short_answer_id, multiple_choice_id, answer_position
 INSERT INTO react
-VALUES
--- id sa   mc  pos
-(NULL, NULL, 10, 0),
-(NULL, NULL, 11, 0),
-(NULL, NULL, 5, 1),
-(NULL, 2, NULL, 0),
-(NULL, 1, NULL, 0);
+VALUES (NULL, NULL, 10, 0),
+       (NULL, NULL, 11, 0),
+       (NULL, NULL, 5, 1),
+       (NULL, 3, NULL, 0),
+       (NULL, 2, NULL, 0),
+       (NULL, NULL, 9, 0);
 
+-- sa_react_relation_id, q_sa_relation_id, react_id
 INSERT INTO short_answer_has_react
 VALUES (NULL, 1, 3),
        (NULL, 2, 4),
        (NULL, 3, 5),
-       (NULL, 5, 1);
+       (NULL, 5, 6);
 
+-- mc_react_relation_id, react_id, q_mc_relation_id
 INSERT INTO multiple_choice_has_react
 VALUES (NULL, 1, 27),
        (NULL, 2, 28);
 
+-- mc_ao_relation_id, multiple_choice_id, answer_option_id
 INSERT INTO multiple_choice_has_answer_option
 VALUES (NULL, 1, 3),
        (NULL, 1, 4),

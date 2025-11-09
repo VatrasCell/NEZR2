@@ -103,7 +103,7 @@ public class SurveyService {
 
     private List<Question> discardSecondDimension(List<SurveyPage> pages) {
         List<Question> results = new ArrayList<>();
-        pages.forEach(page -> results.addAll(page.getQuestions()));
+        pages.forEach(page -> results.addAll(page.getQuestions().values()));
 
         return results;
     }
