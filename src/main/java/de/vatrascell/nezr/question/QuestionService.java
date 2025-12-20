@@ -36,18 +36,22 @@ public class QuestionService {
     private final ShortAnswerQuestionRepository shortAnswerQuestionRepository;
 
     public int getMaxQuestionPosition(int questionnaireId) {
-        int maxPosMc = Objects.requireNonNull(getMaxPosition(questionnaireId, QuestionType.MULTIPLE_CHOICE));
-        int maxPosFf = Objects.requireNonNull(getMaxPosition(questionnaireId, QuestionType.SHORT_ANSWER));
+        int maxPosMc = getMaxPosition(questionnaireId, QuestionType.MULTIPLE_CHOICE);
+        int maxPosSa = getMaxPosition(questionnaireId, QuestionType.SHORT_ANSWER);
 
-        return Math.max(maxPosFf, maxPosMc);
+        return Math.max(maxPosSa, maxPosMc);
     }
 
-    private Integer getMaxPosition(int questionnaireId, QuestionType questionType) {
+    private int getMaxPosition(long questionnaireId, QuestionType questionType) {
+        Integer result;
+
         if (questionType.equals(QuestionType.MULTIPLE_CHOICE)) {
-            return multipleChoiceQuestionRepository.findMaxPositionByQuestionnaireId((long) questionnaireId);
+            result = multipleChoiceQuestionRepository.findMaxPositionByQuestionnaireId(questionnaireId);
         } else {
-            return shortAnswerQuestionRepository.findMaxPositionByQuestionnaireId((long) questionnaireId);
+            result = shortAnswerQuestionRepository.findMaxPositionByQuestionnaireId(questionnaireId);
         }
+
+        return result == null ? 0 : result;
     }
 
     // TODO rework method

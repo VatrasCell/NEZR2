@@ -11,4 +11,6 @@ public interface LocationRepository extends JpaRepository<Location, Long> {
     @Override
     List<Location> findAll();
 
+    Location getByName(String name);
+
 }

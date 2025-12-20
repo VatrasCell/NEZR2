@@ -56,14 +56,14 @@ public class SurveyService {
                 for (AnswerOption answerOption : submittedAnswerOptions) {
                     var existingRelation = surveyHasAnswerOptionRelationRepository.findByRelationIdAndAnswerId(relationId, answerOption.getAnswerOptionId());
                     if (existingRelation.isEmpty()) {
-                        surveyHasAnswerOptionRelationRepository.createRelation(answerOption.getAnswerOptionId(), (int) relationId);
+                        surveyHasAnswerOptionRelationRepository.createRelation(answerOption.getAnswerOptionId(), relationId);
                     }
                 }
 
             } else {
                 var existingRelation = surveyHasShortAnswerRelationRepository.findBySurveyIdAndQuestionId(surveyId, question.getQuestionId());
                 if (existingRelation.isEmpty()) {
-                    surveyHasShortAnswerRelationRepository.createRelation(surveyId, question.getQuestionId(), question.getSubmittedAnswer().getSubmittedAnswerText());
+                    surveyHasShortAnswerRelationRepository.createRelation(surveyId, question.getQuestionId(), question.getSubmittedAnswer().getSubmittedAnswerText().getValue());
                 }
             }
         }

@@ -1,6 +1,9 @@
 package de.vatrascell.nezr.admin;
 
+import de.vatrascell.nezr.application.GlobalVars;
 import de.vatrascell.nezr.application.util.DateUtil;
+import de.vatrascell.nezr.location.LocationMapper;
+import de.vatrascell.nezr.location.LocationRepository;
 import de.vatrascell.nezr.model.Location;
 import de.vatrascell.nezr.model.Questionnaire;
 import de.vatrascell.nezr.questionList.QuestionListService;
@@ -16,9 +19,13 @@ public class QuestionnaireService {
 
     private final QuestionnaireRepository questionnaireRepository;
 
+    private final LocationMapper locationMapper;
+
     private final QuestionListService questionListService;
 
     private final DateUtil dateUtil;
+
+    private final LocationRepository locationRepository;
 
     public List<Questionnaire> getQuestionnaires(String location) {
 
@@ -115,6 +122,7 @@ public class QuestionnaireService {
                 de.vatrascell.nezr.admin.Questionnaire.builder()
                         .creationDate(LocalDateTime.now())
                         .name(name)
+                        .location(locationRepository.getByName(GlobalVars.location.getName()))
                         .build()));
     }
 

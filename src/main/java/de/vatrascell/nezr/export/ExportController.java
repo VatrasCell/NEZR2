@@ -85,7 +85,7 @@ public class ExportController {
                 for (int i = 0; i < model.getAnswerOptions().size(); ++i) {
                     if (question.getQuestionType().equals(QuestionType.SHORT_ANSWER)) {
                         String value = question.getSubmittedAnswer().getSubmittedAnswerText() == null ?
-                                NOT_SELECTED : question.getSubmittedAnswer().getSubmittedAnswerText();
+                                NOT_SELECTED : question.getSubmittedAnswer().getSubmittedAnswerText().getValue();
                         row.createCell(model.getFistCellPosition() + i)
                                 .setCellValue(this.crHelper.createRichTextString(value));
                     } else {

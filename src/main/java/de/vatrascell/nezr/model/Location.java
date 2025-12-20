@@ -1,5 +1,6 @@
 package de.vatrascell.nezr.model;
 
+import de.vatrascell.nezr.flag.Default;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -13,6 +14,7 @@ public class Location {
     String logoPath;
     Coordinate coordinates;
 
+    @Default
     public Location(String name) {
         this.name = name;
     }

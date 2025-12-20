@@ -431,7 +431,6 @@ public class AdminController {
 
     @FXML
     private void logout() {
-        loginService.login("usr", "Q#DQ8Ka&9Vq6`;)s");
         screenController.activate(LandingController.class);
     }
 

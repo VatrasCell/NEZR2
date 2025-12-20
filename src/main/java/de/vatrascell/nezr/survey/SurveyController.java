@@ -214,8 +214,7 @@ public class SurveyController {
     private SubmittedAnswer getSubmittedAnswerFormVBox(VBox vBox) {
         SubmittedAnswer submittedAnswer = new SubmittedAnswer();
         for (Node element : vBox.getChildren()) {
-            if (element instanceof HBox) {
-                HBox hBox = (HBox) element;
+            if (element instanceof HBox hBox) {
                 for (Node innerElement : hBox.getChildren()) {
                     if (innerElement instanceof CheckBox) {
                         if (((CheckBox) innerElement).isSelected()) {
@@ -322,7 +321,6 @@ public class SurveyController {
             if (!question.getFlags().getReacts().isEmpty()) {
                 React react = question.getFlags().getReacts().getFirst();
                 question.setTarget(questions.get(String.format("%s%dA", react.getQuestionType().getQuestionType(), react.getQuestionId())));
-                System.out.println();
             }
         }
 
@@ -357,8 +355,7 @@ public class SurveyController {
         hBox.setAlignment(Pos.CENTER);
         TextField textField = new TextField();
 
-        String submittedText = question.getSubmittedAnswer().getSubmittedAnswerText();
-        textField.setText(submittedText == null ? "" : submittedText);
+        question.getSubmittedAnswer().getSubmittedAnswerText().bind(textField.textProperty());
 
         if (question.getFlags().getValidation() != null) {
             validationSupport.registerValidator(textField,
@@ -378,8 +375,7 @@ public class SurveyController {
         hBox.setAlignment(Pos.CENTER);
         TextArea textArea = new TextArea();
 
-        String submittedText = question.getSubmittedAnswer().getSubmittedAnswerText();
-        textArea.setText(submittedText == null ? "" : submittedText);
+        textArea.textProperty().bindBidirectional(question.getSubmittedAnswer().getSubmittedAnswerText());
 
         if (question.getFlags().getValidation() != null) {
             validationSupport.registerValidator(textArea,
