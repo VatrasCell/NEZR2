@@ -9,32 +9,36 @@
     <version>2.0-SNAPSHOT</version>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.release>21</maven.compiler.release>
+        <maven.compiler.release>25</maven.compiler.release>
 
-        <java-fx-version>21.0.5</java-fx-version>
-        <controls-fx-version>11.2.2</controls-fx-version>
+        <java-fx-version>25.0.1</java-fx-version>
+        <controls-fx-version>11.2.3</controls-fx-version>
         <javafx.maven.plugin.version>0.0.8</javafx.maven.plugin.version>
         <javafx-weaver-spring-boot-starter.version>2.0.1</javafx-weaver-spring-boot-starter.version>
         <javafx-weaver.version>master-76230d4319-1</javafx-weaver.version>
         <mapjfx.version>3.1.0</mapjfx.version>
 
-        <poi.version>5.4.1</poi.version>
-        <ooxml-schemas.version>1.4</ooxml-schemas.version>
+        <poi.version>5.5.1</poi.version>
+        <poi-ooxml-full.version>5.5.1</poi-ooxml-full.version>
         <h2.version>2.4.240</h2.version>
-        <junit.version>5.12.2</junit.version>
+        <junit.version>6.0.1</junit.version>
         <lombok.version>1.18.42</lombok.version>
         <org.osgi.framework.version>1.10.0</org.osgi.framework.version>
         <bootstrapfx-core.version>0.4.0</bootstrapfx-core.version>
         <batik-transcoder.version>1.19</batik-transcoder.version>
         <liquibase-core.version>5.0.1</liquibase-core.version>
-        <mockito-core.version>5.20.0</mockito-core.version>
+        <mockito-core.version>5.21.0</mockito-core.version>
         <mapstruct.version>1.6.3</mapstruct.version>
 
-        <spring.version>3.5.6</spring.version>
-        <spring-boot-starter-data-jpa.version>${spring.version}</spring-boot-starter-data-jpa.version>
-        <spring-boot-starter.version>${spring.version}</spring-boot-starter.version>
-        <spring-boot-starter-test.version>${spring.version}</spring-boot-starter-test.version>
-        <spring-boot-starter-log4j2.version>${spring.version}</spring-boot-starter-log4j2.version>
+        <spring-boot.version>4.0.1</spring-boot.version>
+        <spring-boot-starter-data-jpa.version>${spring-boot.version}</spring-boot-starter-data-jpa.version>
+        <spring-boot-starter.version>${spring-boot.version}</spring-boot-starter.version>
+        <spring-boot-starter-test.version>${spring-boot.version}</spring-boot-starter-test.version>
+        <spring-boot-starter-log4j2.version>${spring-boot.version}</spring-boot-starter-log4j2.version>
+
+        <log4j.version>2.25.3</log4j.version>
+        <log4j-core.version>${log4j.version}</log4j-core.version>
+        <log4j-api.version>${log4j.version}</log4j-api.version>
     </properties>
     <dependencies>
         <!-- https://mvnrepository.com/artifact/org.apache.poi/poi-ooxml -->
@@ -43,11 +47,11 @@
             <artifactId>poi-ooxml</artifactId>
             <version>${poi.version}</version>
         </dependency>
-        <!-- https://mvnrepository.com/artifact/org.apache.poi/ooxml-schemas -->
+        <!-- https://mvnrepository.com/artifact/org.apache.poi/poi-ooxml-full -->
         <dependency>
             <groupId>org.apache.poi</groupId>
-            <artifactId>ooxml-schemas</artifactId>
-            <version>${ooxml-schemas.version}</version>
+            <artifactId>poi-ooxml-full</artifactId>
+            <version>${poi-ooxml-full.version}</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.apache.poi/poi -->
         <dependency>
@@ -186,12 +190,12 @@
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-core</artifactId>
-            <version>2.23.1</version>
+            <version>${log4j-core.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-api</artifactId>
-            <version>2.23.1</version>
+            <version>${log4j-api.version}</version>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/org.projectlombok/lombok -->
