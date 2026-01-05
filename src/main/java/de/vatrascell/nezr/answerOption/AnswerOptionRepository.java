@@ -33,6 +33,6 @@ public interface AnswerOptionRepository extends JpaRepository<AnswerOption, Long
     void deleteRelationByIds(@Param("multipleChoiceId") Long multipleChoiceId, @Param("answerId") Long answerId);
 
     @Modifying
-    @Query("INSERT INTO MultipleChoiceHasAnswerOptionRelation (multipleChoiceQuestion, answerOption) VALUES (:multipleChoiceId, :answerId)")
+    @Query(value = "INSERT INTO multiple_choice_has_answer_option (multiple_choice_id, answer_option_id) VALUES (:multipleChoiceId, :answerId)", nativeQuery = true)
     void createMultipleChoiceAnswerOptionsRelation(@Param("multipleChoiceId") Long multipleChoiceId, @Param("answerId") Long answerId);
 }

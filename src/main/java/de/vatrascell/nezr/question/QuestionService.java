@@ -112,9 +112,9 @@ public class QuestionService {
         Headline headline = question.getHeadline() == null ? null : headlineService.createHeadline(question.getHeadline().getName());
 
         // de.vatrascell.nezr.question
-        Integer shortAnswerId = provideShortAnswerQuestion(question.getQuestion(), category.getId());
+        Integer shortAnswerId = provideShortAnswerQuestion(question.getQuestion(), category.getCategoryId());
 
-        categoryService.setCategoryOnQuestion(category.getId(), shortAnswerId, question.getQuestionType());
+        categoryService.setCategoryOnQuestion(category.getCategoryId(), shortAnswerId, question.getQuestionType());
 
         if (headline != null) {
             headlineService.setHeadlineOnQuestion(headline.getId(), shortAnswerId, question.getQuestionType());
@@ -156,9 +156,9 @@ public class QuestionService {
         Headline headline = question.getHeadline() == null ? null : headlineService.createHeadline(question.getHeadline().getName());
 
         // de.vatrascell.nezr.question
-        Integer multipleChoiceId = provideMultipleChoiceQuestion(question.getQuestion(), category.getId());
+        Integer multipleChoiceId = provideMultipleChoiceQuestion(question.getQuestion(), category.getCategoryId());
 
-        categoryService.setCategoryOnQuestion(category.getId(), multipleChoiceId, question.getQuestionType());
+        categoryService.setCategoryOnQuestion(category.getCategoryId(), multipleChoiceId, question.getQuestionType());
         if (headline != null) {
             headlineService.setHeadlineOnQuestion(headline.getId(), multipleChoiceId, question.getQuestionType());
         }
@@ -278,7 +278,7 @@ public class QuestionService {
     }
 
 
-    private Integer provideMultipleChoiceQuestion(String question, int categoryId) {
+    private Integer provideMultipleChoiceQuestion(String question, long categoryId) {
         Integer multipleChoiceId = getQuestionId(question, QuestionType.MULTIPLE_CHOICE);
 
         if (multipleChoiceId == null) {
@@ -290,7 +290,7 @@ public class QuestionService {
     }
 
 
-    private Integer provideShortAnswerQuestion(String question, int categoryId) {
+    private Integer provideShortAnswerQuestion(String question, long categoryId) {
         Integer shortAnswerId = getQuestionId(question, QuestionType.SHORT_ANSWER);
 
         if (shortAnswerId == null) {

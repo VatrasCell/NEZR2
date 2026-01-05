@@ -5,6 +5,7 @@ import de.vatrascell.nezr.model.QuestionType;
 import de.vatrascell.nezr.question.MultipleChoiceQuestionRepository;
 import de.vatrascell.nezr.question.ShortAnswerQuestionRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -14,25 +15,36 @@ import java.util.List;
 public class CategoryService {
 
     private final CategoryRepository categoryRepository;
+    private final CategoryMapper categoryMapper;
     private final MultipleChoiceQuestionRepository multipleChoiceQuestionRepository;
     private final ShortAnswerQuestionRepository shortAnswerQuestionRepository;
 
     public List<Category> getCategories() {
         return categoryRepository.findAll()
                 .stream()
-                .map(this::convert)
+                .map(categoryMapper::mapCategory)
                 .toList();
     }
 
     public Category getCategory(String name) {
 
-        return convert(categoryRepository.findByName(name)
-                .orElseThrow());
+        return categoryMapper.mapCategory(
+                categoryRepository.findByName(name)
+                        .orElseThrow());
     }
 
     public Category createCategory(String name) {
-        return convert(categoryRepository.findByName(name)
-                .orElse(categoryRepository.save(new de.vatrascell.nezr.category.Category(name))));
+        var existingCategory = categoryRepository.findByName(name);
+        if (existingCategory.isPresent()) {
+            return categoryMapper.mapCategory(existingCategory.get());
+        }
+        try {
+            var newCategory = categoryRepository.save(new de.vatrascell.nezr.category.Category(name));
+            return categoryMapper.mapCategory(newCategory);
+        } catch (DataIntegrityViolationException e) {
+            // Duplicate name, fetch existing
+            return categoryMapper.mapCategory(categoryRepository.findByName(name).orElseThrow());
+        }
     }
 
     public void setCategoryOnQuestion(long categoryId, long questionId, QuestionType questionType) {
@@ -42,9 +54,5 @@ public class CategoryService {
         } else {
             shortAnswerQuestionRepository.updateCategory(categoryId, questionId);
         }
-    }
-
-    private Category convert(de.vatrascell.nezr.category.Category category) {
-        return new Category(category.getCategoryId(), category.getName());
     }
 }

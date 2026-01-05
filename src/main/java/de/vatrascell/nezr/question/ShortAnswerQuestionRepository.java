@@ -59,7 +59,7 @@ public interface ShortAnswerQuestionRepository extends JpaRepository<ShortAnswer
 
     @Modifying
     @Query(value = "INSERT INTO short_answer (question, category_id) VALUES (:question, :categoryId)", nativeQuery = true)
-    void createShortAnswer(@Param("question") String question, @Param("categoryId") int categoryId);
+    void createShortAnswer(@Param("question") String question, @Param("categoryId") Long categoryId);
 
     @Modifying
     @Query("UPDATE ShortAnswerQuestion sa SET sa.category.categoryId = :categoryId WHERE sa.shortAnswerId = :questionId")

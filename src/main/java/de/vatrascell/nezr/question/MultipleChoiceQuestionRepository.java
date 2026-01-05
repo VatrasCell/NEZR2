@@ -66,7 +66,7 @@ public interface MultipleChoiceQuestionRepository extends JpaRepository<Multiple
 
     @Modifying
     @Query(value = "INSERT INTO multiple_choice (question, category_id) VALUES (:question, :categoryId)", nativeQuery = true)
-    void createMultipleChoice(@Param("question") String question, @Param("categoryId") int categoryId);
+    void createMultipleChoice(@Param("question") String question, @Param("categoryId") Long categoryId);
 
     @Modifying
     @Query("UPDATE MultipleChoiceQuestion mc SET mc.category.categoryId = :categoryId WHERE mc.multipleChoiceId = :questionId")
